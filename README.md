@@ -27,8 +27,7 @@
 <body>
 
 <div class="container">
-    <h2>🛠️ Testador de Conexão: Tabela de Usuários</h2>
-    
+    <h2>🛠️ Testador de Conexão: Tabela de Usuários</h2>  
     <div class="grid">
         <!-- FORMULÁRIO PARA ADICIONAR -->
         <div class="card">
@@ -36,7 +35,6 @@
             <form id="userForm" style="margin-top: 15px;">
                 <label>Nome de Guerra</label>
                 <input id="userName" required placeholder="Ex: Silva">
-                
                 <label>Posto / Graduação</label>
                 <select id="userGrad">
                     <option>Oficial</option>
@@ -44,21 +42,17 @@
                     <option>Cb</option>
                     <option selected>Sd</option>
                 </select>
-                
                 <label>Seção</label>
                 <select id="userSec">
                     <option>S1</option><option>S2</option><option selected>S3</option><option>S4</option>
                     <option>Fiscalização</option><option>Pagamento</option><option>SALC</option>
                     <option>Garagem</option><option>Informática</option>
                 </select>
-                
                 <label>Função / Papel</label>
-                <input id="userRole" required placeholder="Ex: Auxiliar">
-                
+                <input id="userRole" required placeholder="Ex: Auxiliar">  
                 <button type="submit">Inserir no Supabase</button>
             </form>
         </div>
-
         <!-- STATUS DA CONEXÃO -->
         <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
             <div>
@@ -71,7 +65,6 @@
             </div>
         </div>
     </div>
-
     <!-- LISTA E FILTRO -->
     <h3>Militares Ativos no Sistema</h3>
     <div class="filter-box" style="margin-top: 15px;">
@@ -83,7 +76,6 @@
             <option>Garagem</option><option>Informática</option>
         </select>
     </div>
-
     <table id="userTable">
         <thead>
             <tr>
@@ -102,23 +94,18 @@
         </tbody>
     </table>
 </div>
-
 <script>
     // Suas credenciais vinculadas
     const SUPABASE_URL = "https://supabase.co";
     const SUPABASE_KEY = "sb_publishable_r7M3twr5mKmbYqP14HGpVQ_ruI0QB_p";
     const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
     let allUsers = [];
-
     // Buscar usuários do Supabase
     async function fetchUsers() {
         const statusBox = document.getElementById("connectionStatus");
         try {
-            const { data, error } = await supabase.from('usuarios').select('*').order('id', { ascending: true });
-            
+            const { data, error } = await supabase.from('usuarios').select('*').order('id', { ascending: true });         
             if (error) throw error;
-
             allUsers = data || [];
             statusBox.style.background = "#d1fae5";
             statusBox.style.color = "#065f46";
@@ -131,20 +118,16 @@
             console.error(err);
         }
     }
-
     // Renderizar na tabela com filtros aplicados
     function renderUsers() {
         const tbody = document.querySelector("#userTable tbody");
         const filter = document.getElementById("filterSection").value;
         tbody.innerHTML = "";
-
         const filtered = allUsers.filter(u => !filter || u.secao === filter);
-
         if(filtered.length === 0) {
             tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #6b7280;">Nenhum usuário encontrado para esta seção.</td></tr>`;
             return;
         }
-
         filtered.forEach(u => {
             const tr = document.createElement("tr");
             tr.innerHTML = `
@@ -158,20 +141,16 @@
             tbody.appendChild(tr);
         });
     }
-
     // Evento de Envio do Form (Salvar novo usuário na nuvem)
     document.getElementById("userForm").addEventListener("submit", async (e) => {
-        e.preventDefault();
-        
+        e.preventDefault();      
         const newUser = {
             nome: document.getElementById("userName").value.trim(),
             graduacao: document.getElementById("userGrad").value,
             secao: document.getElementById("userSec").value,
             papel: document.getElementById("userRole").value.trim()
         };
-
-        const { error } = await supabase.from('usuarios').insert([newUser]);
-        
+        const { error } = await supabase.from('usuarios').insert([newUser]);     
         if(!error) {
             document.getElementById("userName").value = "";
             document.getElementById("userRole").value = "";
@@ -180,8 +159,7 @@
             alert("Erro ao inserir: " + error.message);
         }
     });
-
-    // Iniciar teste ao abrir a página
+   // Iniciar teste ao abrir a página
     fetchUsers();
 </script>
 </body>
