@@ -1,0 +1,91 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Excluir usuário - Supabase</title>
+    <style>
+      body { font-family: sans-serif; padding: 20px; color: #1f2937; }
+      input, textarea, button { border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px; box-sizing: border-box; }
+      button { background: #dc2626; color: white; font-weight: bold; border: none; cursor: pointer; }
+      button:hover { background: #b91c1c; }
+      pre { background: #f1f5f9; padding: 15px; border-radius: 6px; min-height: 40px; }
+    </style>
+  </head>
+  <body>
+    <h2>Excluir em: usuarios</h2>
+    
+    <label>Project URL</label><br/>
+    <input id="projectUrl" style="width: 520px;" value="https://bpvijatnsluwsgnzklrd.supabase.co" /><br/><br/>
+    
+    <label>Anon key (ROLE: anon)</label><br/>
+    <!-- Já deixei sua chave configurada para facilitar seus testes rápidos -->
+    <textarea id="anonKey" style="width: 520px; height: 90px;">sb_publishable_r7M3twr5mKmbYqP14HGpVQ_ruI0QB_p</textarea><br/><br/>
+    
+    <h3>Dados (ajuste os campos conforme sua tabela)</h3>
+    <label>ID do usuário para deletar</label><br/>
+    <input id="id" style="width: 520px;" placeholder="Ex: 1" /><br/><br/>
+    
+    <button id="btn">Deletar</button>
+    
+    <h3>Resultado</h3>
+    <pre id="out">Aguardando comando...</pre>
+
+    <script type="module">
+      // 1. CORREÇÃO: O termo correto para importar sempre será createClient
+      import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+      const projectUrlEl = document.getElementById("projectUrl");
+      const anonKeyEl = document.getElementById("anonKey");
+      const idEl = document.getElementById("id");
+      const outEl = document.getElementById("out");
+
+      document.getElementById("btn").addEventListener("click", async () => {
+        outEl.textContent = "Verificando dados...";
+        
+        const projectUrl = projectUrlEl.value.trim();
+        const anonKey = anonKeyEl.value.trim();
+        const id = idEl.value.trim();
+
+        if (!anonKey) {
+          outEl.textContent = "Erro: Cole a ANON KEY no campo antes de prosseguir.";
+          return;
+        }
+
+        if (!id) {
+          outEl.textContent = "Erro: Preencha o campo 'id' com o número do registro que deseja apagar.";
+          return;
+        }
+
+        outEl.textContent = "Conectando ao Supabase e enviando requisição...";
+
+        try {
+          // Inicializa o cliente do Supabase de forma correta
+          const supabase = createClient(projectUrl, anonKey);
+
+          // 2. CORREÇÃO: O método delete() é vazio e o alvo é filtrado usando .eq()
+          const { data, error } = await supabase
+            .from("usuarios")
+            .delete()
+            .eq("id", id)
+            .select("*"); // Retorna uma cópia dos dados que foram apagados
+
+          if (error) {
+            outEl.textContent = "Erro retornado pelo banco:\n" + error.message;
+            return;
+          }
+
+          // Se der sucesso mas o array vier vazio, significa que o ID digitado não existe no banco
+          if (data.length === 0) {
+            outEl.textContent = `Aviso: O processo rodou, mas nenhum usuário com o ID #${id} foi encontrado para ser excluído.`;
+            return;
+          }
+
+          outEl.textContent = "Deletado com sucesso do banco de dados:\n" + JSON.stringify(data, null, 2);
+          idEl.value = ""; // Limpa o campo de texto do ID após apagar
+          
+        } catch (fail) {
+          outEl.textContent = "Falha crítica no script:\n" + fail.message;
+        }
+      });
+    </script> 
+  </body>
+</html>

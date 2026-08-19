@@ -1,0 +1,70 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Adicionar usuário - Supabase</title>
+  </head>
+  <body>
+    <h2>Adicionar em: usuarios</h2>
+    <label>Project URL</label><br/>
+    <input id="projectUrl" style="width: 520px;" value="https://bpvijatnsluwsgnzklrd.supabase.co" /><br/><br/>
+    <label>Anon key (ROLE: anon)</label><br/>
+    <textarea id="anonKey" style="width: 520px; height: 90px;"></textarea><br/><br/>
+    <h3>Dados (ajuste os campos conforme sua tabela)</h3>
+    <label>nome</label><br/>
+    <input id="nome" style="width: 520px;" placeholder="" /><br/><br/>
+    <label>graduacao</label><br/>
+    <input id="graduacao" style="width: 520px;" placeholder="" /><br/><br/>
+    <label>secao</label><br/>
+    <input id="secao" style="width: 520px;" placeholder="" /><br/><br/>
+    <label>papel</label>
+    <input id="papel" style="width: 520px;" placeholder="" /><br/><br/>
+    <button id="btn">Adicionar</button>    
+<h3>Resultado</h3>    
+<pre id="out"></pre>    
+<script type="module">
+      import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+      const projectUrlEl = document.getElementById("projectUrl");
+      const anonKeyEl = document.getElementById("anonKey");
+      const outEl = document.getElementById("out");
+      const nomeEl = document.getElementById("nome");
+      const graduacaoEl = document.getElementById("graduacao");
+      const secaoEl = document.getElementById("secao");
+      const papelEl = document.getElementById("papel");
+      document.getElementById("btn").addEventListener("click", async () => {
+        outEl.textContent = "Enviando...";
+        const projectUrl = projectUrlEl.value.trim();
+        const anonKey = anonKeyEl.value.trim();
+        if (!anonKey) {
+          outEl.textContent = "Cole a ANON KEY no campo antes de adicionar.";
+          return;
+        }
+        const nome = nomeEl.value.trim();
+        const graduacao = graduacaoEl.value.trim();
+        const secao = secaoEl.value.trim();
+        const papel = papelEl.value.trim();
+        if (!nome || !graduacao || !secao || !papel) {
+          outEl.textContent = "Preencha 'nome','graduacao','secao' e 'papel'.";
+          return;
+        }
+        const supabase = createClient(projectUrl, anonKey);
+        // Ajuste os campos conforme as colunas reais da sua tabela "usuarios"
+        const payload = {
+          nome,
+          graduacao,
+          secao,
+          papel
+        };
+        const { data, error } = await supabase
+          .from("usuarios")
+          .insert(payload)
+          .select("*") // retorna o registro inserido
+          .single();
+        if (error) {
+          outEl.textContent = error.message;
+          return;
+        }
+        outEl.textContent = "Inserido com sucesso:\n" + JSON.stringify(data, null, 2);
+      });
+    </script>
+  </body>
+</html>

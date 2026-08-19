@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>TAREFAS - Criar conta</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #1e3a8a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+
+        .cadastro {
+            width: 100%;
+            max-width: 430px;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px #0006;
+        }
+
+        .logo {
+            text-align: center;
+            color: #2563eb;
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #222;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+            color: #333;
+            font-size: 14px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 17px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 15px;
+            background: white;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+
+        button {
+            width: 100%;
+            padding: 13px;
+            border: 0;
+            border-radius: 8px;
+            background: #2563eb;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .voltar {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .voltar a {
+            color: #2563eb;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .voltar a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="cadastro">
+
+        <div class="logo">
+            TAREFAS
+        </div>
+
+        <p class="subtitle">
+            Crie sua conta
+        </p>
+
+        <h2>Cadastro</h2>
+
+        <form id="formCadastro">
+
+            <label for="nome">Nome completo</label>
+            <input
+                type="text"
+                id="nome"
+                placeholder="Digite seu nome completo"
+                required
+            >
+
+            <label for="guerra">Nome de guerra</label>
+            <input
+                type="text"
+                id="guerra"
+                placeholder="Digite seu nome de guerra"
+                required
+            >
+
+            <label for="cpf">CPF</label>
+            <input
+                type="text"
+                id="cpf"
+                placeholder="000.000.000-00"
+                maxlength="14"
+                required
+            >
+
+            <label for="patente">Patente</label>
+            <select id="patente" required>
+                <option value="">Selecione sua patente</option>
+                <option value="SdEv">Recruta</option>
+                <option value="Sd">Soldado</option>
+                <option value="Cb">Cabo</option>
+                <option value="3ºSgt">3º Sargento</option>
+                <option value="2°Sgt">2º Sargento</option>
+                <option value="1ºSgt">1º Sargento</option>
+                <option value="ST">Subtenente</option>
+                <option value="Asp">Aspirante a Oficial</option>
+                <option value="2ºTen">2º Tenente</option>
+                <option value="1ºTen">1º Tenente</option>
+            </select>
+
+            <label for="secao">Seção</label>
+            <select id="secao" required>
+                <option value="">Selecione sua seção</option>
+                <option value="S1">S1</option>
+                <option value="S2">S2</option>
+                <option value="S3">S3</option>
+                <option value="S4">S4</option>
+                <option value="Fiscalização">Fiscalização</option>
+                <option value="Pagamento">Pagamento</option>
+                <option value="SALC">SALC</option>
+                <option value="Garagem">Garagem</option>
+                <option value="ResMat">Reserva de Materiais</option>
+                <option value="ResArmt">Reserva de Armamento</option>
+                <option value="Informática">Informática</option>
+            </select>
+
+            <label for="posicao">Posição</label>
+            <select id="posicao" required>
+                <option value="">Selecione sua posição</option>
+                <option value="Aux">Auxiliar</option>
+                <option value="Ch">Chefe</option>
+                <option value="Cmt">Comandante</option>
+            </select>
+
+            <label for="senha">Senha</label>
+            <input
+                type="password"
+                id="senha"
+                placeholder="Digite sua senha"
+                required
+            >
+
+            <label for="confirmarSenha">Confirmar senha</label>
+            <input
+                type="password"
+                id="confirmarSenha"
+                placeholder="Digite a senha novamente"
+                required
+            >
+
+            <button type="submit">
+                Criar conta
+            </button>
+
+        </form>
+
+        <div class="voltar">
+            Já possui uma conta?
+            <a href="index.html">Entrar</a>
+        </div>
+
+    </div>
+
+    <script>
+
+        // Máscara de CPF
+        document.getElementById("cpf").addEventListener("input", function () {
+
+            let cpf = this.value.replace(/\D/g, "");
+
+            if (cpf.length > 11) {
+                cpf = cpf.substring(0, 11);
+            }
+
+            cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
+            cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
+            cpf = cpf.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+
+            this.value = cpf;
+        });
+
+
+        // Validação do formulário
+        document.getElementById("formCadastro").addEventListener("submit", function(event) {
+
+            event.preventDefault();
+
+            const senha = document.getElementById("senha").value;
+            const confirmarSenha = document.getElementById("confirmarSenha").value;
+
+            if (senha !== confirmarSenha) {
+                alert("As senhas não são iguais.");
+                return;
+            }
+
+            alert("Cadastro preenchido com sucesso!");
+
+        });
+
+    </script>
+
+</body>
+</html>
