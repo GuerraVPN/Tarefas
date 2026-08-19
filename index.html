@@ -1,223 +1,172 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TAREFAS - Login</title>
 
-    <title>TAREFAS - Login</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <!-- CDN DO SDK DO SUPABASE OBRIGATÓRIA PARA A CONEXÃO -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <style>
-        body {
-            margin: 0;
-            min-height: 100vh;
-            background: #1e3a8a;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: Arial, sans-serif;
-        }
-
-        .login {
-            width: 320px;
-            padding: 30px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px #0006;
-        }
-
-        .logo {
-            text-align: center;
-            color: #2563eb;
-            font-size: 28px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .subtitle {
-            text-align: center;
-            color: #666;
-            margin-bottom: 25px;
-        }
-
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0 15px;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            border: 0;
-            border-radius: 8px;
-            background: #2563eb;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: #1d4ed8;
-        }
-
-        button:disabled {
-            background: #93c5fd;
-            cursor: not-allowed;
-        }
-
-        .criar-conta {
-            text-align: center;
-            margin-top: 20px;
-            color: #666;
-            font-size: 14px;
-        }
-
-        .criar-conta a {
-            color: #2563eb;
-            font-weight: bold;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .criar-conta a:hover {
-            text-decoration: underline;
-        }
-    </style>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #1e3a8a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+    }
+    .login {
+      width: 320px;
+      padding: 30px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px #0006;
+    }
+    .logo {
+      text-align: center;
+      color: #2563eb;
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .subtitle { text-align: center; color: #666; margin-bottom: 25px; }
+    h2 { text-align: center; margin-bottom: 20px; }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0 15px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      border: 0;
+      border-radius: 8px;
+      background: #2563eb;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover { background: #1d4ed8; }
+    button:disabled { background: #93c5fd; cursor: not-allowed; }
+    .criar-conta {
+      text-align: center;
+      margin-top: 20px;
+      color: #666;
+      font-size: 14px;
+    }
+    .criar-conta a {
+      color: #2563eb;
+      font-weight: bold;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .criar-conta a:hover { text-decoration: underline; }
+  </style>
 </head>
 
 <body>
+  <div class="login">
+    <div class="logo">TAREFAS</div>
+    <p class="subtitle">Organize suas tarefas</p>
+    <h2>Entrar</h2>
 
-    <div class="login">
+    <form id="formLogin">
+      <input
+        type="text"
+        id="loginCpf"
+        placeholder="CPF"
+        maxlength="14"
+        required
+      />
+      <input
+        type="password"
+        id="loginSenha"
+        placeholder="Senha"
+        required
+      />
+      <button type="submit" id="btnEntrar">Entrar</button>
+    </form>
 
-        <div class="logo">
-            TAREFAS
-        </div>
-
-        <p class="subtitle">
-            Organize suas tarefas
-        </p>
-
-        <h2>Entrar</h2>
-
-        <form id="formLogin">
-
-            <input
-                type="text"
-                id="loginCpf"
-                placeholder="CPF"
-                maxlength="14"
-                required
-            >
-
-            <input
-                type="password"
-                id="loginSenha"
-                placeholder="Senha"
-                required
-            >
-
-            <button type="submit" id="btnEntrar">
-                Entrar
-            </button>
-
-        </form>
-
-        <div class="criar-conta">
-            Não possui uma conta?
-            <a href="criarconta.html">
-                Criar conta
-            </a>
-        </div>
-
+    <div class="criar-conta">
+      Não possui uma conta?
+      <a href="criarconta.html">Criar conta</a>
     </div>
+  </div>
 
-    <script>
-        // CONFIGURAÇÃO DE CREDENCIAIS DO SEU SUPABASE
-        const SUPABASE_URL = "https://bpvijatnsluwsgnzklrd.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwdmlqYXRuc2x1d3NnbnprbHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MzkxNDMsImV4cCI6MjEwMjQxNTE0M30.uvyfm9mgl6MON0v75CwfGzNz6FBqw58uzR4ZcRAOLNQ";
+  <script>
+    const SUPABASE_URL = "https://bpvijatnsluwsgnzklrd.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwdmlqYXRuc2x1d3NnbnprbHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MzkxNDMsImV4cCI6MjEwMjQxNTE0M30.uvyfm9mgl6MON0v75CwfGzNz6FBqw58uzR4ZcRAOLNQ";
 
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Máscara de CPF automática na tela de login
-        document.getElementById("loginCpf").addEventListener("input", function () {
-            let cpf = this.value.replace(/\D/g, "");
+    // CPF máscara
+    document.getElementById("loginCpf").addEventListener("input", function () {
+      let cpf = this.value.replace(/\D/g, "");
+      if (cpf.length > 11) cpf = cpf.substring(0, 11);
 
-            if (cpf.length > 11) {
-                cpf = cpf.substring(0, 11);
-            }
+      cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
+      cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
+      cpf = cpf.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+      this.value = cpf;
+    });
 
-            cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
-            cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
-            cpf = cpf.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+    document.getElementById("formLogin").addEventListener("submit", async function (event) {
+      event.preventDefault();
 
-            this.value = cpf;
-        });
+      const cpfLimpo = document.getElementById("loginCpf").value.replace(/\D/g, "");
+      const senhaDigitada = document.getElementById("loginSenha").value;
+      const btnEntrar = document.getElementById("btnEntrar");
 
-        // Evento de envio do formulário de autenticação
-        document.getElementById("formLogin").addEventListener("submit", async function(event) {
-            event.preventDefault();
+      btnEntrar.disabled = true;
+      btnEntrar.innerText = "Autenticando...";
 
-            const cpfDigitado = document.getElementById("loginCpf").value;
-            const senhaDigitada = document.getElementById("loginSenha").value;
-            const btnEntrar = document.getElementById("btnEntrar");
+      try {
+        // Busca usuário pelo CPF
+        const { data, error } = await supabaseClient
+          .from("usuarios")
+          .select("*")
+          .eq("cpf", cpfLimpo)
+          .single();
 
-            // Limpa o CPF para usar apenas os números puros na busca (igual está salvo no SQL)
-            const cpfLimpo = cpfDigitado.replace(/\D/g, "");
+        if (error || !data) {
+          alert("CPF não cadastrado ou erro na busca.");
+          return;
+        }
 
-            // Desabilita o botão enquanto faz a verificação
-            btnEntrar.disabled = true;
-            btnEntrar.innerText = "Verificando...";
+        // Verifica senha (igual ao seu código atual)
+        if (data.senha === senhaDigitada) {
+          localStorage.setItem(
+            "usuarioLogado",
+            JSON.stringify({
+              id: data.id,
+              nome_completo: data.nome_completo,
+              nome_guerra: data.nome_guerra,
+              patente: data.patente,
+              secao: data.secao,
+              posicao: data.posicao
+            })
+          );
 
-            try {
-                // Busca direta na tabela 'usuarios' usando o CPF puro
-                const { data, error } = await supabaseClient
-                    .from('usuarios')
-                    .select('*')
-                    .eq('cpf', cpfLimpo);
+          alert(`Bem-vindo, ${data.patente} ${data.nome_guerra}!`);
+          window.location.href = "menu.html";
+        } else {
+          alert("Senha incorreta.");
+        }
+      } catch (err) {
+        alert("Erro ao conectar ao servidor: " + err.message);
+      } finally {
+        btnEntrar.disabled = false;
+        btnEntrar.innerText = "Entrar";
+      }
+    });
 
-                if (error) throw error;
-
-                // Verifica se o usuário foi localizado e se a senha confere perfeitamente
-                if (data && data.length > 0 && data[0].senha === senhaDigitada) {
-                    const usuario = data[0];
-                    
-                    // Salva os dados básicos na sessão do navegador para usar na tela menu.html
-                    localStorage.setItem("usuario_logado", JSON.stringify({
-                        id: usuario.id,
-                        nome_guerra: usuario.nome_guerra,
-                        patente: usuario.patente,
-                        secao: usuario.secao,
-                        posicao: usuario.posicao
-                    }));
-
-                    alert(`Acesso liberado! Bem-vindo, ${usuario.patente} ${usuario.nome_guerra}.`);
-                    
-                    // Redireciona para a tela informada
-                    window.location.href = "menu.html";
-                } else {
-                    alert("CPF ou Senha incorretos.");
-                }
-
-            } catch (error) {
-                alert("Erro ao conectar com o banco de dados: " + error.message);
-            } finally {
-                // Restaura o estado original do botão
-                btnEntrar.disabled = false;
-                btnEntrar.innerText = "Entrar";
-            }
-        });
-    </script>
-
+    // O index é a tela de login.
+    // O menu só é aberto após um login bem-sucedido.
+  </script>
 </body>
 </html>

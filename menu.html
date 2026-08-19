@@ -1,1055 +1,802 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-   <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Quadro de Tarefas - Funcional + V5</title>
-   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-   
-   <style>
-       :root {
-           --sidebar-bg: #131a16;
-           --sidebar-hover: #1e2923;
-           --sidebar-active: #23432d;
-           --sidebar-text: #9ca3af;
-           --bg-main: #f4f6f8;
-           --text-main: #1f2937;
-           --text-muted: #6b7280;
-           --border-color: #e5e7eb;
-           --primary: #2d5d40; 
-           --danger-color: #ef4444;
-           --danger-bg: #fee2e2;
-           --warning-color: #f59e0b;
-           --warning-bg: #fef3c7;
-           --success-color: #10b981;
-           --success-bg: #d1fae5;
-           --info-color: #3b82f6;
-       }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quadro de Tarefas - 26º Pel PE Mec</title>
 
-       * {
-           margin: 0;
-           padding: 0;
-           box-sizing: border-box;
-           font-family: 'Inter', sans-serif;
-       }
+    <!-- CDN DO SDK DO SUPABASE OBRIGATÓRIA PARA A CONEXÃO -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-       body {
-           display: flex;
-           height: 100vh;
-           background-color: var(--bg-main);
-           color: var(--text-main);
-           overflow: hidden;
-       }
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
 
-       button, input, select, textarea { font: inherit; }
+        body {
+            background: #f3f4f6;
+            display: flex;
+            min-height: 100vh;
+        }
 
-       /* ================= SIDEBAR ================= */
-       .sidebar {
-           width: 260px;
-           background-color: var(--sidebar-bg);
-           display: flex;
-           flex-direction: column;
-           flex-shrink: 0;
-           color: white;
-           transition: transform 0.3s ease;
-           z-index: 1000;
-       }
+        /* Sidebar / Menu Lateral */
+        .sidebar {
+            width: 260px;
+            background: #111827;
+            color: #9ca3af;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #1f2937;
+        }
 
-       .brand { padding: 24px; display: flex; align-items: center; gap: 16px; }
-       .brand-icon { width: 44px; height: 44px; background-color: #27302a; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fbbf24; font-size: 20px; border: 1px solid #3f4a43; }
-       .brand-text h1 { font-size: 18px; font-weight: 700; letter-spacing: 0.5px; }
-       .brand-text p { font-size: 12px; color: var(--sidebar-text); }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            padding: 0 10px;
+        }
 
-       .nav-menu { flex: 1; padding: 0 12px; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
-       .nav-item { border: none; background: transparent; display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: var(--sidebar-text); text-decoration: none; border-radius: 8px; font-size: 14px; font-weight: 500; transition: all 0.2s ease; cursor: pointer; text-align: left; width: 100%; }
-       .nav-item:hover { background-color: var(--sidebar-hover); color: white; }
-       .nav-item.active { background-color: var(--sidebar-active); color: white; }
-       .nav-item i { width: 20px; text-align: center; font-size: 16px; }
+        .star-icon {
+            background: #eab308;
+            color: #111827;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 20px;
+        }
 
-       .sidebar-footer { padding: 16px; }
-       .user-profile { display: flex; align-items: center; gap: 12px; padding: 12px; background-color: #1e2923; border-radius: 8px; margin-bottom: 8px; cursor: pointer; }
-       .user-avatar { width: 32px; height: 32px; background-color: #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #475569; }
-       .user-info h4 { font-size: 14px; font-weight: 600; color: white; }
-       .user-info p { font-size: 12px; color: var(--sidebar-text); }
-       .logout { width: 100%; border: none; background: transparent; display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: var(--sidebar-text); cursor: pointer; font-size: 14px; border-radius: 8px; transition: 0.2s; }
-       .logout:hover { background-color: var(--sidebar-hover); color: white; }
+        .logo-text h1 {
+            font-size: 20px;
+            color: white;
+            font-weight: bold;
+        }
 
-       .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); z-index: 999; }
+        .logo-text p {
+            font-size: 12px;
+            color: #eab308;
+        }
 
-       /* ================= MAIN CONTENT ================= */
-       .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        .menu-items {
+            list-style: none;
+            flex-grow: 1;
+        }
 
-       .header { height: 72px; background-color: white; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; flex-shrink: 0; }
-       .header-left { display: flex; align-items: center; gap: 16px; }
-       .menu-btn { background: none; border: none; font-size: 20px; color: var(--text-muted); cursor: pointer; display: none; }
-       .page-title h2 { font-size: 20px; font-weight: 600; }
-       .page-title p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        .menu-items li {
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 15px;
+            transition: all 0.2s;
+        }
 
-       .header-right { display: flex; align-items: center; gap: 24px; }
-       .search-container { position: relative; width: 300px; }
-       .search-container input { width: 100%; padding: 10px 16px 10px 40px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; outline: none; }
-       .search-container input:focus { border-color: var(--primary); }
-       .search-container i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
-       
-       .toolbar { padding: 24px; display: flex; justify-content: flex-end; gap: 12px; flex-wrap: wrap; }
-       .btn { padding: 8px 16px; border-radius: 6px; font-size: 14px; font-weight: 500; border: 1px solid var(--border-color); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--text-main); transition: 0.2s; }
-       .btn:hover { background-color: #f9fafb; }
-       .btn-primary { background-color: var(--primary); color: white; border: none; }
-       .btn-primary:hover { background-color: #1f422e; }
-       .btn-danger { background-color: var(--danger-color); color: white; border: none; }
-       .btn-danger:hover { background-color: #dc2626; }
-       .btn-success { background-color: var(--success-color); color: white; border: none; }
-       .btn-success:hover { background-color: #059669; }
-       
-       select.btn { outline: none; appearance: none; padding-right: 32px; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; }
+        .menu-items li:hover, .menu-items li.active {
+            background: #1f2937;
+            color: white;
+        }
 
-       /* ================= BOARD & COLUMNS ================= */
-       .board { flex: 1; padding: 0 24px 24px; display: flex; gap: 24px; overflow-x: auto; overflow-y: hidden; scroll-behavior: smooth; }
-       
-       .column { width: 320px; flex-shrink: 0; display: flex; flex-direction: column; background-color: var(--bg-main); height: 100%; border-radius: 8px; transition: 0.2s; }
-       .column.drag-over { background-color: #e5e7eb; border-radius: 8px; }
-       
-       .column-header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 16px; position: sticky; top: 0; background-color: transparent; z-index: 10; }
-       .column-title { display: flex; align-items: center; gap: 12px; font-size: 16px; font-weight: 600; }
-       
-       .task-list { flex: 1; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; padding-bottom: 16px; min-height: 150px; }
-       .task-list::-webkit-scrollbar { width: 4px; }
-       .task-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        /* Perfil de Usuário na Sidebar (Rodapé) */
+        .sidebar-footer {
+            border-top: 1px solid #1f2937;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
 
-       .count-badge { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: bold; }
-       [data-status="pending"] .count-badge { background-color: var(--danger-color); }
-       [data-status="progress"] .count-badge { background-color: var(--info-color); }
-       [data-status="done"] .count-badge { background-color: var(--success-color); }
+        .sb-user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+        }
 
-       /* ================= CARDS ================= */
-       .card { background: white; border-radius: 8px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-top: 4px solid transparent; display: flex; flex-direction: column; gap: 12px; cursor: pointer; transition: 0.2s; }
-       .card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-       .card.dragging { opacity: 0.5; }
+        .sb-user-profile:hover {
+            background: #1f2937;
+        }
 
-       .card-pending { border-top-color: var(--danger-color); }
-       .card-progress { border-top-color: var(--info-color); }
-       .card-done { border-top-color: var(--success-color); }
+        .avatar-circle {
+            width: 40px;
+            height: 40px;
+            background: #4b5563;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 16px;
+            color: white;
+        }
 
-       .card-top { display: flex; justify-content: space-between; align-items: center; }
-       .task-id { font-size: 12px; font-weight: 600; }
-       .card-pending .task-id { color: var(--danger-color); }
-       .card-progress .task-id { color: var(--info-color); }
-       .card-done .task-id { color: var(--success-color); }
+        .btn-sair-sidebar {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: #ef4444;
+            padding: 12px 15px;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 15px;
+        }
 
-       .tag { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
-       .tag-high { background-color: var(--danger-bg); color: var(--danger-color); }
-       .tag-medium { background-color: var(--warning-bg); color: var(--warning-color); }
-       .tag-low { background-color: var(--success-bg); color: #059669; }
+        /* Topbar / Cabeçalho */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
 
-       .card-title { font-size: 14px; font-weight: 600; line-height: 1.4; color: var(--text-main); }
-       .card-infos { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-top: 4px; }
-       .info-item { display: flex; align-items: center; gap: 6px; }
-       .card-footer { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-muted); padding-top: 12px; border-top: 1px solid var(--border-color); }
+        .header {
+            background: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e5e7eb;
+        }
 
-       .add-task-btn { background: transparent; border: 1px dashed #cbd5e1; padding: 12px; border-radius: 8px; color: var(--text-muted); font-size: 14px; font-weight: 500; cursor: pointer; transition: 0.2s; width: 100%; flex-shrink: 0; margin-top: auto; }
-       .add-task-btn:hover { background-color: white; border-color: var(--primary); color: var(--primary); }
+        .header-title h2 {
+            font-size: 20px;
+            color: #111827;
+        }
 
-       .main-footer { text-align: center; padding: 12px; font-size: 12px; color: var(--text-muted); background-color: white; border-top: 1px solid var(--border-color); }
+        .header-title p {
+            font-size: 13px;
+            color: #6b7280;
+            margin-top: 2px;
+        }
 
-       /* ================= AÇÕES EM LOTE ================= */
-       .dropdown { position: relative; display: inline-block; }
-       .dropdown-btn { background: transparent; border: none; font-size: 16px; color: var(--text-muted); cursor: pointer; padding: 4px 8px; border-radius: 4px; }
-       .dropdown-btn:hover { background-color: #e5e7eb; }
-       .dropdown-content { display: none; position: absolute; right: 0; top: 100%; background-color: #fff; min-width: 200px; box-shadow: 0px 4px 15px rgba(0,0,0,0.1); z-index: 20; border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; }
-       .dropdown-content a { color: var(--text-main); padding: 12px 16px; text-decoration: none; display: block; font-size: 13px; cursor: pointer; transition: 0.2s; }
-       .dropdown-content a:hover { background-color: var(--bg-main); color: var(--primary); }
-       .dropdown:hover .dropdown-content { display: block; }
-       .task-check { width: 16px; height: 16px; cursor: pointer; accent-color: var(--primary); }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
 
-       /* ================= ANEXOS E COMPONENTES NOVOS ================= */
-       .attach-zone { border: 2px dashed var(--border-color); border-radius: 8px; padding: 16px; text-align: center; background: var(--bg-main); cursor: pointer; transition: 0.2s; margin-bottom: 12px; position: relative; }
-       .attach-zone:hover { border-color: var(--primary); background: #f0f4f1; }
-       .attach-zone i { font-size: 24px; color: var(--text-muted); margin-bottom: 8px; display: block; }
-       .attach-zone span { font-size: 13px; color: var(--text-main); font-weight: 500; }
-       .attach-zone p { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
-       .attach-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
-       .attach-item { display: flex; align-items: center; justify-content: space-between; background: var(--bg-main); border: 1px solid var(--border-color); padding: 10px 12px; border-radius: 6px; }
-       .attach-info { display: flex; align-items: center; gap: 10px; font-size: 13px; overflow: hidden; }
-       .attach-info i { color: var(--primary); font-size: 16px; flex-shrink: 0; }
-       .attach-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; color: var(--text-main); text-decoration: none; }
-       .attach-name:hover { text-decoration: underline; color: var(--primary); }
-       .attach-del { background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; border-radius: 4px; transition: 0.2s; }
-       .attach-del:hover { color: var(--danger-color); background: var(--danger-bg); }
+        .select-secao {
+            padding: 10px 15px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
 
-       /* ================= MODAIS ================= */
-       .modal-bg { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 2000; backdrop-filter: blur(2px); }
-       .modal-bg.show { display: flex; }
-       .modal { background: white; width: 100%; max-width: 650px; max-height: 92vh; overflow-y: auto; border-radius: 12px; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
-       .modal::-webkit-scrollbar { width: 6px; }
-       .modal::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-       
-       .modal h2 { margin-bottom: 24px; font-size: 20px; font-weight: 600; color: var(--text-main); }
-       
-       .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-       .field.full { grid-column: 1 / -1; }
-       .field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text-main); }
-       .field input, .field select, .field textarea { width: 100%; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 12px; outline: none; font-size: 14px; transition: border 0.2s; }
-       .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--primary); }
-       .field textarea { resize: vertical; min-height: 80px; }
-       
-       .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color); }
+        .btn-nova-tarefa {
+            background: #047857;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-       .detail-header { display: flex; justify-content: space-between; gap: 15px; align-items: flex-start; margin-bottom: 20px; }
-       .detail-id { color: var(--primary); font-weight: 700; font-size: 13px; margin-bottom: 4px; }
-       .close-x { border: none; background: transparent; font-size: 24px; cursor: pointer; color: var(--text-muted); transition: 0.2s; }
-       .close-x:hover { color: var(--danger-color); }
-       .detail-title { font-size: 22px; font-weight: 700; line-height: 1.3; color: var(--text-main); }
+        .btn-nova-tarefa:hover {
+            background: #065f46;
+        }
 
-       .detail-section { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border-color); }
-       .detail-section h4 { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+        /* Dropdown Superior */
+        .dropdown-menu {
+            position: absolute;
+            top: 65px;
+            right: 30px;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 160px;
+            display: none;
+            z-index: 100;
+        }
 
-       .status-row { display: flex; gap: 8px; flex-wrap: wrap; }
-       .status-btn { padding: 8px 16px; border: 1px solid var(--border-color); background: white; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 13px; color: var(--text-muted); transition: 0.2s; }
-       .status-btn.active.pending { background: var(--danger-color); border-color: var(--danger-color); color: white; }
-       .status-btn.active.progress { background: var(--info-color); border-color: var(--info-color); color: white; }
-       .status-btn.active.done { background: var(--success-color); border-color: var(--success-color); color: white; }
+        .dropdown-menu button {
+            width: 100%;
+            padding: 12px;
+            text-align: left;
+            background: none;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+        }
 
-       .progress-controls { display: flex; align-items: center; gap: 16px; }
-       .progress-controls input[type="range"] { flex: 1; accent-color: var(--primary); }
-       .progress-number { min-width: 48px; text-align: right; font-weight: 700; font-size: 16px; color: var(--text-main); }
-       .big-progress { height: 10px; background: #e5e7eb; border-radius: 10px; overflow: hidden; margin: 12px 0; }
-       .big-progress-fill { height: 100%; background: var(--info-color); transition: 0.3s ease; }
+        .dropdown-menu button:hover {
+            background: #f3f4f6;
+        }
 
-       .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-       .info-box { background: var(--bg-main); border-radius: 8px; padding: 12px; border: 1px solid var(--border-color); }
-       .info-box small { display: block; color: var(--text-muted); font-size: 12px; margin-bottom: 4px; }
-       .info-box strong { font-size: 14px; color: var(--text-main); }
+        /* Container Kanban */
+        .kanban-board {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            flex-grow: 1;
+            align-items: start;
+        }
 
-       .update-box textarea { width: 100%; min-height: 80px; resize: vertical; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; outline: none; font-size: 14px; margin-bottom: 12px; }
-       .update-box textarea:focus { border-color: var(--primary); }
+        .kanban-column {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
 
-       .timeline { display: flex; flex-direction: column; gap: 16px; }
-       .timeline-item { border-left: 3px solid #cbd5e1; padding-left: 16px; position: relative; }
-       .timeline-item::before { content: ''; position: absolute; left: -7px; top: 0; width: 11px; height: 11px; border-radius: 50%; background: #cbd5e1; border: 2px solid white; }
-       .timeline-item .time { color: var(--text-muted); font-size: 12px; font-weight: 500; }
-       .timeline-item strong { display: block; margin: 4px 0; font-size: 14px; color: var(--text-main); }
-       .timeline-item p { font-size: 13px; color: #4b5563; line-height: 1.5; }
-       .empty { color: var(--text-muted); text-align: center; padding: 24px; font-size: 14px; font-style: italic; }
+        .column-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f3f4f6;
+        }
 
-       /* ================= MEDIA QUERIES ================= */
-       @media (max-width: 900px) {
-           .search-container { width: 200px; }
-       }
+        .column-title-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
 
-       @media (max-width: 768px) {
-           .sidebar { position: fixed; height: 100vh; transform: translateX(-100%); }
-           .sidebar.active { transform: translateX(0); }
-           .sidebar-overlay.active { display: block; }
-           .menu-btn { display: block; } 
-           .header { padding: 0 16px; }
-           .page-title p { display: none; } 
-           .search-container { display: none; } 
-           .toolbar { padding: 16px; justify-content: space-between; }
-           .btn { flex: 1; font-size: 13px; }
-           .board { padding: 0 16px 16px; gap: 16px; scroll-snap-type: x mandatory; }
-           .column { width: 85vw; scroll-snap-align: center; }
-           .form-grid, .info-grid { grid-template-columns: 1fr; }
-           .modal-actions { flex-direction: column; }
-           .modal-actions .btn { width: 100%; }
-           .detail-footer { flex-direction: column; }
-           .detail-footer > div { display: flex; flex-direction: column; width: 100%; }
-       }
-   </style>
+        .column-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #111827;
+        }
+
+        .column-badge {
+            background: #f3f4f6;
+            color: #374151;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Cores das colunas baseadas na imagem */
+        .col-pendente .column-header { border-bottom-color: #ef4444; }
+        .col-andamento .column-header { border-bottom-color: #3b82f6; }
+        .col-concluida .column-header { border-bottom-color: #10b981; }
+
+        .cards-container {
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Card Kanban */
+        .task-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+        }
+
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .task-code {
+            font-size: 12px;
+            color: #9ca3af;
+            font-weight: bold;
+        }
+
+        .priority-badge {
+            font-size: 11px;
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .prio-alta { background: #fee2e2; color: #ef4444; }
+        .prio-media { background: #fef3c7; color: #d97706; }
+        .prio-baixa { background: #dcfce7; color: #15803d; }
+
+        .task-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .card-footer {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 12px;
+            color: #6b7280;
+            border-top: 1px dashed #f3f4f6;
+            padding-top: 10px;
+        }
+
+        .footer-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-add-card-footer {
+            width: 100%;
+            padding: 10px;
+            background: #f9fafb;
+            border: 1px dashed #d1d5db;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 13px;
+            color: #4b5563;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .btn-add-card-footer:hover {
+            background: #f3f4f6;
+        }
+
+        /* Modais */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #9ca3af;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 20px;
+            color: #111827;
+        }
+
+        .modal-content label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+            font-size: 14px;
+            color: #4b5563;
+        }
+
+        .modal-content input, .modal-content select, .modal-content textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .modal-buttons button {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-cancelar { background: #e5e7eb; color: #374151; }
+        .btn-salvar { background: #047857; color: white; }
+    </style>
 </head>
 <body>
 
-   <!-- Overlay Mobile -->
-   <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-   <!-- SIDEBAR -->
-   <aside class="sidebar" id="sidebar">
-       <div class="brand">
-           <div class="brand-icon"><i class="fa-solid fa-star"></i></div>
-           <div class="brand-text">
-               <h1>TAREFAS</h1>
-               <p>26º Pel PE Mec</p>
-           </div>
-       </div>
-       <nav class="nav-menu">
-           <button class="nav-item active"><i class="fa-solid fa-table-cells-large"></i> Quadro</button>
-           <button class="nav-item"><i class="fa-regular fa-user"></i> Minhas tarefas</button>
-           <button class="nav-item"><i class="fa-regular fa-calendar"></i> Calendário</button>
-           <button class="nav-item"><i class="fa-solid fa-chart-simple"></i> Relatórios</button>
-           <button class="nav-item"><i class="fa-solid fa-users"></i> Usuários</button>
-           <button class="nav-item"><i class="fa-solid fa-list-ul"></i> Seções</button>
-           <button class="nav-item"><i class="fa-solid fa-gear"></i> Configurações</button>
-       </nav>
-       <div class="sidebar-footer">
-           <div class="user-profile">
-               <div class="user-avatar"><i class="fa-solid fa-user"></i></div>
-               <div class="user-info">
-                   <h4>Sd Silva</h4>
-                   <p>S3 - Auxiliar</p>
-               </div>
-           </div>
-           <button class="logout"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair</button>
-       </div>
-   </aside>
-
-   <!-- MAIN CONTENT -->
-   <main class="main-content">
-       <header class="header">
-           <div class="header-left">
-               <button class="menu-btn" id="menuBtn"><i class="fa-solid fa-bars"></i></button>
-               <div class="page-title">
-                   <h2>Quadro de Tarefas</h2>
-                   <p>Início > Quadro</p>
-               </div>
-           </div>
-           <div class="header-right">
-               <div class="search-container">
-                   <i class="fa-solid fa-magnifying-glass"></i>
-                   <input type="text" id="search" placeholder="Buscar tarefas...">
-               </div>
-           </div>
-       </header>
-
-       <div class="toolbar">
-           <button class="btn" id="filterBtn"><i class="fa-solid fa-filter"></i> Filtros</button>
-           
-           <select class="btn" id="sectionFilter">
-               <option value="">Todas as seções</option>
-               <option>S1</option>
-               <option>S2</option>
-               <option>S3</option>
-               <option>S4</option>
-               <option>Fiscalização</option>
-               <option>Pagamento</option>
-               <option>SALC</option>
-               <option>Garagem</option>
-               <option>ResMat</option>
-               <option>ResArmt</option>
-               <option>Informática</option>
-           </select>
-
-           <button class="btn btn-primary" id="newTask"><i class="fa-solid fa-plus"></i> Nova tarefa</button>
-       </div>
-
-       <div class="board">
-           
-           <!-- COLUNA PENDENTES -->
-           <div class="column" data-status="pending">
-               <div class="column-header">
-                   <div class="column-title">Pendentes <span class="count-badge count-pendentes">0</span></div>
-                   <div class="dropdown">
-                       <button class="dropdown-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-                       <div class="dropdown-content">
-                           <a onclick="concluirSelecionadas('pending')"><i class="fa-solid fa-check"></i> Concluir selecionadas</a>
-                           <a onclick="excluirSelecionadas('pending')"><i class="fa-regular fa-trash-can"></i> Excluir selecionadas</a>
-                       </div>
-                   </div>
-               </div>
-               <div class="task-list"></div>
-               <button class="add-task-btn"><i class="fa-solid fa-plus"></i> Adicionar tarefa</button>
-           </div>
-
-           <!-- COLUNA EM ANDAMENTO -->
-           <div class="column" data-status="progress">
-               <div class="column-header">
-                   <div class="column-title">Em andamento <span class="count-badge count-andamento">0</span></div>
-                   <div class="dropdown">
-                       <button class="dropdown-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-                       <div class="dropdown-content">
-                           <a onclick="concluirSelecionadas('progress')"><i class="fa-solid fa-check"></i> Concluir selecionadas</a>
-                           <a onclick="excluirSelecionadas('progress')"><i class="fa-regular fa-trash-can"></i> Excluir selecionadas</a>
-                       </div>
-                   </div>
-               </div>
-               <div class="task-list"></div>
-               <button class="add-task-btn"><i class="fa-solid fa-plus"></i> Adicionar tarefa</button>
-           </div>
-
-           <!-- COLUNA CONCLUÍDAS -->
-           <div class="column" data-status="done">
-               <div class="column-header">
-                   <div class="column-title">Concluídas <span class="count-badge count-concluidas">0</span></div>
-                   <div class="dropdown">
-                       <button class="dropdown-btn"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-                       <div class="dropdown-content">
-                           <a onclick="excluirSelecionadas('done')"><i class="fa-regular fa-trash-can"></i> Excluir selecionadas</a>
-                       </div>
-                   </div>
-               </div>
-               <div class="task-list"></div>
-               <button class="add-task-btn"><i class="fa-solid fa-plus"></i> Adicionar tarefa</button>
-           </div>
-
-       </div>
-
-       <footer class="main-footer">
-           <i class="fa-solid fa-circle-info"></i> Arraste as tarefas entre as colunas ou abra uma tarefa para atualizar seu andamento.
-       </footer>
-   </main>
-
-   <!-- MODAL: NOVA TAREFA -->
-   <div class="modal-bg" id="modal">
-       <div class="modal">
-           <div class="detail-header">
-               <div><h2>Nova tarefa</h2></div>
-               <button class="close-x" id="cancel">×</button>
-           </div>
-           
-           <form id="taskForm">
-               <div class="form-grid">
-                   <div class="field full">
-                       <label>Título *</label>
-                       <input id="taskTitle" required placeholder="Ex.: Conferir documentação">
-                   </div>
-                   
-                   <div class="field full">
-                       <label>Descrição</label>
-                       <textarea id="taskDescription" placeholder="Detalhes da tarefa..."></textarea>
-                   </div>
-                   
-                   <div class="field">
-                       <label>Seção</label>
-                       <select id="taskSection">
-                           <option>S1</option>
-                           <option>S2</option>
-                           <option>S3</option>
-                           <option>S4</option>
-                           <option>Fiscalização</option>
-                           <option>Pagamento</option>
-                           <option>SALC</option>
-                           <option>Garagem</option>
-                           <option>ResMat</option>
-                           <option>ResArmt</option>
-                           <option>Informática</option>
-                       </select>
-                   </div>
-                   
-                   <div class="field">
-                       <label>Responsável</label>
-                       <input id="taskResponsible" placeholder="Ex.: Sd Silva">
-                   </div>
-                   
-                   <div class="field">
-                       <label>Prioridade</label>
-                       <select id="taskPriority">
-                           <option value="high">Alta</option>
-                           <option value="medium" selected>Média</option>
-                           <option value="low">Baixa</option>
-                       </select>
-                   </div>
-                   
-                   <div class="field">
-                       <label>Prazo</label>
-                       <input id="taskDue" type="date">
-                   </div>
-               </div>
-               
-               <div class="modal-actions">
-                   <button type="button" class="btn" id="cancel2">Cancelar</button>
-                   <button type="submit" class="btn btn-primary">Criar tarefa</button>
-               </div>
-           </form>
-       </div>
-   </div>
-
-   <!-- MODAL: GERENCIAR TAREFA -->
-   <div class="modal-bg" id="detailModal">
-       <div class="modal">
-           
-           <div class="detail-header">
-               <div>
-                   <div class="detail-id" id="detailId">#0000</div>
-                   <h2 class="detail-title" id="detailTitle">Tarefa</h2>
-               </div>
-               <button class="close-x" id="closeDetail">×</button>
-           </div>
-
-           <!-- STATUS -->
-           <div class="detail-section">
-               <h4>Status da Tarefa</h4>
-               <div class="status-row">
-                   <button class="status-btn pending" data-status="pending">🔴 Pendente</button>
-                   <button class="status-btn progress" data-status="progress">🔵 Em andamento</button>
-                   <button class="status-btn done" data-status="done">🟢 Concluída</button>
-               </div>
-           </div>
-
-           <!-- ANDAMENTO -->
-           <div class="detail-section">
-               <h4>Andamento</h4>
-               <div class="progress-controls">
-                   <input type="range" id="progressRange" min="0" max="100" value="0">
-                   <span class="progress-number" id="progressNumber">0%</span>
-               </div>
-               <div class="big-progress">
-                   <div class="big-progress-fill" id="bigProgressFill" style="width:0%"></div>
-               </div>
-           </div>
-
-           <!-- INFORMAÇÕES -->
-           <div class="detail-section">
-               <h4>Informações</h4>
-               <div class="info-grid">
-                   <div class="info-box">
-                       <small>Seção</small>
-                       <strong id="detailSection">-</strong>
-                   </div>
-                   <div class="info-box">
-                       <small>Responsável</small>
-                       <strong id="detailResponsible">-</strong>
-                   </div>
-                   <div class="info-box">
-                       <small>Prioridade</small>
-                       <strong id="detailPriority">-</strong>
-                   </div>
-                   <div class="info-box">
-                       <small>Prazo</small>
-                       <strong id="detailDue">-</strong>
-                   </div>
-               </div>
-           </div>
-
-           <!-- DESCRIÇÃO -->
-           <div class="detail-section">
-               <h4>Descrição</h4>
-               <p id="detailDescription" style="font-size:14px; color:var(--text-main); line-height:1.5">
-                   Sem descrição.
-               </p>
-           </div>
-
-           <!-- ANEXOS DA TAREFA -->
-           <div class="detail-section">
-               <h4>Arquivos Anexos</h4>
-               <div class="attach-zone" onclick="document.getElementById('fileInput').click()">
-                   <i class="fa-solid fa-cloud-arrow-up"></i>
-                   <span>Clique para anexar um documento</span>
-                   <p>Formatos suportados: PDF, Imagens, Documentos de Texto (Máx. 5MB)</p>
-                   <input type="file" id="fileInput" style="display:none">
-               </div>
-               <div class="attach-list" id="attachList"></div>
-           </div>
-
-           <!-- ATUALIZAÇÃO -->
-           <div class="detail-section">
-               <h4>Adicionar Atualização</h4>
-               <div class="update-box">
-                   <textarea id="updateText" placeholder="Informe o que foi realizado, alguma pendência ou mudança na tarefa..."></textarea>
-               </div>
-               <button class="btn btn-primary" id="addUpdate" style="margin-top:4px"><i class="fa-solid fa-paper-plane"></i> Enviar atualização</button>
-           </div>
-
-           <!-- HISTÓRICO -->
-           <div class="detail-section">
-               <h4>Histórico da Tarefa</h4>
-               <div class="timeline" id="timeline"></div>
-           </div>
-
-           <!-- RODAPÉ -->
-           <div class="detail-footer" style="display:flex; justify-content:space-between; gap:12px; margin-top:24px; padding-top:20px; border-top:1px solid var(--border-color);">
-               <button class="btn btn-danger" id="deleteTask"><i class="fa-regular fa-trash-can"></i> Excluir tarefa</button>
-               <div style="display:flex; gap:12px">
-                   <button class="btn" id="saveDetail"><i class="fa-regular fa-floppy-disk"></i> Salvar alterações</button>
-                   <button class="btn btn-success" id="completeTask"><i class="fa-solid fa-check"></i> Concluir tarefa</button>
-               </div>
-           </div>
-
-       </div>
-   </div>
-
-   <script>
-       /* ================================
-          CONTROLE DO MENU MOBILE
-       ================================ */
-       const menuBtn = document.getElementById('menuBtn');
-       const sidebar = document.getElementById('sidebar');
-       const overlay = document.getElementById('sidebarOverlay');
-
-       function toggleMenu() {
-           sidebar.classList.toggle('active');
-           overlay.classList.toggle('active');
-       }
-
-       if(menuBtn) menuBtn.addEventListener('click', toggleMenu);
-       if(overlay) overlay.addEventListener('click', toggleMenu);
-
-       /* ================================
-          SCRIPT FUNCIONAL DO SISTEMA
-       ================================ */
-       const STORAGE_KEY = "tarefas_26_pel_pe_mec_v5";
-
-       const labels = { high: "Alta", medium: "Média", low: "Baixa" };
-       const statusLabels = { pending: "Pendente", progress: "Em andamento", done: "Concluída" };
-
-       const defaultTasks = [
-           { id: 1, title: "Conferir guias de transferência de material de uso", description: "Conferir as guias e verificar se os documentos estão de acordo com o material transferido.", section: "S3 - Fiscalização", responsible: "Sd Silva", priority: "high", due: "20/08/2026", status: "pending", progress: 0, attachments: [], history: [{ date: "18/08/2026 08:00", user: "Sistema", text: "Tarefa criada." }] },
-           { id: 2, title: "Organizar documentos da seção", description: "Organizar os documentos administrativos da seção.", section: "S3 - Fiscalização", responsible: "Sd Falcão", priority: "medium", due: "21/08/2026", status: "pending", progress: 0, attachments: [], history: [{ date: "18/08/2026 08:10", user: "Sistema", text: "Tarefa criada." }] },
-           { id: 5, title: "Elaborar relatório mensal da seção", description: "Preparar o relatório mensal contendo as atividades realizadas.", section: "S1", responsible: "Cb Santos", priority: "medium", due: "18/08/2026", status: "progress", progress: 55, attachments: [], history: [{ date: "18/08/2026 10:30", user: "Cb Santos", text: "Relatório iniciado. Dados principais já foram levantados." }] },
-           { id: 9, title: "Distribuir documentos para assinatura", description: "Distribuir os documentos aos responsáveis para assinatura.", section: "S2", responsible: "1º Sgt Lima", priority: "low", due: "16/08/2026", status: "done", progress: 100, attachments: [], history: [{ date: "16/08/2026 15:30", user: "1º Sgt Lima", text: "Documentos distribuídos e processo concluído." }] }
-       ];
-
-       let storedTasks = localStorage.getItem(STORAGE_KEY);
-       let tasks = storedTasks ? JSON.parse(storedTasks) : defaultTasks;
-       let draggedId = null;
-       let selectedTaskId = null;
-
-       function saveTasks(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); }
-       
-       function now(){ 
-           const d = new Date(); 
-           return d.toLocaleDateString("pt-BR") + " " + d.toLocaleTimeString("pt-BR", {hour:"2-digit", minute:"2-digit"}); 
-       }
-
-       function escapeHtml(v){ 
-           return String(v).replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m])); 
-       }
-
-       function render(){
-           document.querySelectorAll(".task-list").forEach(x => x.innerHTML="");
-
-           const query = document.getElementById("search").value.toLowerCase();
-           const section = document.getElementById("sectionFilter").value;
-
-           const filtered = tasks.filter(t => {
-               const text = (t.title + " " + t.section + " " + t.responsible).toLowerCase();
-               return (text.includes(query) && (!section || t.section.includes(section)));
-           });
-
-           filtered.forEach(t => {
-               const col = document.querySelector(`[data-status="${t.status}"] .task-list`);
-               if(!col) return;
-
-               const el = document.createElement("div");
-               el.className = `card card-${t.status}`; 
-               el.draggable = true;
-               el.dataset.id = t.id;
-
-               const attachCount = t.attachments ? t.attachments.length : 0;
-               const attachBadge = attachCount > 0 ? `<div class="info-item"><i class="fa-solid fa-paperclip"></i> ${attachCount} anexo(s)</div>` : '';
-
-               el.innerHTML = `
-                   <div class="card-top">
-                       <div style="display:flex; align-items:center; gap:8px;">
-                           <input type="checkbox" class="task-check" data-id="${t.id}" onclick="event.stopPropagation()">
-                           <span class="task-id">#${String(t.id).padStart(4,"0")}</span>
-                       </div>
-                       <span class="tag tag-${t.priority}">${labels[t.priority]}</span>
-                   </div>
-                   
-                   <div class="card-title">${escapeHtml(t.title)}</div>
-                   
-                   <div class="card-infos">
-                       <div class="info-item"><i class="fa-solid fa-building-columns"></i> ${escapeHtml(t.section)}</div>
-                       <div class="info-item"><i class="fa-regular fa-user"></i> ${escapeHtml(t.responsible)}</div>
-                   </div>
-
-                   <div style="margin-top: 8px;">
-                       <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px; color: var(--text-muted);">
-                           <span>Andamento</span> <strong>${t.progress || 0}%</strong>
-                       </div>
-                       <div style="height: 6px; background: #e5e7eb; border-radius: 4px; overflow: hidden;">
-                           <div style="height: 100%; background: ${t.status === 'done' ? 'var(--success-color)' : 'var(--info-color)'}; width: ${t.progress || 0}%; transition: 0.2s;"></div>
-                       </div>
-                   </div>
-
-                   <div class="card-footer">
-                       <div class="info-item"><i class="fa-regular fa-calendar"></i> Prazo: ${escapeHtml(t.due)}</div>
-                       ${attachBadge}
-                   </div>
-               `;
-
-               // ABRIR TAREFA
-               el.addEventListener("click", () => {
-                   if(!el.classList.contains("dragging")){ openDetail(t.id); }
-               });
-
-               // DRAG AND DROP
-               el.addEventListener("dragstart", () => {
-                   draggedId = t.id;
-                   el.classList.add("dragging");
-               });
-
-               el.addEventListener("dragend", () => {
-                   el.classList.remove("dragging");
-               });
-
-               col.appendChild(el);
-           });
-
-           // Atualizar contadores
-           document.querySelectorAll(".column").forEach(c => {
-               const status = c.dataset.status;
-               const count = tasks.filter(t => t.status === status).length;
-               const badge = c.querySelector(".count-badge");
-               if(badge) badge.textContent = count;
-           });
-       }
-
-       /* Modais - Abrir/Fechar */
-       function openModal(){
-           document.getElementById("modal").classList.add("show");
-           document.getElementById("taskTitle").focus();
-       }
-       function closeModal(){
-           document.getElementById("modal").classList.remove("show");
-           document.getElementById("taskForm").reset();
-       }
-
-       document.getElementById("newTask").onclick = openModal;
-       document.querySelectorAll(".add-task-btn").forEach(b => b.onclick = openModal);
-       document.getElementById("cancel").onclick = closeModal;
-       document.getElementById("cancel2").onclick = closeModal;
-       document.getElementById("modal").addEventListener("click", e => { if(e.target.id==="modal") closeModal(); });
-
-       /* CRIAR TAREFA */
-       document.getElementById("taskForm").addEventListener("submit", e => {
-           e.preventDefault();
-           const date = document.getElementById("taskDue").value;
-           const formatted = date ? date.split("-").reverse().join("/") : "Sem prazo";
-           const id = Math.max(...tasks.map(t => t.id), 0) + 1;
-
-           tasks.push({
-               id: id,
-               title: document.getElementById("taskTitle").value.trim(),
-               description: document.getElementById("taskDescription").value.trim(),
-               section: document.getElementById("taskSection").value,
-               responsible: document.getElementById("taskResponsible").value.trim() || "Não definido",
-               priority: document.getElementById("taskPriority").value,
-               due: formatted,
-               status: "pending",
-               progress: 0,
-               attachments: [],
-               history: [{ date: now(), user: "Sd Silva", text: "Tarefa criada." }]
-           });
-
-           saveTasks();
-           closeModal();
-           render();
-       });
-
-       /* ABRIR E ATUALIZAR DETALHES */
-       function openDetail(id){
-           selectedTaskId = id;
-           document.getElementById("detailModal").classList.add("show");
-           updateDetail();
-       }
-
-       function updateDetail(){
-           const task = tasks.find(t => t.id === selectedTaskId);
-           if(!task) return;
-
-           if(!task.attachments) task.attachments = [];
-
-           document.getElementById("detailId").textContent = "#" + String(task.id).padStart(4,"0");
-           document.getElementById("detailTitle").textContent = task.title;
-           document.getElementById("detailSection").textContent = task.section;
-           document.getElementById("detailResponsible").textContent = task.responsible;
-           document.getElementById("detailPriority").textContent = labels[task.priority];
-           document.getElementById("detailDue").textContent = task.due;
-           document.getElementById("detailDescription").textContent = task.description || "Sem descrição.";
-
-           const progress = Number(task.progress)||0;
-           document.getElementById("progressRange").value = progress;
-           document.getElementById("progressNumber").textContent = progress + "%";
-           
-           const fill = document.getElementById("bigProgressFill");
-           fill.style.width = progress + "%";
-           fill.style.background = progress === 100 ? "var(--success-color)" : "var(--info-color)"; 
-
-           document.querySelectorAll(".status-btn").forEach(btn => {
-               btn.classList.toggle("active", btn.dataset.status === task.status);
-           });
-
-           // Renderizar lista de anexos
-           renderAttachments(task);
-
-           const timeline = document.getElementById("timeline");
-           timeline.innerHTML = "";
-           const history = task.history || [];
-
-           if(!history.length){
-               timeline.innerHTML = '<div class="empty">Nenhuma atualização registrada.</div>';
-           } else {
-               [...history].reverse().forEach(item => {
-                   const div = document.createElement("div");
-                   div.className = "timeline-item";
-                   div.innerHTML = `
-                       <div class="time">${escapeHtml(item.date)}</div>
-                       <strong>${escapeHtml(item.user)}</strong>
-                       <p>${escapeHtml(item.text)}</p>
-                   `;
-                   timeline.appendChild(div);
-               });
-           }
-       }
-
-       function renderAttachments(task) {
-           const attachList = document.getElementById("attachList");
-           attachList.innerHTML = "";
-           
-           if(task.attachments.length === 0) {
-               attachList.innerHTML = '<div style="font-size:12px; color:var(--text-muted); font-style:italic;">Nenhum arquivo anexado a esta tarefa.</div>';
-               return;
-           }
-
-           task.attachments.forEach((file, index) => {
-               const item = document.createElement("div");
-               item.className = "attach-item";
-               item.innerHTML = `
-                   <div class="attach-info">
-                       <i class="fa-solid fa-file-lines"></i>
-                       <a href="${file.content}" download="${file.name}" class="attach-name" title="Clique para baixar">${escapeHtml(file.name)}</a>
-                   </div>
-                   <button class="attach-del" onclick="deleteAttachment(${index})" title="Remover anexo">
-                       <i class="fa-solid fa-trash-can"></i>
-                   </button>
-               `;
-               attachList.appendChild(item);
-           });
-       }
-
-       /* MANIPULAÇÃO DE ANEXOS */
-       document.getElementById("fileInput").addEventListener("change", e => {
-           const file = e.target.files[0];
-           if(!file) return;
-
-           if(file.size > 5 * 1024 * 1024) {
-               alert("O arquivo excede o limite de 5MB.");
-               return;
-           }
-
-           const reader = new FileReader();
-           reader.onload = function(event) {
-               const task = tasks.find(t => t.id === selectedTaskId);
-               if(!task) return;
-
-               if(!task.attachments) task.attachments = [];
-               
-               task.attachments.push({
-                   name: file.name,
-                   content: event.target.result // Base64 url do arquivo
-               });
-
-               task.history = task.history || [];
-               task.history.push({
-                   date: now(),
-                   user: "Sd Silva",
-                   text: `Arquivo "${file.name}" anexado à tarefa.`
-               });
-
-               saveTasks();
-               renderAttachments(task);
-               render(); // atualiza o card com o ícone de clips
-               e.target.value = ""; // reseta o input
-           };
-           reader.readAsDataURL(file);
-       });
-
-       function deleteAttachment(index) {
-           const task = tasks.find(t => t.id === selectedTaskId);
-           if(!task) return;
-
-           const fileName = task.attachments[index].name;
-           if(!confirm(`Deseja remover o anexo "${fileName}"?`)) return;
-
-           task.attachments.splice(index, 1);
-           
-           task.history = task.history || [];
-           task.history.push({
-               date: now(),
-               user: "Sd Silva",
-               text: `Arquivo "${fileName}" removido.`
-           });
-
-           saveTasks();
-           renderAttachments(task);
-           render();
-       }
-
-       function closeDetail(){
-           document.getElementById("detailModal").classList.remove("show");
-           selectedTaskId = null;
-       }
-       
-       document.getElementById("closeDetail").onclick = closeDetail;
-       document.getElementById("detailModal").addEventListener("click", e => { if(e.target.id==="detailModal") closeDetail(); });
-
-       /* BOTÕES DE STATUS DENTRO DA TAREFA */
-       document.querySelectorAll(".status-btn").forEach(btn => {
-           btn.addEventListener("click", () => {
-               const task = tasks.find(t => t.id === selectedTaskId);
-               if(!task) return;
-
-               const newStatus = btn.dataset.status;
-               task.status = newStatus;
-               if(newStatus === "done") task.progress = 100;
-               if(newStatus === "pending") task.progress = 0;
-
-               task.history = task.history || [];
-               task.history.push({ date: now(), user: "Sd Silva", text: `Status alterado para "${statusLabels[newStatus]}".` });
-
-               saveTasks();
-               render();
-               updateDetail();
-           });
-       });
-
-       /* BARRA DE ANDAMENTO */
-       document.getElementById("progressRange").addEventListener("input", e => {
-           const progress = Number(e.target.value);
-           document.getElementById("progressNumber").textContent = progress + "%";
-           const fill = document.getElementById("bigProgressFill");
-           fill.style.width = progress + "%";
-           fill.style.background = progress === 100 ? "var(--success-color)" : "var(--info-color)";
-       });
-
-       document.getElementById("saveDetail").addEventListener("click", () => {
-           const task = tasks.find(t => t.id === selectedTaskId);
-           if(!task) return;
-
-           const progress = Number(document.getElementById("progressRange").value);
-           task.progress = progress;
-
-           if(progress >= 100) {
-               task.progress = 100;
-               task.status = "done";
-               task.history = task.history || [];
-               task.history.push({ date: now(), user: "Sd Silva", text: "Andamento updated para 100%. Tarefa concluída." });
-           } else if(progress > 0) {
-               task.status = "progress";
-               task.history = task.history || [];
-               task.history.push({ date: now(), user: "Sd Silva", text: `Andamento atualizado para ${progress}%.` });
-           }
-
-           saveTasks();
-           render();
-           updateDetail();
-           alert("Alterações salvas.");
-       });
-
-       /* ADICIONAR ATUALIZAÇÃO */
-       document.getElementById("addUpdate").addEventListener("click", () => {
-           const task = tasks.find(t => t.id === selectedTaskId);
-           if(!task) return;
-           
-           const textarea = document.getElementById("updateText");
-           const text = textarea.value.trim();
-           
-           if(!text) { alert("Digite uma atualização antes de adicionar."); textarea.focus(); return; }
-
-           task.history = task.history || [];
-           task.history.push({ date: now(), user: "Sd Silva", text: text });
-
-           if(task.status === "pending") {
-               task.status = "progress";
-               if(task.progress === 0) task.progress = 1;
-           }
-
-           saveTasks();
-           render();
-           textarea.value = "";
-           updateDetail();
-       });
-
-       /* CONCLUIR / EXCLUIR */
-       document.getElementById("completeTask").addEventListener("click", () => {
-           const task = tasks.find(t => t.id === selectedTaskId);
-           if(!task) return;
-           task.status = "done";
-           task.progress = 100;
-           task.history = task.history || [];
-           task.history.push({ date: now(), user: "Sd Silva", text: "Tarefa marcada como concluída." });
-           saveTasks();
-           render();
-           updateDetail();
-       });
-
-       document.getElementById("deleteTask").addEventListener("click", () => {
-           const task = tasks.find(t => t.id === selectedTaskId);
-           if(!task) return;
-           if(!confirm(`Deseja realmente excluir a tarefa #${String(task.id).padStart(4,"0")}?
-
-${task.title}`)) return;
-           
-           tasks = tasks.filter(t => t.id !== selectedTaskId);
-           saveTasks();
-           closeDetail();
-           render();
-       });
-
-       /* DRAG OVER COLUNAS */
-       document.querySelectorAll(".column").forEach(col => {
-           col.addEventListener("dragover", e => { e.preventDefault(); col.classList.add("drag-over"); });
-           col.addEventListener("dragleave", () => { col.classList.remove("drag-over"); });
-           
-           col.addEventListener("drop", e => {
-               e.preventDefault();
-               col.classList.remove("drag-over");
-               
-               const task = tasks.find(t => t.id === draggedId);
-               if(!task) return;
-
-               const newStatus = col.dataset.status;
-               task.status = newStatus;
-
-               if(newStatus === "pending") task.progress = 0;
-               else if(newStatus === "progress" && (!task.progress || task.progress === 0)) task.progress = 1;
-               else if(newStatus === "done") task.progress = 100;
-
-               task.history = task.history || [];
-               task.history.push({ date: now(), user: "Sd Silva", text: `Tarefa movida para "${statusLabels[newStatus]}".` });
-
-               saveTasks();
-               render();
-           });
-       });
-
-       /* AÇÕES EM LOTE (CHECKBOXES) */
-       function concluirSelecionadas(status) {
-           const checkboxes = document.querySelectorAll(`.column[data-status="${status}"] .task-check:checked`);
-           if(checkboxes.length === 0) { alert("Nenhuma tarefa selecionada nesta coluna."); return; }
-
-           checkboxes.forEach(cb => {
-               const taskId = parseInt(cb.dataset.id);
-               const task = tasks.find(t => t.id === taskId);
-               if(task) {
-                   task.status = "done";
-                   task.progress = 100;
-                   task.history = task.history || [];
-                   task.history.push({ date: now(), user: "Sd Silva", text: "Tarefa concluída em lote pelo quadro." });
-               }
-           });
-           saveTasks();
-           render();
-       }
-
-       function excluirSelecionadas(status) {
-           const checkboxes = document.querySelectorAll(`.column[data-status="${status}"] .task-check:checked`);
-           if(checkboxes.length === 0) { alert("Nenhuma tarefa selecionada nesta coluna."); return; }
-           if(!confirm(`Deseja realmente excluir as ${checkboxes.length} tarefa(s) selecionada(s)?`)) return;
-
-           const idsParaExcluir = Array.from(checkboxes).map(cb => parseInt(cb.dataset.id));
-           tasks = tasks.filter(t => !idsParaExcluir.includes(t.id));
-           saveTasks();
-           render();
-       }
-
-       /* EVENTOS GERAIS */
-       document.getElementById("search").addEventListener("input", render);
-       document.getElementById("sectionFilter").addEventListener("change", render);
-       
-       document.getElementById("filterBtn").addEventListener("click", () => {
-           const current = document.getElementById("sectionFilter");
-           if(current.showPicker) current.showPicker(); else current.focus();
-       });
-
-       document.addEventListener("keydown", e => {
-           if(e.key !== "Escape") return;
-           if(document.getElementById("modal").classList.contains("show")) closeModal();
-           if(document.getElementById("detailModal").classList.contains("show")) closeDetail();
-       });
-
-       /* Iniciar */
-       render();
-   </script>
+    <!-- BARREIRA DE SEGURANÇA IMEDIATA -->
+    <script>
+        const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
+        if (!usuarioLogado || !usuarioLogado.id) {
+            alert("Acesso negado. Por favor, faça login primeiro.");
+            window.location.href = "index.html";
+        }
+    </script>
+
+    <!-- Sidebar Fiel à Imagem -->
+    <div class="sidebar">
+        <div class="brand">
+            <div class="star-icon">★</div>
+            <div class="logo-text">
+                <h1>TAREFAS</h1>
+                <p>26º Pel PE Mec</p>
+            </div>
+        </div>
+        <ul class="menu-items">
+            <li class="active">■ Quadro</li>
+            <li>👤 Minhas tarefas</li>
+            <li>📅 Calendário</li>
+            <li>📊 Relatórios</li>
+            <li>👥 Usuários</li>
+            <li>⚙️ Configurações</li>
+        </ul>
+        <div class="sidebar-footer">
+            <div class="sb-user-profile" id="sidebarUserBtn">
+                <div class="avatar-circle" id="avatarLetra">S</div>
+                <div>
+                    <div class="user-name" id="sbMilitarNome" style="font-weight:bold; font-size:14px;">Sd Silva</div>
+                    <div class="user-role" id="sbMilitarDetalhes" style="font-size:12px; color:#9ca3af;">S3 - Auxiliar</div>
+                </div>
+            </div>
+            <button class="btn-sair-sidebar" id="btnSairSessao">➔ Sair</button>
+        </div>
+    </div>
+
+    <!-- Painel de Conteúdo -->
+    <div class="main-content">
+        <!-- Topbar -->
+        <div class="header">
+            <div class="header-title">
+                <h2>Quadro de Tarefas</h2>
+                <p>Início > Quadro</p>
+            </div>
+            <div class="header-actions">
+                <select class="select-secao" id="filtroSecao">
+                    <option value="Todas">Todas as seções</option>
+                    <option value="S1">S1</option>
+                    <option value="S2">S2</option>
+                    <option value="S3">S3</option>
+                    <option value="S4">S4</option>
+                    <option value="Fiscalização">Fiscalização</option>
+                    <option value="Pagamento">Pagamento</option>
+                    <option value="SALC">SALC</option>
+                    <option value="Garagem">Garagem</option>
+                    <option value="ResMat">Reserva de Materiais</option>
+                    <option value="ResArmt">Reserva de Armamento</option>
+                    <option value="Informática">Informática</option>
+                </select>
+                <button class="btn-nova-tarefa" id="btnNovaTarefaTop">+ Nova tarefa</button>
+            </div>
+
+            <!-- Dropdown escondido para Alterar Senha -->
+            <div class="dropdown-menu" id="userDropdown">
+                <button id="btnAbrirModalSenha">Alterar Senha</button>
+            </div>
+        </div>
+
+        <!-- Quadro Kanban de Colunas -->
+        <div class="kanban-board">
+            <!-- Pendentes -->
+            <div class="kanban-column col-pendente">
+                <div class="column-header">
+                    <div class="column-title-wrapper">
+                        <span class="column-title">Pendentes</span>
+                        <span class="column-badge" id="badge-pendente">0</span>
+                    </div>
+                </div>
+                <div class="cards-container" id="container-pendente"></div>
+                <div class="btn-add-card-footer" onclick="abrirModalNovaTarefa('Pendente')">+ Adicionar tarefa</div>
+            </div>
+
+            <!-- Em Andamento -->
+            <div class="kanban-column col-andamento">
+                <div class="column-header">
+                    <div class="column-title-wrapper">
+                        <span class="column-title">Em andamento</span>
+                        <span class="column-badge" id="badge-andamento">0</span>
+                    </div>
+                </div>
+                <div class="cards-container" id="container-andamento"></div>
+                <div class="btn-add-card-footer" onclick="abrirModalNovaTarefa('Em andamento')">+ Adicionar tarefa</div>
+            </div>
+
+            <!-- Concluídas -->
+            <div class="kanban-column col-concluida">
+                <div class="column-header">
+                    <div class="column-title-wrapper">
+                        <span class="column-title">Concluídas</span>
+                        <span class="column-badge" id="badge-concluida">0</span>
+                    </div>
+                </div>
+                <div class="cards-container" id="container-concluida"></div>
+                <div class="btn-add-card-footer" onclick="abrirModalNovaTarefa('Concluída')">+ Adicionar tarefa</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: NOVA TAREFA -->
+    <div class="modal" id="modalNovaTarefa">
+        <div class="modal-content">
+            <span class="modal-close" id="fecharModalTarefa">×</span>
+            <h3>Criar Nova Tarefa</h3>
+            <form id="formNovaTarefa">
+                <input type="hidden" id="taskStatusAlvo" value="Pendente">
+
+                <label for="taskTitulo">Título *</label>
+                <input type="text" id="taskTitulo" placeholder="Ex: Conferência de armamento" required>
+
+                <label for="taskDescricao">Descrição</label>
+                <textarea id="taskDescricao" rows="3" placeholder="Detalhes sobre a tarefa militar..."></textarea>
+
+                <label for="taskSecao">Seção *</label>
+                <select id="taskSecao" required>
+                    <option value="S1">S1</option>
+                    <option value="S2">S2</option>
+                    <option value="S3">S3</option>
+                    <option value="S4">S4</option>
+                    <option value="Fiscalização">Fiscalização</option>
+                    <option value="Pagamento">Pagamento</option>
+                    <option value="SALC">SALC</option>
+                    <option value="Garagem">Garagem</option>
+                    <option value="ResMat">Reserva de Materiais</option>
+                    <option value="ResArmt">Reserva de Armamento</option>
+                    <option value="Informática">Informática</option>
+                </select>
+
+                <label for="taskResponsavel">Militar Responsável *</label>
+                <input type="text" id="taskResponsavel" placeholder="Ex: Cb Santos" required>
+
+                <label for="taskPrioridade">Prioridade *</label>
+                <select id="taskPrioridade" required>
+                    <option value="Alta">Alta</option>
+                    <option value="Média">Média</option>
+                    <option value="Baixa">Baixa</option>
+                </select>
+
+                <label for="taskPrazo">Prazo de Conclusão</label>
+                <input type="date" id="taskPrazo">
+
+                <div class="modal-buttons">
+                    <button type="button" class="btn-cancelar" id="btnCancelaTarefa">Cancelar</button>
+                    <button type="submit" class="btn-salvar" id="btnSalvaTarefa">Criar tarefa</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ALTERAR SENHA -->
+    <div class="modal" id="modalSenha">
+        <div class="modal-content">
+            <span class="modal-close" id="btnFecharModalSenha">×</span>
+            <h3>Alterar Senha</h3>
+            <form id="formAlterarSenha">
+                <label for="novaSenha">Nova Senha</label>
+                <input type="password" id="novaSenha" placeholder="No mínimo 6 caracteres" required>
+                <label for="confirmaNovaSenha">Confirmar Nova Senha</label>
+                <input type="password" id="confirmaNovaSenha" placeholder="Repita a nova senha" required>
+                <div class="modal-buttons">
+                    <button type="button" class="btn-cancelar" id="btnCancelaSenha">Cancelar</button>
+                    <button type="submit" class="btn-salvar" id="btnConfirmarAlterarSenha">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURAÇÕES DO SEU BANCO SUPABASE
+        const SUPABASE_URL = "https://bpvijatnsluwsgnzklrd.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwdmlqYXRuc2x1d3NnbnprbHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MzkxNDMsImV4cCI6MjEwMjQxNTE0M30.uvyfm9mgl6MON0v75CwfGzNz6FBqw58uzR4ZcRAOLNQ";
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let todasAsTarefas = [];
+
+        // Injeta os dados dinâmicos do militar logado nos placeholders
+        if (usuarioLogado) {
+            document.getElementById("sbMilitarNome").innerText = `${usuarioLogado.patente} ${usuarioLogado.nome_guerra}`;
+            document.getElementById("sbMilitarDetalhes").innerText = `${usuarioLogado.secao} - ${usuarioLogado.posicao}`;
+            document.getElementById("avatarLetra").innerText = usuarioLogado.nome_guerra.charAt(0).toUpperCase();
+        }
+
+        // Carrega as tarefas salvas do banco quando a tela abrir
+        async function buscarTarefasDoBanco() {
+            try {
+                const { data, error } = await supabaseClient.from('tarefas').select('*').order('id', { ascending: true });
+                if (error) throw error;
+                todasAsTarefas = data || [];
+                renderizarQuadroKanban();
+            } catch (err) {
+                console.error("Erro ao puxar tarefas:", err.message);
+            }
+        }
+
+        function renderizarQuadroKanban() {
+            const filtro = document.getElementById("filtroSecao").value;
+            
+            const contPendente = document.getElementById("container-pendente");
+            const contAndamento = document.getElementById("container-andamento");
+            const contConcluida = document.getElementById("container-concluida");
+
+            contPendente.innerHTML = "";
+            contAndamento.innerHTML = "";
+            contConcluida.innerHTML = "";
+
+            let cP = 0, cA = 0, cC = 0;
+
+            todasAsTarefas.forEach(tarefa => {
+                if (filtro !== "Todas" && tarefa.secao !== filtro) return;
+
+                const card = document.createElement("div");
+                card.className = "task-card";
+                card.onclick = () => mudarStatusRapido(tarefa.id, tarefa.status);
+
+                const classePrio = tarefa.prioridade === "Alta" ? "prio-alta" : tarefa.prioridade === "Média" ? "prio-media" : "prio-baixa";
+                const dataFormatada = tarefa.prazo ? tarefa.prazo.split("-").reverse().join("/") : "--/--/----";
+
+                card.innerHTML = `
+                    <div class="card-top">
+                        <span class="task-code">${tarefa.codigo}</span>
+                        <span class="priority-badge ${classePrio}">${tarefa.prioridade}</span>
+                    </div>
+                    <div class="task-title">${tarefa.titulo}</div>
+                    <div class="card-footer">
+                        <div class="footer-row">
+                            <span>🏠 ${tarefa.secao}</span>
+                            <span>👤 ${tarefa.responsavel}</span>
+                        </div>
+                        <div class="footer-row" style="margin-top: 4px; font-size: 11px; color:#9ca3af;">
+                            <span>📅 Prazo: ${dataFormatada}</span>
+                            <span style="color:#3b82f6; font-weight:bold;">Mudar Status ➔</span>
+                        </div>
+                    </div>
+                `;
+
+                if (tarefa.status === "Pendente") { contPendente.appendChild(card); cP++; }
+                else if (tarefa.status === "Em andamento") { contAndamento.appendChild(card); cA++; }
+                else if (tarefa.status === "Concluída") { contConcluida.appendChild(card); cC++; }
+            });
+
+            document.getElementById("badge-pendente").innerText = cP;
+            document.getElementById("badge-andamento").innerText = cA;
+            document.getElementById("badge-concluida").innerText = cC;
+        }
+
+        // Alterna dinamicamente as colunas ao clicar no card para testes rápidos
+        async function mudarStatusRapido(id, statusAtual) {
+            let novoStatus = "Em andamento";
+            if (statusAtual === "Em andamento") novoStatus = "Concluída";
+            else if (statusAtual === "Concluída") novoStatus = "Pendente";
+
+            try {
+                const { error } = await supabaseClient.from('tarefas').update({ status: novoStatus }).eq('id', id);
+                if (error) throw error;
+                buscarTarefasDoBanco();
+            } catch (err) {
+                alert("Erro ao mover: " + err.message);
+            }
+        }
+
+        // Controle dos Modais de Criação
+        const modalTarefa = document.getElementById("modalNovaTarefa");
+        function abrirModalNovaTarefa(statusColumn) {
+            document.getElementById("taskStatusAlvo").value = statusColumn;
+            modalTarefa.style.display = "flex";
+        }
+
+        document.getElementById("btnNovaTarefaTop").onclick = () => abrirModalNovaTarefa('Pendente');
+        document.getElementById("fecharModalTarefa").onclick = () => modalTarefa.style.display = "none";
+        document.getElementById("btnCancelaTarefa").onclick = () => modalTarefa.style.display = "none";
+
+        // Criação e gravação da tarefa no banco de dados
+        document.getElementById("formNovaTarefa").addEventListener("submit", async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById("btnSalvaTarefa");
+            btn.disabled = true;
+
+            const tTitulo = document.getElementById("taskTitulo").value;
+            const tDesc = document.getElementById("taskDescricao").value;
+            const tSecao = document.getElementById("taskSecao").value;
+            const tResp = document.getElementById("taskResponsavel").value;
+            const tPrio = document.getElementById("taskPrioridade").value;
+            const tPrazo = document.getElementById("taskPrazo").value || null;
+            const tStatus = document.getElementById("taskStatusAlvo").value;
+
+            // Gera código automático como #0001 baseado em números aleatórios estruturados
+            const codGerado = "#" + Math.floor(1000 + Math.random() * 9000);
+
+            try {
+                const { error } = await supabaseClient.from('tarefas').insert([{
+                    codigo: codGerado,
+                    titulo: tTitulo,
+                    descricao: tDesc,
+                    secao: tSecao,
+                    responsavel: tResp,
+                    prioridade: tPrio,
+                    prazo: tPrazo,
+                    status: tStatus,
+                    criado_by: usuarioLogado.id
+                }]);
+
+                if (error) throw error;
+
+                modalTarefa.style.display = "none";
+                document.getElementById("formNovaTarefa").reset();
+                buscarTarefasDoBanco();
+            } catch (err) {
+                alert("Erro ao salvar tarefa: " + err.message);
+            } finally {
+                btn.disabled = false;
+            }
+        });
+
+        // Dropdown e Modal de Senha
+        const dropdown = document.getElementById("userDropdown");
+        document.getElementById("sidebarUserBtn").onclick = (e) => {
+            e.stopPropagation();
+            dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+        };
+        document.onclick = () => dropdown.style.display = "none";
+
+        const modalSenha = document.getElementById("modalSenha");
+        document.getElementById("btnAbrirModalSenha").onclick = () => modalSenha.style.display = "flex";
+        document.getElementById("btnFecharModalSenha").onclick = () => modalSenha.style.display = "none";
+        document.getElementById("btnCancelaSenha").onclick = () => modalSenha.style.display = "none";
+
+        document.getElementById("formAlterarSenha").addEventListener("submit", async function(e) {
+            e.preventDefault();
+            const ns = document.getElementById("novaSenha").value;
+            if(ns !== document.getElementById("confirmaNovaSenha").value) return alert("Senhas não coincidem!");
+            
+            try {
+                const { error } = await supabaseClient.from('usuarios').update({ senha: ns }).eq('id', usuarioLogado.id);
+                if (error) throw error;
+                alert("Senha modificada com sucesso!");
+                modalSenha.style.display = "none";
+            } catch(err) { alert(err.message); }
+        });
+
+        // Eventos adicionais
+        document.getElementById("btnSairSessao").onclick = () => { localStorage.clear(); window.location.href = "index.html"; };
+        document.getElementById("filtroSecao").onchange = () => renderizarQuadroKanban();
+
+        // Inicialização
+        buscarTarefasDoBanco();
+    </script>
 </body>
 </html>
