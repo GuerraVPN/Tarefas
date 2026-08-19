@@ -585,6 +585,83 @@
             cursor: pointer;
             font-weight: bold;
         }
+
+
+        /* ===== Funções incorporadas do menu 3 ===== */
+        .search-tarefa {
+            width: 240px;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: white;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .search-tarefa:focus {
+            border-color: #047857;
+            box-shadow: 0 0 0 2px rgba(4, 120, 87, 0.08);
+        }
+
+        .task-card {
+            cursor: pointer;
+        }
+
+        .task-card.dragging {
+            opacity: 0.45;
+            transform: rotate(1deg);
+        }
+
+        .cards-container.drag-over {
+            outline: 2px dashed #047857;
+            outline-offset: 6px;
+            border-radius: 8px;
+            background: #ecfdf5;
+        }
+
+        .file-name-link {
+            color: #1f2937;
+            text-decoration: none;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 360px;
+        }
+
+        .file-name-link:hover {
+            color: #047857;
+            text-decoration: underline;
+        }
+
+        .file-item-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .drag-hint {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 1050px) {
+            .header { align-items: flex-start; gap: 15px; }
+            .header-actions { flex-wrap: wrap; justify-content: flex-end; }
+            .search-tarefa { width: 190px; }
+            .kanban-board { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 760px) {
+            body { display: block; }
+            .sidebar { width: 100%; min-height: auto; }
+            .main-content { width: 100%; }
+            .header { padding: 15px; flex-direction: column; }
+            .header-actions { width: 100%; justify-content: stretch; }
+            .search-tarefa, .select-secao, .btn-nova-tarefa { width: 100%; }
+            .kanban-board { padding: 15px; }
+        }
     </style>
 </head>
 <body>
@@ -636,6 +713,7 @@
                 <p>Início > Quadro</p>
             </div>
             <div class="header-actions">
+                <input type="search" class="search-tarefa" id="buscaTarefa" placeholder="Buscar tarefas..." autocomplete="off">
                 <select class="select-secao" id="filtroSecao">
                     <option value="Todas">Todas as seções</option>
                     <option value="S1">S1</option>
@@ -805,9 +883,10 @@
             <p id="detalheDescricao" style="font-size:14px; color:#4b5563; background:#f9fafb; padding:10px; border-radius:6px; border:1px solid #e5e7eb; min-height:50px;">Sem descrição.</p>
 
             <label>Arquivos Anexos</label>
-            <div class="file-upload-box" onclick="simularAnexoArquivo()">
+            <div class="file-upload-box" onclick="document.getElementById('inputAnexoTarefa').click()">
                 📎 Clique para anexar um documento<br>
-                <span style="font-size:11px; color:#9ca3af;">Formatos suportados: PDF, Imagens, Docs (Máx. 5MB)</span>
+                <span style="font-size:11px; color:#9ca3af;">PDF, imagens e documentos (Máx. 5MB por arquivo)</span>
+                <input type="file" id="inputAnexoTarefa" style="display:none" accept=".pdf,image/*,.doc,.docx,.txt,.xls,.xlsx,.ppt,.pptx">
             </div>
             <div class="files-list" id="detalheListaArquivos"></div>
 
@@ -823,6 +902,7 @@
             <div class="modal-buttons">
                 <button type="button" class="btn-excluir-task" id="btnExcluirTarefaIndividual">Excluir tarefa</button>
                 <button type="button" class="btn-cancelar" id="btnFecharDetalhes">Fechar</button>
+                <button type="button" class="btn-salvar" id="btnConcluirTarefaIndividual" style="background:#10b981;">Concluir tarefa</button>
                 <button type="button" class="btn-salvar" id="btnSalvarAlteracoesDetalhes">Salvar alterações</button>
             </div>
         </div>
@@ -856,15 +936,95 @@
         let tarefaSelecionadaId = null;
         let listaArquivosLocal = [];
         let listaHistoricoLocal = [];
+        let tarefaArrastadaId = null;
 
-        // Injeta os dados dinâmicos do militar logado
-        if (usuarioLogado) {
-            document.getElementById("sbMilitarNome").innerText = `${usuarioLogado.patente} ${usuarioLogado.nome_guerra}`;
-            document.getElementById("sbMilitarDetalhes").innerText = `${usuarioLogado.secao} - ${usuarioLogado.posicao}`;
-            document.getElementById("avatarLetra").innerText = usuarioLogado.nome_guerra.charAt(0).toUpperCase();
+        // ---------- Utilidades ----------
+        function escaparHtml(valor) {
+            return String(valor ?? '').replace(/[&<>"']/g, caractere => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+            }[caractere]));
         }
 
-        // Carrega as tarefas salvas do banco quando a tela abrir
+        function agoraFormatado() {
+            const d = new Date();
+            return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function nomeUsuarioAtual() {
+            if (!usuarioLogado) return 'Sistema';
+            const patente = usuarioLogado.patente || '';
+            const nome = usuarioLogado.nome_guerra || usuarioLogado.nome || '';
+            return `${patente} ${nome}`.trim() || 'Usuário';
+        }
+
+        function normalizarHistorico(valor) {
+            if (!valor) return [];
+            if (Array.isArray(valor)) return valor.slice();
+            if (typeof valor === 'string') {
+                try {
+                    const parsed = JSON.parse(valor);
+                    return Array.isArray(parsed) ? parsed : [valor];
+                } catch (_) {
+                    return [valor];
+                }
+            }
+            return [];
+        }
+
+        function normalizarArquivos(valor) {
+            if (!valor) return [];
+            let itens = valor;
+            if (!Array.isArray(itens)) {
+                if (typeof itens === 'string') {
+                    try { itens = JSON.parse(itens); } catch (_) { itens = [itens]; }
+                } else {
+                    itens = [];
+                }
+            }
+
+            return itens.map(item => {
+                if (item && typeof item === 'object') {
+                    return { name: item.name || item.nome || 'arquivo', content: item.content || item.conteudo || null };
+                }
+                if (typeof item === 'string') {
+                    try {
+                        const obj = JSON.parse(item);
+                        if (obj && typeof obj === 'object' && (obj.name || obj.nome)) {
+                            return { name: obj.name || obj.nome, content: obj.content || obj.conteudo || null };
+                        }
+                    } catch (_) {}
+                    return { name: item, content: null };
+                }
+                return null;
+            }).filter(Boolean);
+        }
+
+        // Mantém compatibilidade com coluna JSONB ou text[]: cada anexo é gravado como string JSON.
+        function serializarArquivosParaBanco() {
+            return listaArquivosLocal.map(arq => JSON.stringify({ name: arq.name, content: arq.content || null }));
+        }
+
+        function criarEntradaHistorico(texto) {
+            return `${texto} | ${agoraFormatado()} | ${nomeUsuarioAtual()}`;
+        }
+
+        function adicionarHistoricoLocal(texto) {
+            listaHistoricoLocal.push(criarEntradaHistorico(texto));
+        }
+
+        function encontrarTarefa(id) {
+            return todasAsTarefas.find(t => String(t.id) === String(id));
+        }
+
+        // ---------- Perfil do militar logado ----------
+        if (usuarioLogado) {
+            const nomeGuerra = usuarioLogado.nome_guerra || usuarioLogado.nome || 'Usuário';
+            document.getElementById('sbMilitarNome').innerText = `${usuarioLogado.patente || ''} ${nomeGuerra}`.trim();
+            document.getElementById('sbMilitarDetalhes').innerText = `${usuarioLogado.secao || '-'} - ${usuarioLogado.posicao || '-'}`;
+            document.getElementById('avatarLetra').innerText = nomeGuerra.charAt(0).toUpperCase();
+        }
+
+        // ---------- Banco / renderização ----------
         async function buscarTarefasDoBanco() {
             try {
                 const { data, error } = await supabaseClient.from('tarefas').select('*').order('id', { ascending: true });
@@ -872,248 +1032,533 @@
                 todasAsTarefas = data || [];
                 renderizarQuadroKanban();
             } catch (err) {
-                console.error("Erro ao puxar tarefas:", err.message);
+                console.error('Erro ao puxar tarefas:', err.message);
+                alert('Não foi possível carregar as tarefas do banco: ' + err.message);
             }
         }
 
         function renderizarQuadroKanban() {
-            const filtro = document.getElementById("filtroSecao").value;
-            
-            const contPendente = document.getElementById("container-pendente");
-            const contAndamento = document.getElementById("container-andamento");
-            const contConcluida = document.getElementById("container-concluida");
+            const filtro = document.getElementById('filtroSecao').value;
+            const termo = (document.getElementById('buscaTarefa')?.value || '').trim().toLowerCase();
 
-            contPendente.innerHTML = "";
-            contAndamento.innerHTML = "";
-            contConcluida.innerHTML = "";
+            const contPendente = document.getElementById('container-pendente');
+            const contAndamento = document.getElementById('container-andamento');
+            const contConcluida = document.getElementById('container-concluida');
+
+            contPendente.innerHTML = '';
+            contAndamento.innerHTML = '';
+            contConcluida.innerHTML = '';
 
             let cP = 0, cA = 0, cC = 0;
 
             todasAsTarefas.forEach(tarefa => {
-                if (filtro !== "Todas" && tarefa.secao !== filtro) return;
+                if (filtro !== 'Todas' && tarefa.secao !== filtro) return;
 
-                const card = document.createElement("div");
-                card.className = "task-card";
+                const textoBusca = `${tarefa.codigo || ''} ${tarefa.titulo || ''} ${tarefa.descricao || ''} ${tarefa.secao || ''} ${tarefa.responsavel || ''}`.toLowerCase();
+                if (termo && !textoBusca.includes(termo)) return;
 
-                const classePrio = tarefa.prioridade === "Alta" ? "prio-alta" : tarefa.prioridade === "Média" ? "prio-media" : "prio-baixa";
-                const dataFormatada = tarefa.prazo ? tarefa.prazo.split("-").reverse().join("/") : "--/--/----";
-                const pct = tarefa.andamento || 0;
+                const card = document.createElement('div');
+                card.className = 'task-card';
+                card.draggable = true;
+                card.dataset.id = tarefa.id;
+
+                const classePrio = tarefa.prioridade === 'Alta' ? 'prio-alta' : tarefa.prioridade === 'Média' ? 'prio-media' : 'prio-baixa';
+                const dataFormatada = tarefa.prazo ? String(tarefa.prazo).split('-').reverse().join('/') : '--/--/----';
+                const pct = Math.max(0, Math.min(100, Number(tarefa.andamento) || 0));
+                const qtdAnexos = normalizarArquivos(tarefa.arquivos).length;
 
                 card.innerHTML = `
                     <div class="card-top">
                         <div class="card-top-left">
                             <input type="checkbox" class="task-checkbox" data-id="${tarefa.id}" onclick="event.stopPropagation()">
-                            <span class="task-code">${tarefa.codigo}</span>
+                            <span class="task-code">${escaparHtml(tarefa.codigo || ('#' + String(tarefa.id).padStart(4, '0')))}</span>
                         </div>
-                        <span class="priority-badge ${classePrio}">${tarefa.prioridade}</span>
+                        <span class="priority-badge ${classePrio}">${escaparHtml(tarefa.prioridade || 'Baixa')}</span>
                     </div>
-                    <div class="task-title" onclick="abrirModalDetalhes(${tarefa.id})">${tarefa.titulo}</div>
+                    <div class="task-title">${escaparHtml(tarefa.titulo || 'Sem título')}</div>
                     <div class="card-footer">
                         <div class="footer-row">
-                            <span>🏠 ${tarefa.secao}</span>
-                            <span>👤 ${tarefa.responsavel}</span>
+                            <span>🏠 ${escaparHtml(tarefa.secao || '-')}</span>
+                            <span>👤 ${escaparHtml(tarefa.responsavel || '-')}</span>
                         </div>
-                        <div class="footer-row" style="margin-top: 4px; font-size: 11px;">
-                            <span>📅 Prazo: ${dataFormatada}</span>
+                        <div class="footer-row" style="margin-top:4px; font-size:11px;">
+                            <span>📅 Prazo: ${escaparHtml(dataFormatada)}</span>
                             <span style="font-weight:bold; color:#1f2937;">${pct}%</span>
                         </div>
                         <div class="progress-mini-bar">
-                            <div class="progress-mini-fill" style="width: ${pct}%"></div>
+                            <div class="progress-mini-fill" style="width:${pct}%; background:${tarefa.status === 'Concluída' ? '#10b981' : '#3b82f6'};"></div>
                         </div>
+                        ${qtdAnexos ? `<div class="drag-hint">📎 ${qtdAnexos} anexo(s)</div>` : ''}
                     </div>
                 `;
 
-                if (tarefa.status === "Pendente") { contPendente.appendChild(card); cP++; }
-                else if (tarefa.status === "Em andamento") { contAndamento.appendChild(card); cA++; }
-                else if (tarefa.status === "Concluída") { contConcluida.appendChild(card); cC++; }
+                card.addEventListener('click', e => {
+                    if (e.target.closest('.task-checkbox')) return;
+                    if (!card.classList.contains('dragging')) abrirModalDetalhes(tarefa.id);
+                });
+
+                card.addEventListener('dragstart', e => {
+                    tarefaArrastadaId = tarefa.id;
+                    card.classList.add('dragging');
+                    if (e.dataTransfer) {
+                        e.dataTransfer.effectAllowed = 'move';
+                        e.dataTransfer.setData('text/plain', String(tarefa.id));
+                    }
+                });
+
+                card.addEventListener('dragend', () => {
+                    card.classList.remove('dragging');
+                    tarefaArrastadaId = null;
+                    document.querySelectorAll('.cards-container').forEach(c => c.classList.remove('drag-over'));
+                });
+
+                if (tarefa.status === 'Pendente') { contPendente.appendChild(card); cP++; }
+                else if (tarefa.status === 'Em andamento') { contAndamento.appendChild(card); cA++; }
+                else if (tarefa.status === 'Concluída') { contConcluida.appendChild(card); cC++; }
             });
 
-            document.getElementById("badge-pendente").innerText = cP;
-            document.getElementById("badge-andamento").innerText = cA;
-            document.getElementById("badge-concluida").innerText = cC;
+            document.getElementById('badge-pendente').innerText = cP;
+            document.getElementById('badge-andamento').innerText = cA;
+            document.getElementById('badge-concluida').innerText = cC;
         }
 
-        // Abrir Modal de Detalhes Avançados
-        function abrirModalDetalhes(id) {
-            const t = todasAsTarefas.find(item => item.id === id);
-            if (!t) return;
+        // ---------- Drag and drop ----------
+        async function moverTarefaParaStatus(id, novoStatus) {
+            const tarefa = encontrarTarefa(id);
+            if (!tarefa || tarefa.status === novoStatus) return;
 
-            tarefaSelecionadaId = id;
-            listaArquivosLocal = t.arquivos || [];
-            listaHistoricoLocal = t.historico || [];
+            let novoAndamento = Number(tarefa.andamento) || 0;
+            if (novoStatus === 'Pendente') novoAndamento = 0;
+            if (novoStatus === 'Em andamento') {
+                if (novoAndamento <= 0) novoAndamento = 1;
+                if (novoAndamento >= 100) novoAndamento = 99;
+            }
+            if (novoStatus === 'Concluída') novoAndamento = 100;
 
-            document.getElementById("detalheCodigoTitulo").innerText = `Tarefa ${t.codigo}`;
-            document.getElementById("detalheFormTitulo").innerText = t.titulo;
-            document.getElementById("detalheSecao").innerText = t.secao;
-            document.getElementById("detalheResponsavel").innerText = t.responsavel;
-            document.getElementById("detalhePrioridade").innerText = t.prioridade;
-            document.getElementById("detalheDescricao").innerText = t.descricao || "Sem descrição.";
-            document.getElementById("detalhePrazo").innerText = t.prazo ? t.prazo.split("-").reverse().join("/") : "--/--/----";
-            
-            // Status radio
-            const radios = document.getElementsByName("detalheStatus");
-            radios.forEach(r => r.checked = r.value === t.status);
+            const hist = normalizarHistorico(tarefa.historico);
+            hist.push(criarEntradaHistorico(`Tarefa movida para "${novoStatus}".`));
 
-            // Slider andamento
-            document.getElementById("detalheAndamento").value = t.andamento || 0;
-            document.getElementById("txtAndamentoPorcentagem").innerText = t.andamento || 0;
+            try {
+                const { error } = await supabaseClient.from('tarefas').update({
+                    status: novoStatus,
+                    andamento: novoAndamento,
+                    historico: hist
+                }).eq('id', tarefa.id);
+                if (error) throw error;
 
-            renderizarArquivosLocal();
-            renderizarHistoricoLocal();
-
-            document.getElementById("modalDetalhesTarefa").style.display = "flex";
-        }
-
-        function renderizarArquivosLocal() {
-            const container = document.getElementById("detalheListaArquivos");
-            container.innerHTML = "";
-            listaArquivosLocal.forEach((arq, index) => {
-                const item = document.createElement("div");
-                item.className = "file-item";
-                item.innerHTML = `<span>📄 ${arq}</span><span class="file-remove" onclick="removerAnexoLocal(${index})">×</span>`;
-                container.appendChild(item);
-            });
-        }
-
-        function simularAnexoArquivo() {
-            const nomeFicticio = prompt("Digite o nome do arquivo para simular o anexo (Ex: relatorio.pdf):");
-            if (nomeFicticio) {
-                listaArquivosLocal.push(nomeFicticio);
-                renderizarArquivosLocal();
+                tarefa.status = novoStatus;
+                tarefa.andamento = novoAndamento;
+                tarefa.historico = hist;
+                renderizarQuadroKanban();
+            } catch (err) {
+                alert('Erro ao mover tarefa: ' + err.message);
+                buscarTarefasDoBanco();
             }
         }
 
-        function removerAnexoLocal(index) {
-            listaArquivosLocal.splice(index, 1);
-            renderizarArquivosLocal();
+        function configurarDragDrop() {
+            const destinos = [
+                ['container-pendente', 'Pendente'],
+                ['container-andamento', 'Em andamento'],
+                ['container-concluida', 'Concluída']
+            ];
+
+            destinos.forEach(([id, status]) => {
+                const container = document.getElementById(id);
+                if (!container) return;
+
+                container.addEventListener('dragover', e => {
+                    e.preventDefault();
+                    container.classList.add('drag-over');
+                    if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+                });
+                container.addEventListener('dragleave', e => {
+                    if (!container.contains(e.relatedTarget)) container.classList.remove('drag-over');
+                });
+                container.addEventListener('drop', async e => {
+                    e.preventDefault();
+                    container.classList.remove('drag-over');
+                    const idDrop = tarefaArrastadaId || (e.dataTransfer ? e.dataTransfer.getData('text/plain') : null);
+                    if (idDrop) await moverTarefaParaStatus(idDrop, status);
+                });
+            });
         }
 
-        function renderizarHistoricoLocal() {
-            const container = document.getElementById("detalheListaHistorico");
-            container.innerHTML = "";
-            listaHistoricoLocal.slice().reverse().forEach(log => {
-                const item = document.createElement("div");
-                item.className = "history-item";
-                const partes = log.split(" | ");
-                const texto = partes[0];
-                const data = partes[1] || "";
-                item.innerHTML = `<div>${texto}</div><span class="history-date">${data}</span>`;
+        // ---------- Modal de detalhes ----------
+        function abrirModalDetalhes(id) {
+            const t = encontrarTarefa(id);
+            if (!t) return;
+
+            tarefaSelecionadaId = t.id;
+            listaArquivosLocal = normalizarArquivos(t.arquivos);
+            listaHistoricoLocal = normalizarHistorico(t.historico);
+
+            document.getElementById('detalheCodigoTitulo').innerText = `Tarefa ${t.codigo || ('#' + String(t.id).padStart(4, '0'))}`;
+            document.getElementById('detalheFormTitulo').innerText = t.titulo || 'Sem título';
+            document.getElementById('detalheSecao').innerText = t.secao || '-';
+            document.getElementById('detalheResponsavel').innerText = t.responsavel || '-';
+            document.getElementById('detalhePrioridade').innerText = t.prioridade || '-';
+            document.getElementById('detalheDescricao').innerText = t.descricao || 'Sem descrição.';
+            document.getElementById('detalhePrazo').innerText = t.prazo ? String(t.prazo).split('-').reverse().join('/') : '--/--/----';
+
+            document.getElementsByName('detalheStatus').forEach(r => r.checked = r.value === t.status);
+
+            const pct = Math.max(0, Math.min(100, Number(t.andamento) || 0));
+            document.getElementById('detalheAndamento').value = pct;
+            document.getElementById('txtAndamentoPorcentagem').innerText = pct;
+
+            renderizarArquivosLocal();
+            renderizarHistoricoLocal();
+            document.getElementById('modalDetalhesTarefa').style.display = 'flex';
+        }
+
+        function fecharModalDetalhes() {
+            document.getElementById('modalDetalhesTarefa').style.display = 'none';
+            tarefaSelecionadaId = null;
+            listaArquivosLocal = [];
+            listaHistoricoLocal = [];
+            const input = document.getElementById('txtNovaAtualizacao');
+            if (input) input.value = '';
+        }
+
+        function renderizarArquivosLocal() {
+            const container = document.getElementById('detalheListaArquivos');
+            container.innerHTML = '';
+
+            if (!listaArquivosLocal.length) {
+                container.innerHTML = '<div style="font-size:12px;color:#9ca3af;font-style:italic;padding:4px 0;">Nenhum arquivo anexado.</div>';
+                return;
+            }
+
+            listaArquivosLocal.forEach((arq, index) => {
+                const item = document.createElement('div');
+                item.className = 'file-item';
+                const nome = escaparHtml(arq.name || 'arquivo');
+                const conteudoSeguro = typeof arq.content === 'string' && arq.content.startsWith('data:') ? arq.content : null;
+
+                item.innerHTML = `
+                    <div class="file-item-left">
+                        <span>📄</span>
+                        ${conteudoSeguro
+                            ? `<a class="file-name-link" href="${conteudoSeguro}" download="${nome}" title="Baixar arquivo">${nome}</a>`
+                            : `<span class="file-name-link" title="Anexo legado sem conteúdo incorporado">${nome}</span>`}
+                    </div>
+                    <span class="file-remove" onclick="removerAnexoLocal(${index})" title="Remover">×</span>
+                `;
                 container.appendChild(item);
             });
         }
 
-        function adicionarLogHistorico() {
-            const input = document.getElementById("txtNovaAtualizacao");
-            if (!input.value.trim()) return;
-            
-            const agora = new Date();
-            const dataStr = agora.toLocaleDateString('pt-BR') + " " + agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
-            
-            listaHistoricoLocal.push(`${input.value.trim()} | ${dataStr}`);
-            input.value = "";
-            renderizarHistoricoLocal();
+        async function salvarAnexosEHistorico() {
+            if (!tarefaSelecionadaId) return;
+            const { error } = await supabaseClient.from('tarefas').update({
+                arquivos: serializarArquivosParaBanco(),
+                historico: listaHistoricoLocal
+            }).eq('id', tarefaSelecionadaId);
+            if (error) throw error;
+
+            const t = encontrarTarefa(tarefaSelecionadaId);
+            if (t) {
+                t.arquivos = serializarArquivosParaBanco();
+                t.historico = listaHistoricoLocal.slice();
+            }
         }
 
-        // Salvar alterações de detalhes
-        document.getElementById("btnSalvarAlteracoesDetalhes").onclick = async function() {
+        async function processarAnexoArquivo(event) {
+            const file = event.target.files?.[0];
+            event.target.value = '';
+            if (!file || !tarefaSelecionadaId) return;
+
+            if (file.size > 5 * 1024 * 1024) {
+                alert('O arquivo excede o limite de 5MB.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = async e => {
+                listaArquivosLocal.push({ name: file.name, content: e.target.result });
+                adicionarHistoricoLocal(`Arquivo "${file.name}" anexado à tarefa.`);
+                renderizarArquivosLocal();
+                renderizarHistoricoLocal();
+
+                try {
+                    await salvarAnexosEHistorico();
+                    renderizarQuadroKanban();
+                } catch (err) {
+                    listaArquivosLocal.pop();
+                    listaHistoricoLocal.pop();
+                    renderizarArquivosLocal();
+                    renderizarHistoricoLocal();
+                    alert('Erro ao salvar o anexo no banco: ' + err.message);
+                }
+            };
+            reader.onerror = () => alert('Não foi possível ler o arquivo selecionado.');
+            reader.readAsDataURL(file);
+        }
+
+        async function removerAnexoLocal(index) {
+            const arq = listaArquivosLocal[index];
+            if (!arq || !confirm(`Deseja remover o anexo "${arq.name}"?`)) return;
+
+            const backupArquivos = listaArquivosLocal.slice();
+            const backupHistorico = listaHistoricoLocal.slice();
+            listaArquivosLocal.splice(index, 1);
+            adicionarHistoricoLocal(`Arquivo "${arq.name}" removido.`);
+            renderizarArquivosLocal();
+            renderizarHistoricoLocal();
+
+            try {
+                await salvarAnexosEHistorico();
+                renderizarQuadroKanban();
+            } catch (err) {
+                listaArquivosLocal = backupArquivos;
+                listaHistoricoLocal = backupHistorico;
+                renderizarArquivosLocal();
+                renderizarHistoricoLocal();
+                alert('Erro ao remover o anexo: ' + err.message);
+            }
+        }
+
+        function renderizarHistoricoLocal() {
+            const container = document.getElementById('detalheListaHistorico');
+            container.innerHTML = '';
+
+            if (!listaHistoricoLocal.length) {
+                container.innerHTML = '<div style="font-size:12px;color:#9ca3af;font-style:italic;">Nenhuma atualização registrada.</div>';
+                return;
+            }
+
+            listaHistoricoLocal.slice().reverse().forEach(log => {
+                let texto = '', data = '', usuario = '';
+                if (log && typeof log === 'object') {
+                    texto = log.text || log.texto || '';
+                    data = log.date || log.data || '';
+                    usuario = log.user || log.usuario || '';
+                } else {
+                    const partes = String(log).split(' | ');
+                    texto = partes[0] || '';
+                    data = partes[1] || '';
+                    usuario = partes.slice(2).join(' | ') || '';
+                }
+
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                item.innerHTML = `
+                    <div>${escaparHtml(texto)}</div>
+                    <span class="history-date">${escaparHtml([data, usuario].filter(Boolean).join(' — '))}</span>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        async function adicionarLogHistorico() {
+            const input = document.getElementById('txtNovaAtualizacao');
+            const texto = input.value.trim();
+            if (!texto || !tarefaSelecionadaId) return;
+
+            const t = encontrarTarefa(tarefaSelecionadaId);
+            if (!t) return;
+
+            listaHistoricoLocal.push(criarEntradaHistorico(texto));
+            let status = t.status;
+            let andamento = Number(t.andamento) || 0;
+            if (status === 'Pendente') {
+                status = 'Em andamento';
+                if (andamento === 0) andamento = 1;
+            }
+
+            try {
+                const { error } = await supabaseClient.from('tarefas').update({
+                    historico: listaHistoricoLocal,
+                    status,
+                    andamento
+                }).eq('id', tarefaSelecionadaId);
+                if (error) throw error;
+
+                input.value = '';
+                t.historico = listaHistoricoLocal.slice();
+                t.status = status;
+                t.andamento = andamento;
+                renderizarHistoricoLocal();
+                renderizarQuadroKanban();
+
+                document.getElementsByName('detalheStatus').forEach(r => r.checked = r.value === status);
+                document.getElementById('detalheAndamento').value = andamento;
+                document.getElementById('txtAndamentoPorcentagem').innerText = andamento;
+            } catch (err) {
+                listaHistoricoLocal.pop();
+                alert('Erro ao registrar atualização: ' + err.message);
+            }
+        }
+
+        // ---------- Sincronização status x andamento ----------
+        document.getElementsByName('detalheStatus').forEach(radio => {
+            radio.addEventListener('change', () => {
+                const slider = document.getElementById('detalheAndamento');
+                let valor = Number(slider.value) || 0;
+                if (radio.value === 'Pendente') valor = 0;
+                if (radio.value === 'Em andamento' && (valor <= 0 || valor >= 100)) valor = 1;
+                if (radio.value === 'Concluída') valor = 100;
+                slider.value = valor;
+                document.getElementById('txtAndamentoPorcentagem').innerText = valor;
+            });
+        });
+
+        document.getElementById('detalheAndamento').addEventListener('input', e => {
+            const valor = Number(e.target.value) || 0;
+            document.getElementById('txtAndamentoPorcentagem').innerText = valor;
+            let status = valor === 0 ? 'Pendente' : valor >= 100 ? 'Concluída' : 'Em andamento';
+            document.getElementsByName('detalheStatus').forEach(r => r.checked = r.value === status);
+        });
+
+        // ---------- Salvar / concluir / excluir tarefa ----------
+        document.getElementById('btnSalvarAlteracoesDetalhes').onclick = async function() {
             if (!tarefaSelecionadaId) return;
-            
+            const t = encontrarTarefa(tarefaSelecionadaId);
+            if (!t) return;
+
             const btn = this;
             btn.disabled = true;
 
-            const radios = document.getElementsByName("detalheStatus");
-            let statusSel = "Pendente";
-            radios.forEach(r => { if (r.checked) statusSel = r.value; });
+            let statusSel = 'Pendente';
+            document.getElementsByName('detalheStatus').forEach(r => { if (r.checked) statusSel = r.value; });
+            let andamentoSel = Math.max(0, Math.min(100, Number(document.getElementById('detalheAndamento').value) || 0));
 
-            const andamentoSel = parseInt(document.getElementById("detalheAndamento").value);
+            if (andamentoSel >= 100 || statusSel === 'Concluída') { statusSel = 'Concluída'; andamentoSel = 100; }
+            else if (andamentoSel <= 0 || statusSel === 'Pendente') { statusSel = 'Pendente'; andamentoSel = 0; }
+            else { statusSel = 'Em andamento'; }
+
+            const statusAnterior = t.status;
+            const andamentoAnterior = Number(t.andamento) || 0;
+            if (statusSel !== statusAnterior) adicionarHistoricoLocal(`Status alterado de "${statusAnterior}" para "${statusSel}".`);
+            if (andamentoSel !== andamentoAnterior) adicionarHistoricoLocal(`Andamento atualizado de ${andamentoAnterior}% para ${andamentoSel}%.`);
 
             try {
                 const { error } = await supabaseClient.from('tarefas').update({
                     status: statusSel,
                     andamento: andamentoSel,
-                    arquivos: listaArquivosLocal,
+                    arquivos: serializarArquivosParaBanco(),
                     historico: listaHistoricoLocal
                 }).eq('id', tarefaSelecionadaId);
-
                 if (error) throw error;
 
-                document.getElementById("modalDetalhesTarefa").style.display = "none";
-                buscarTarefasDoBanco();
+                fecharModalDetalhes();
+                await buscarTarefasDoBanco();
             } catch (err) {
-                alert("Erro ao atualizar detalhes: " + err.message);
+                alert('Erro ao atualizar detalhes: ' + err.message);
             } finally {
                 btn.disabled = false;
             }
         };
 
-        // Excluir tarefa individual
-        document.getElementById("btnExcluirTarefaIndividual").onclick = async function() {
-            if (!tarefaSelecionadaId || !confirm("Tem certeza que deseja excluir esta tarefa de forma definitiva?")) return;
+        document.getElementById('btnConcluirTarefaIndividual').onclick = async function() {
+            if (!tarefaSelecionadaId) return;
+            const t = encontrarTarefa(tarefaSelecionadaId);
+            if (!t) return;
+
+            listaHistoricoLocal.push(criarEntradaHistorico('Tarefa marcada como concluída.'));
             try {
-                const { error } = await supabaseClient.from('tarefas').delete().eq('id', tarefaSelecionadaId);
+                const { error } = await supabaseClient.from('tarefas').update({
+                    status: 'Concluída',
+                    andamento: 100,
+                    historico: listaHistoricoLocal,
+                    arquivos: serializarArquivosParaBanco()
+                }).eq('id', tarefaSelecionadaId);
                 if (error) throw error;
-                document.getElementById("modalDetalhesTarefa").style.display = "none";
-                buscarTarefasDoBanco();
+
+                t.status = 'Concluída';
+                t.andamento = 100;
+                t.historico = listaHistoricoLocal.slice();
+                document.getElementsByName('detalheStatus').forEach(r => r.checked = r.value === 'Concluída');
+                document.getElementById('detalheAndamento').value = 100;
+                document.getElementById('txtAndamentoPorcentagem').innerText = 100;
+                renderizarHistoricoLocal();
+                renderizarQuadroKanban();
             } catch (err) {
-                alert("Erro ao excluir: " + err.message);
+                listaHistoricoLocal.pop();
+                alert('Erro ao concluir tarefa: ' + err.message);
             }
         };
 
-        // Ações em massa (Concluir selecionadas / Excluir selecionadas)
+        document.getElementById('btnExcluirTarefaIndividual').onclick = async function() {
+            if (!tarefaSelecionadaId || !confirm('Tem certeza que deseja excluir esta tarefa de forma definitiva?')) return;
+            try {
+                const { error } = await supabaseClient.from('tarefas').delete().eq('id', tarefaSelecionadaId);
+                if (error) throw error;
+                fecharModalDetalhes();
+                await buscarTarefasDoBanco();
+            } catch (err) {
+                alert('Erro ao excluir: ' + err.message);
+            }
+        };
+
+        // ---------- Ações em massa ----------
         async function executarAcaoEmMassa(colunaStatus, acao) {
-            const checkboxes = document.querySelectorAll(`#container-${colunaStatus === 'Pendente' ? 'pendente' : colunaStatus === 'Em andamento' ? 'andamento' : 'concluida'} .task-checkbox:checked`);
+            const sufixo = colunaStatus === 'Pendente' ? 'pendente' : colunaStatus === 'Em andamento' ? 'andamento' : 'concluida';
+            const checkboxes = document.querySelectorAll(`#container-${sufixo} .task-checkbox:checked`);
             if (checkboxes.length === 0) {
-                alert("Nenhuma tarefa selecionada nesta coluna.");
+                alert('Nenhuma tarefa selecionada nesta coluna.');
                 return;
             }
 
-            const ids = Array.from(checkboxes).map(cb => parseInt(cb.getAttribute("data-id")));
-
-            if (acao === "Excluir" && !confirm(`Deseja excluir as ${ids.length} tarefas selecionadas?`)) return;
+            const ids = Array.from(checkboxes).map(cb => Number(cb.dataset.id));
+            if (acao === 'Excluir' && !confirm(`Deseja excluir as ${ids.length} tarefa(s) selecionada(s)?`)) return;
 
             try {
-                if (acao === "Concluir") {
-                    const { error } = await supabaseClient.from('tarefas').update({ status: 'Concluída', andamento: 100 }).in('id', ids);
-                    if (error) throw error;
-                } else if (acao === "Excluir") {
+                if (acao === 'Concluir') {
+                    for (const id of ids) {
+                        const tarefa = encontrarTarefa(id);
+                        const hist = normalizarHistorico(tarefa?.historico);
+                        hist.push(criarEntradaHistorico('Tarefa concluída em lote pelo quadro.'));
+                        const { error } = await supabaseClient.from('tarefas').update({
+                            status: 'Concluída', andamento: 100, historico: hist
+                        }).eq('id', id);
+                        if (error) throw error;
+                    }
+                } else if (acao === 'Excluir') {
                     const { error } = await supabaseClient.from('tarefas').delete().in('id', ids);
                     if (error) throw error;
                 }
-                buscarTarefasDoBanco();
+                await buscarTarefasDoBanco();
             } catch (err) {
-                alert("Erro na ação em massa: " + err.message);
+                alert('Erro na ação em massa: ' + err.message);
             }
         }
 
-        // Controle dos Modais de Criação
-        const modalTarefa = document.getElementById("modalNovaTarefa");
+        // ---------- Modal de criação ----------
+        const modalTarefa = document.getElementById('modalNovaTarefa');
         function abrirModalNovaTarefa(statusColumn) {
-            document.getElementById("taskStatusAlvo").value = statusColumn;
-            modalTarefa.style.display = "flex";
+            document.getElementById('taskStatusAlvo').value = statusColumn;
+            modalTarefa.style.display = 'flex';
+            setTimeout(() => document.getElementById('taskTitulo').focus(), 0);
         }
 
-        document.getElementById("btnNovaTarefaTop").onclick = () => abrirModalNovaTarefa('Pendente');
-        document.getElementById("fecharModalTarefa").onclick = () => modalTarefa.style.display = "none";
-        document.getElementById("btnCancelaTarefa").onclick = () => modalTarefa.style.display = "none";
-        
-        document.getElementById("fecharModalDetalhes").onclick = () => document.getElementById("modalDetalhesTarefa").style.display = "none";
-        document.getElementById("btnFecharDetalhes").onclick = () => document.getElementById("modalDetalhesTarefa").style.display = "none";
+        function fecharModalNovaTarefa() {
+            modalTarefa.style.display = 'none';
+            document.getElementById('formNovaTarefa').reset();
+            document.getElementById('taskStatusAlvo').value = 'Pendente';
+        }
 
-        // Gravação da nova tarefa no banco de dados
-        document.getElementById("formNovaTarefa").addEventListener("submit", async function(e) {
+        document.getElementById('btnNovaTarefaTop').onclick = () => abrirModalNovaTarefa('Pendente');
+        document.getElementById('fecharModalTarefa').onclick = fecharModalNovaTarefa;
+        document.getElementById('btnCancelaTarefa').onclick = fecharModalNovaTarefa;
+        document.getElementById('fecharModalDetalhes').onclick = fecharModalDetalhes;
+        document.getElementById('btnFecharDetalhes').onclick = fecharModalDetalhes;
+
+        document.getElementById('formNovaTarefa').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const btn = document.getElementById("btnSalvaTarefa");
+            const btn = document.getElementById('btnSalvaTarefa');
             btn.disabled = true;
 
-            const tTitulo = document.getElementById("taskTitulo").value;
-            const tDesc = document.getElementById("taskDescricao").value;
-            const tSecao = document.getElementById("taskSecao").value;
-            const tResp = document.getElementById("taskResponsavel").value;
-            const tPrio = document.getElementById("taskPrioridade").value;
-            const tPrazo = document.getElementById("taskPrazo").value || null;
-            const tStatus = document.getElementById("taskStatusAlvo").value;
-
-            const codGerado = "#" + Math.floor(1000 + Math.random() * 9000);
+            const tTitulo = document.getElementById('taskTitulo').value.trim();
+            const tDesc = document.getElementById('taskDescricao').value.trim();
+            const tSecao = document.getElementById('taskSecao').value;
+            const tResp = document.getElementById('taskResponsavel').value.trim();
+            const tPrio = document.getElementById('taskPrioridade').value;
+            const tPrazo = document.getElementById('taskPrazo').value || null;
+            const tStatus = document.getElementById('taskStatusAlvo').value;
+            const codGerado = '#' + Math.floor(1000 + Math.random() * 9000);
+            const andamentoInicial = tStatus === 'Concluída' ? 100 : tStatus === 'Em andamento' ? 1 : 0;
 
             try {
                 const { error } = await supabaseClient.from('tarefas').insert([{
@@ -1126,52 +1571,83 @@
                     prazo: tPrazo,
                     status: tStatus,
                     criado_por: usuarioLogado.id,
-                    andamento: tStatus === 'Concluída' ? 100 : 0
+                    andamento: andamentoInicial,
+                    arquivos: [],
+                    historico: [criarEntradaHistorico('Tarefa criada.')]
                 }]);
-
                 if (error) throw error;
 
-                modalTarefa.style.display = "none";
-                document.getElementById("formNovaTarefa").reset();
-                buscarTarefasDoBanco();
+                fecharModalNovaTarefa();
+                await buscarTarefasDoBanco();
             } catch (err) {
-                alert("Erro ao salvar tarefa: " + err.message);
+                alert('Erro ao salvar tarefa: ' + err.message);
             } finally {
                 btn.disabled = false;
             }
         });
 
-        // Dropdown e Modal de Senha
-        const dropdown = document.getElementById("userDropdown");
-        document.getElementById("sidebarUserBtn").onclick = (e) => {
+        // ---------- Dropdown / senha / sessão ----------
+        const dropdown = document.getElementById('userDropdown');
+        document.getElementById('sidebarUserBtn').onclick = e => {
             e.stopPropagation();
-            dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
         };
-        document.onclick = () => dropdown.style.display = "none";
+        document.addEventListener('click', () => dropdown.style.display = 'none');
 
-        const modalSenha = document.getElementById("modalSenha");
-        document.getElementById("btnAbrirModalSenha").onclick = () => modalSenha.style.display = "flex";
-        document.getElementById("btnFecharModalSenha").onclick = () => modalSenha.style.display = "none";
-        document.getElementById("btnCancelaSenha").onclick = () => modalSenha.style.display = "none";
+        const modalSenha = document.getElementById('modalSenha');
+        document.getElementById('btnAbrirModalSenha').onclick = e => {
+            e.stopPropagation();
+            dropdown.style.display = 'none';
+            modalSenha.style.display = 'flex';
+        };
+        document.getElementById('btnFecharModalSenha').onclick = () => modalSenha.style.display = 'none';
+        document.getElementById('btnCancelaSenha').onclick = () => modalSenha.style.display = 'none';
 
-        document.getElementById("formAlterarSenha").addEventListener("submit", async function(e) {
+        document.getElementById('formAlterarSenha').addEventListener('submit', async function(e) {
             e.preventDefault();
-            const ns = document.getElementById("novaSenha").value;
-            if(ns !== document.getElementById("confirmaNovaSenha").value) return alert("Senhas não coincidem!");
-            
+            const ns = document.getElementById('novaSenha').value;
+            const confirma = document.getElementById('confirmaNovaSenha').value;
+            if (ns.length < 6) return alert('A nova senha deve ter no mínimo 6 caracteres.');
+            if (ns !== confirma) return alert('Senhas não coincidem!');
+
             try {
                 const { error } = await supabaseClient.from('usuarios').update({ senha: ns }).eq('id', usuarioLogado.id);
                 if (error) throw error;
-                alert("Senha modificada com sucesso!");
-                modalSenha.style.display = "none";
-            } catch(err) { alert(err.message); }
+                alert('Senha modificada com sucesso!');
+                modalSenha.style.display = 'none';
+                this.reset();
+            } catch (err) {
+                alert('Erro ao alterar senha: ' + err.message);
+            }
         });
 
-        // Eventos adicionais
-        document.getElementById("btnSairSessao").onclick = () => { localStorage.clear(); window.location.href = "index.html"; };
-        document.getElementById("filtroSecao").onchange = () => renderizarQuadroKanban();
+        document.getElementById('btnSairSessao').onclick = () => {
+            localStorage.removeItem('usuarioLogado');
+            window.location.href = 'index.html';
+        };
 
-        // Inicialização primária
+        // ---------- Eventos gerais ----------
+        document.getElementById('filtroSecao').addEventListener('change', renderizarQuadroKanban);
+        document.getElementById('buscaTarefa').addEventListener('input', renderizarQuadroKanban);
+        document.getElementById('inputAnexoTarefa').addEventListener('change', processarAnexoArquivo);
+
+        [modalTarefa, document.getElementById('modalDetalhesTarefa'), modalSenha].forEach(modal => {
+            modal.addEventListener('click', e => {
+                if (e.target !== modal) return;
+                if (modal === modalTarefa) fecharModalNovaTarefa();
+                else if (modal.id === 'modalDetalhesTarefa') fecharModalDetalhes();
+                else modalSenha.style.display = 'none';
+            });
+        });
+
+        document.addEventListener('keydown', e => {
+            if (e.key !== 'Escape') return;
+            if (modalSenha.style.display === 'flex') modalSenha.style.display = 'none';
+            else if (document.getElementById('modalDetalhesTarefa').style.display === 'flex') fecharModalDetalhes();
+            else if (modalTarefa.style.display === 'flex') fecharModalNovaTarefa();
+        });
+
+        configurarDragDrop();
         buscarTarefasDoBanco();
     </script>
 </body>
