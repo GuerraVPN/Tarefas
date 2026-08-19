@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Testador de Usuários - Supabase</title>
+    <title>Testador de Usuários Modular - Supabase</title>
     <link href="https://googleapis.com" rel="stylesheet">
-    <script src="https://jsdelivr.net"></script>
     <style>
         body { font-family: 'Inter', sans-serif; background: #f4f6f8; padding: 30px; color: #1f2937; }
         .container { max-width: 800px; margin: 0 auto; background: white; padding: 24px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
@@ -27,7 +26,8 @@
 <body>
 
 <div class="container">
-    <h2>🛠️ Testador de Conexão: Tabela de Usuários</h2>  
+    <h2>🛠️ Testador de Conexão (Modular): Tabela de Usuários</h2>
+    
     <div class="grid">
         <!-- FORMULÁRIO PARA ADICIONAR -->
         <div class="card">
@@ -35,6 +35,7 @@
             <form id="userForm" style="margin-top: 15px;">
                 <label>Nome de Guerra</label>
                 <input id="userName" required placeholder="Ex: Silva">
+                
                 <label>Posto / Graduação</label>
                 <select id="userGrad">
                     <option>Oficial</option>
@@ -42,40 +43,46 @@
                     <option>Cb</option>
                     <option selected>Sd</option>
                 </select>
+                
                 <label>Seção</label>
                 <select id="userSec">
                     <option>S1</option><option>S2</option><option selected>S3</option><option>S4</option>
                     <option>Fiscalização</option><option>Pagamento</option><option>SALC</option>
                     <option>Garagem</option><option>Informática</option>
                 </select>
+                
                 <label>Função / Papel</label>
-                <input id="userRole" required placeholder="Ex: Auxiliar">  
+                <input id="userRole" required placeholder="Ex: Auxiliar">
+                
                 <button type="submit">Inserir no Supabase</button>
             </form>
         </div>
+
         <!-- STATUS DA CONEXÃO -->
         <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
             <div>
                 <h3>Status do Banco</h3>
-                <p style="margin-top:15px; font-size: 14px;"><strong>URL:</strong> bpvijatnsluwsgnzklrd</p>
+                <p style="margin-top:15px; font-size: 14px;"><strong>ID do Projeto:</strong> bpvijatnsluwsgnzklrd</p>
                 <p style="margin-top:5px; font-size: 14px;"><strong>Tabela Alvo:</strong> usuarios</p>
             </div>
-            <div id="connectionStatus" style="padding: 15px; border-radius: 6px; background: #fee2e2; color: #991b1b; font-weight: bold; text-align: center;">
-                Conectando...
+            <div id="connectionStatus" style="padding: 15px; border-radius: 6px; background: #fef3c7; color: #d97706; font-weight: bold; text-align: center;">
+                Buscando módulo...
             </div>
         </div>
     </div>
+
     <!-- LISTA E FILTRO -->
     <h3>Militares Ativos no Sistema</h3>
     <div class="filter-box" style="margin-top: 15px;">
         <label style="margin: 0; white-space: nowrap;">Filtrar Seção:</label>
-        <select id="filterSection" onchange="renderUsers()">
+        <select id="filterSection">
             <option value="">Todos</option>
             <option>S1</option><option>S2</option><option>S3</option><option>S4</option>
             <option>Fiscalização</option><option>Pagamento</option><option>SALC</option>
             <option>Garagem</option><option>Informática</option>
         </select>
     </div>
+
     <table id="userTable">
         <thead>
             <tr>
@@ -89,23 +96,34 @@
         </thead>
         <tbody>
             <tr>
-                <td colspan="6" style="text-align: center; color: var(--text-muted);">Buscando dados na nuvem...</td>
+                <td colspan="6" style="text-align: center; color: #6b7280;" id="tableMessage">Buscando dados na nuvem...</td>
             </tr>
         </tbody>
     </table>
 </div>
-<script>
-    // Suas credenciais vinculadas
-    const SUPABASE_URL = "https://supabase.co";
+
+<!-- Usando a tag script com type="module" evita o carregamento infinito do cdn clássico -->
+<script type="module">
+    import { createClient } from 'https://jsdelivr.net';
+
+    const SUPABASE_URL = "https://bpvijatnsluwsgnzklrd.supabase.co";
     const SUPABASE_KEY = "sb_publishable_r7M3twr5mKmbYqP14HGpVQ_ruI0QB_p";
-    const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
     let allUsers = [];
-    // Buscar usuários do Supabase
+
     async function fetchUsers() {
         const statusBox = document.getElementById("connectionStatus");
+        const tableMsg = document.getElementById("tableMessage");
         try {
-            const { data, error } = await supabase.from('usuarios').select('*').order('id', { ascending: true });         
+            statusBox.style.background = "#eff6ff";
+            statusBox.style.color = "#2563eb";
+            statusBox.innerHTML = "Executando leitura...";
+
+            const { data, error } = await supabase.from('usuarios').select('*').order('id', { ascending: true });
+            
             if (error) throw error;
+
             allUsers = data || [];
             statusBox.style.background = "#d1fae5";
             statusBox.style.color = "#065f46";
@@ -114,20 +132,24 @@
         } catch (err) {
             statusBox.style.background = "#fee2e2";
             statusBox.style.color = "#991b1b";
-            statusBox.innerHTML = "🔴 Erro: Certifique-se de ter rodado o código SQL no painel.";
+            statusBox.innerHTML = "🔴 Erro na Conexão";
+            tableMsg.innerHTML = `Falha crítica: ${err.message || 'Verifique o SQL Editor'}.`;
             console.error(err);
         }
     }
-    // Renderizar na tabela com filtros aplicados
+
     function renderUsers() {
         const tbody = document.querySelector("#userTable tbody");
         const filter = document.getElementById("filterSection").value;
         tbody.innerHTML = "";
+
         const filtered = allUsers.filter(u => !filter || u.secao === filter);
+
         if(filtered.length === 0) {
             tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #6b7280;">Nenhum usuário encontrado para esta seção.</td></tr>`;
             return;
         }
+
         filtered.forEach(u => {
             const tr = document.createElement("tr");
             tr.innerHTML = `
@@ -141,25 +163,31 @@
             tbody.appendChild(tr);
         });
     }
-    // Evento de Envio do Form (Salvar novo usuário na nuvem)
+
     document.getElementById("userForm").addEventListener("submit", async (e) => {
-        e.preventDefault();      
+        e.preventDefault();
+        
         const newUser = {
             nome: document.getElementById("userName").value.trim(),
             graduacao: document.getElementById("userGrad").value,
             secao: document.getElementById("userSec").value,
             papel: document.getElementById("userRole").value.trim()
         };
-        const { error } = await supabase.from('usuarios').insert([newUser]);     
+
+        const { error } = await supabase.from('usuarios').insert([newUser]);
+        
         if(!error) {
             document.getElementById("userName").value = "";
             document.getElementById("userRole").value = "";
-            fetchUsers(); // Recarrega a tabela imediatamente
+            fetchUsers();
         } else {
             alert("Erro ao inserir: " + error.message);
         }
     });
-   // Iniciar teste ao abrir a página
+
+    document.getElementById("filterSection").addEventListener("change", renderUsers);
+
+    // Executa a primeira chamada
     fetchUsers();
 </script>
 </body>
