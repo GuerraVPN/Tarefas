@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quadro de Tarefas - 26º Pel PE Mec</title>
 
-    <!-- CDN DO SDK DO SUPABASE OBRIGATÓRIA PARA A CONEXÃO -->
+    <!-- CDN DO SDK DO SUPABASE -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
@@ -31,6 +31,7 @@
             display: flex;
             flex-direction: column;
             border-right: 1px solid #1f2937;
+            flex-shrink: 0;
         }
 
         .brand {
@@ -54,13 +55,13 @@
             font-size: 20px;
         }
 
-        .logo-text h1 {
+        .brand h1 {
             font-size: 20px;
             color: white;
             font-weight: bold;
         }
 
-        .logo-text p {
+        .brand p {
             font-size: 12px;
             color: #eab308;
         }
@@ -87,7 +88,6 @@
             color: white;
         }
 
-        /* Perfil de Usuário na Sidebar (Rodapé) */
         .sidebar-footer {
             border-top: 1px solid #1f2937;
             padding-top: 20px;
@@ -119,6 +119,7 @@
             font-weight: bold;
             font-size: 16px;
             color: white;
+            flex-shrink: 0;
         }
 
         .btn-sair-sidebar {
@@ -133,6 +134,7 @@
             align-items: center;
             gap: 12px;
             font-size: 15px;
+            margin-top: 10px;
         }
 
         /* Topbar / Cabeçalho */
@@ -150,6 +152,7 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid #e5e7eb;
+            position: relative;
         }
 
         .header-title h2 {
@@ -245,7 +248,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             padding-bottom: 10px;
             border-bottom: 2px solid #f3f4f6;
         }
@@ -271,13 +274,32 @@
             font-weight: bold;
         }
 
+        .mass-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .mass-actions button {
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            color: #4b5563;
+        }
+
+        .mass-actions button:hover {
+            background: #e5e7eb;
+        }
+
         /* Cores das colunas baseadas na imagem */
         .col-pendente .column-header { border-bottom-color: #ef4444; }
         .col-andamento .column-header { border-bottom-color: #3b82f6; }
         .col-concluida .column-header { border-bottom-color: #10b981; }
 
         .cards-container {
-            min-height: 200px;
+            min-height: 150px;
             display: flex;
             flex-direction: column;
             gap: 15px;
@@ -289,7 +311,6 @@
             border: 1px solid #e5e7eb;
             border-radius: 10px;
             padding: 15px;
-            cursor: pointer;
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
             transition: transform 0.2s, box-shadow 0.2s;
             position: relative;
@@ -305,6 +326,18 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
+        }
+
+        .card-top-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .task-checkbox {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
         }
 
         .task-code {
@@ -330,6 +363,7 @@
             color: #1f2937;
             margin-bottom: 12px;
             line-height: 1.4;
+            cursor: pointer;
         }
 
         .card-footer {
@@ -346,6 +380,21 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+        }
+
+        .progress-mini-bar {
+            background: #e5e7eb;
+            border-radius: 4px;
+            height: 6px;
+            width: 100%;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .progress-mini-fill {
+            background: #3b82f6;
+            height: 100%;
+            width: 0%;
         }
 
         .btn-add-card-footer {
@@ -382,12 +431,14 @@
 
         .modal-content {
             background: white;
-            padding: 30px;
+            padding: 25px;
             border-radius: 12px;
             width: 100%;
             max-width: 500px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
             position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .modal-close {
@@ -410,21 +461,23 @@
             font-weight: bold;
             font-size: 14px;
             color: #4b5563;
+            margin-top: 10px;
         }
 
         .modal-content input, .modal-content select, .modal-content textarea {
             width: 100%;
             padding: 10px;
-            margin-bottom: 15px;
             border: 1px solid #ccc;
             border-radius: 6px;
             font-size: 14px;
+            margin-bottom: 5px;
         }
 
         .modal-buttons {
             display: flex;
             justify-content: flex-end;
             gap: 10px;
+            margin-top: 20px;
         }
 
         .modal-buttons button {
@@ -437,6 +490,101 @@
 
         .btn-cancelar { background: #e5e7eb; color: #374151; }
         .btn-salvar { background: #047857; color: white; }
+        .btn-excluir-task { background: #dc2626; color: white; margin-right: auto; }
+
+        /* Estilos dos detalhes da tarefa */
+        .status-radio-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .status-radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: normal;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .slider-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .slider-wrapper input {
+            flex-grow: 1;
+            margin: 0;
+        }
+
+        .history-list {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 10px;
+            max-height: 120px;
+            overflow-y: auto;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .history-item {
+            margin-bottom: 6px;
+            padding-bottom: 6px;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+
+        .history-item:last-child {
+            margin: 0;
+            padding: 0;
+            border: none;
+        }
+
+        .history-date {
+            font-size: 11px;
+            color: #9ca3af;
+            display: block;
+        }
+
+        .file-upload-box {
+            border: 2px dashed #d1d5db;
+            padding: 15px;
+            text-align: center;
+            border-radius: 6px;
+            background: #f9fafb;
+            cursor: pointer;
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 10px;
+        }
+
+        .file-upload-box:hover {
+            background: #f3f4f6;
+        }
+
+        .files-list {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            font-size: 13px;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f3f4f6;
+            padding: 6px 10px;
+            border-radius: 4px;
+        }
+
+        .file-remove {
+            color: #ef4444;
+            cursor: pointer;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -450,11 +598,11 @@
         }
     </script>
 
-    <!-- Sidebar Fiel à Imagem -->
+    <!-- Sidebar -->
     <div class="sidebar">
         <div class="brand">
             <div class="star-icon">★</div>
-            <div class="logo-text">
+            <div>
                 <h1>TAREFAS</h1>
                 <p>26º Pel PE Mec</p>
             </div>
@@ -505,7 +653,6 @@
                 <button class="btn-nova-tarefa" id="btnNovaTarefaTop">+ Nova tarefa</button>
             </div>
 
-            <!-- Dropdown escondido para Alterar Senha -->
             <div class="dropdown-menu" id="userDropdown">
                 <button id="btnAbrirModalSenha">Alterar Senha</button>
             </div>
@@ -520,6 +667,10 @@
                         <span class="column-title">Pendentes</span>
                         <span class="column-badge" id="badge-pendente">0</span>
                     </div>
+                    <div class="mass-actions">
+                        <button onclick="executarAcaoEmMassa('Pendente', 'Concluir')">Concluir</button>
+                        <button onclick="executarAcaoEmMassa('Pendente', 'Excluir')">Excluir</button>
+                    </div>
                 </div>
                 <div class="cards-container" id="container-pendente"></div>
                 <div class="btn-add-card-footer" onclick="abrirModalNovaTarefa('Pendente')">+ Adicionar tarefa</div>
@@ -532,6 +683,10 @@
                         <span class="column-title">Em andamento</span>
                         <span class="column-badge" id="badge-andamento">0</span>
                     </div>
+                    <div class="mass-actions">
+                        <button onclick="executarAcaoEmMassa('Em andamento', 'Concluir')">Concluir</button>
+                        <button onclick="executarAcaoEmMassa('Em andamento', 'Excluir')">Excluir</button>
+                    </div>
                 </div>
                 <div class="cards-container" id="container-andamento"></div>
                 <div class="btn-add-card-footer" onclick="abrirModalNovaTarefa('Em andamento')">+ Adicionar tarefa</div>
@@ -543,6 +698,9 @@
                     <div class="column-title-wrapper">
                         <span class="column-title">Concluídas</span>
                         <span class="column-badge" id="badge-concluida">0</span>
+                    </div>
+                    <div class="mass-actions">
+                        <button onclick="executarAcaoEmMassa('Concluída', 'Excluir')">Excluir</button>
                     </div>
                 </div>
                 <div class="cards-container" id="container-concluida"></div>
@@ -601,6 +759,75 @@
         </div>
     </div>
 
+    <!-- MODAL: DETALHES AVANÇADOS DA TAREFA -->
+    <div class="modal" id="modalDetalhesTarefa">
+        <div class="modal-content">
+            <span class="modal-close" id="fecharModalDetalhes">×</span>
+            <h3 id="detalheCodigoTitulo">Tarefa #0000</h3>
+            
+            <h4 style="margin-bottom:10px; font-size:16px;" id="detalheFormTitulo">Título da Tarefa</h4>
+            
+            <label>Status da Tarefa</label>
+            <div class="status-radio-group">
+                <label><input type="radio" name="detalheStatus" value="Pendente"> 🔴 Pendente</label>
+                <label><input type="radio" name="detalheStatus" value="Em andamento"> 🔵 Em andamento</label>
+                <label><input type="radio" name="detalheStatus" value="Concluída"> 🟢 Concluída</label>
+            </div>
+
+            <label>Andamento (<span id="txtAndamentoPorcentagem">0</span>%)</label>
+            <div class="slider-wrapper">
+                <input type="range" id="detalheAndamento" min="0" max="100" value="0" oninput="document.getElementById('txtAndamentoPorcentagem').innerText = this.value">
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-top:5px;">
+                <div>
+                    <label>Seção</label>
+                    <p id="detalheSecao" style="font-size:14px; color:#1f2937; background:#f3f4f6; padding:8px; border-radius:6px; font-weight:bold;">S3</p>
+                </div>
+                <div>
+                    <label>Responsável</label>
+                    <p id="detalheResponsavel" style="font-size:14px; color:#1f2937; background:#f3f4f6; padding:8px; border-radius:6px; font-weight:bold;">Sd Silva</p>
+                </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                <div>
+                    <label>Prioridade</label>
+                    <p id="detalhePrioridade" style="font-size:14px; color:#1f2937; background:#f3f4f6; padding:8px; border-radius:6px; font-weight:bold;">Média</p>
+                </div>
+                <div>
+                    <label>Prazo</label>
+                    <p id="detalhePrazo" style="font-size:14px; color:#1f2937; background:#f3f4f6; padding:8px; border-radius:6px; font-weight:bold;">--/--/----</p>
+                </div>
+            </div>
+
+            <label>Descrição</label>
+            <p id="detalheDescricao" style="font-size:14px; color:#4b5563; background:#f9fafb; padding:10px; border-radius:6px; border:1px solid #e5e7eb; min-height:50px;">Sem descrição.</p>
+
+            <label>Arquivos Anexos</label>
+            <div class="file-upload-box" onclick="simularAnexoArquivo()">
+                📎 Clique para anexar um documento<br>
+                <span style="font-size:11px; color:#9ca3af;">Formatos suportados: PDF, Imagens, Docs (Máx. 5MB)</span>
+            </div>
+            <div class="files-list" id="detalheListaArquivos"></div>
+
+            <label>Adicionar Atualização</label>
+            <div style="display:flex; gap:10px;">
+                <input type="text" id="txtNovaAtualizacao" placeholder="Ex: Iniciado levantamento de dados..." style="margin:0;">
+                <button type="button" class="btn-salvar" onclick="adicionarLogHistorico()" style="padding:10px 15px; border-radius:6px; font-weight:bold; border:none; cursor:pointer;">Enviar</button>
+            </div>
+
+            <label>Histórico da Tarefa</label>
+            <div class="history-list" id="detalheListaHistorico"></div>
+
+            <div class="modal-buttons">
+                <button type="button" class="btn-excluir-task" id="btnExcluirTarefaIndividual">Excluir tarefa</button>
+                <button type="button" class="btn-cancelar" id="btnFecharDetalhes">Fechar</button>
+                <button type="button" class="btn-salvar" id="btnSalvarAlteracoesDetalhes">Salvar alterações</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL: ALTERAR SENHA -->
     <div class="modal" id="modalSenha">
         <div class="modal-content">
@@ -626,8 +853,11 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let todasAsTarefas = [];
+        let tarefaSelecionadaId = null;
+        let listaArquivosLocal = [];
+        let listaHistoricoLocal = [];
 
-        // Injeta os dados dinâmicos do militar logado nos placeholders
+        // Injeta os dados dinâmicos do militar logado
         if (usuarioLogado) {
             document.getElementById("sbMilitarNome").innerText = `${usuarioLogado.patente} ${usuarioLogado.nome_guerra}`;
             document.getElementById("sbMilitarDetalhes").innerText = `${usuarioLogado.secao} - ${usuarioLogado.posicao}`;
@@ -664,25 +894,31 @@
 
                 const card = document.createElement("div");
                 card.className = "task-card";
-                card.onclick = () => mudarStatusRapido(tarefa.id, tarefa.status);
 
                 const classePrio = tarefa.prioridade === "Alta" ? "prio-alta" : tarefa.prioridade === "Média" ? "prio-media" : "prio-baixa";
                 const dataFormatada = tarefa.prazo ? tarefa.prazo.split("-").reverse().join("/") : "--/--/----";
+                const pct = tarefa.andamento || 0;
 
                 card.innerHTML = `
                     <div class="card-top">
-                        <span class="task-code">${tarefa.codigo}</span>
+                        <div class="card-top-left">
+                            <input type="checkbox" class="task-checkbox" data-id="${tarefa.id}" onclick="event.stopPropagation()">
+                            <span class="task-code">${tarefa.codigo}</span>
+                        </div>
                         <span class="priority-badge ${classePrio}">${tarefa.prioridade}</span>
                     </div>
-                    <div class="task-title">${tarefa.titulo}</div>
+                    <div class="task-title" onclick="abrirModalDetalhes(${tarefa.id})">${tarefa.titulo}</div>
                     <div class="card-footer">
                         <div class="footer-row">
                             <span>🏠 ${tarefa.secao}</span>
                             <span>👤 ${tarefa.responsavel}</span>
                         </div>
-                        <div class="footer-row" style="margin-top: 4px; font-size: 11px; color:#9ca3af;">
+                        <div class="footer-row" style="margin-top: 4px; font-size: 11px;">
                             <span>📅 Prazo: ${dataFormatada}</span>
-                            <span style="color:#3b82f6; font-weight:bold;">Mudar Status ➔</span>
+                            <span style="font-weight:bold; color:#1f2937;">${pct}%</span>
+                        </div>
+                        <div class="progress-mini-bar">
+                            <div class="progress-mini-fill" style="width: ${pct}%"></div>
                         </div>
                     </div>
                 `;
@@ -697,18 +933,155 @@
             document.getElementById("badge-concluida").innerText = cC;
         }
 
-        // Alterna dinamicamente as colunas ao clicar no card para testes rápidos
-        async function mudarStatusRapido(id, statusAtual) {
-            let novoStatus = "Em andamento";
-            if (statusAtual === "Em andamento") novoStatus = "Concluída";
-            else if (statusAtual === "Concluída") novoStatus = "Pendente";
+        // Abrir Modal de Detalhes Avançados
+        function abrirModalDetalhes(id) {
+            const t = todasAsTarefas.find(item => item.id === id);
+            if (!t) return;
+
+            tarefaSelecionadaId = id;
+            listaArquivosLocal = t.arquivos || [];
+            listaHistoricoLocal = t.historico || [];
+
+            document.getElementById("detalheCodigoTitulo").innerText = `Tarefa ${t.codigo}`;
+            document.getElementById("detalheFormTitulo").innerText = t.titulo;
+            document.getElementById("detalheSecao").innerText = t.secao;
+            document.getElementById("detalheResponsavel").innerText = t.responsavel;
+            document.getElementById("detalhePrioridade").innerText = t.prioridade;
+            document.getElementById("detalheDescricao").innerText = t.descricao || "Sem descrição.";
+            document.getElementById("detalhePrazo").innerText = t.prazo ? t.prazo.split("-").reverse().join("/") : "--/--/----";
+            
+            // Status radio
+            const radios = document.getElementsByName("detalheStatus");
+            radios.forEach(r => r.checked = r.value === t.status);
+
+            // Slider andamento
+            document.getElementById("detalheAndamento").value = t.andamento || 0;
+            document.getElementById("txtAndamentoPorcentagem").innerText = t.andamento || 0;
+
+            renderizarArquivosLocal();
+            renderizarHistoricoLocal();
+
+            document.getElementById("modalDetalhesTarefa").style.display = "flex";
+        }
+
+        function renderizarArquivosLocal() {
+            const container = document.getElementById("detalheListaArquivos");
+            container.innerHTML = "";
+            listaArquivosLocal.forEach((arq, index) => {
+                const item = document.createElement("div");
+                item.className = "file-item";
+                item.innerHTML = `<span>📄 ${arq}</span><span class="file-remove" onclick="removerAnexoLocal(${index})">×</span>`;
+                container.appendChild(item);
+            });
+        }
+
+        function simularAnexoArquivo() {
+            const nomeFicticio = prompt("Digite o nome do arquivo para simular o anexo (Ex: relatorio.pdf):");
+            if (nomeFicticio) {
+                listaArquivosLocal.push(nomeFicticio);
+                renderizarArquivosLocal();
+            }
+        }
+
+        function removerAnexoLocal(index) {
+            listaArquivosLocal.splice(index, 1);
+            renderizarArquivosLocal();
+        }
+
+        function renderizarHistoricoLocal() {
+            const container = document.getElementById("detalheListaHistorico");
+            container.innerHTML = "";
+            listaHistoricoLocal.slice().reverse().forEach(log => {
+                const item = document.createElement("div");
+                item.className = "history-item";
+                const partes = log.split(" | ");
+                const texto = partes[0];
+                const data = partes[1] || "";
+                item.innerHTML = `<div>${texto}</div><span class="history-date">${data}</span>`;
+                container.appendChild(item);
+            });
+        }
+
+        function adicionarLogHistorico() {
+            const input = document.getElementById("txtNovaAtualizacao");
+            if (!input.value.trim()) return;
+            
+            const agora = new Date();
+            const dataStr = agora.toLocaleDateString('pt-BR') + " " + agora.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+            
+            listaHistoricoLocal.push(`${input.value.trim()} | ${dataStr}`);
+            input.value = "";
+            renderizarHistoricoLocal();
+        }
+
+        // Salvar alterações de detalhes
+        document.getElementById("btnSalvarAlteracoesDetalhes").onclick = async function() {
+            if (!tarefaSelecionadaId) return;
+            
+            const btn = this;
+            btn.disabled = true;
+
+            const radios = document.getElementsByName("detalheStatus");
+            let statusSel = "Pendente";
+            radios.forEach(r => { if (r.checked) statusSel = r.value; });
+
+            const andamentoSel = parseInt(document.getElementById("detalheAndamento").value);
 
             try {
-                const { error } = await supabaseClient.from('tarefas').update({ status: novoStatus }).eq('id', id);
+                const { error } = await supabaseClient.from('tarefas').update({
+                    status: statusSel,
+                    andamento: andamentoSel,
+                    arquivos: listaArquivosLocal,
+                    historico: listaHistoricoLocal
+                }).eq('id', tarefaSelecionadaId);
+
                 if (error) throw error;
+
+                document.getElementById("modalDetalhesTarefa").style.display = "none";
                 buscarTarefasDoBanco();
             } catch (err) {
-                alert("Erro ao mover: " + err.message);
+                alert("Erro ao atualizar detalhes: " + err.message);
+            } finally {
+                btn.disabled = false;
+            }
+        };
+
+        // Excluir tarefa individual
+        document.getElementById("btnExcluirTarefaIndividual").onclick = async function() {
+            if (!tarefaSelecionadaId || !confirm("Tem certeza que deseja excluir esta tarefa de forma definitiva?")) return;
+            try {
+                const { error } = await supabaseClient.from('tarefas').delete().eq('id', tarefaSelecionadaId);
+                if (error) throw error;
+                document.getElementById("modalDetalhesTarefa").style.display = "none";
+                buscarTarefasDoBanco();
+            } catch (err) {
+                alert("Erro ao excluir: " + err.message);
+            }
+        };
+
+        // Ações em massa (Concluir selecionadas / Excluir selecionadas)
+        async function executarAcaoEmMassa(colunaStatus, acao) {
+            const checkboxes = document.querySelectorAll(`#container-${colunaStatus === 'Pendente' ? 'pendente' : colunaStatus === 'Em andamento' ? 'andamento' : 'concluida'} .task-checkbox:checked`);
+            if (checkboxes.length === 0) {
+                alert("Nenhuma tarefa selecionada nesta coluna.");
+                return;
+            }
+
+            const ids = Array.from(checkboxes).map(cb => parseInt(cb.getAttribute("data-id")));
+
+            if (acao === "Excluir" && !confirm(`Deseja excluir as ${ids.length} tarefas selecionadas?`)) return;
+
+            try {
+                if (acao === "Concluir") {
+                    const { error } = await supabaseClient.from('tarefas').update({ status: 'Concluída', andamento: 100 }).in('id', ids);
+                    if (error) throw error;
+                } else if (acao === "Excluir") {
+                    const { error } = await supabaseClient.from('tarefas').delete().in('id', ids);
+                    if (error) throw error;
+                }
+                buscarTarefasDoBanco();
+            } catch (err) {
+                alert("Erro na ação em massa: " + err.message);
             }
         }
 
@@ -722,8 +1095,11 @@
         document.getElementById("btnNovaTarefaTop").onclick = () => abrirModalNovaTarefa('Pendente');
         document.getElementById("fecharModalTarefa").onclick = () => modalTarefa.style.display = "none";
         document.getElementById("btnCancelaTarefa").onclick = () => modalTarefa.style.display = "none";
+        
+        document.getElementById("fecharModalDetalhes").onclick = () => document.getElementById("modalDetalhesTarefa").style.display = "none";
+        document.getElementById("btnFecharDetalhes").onclick = () => document.getElementById("modalDetalhesTarefa").style.display = "none";
 
-        // Criação e gravação da tarefa no banco de dados
+        // Gravação da nova tarefa no banco de dados
         document.getElementById("formNovaTarefa").addEventListener("submit", async function(e) {
             e.preventDefault();
             const btn = document.getElementById("btnSalvaTarefa");
@@ -737,7 +1113,6 @@
             const tPrazo = document.getElementById("taskPrazo").value || null;
             const tStatus = document.getElementById("taskStatusAlvo").value;
 
-            // Gera código automático como #0001 baseado em números aleatórios estruturados
             const codGerado = "#" + Math.floor(1000 + Math.random() * 9000);
 
             try {
@@ -750,7 +1125,8 @@
                     prioridade: tPrio,
                     prazo: tPrazo,
                     status: tStatus,
-                    criado_por: usuarioLogado.id
+                    criado_por: usuarioLogado.id,
+                    andamento: tStatus === 'Concluída' ? 100 : 0
                 }]);
 
                 if (error) throw error;
@@ -795,7 +1171,7 @@
         document.getElementById("btnSairSessao").onclick = () => { localStorage.clear(); window.location.href = "index.html"; };
         document.getElementById("filtroSecao").onchange = () => renderizarQuadroKanban();
 
-        // Inicialização
+        // Inicialização primária
         buscarTarefasDoBanco();
     </script>
 </body>
