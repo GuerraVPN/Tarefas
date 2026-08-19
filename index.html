@@ -6,6 +6,9 @@
 
     <title>TAREFAS - Login</title>
 
+    <!-- CDN DO SDK DO SUPABASE OBRIGATÓRIA PARA A CONEXÃO -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         body {
             margin: 0;
@@ -68,6 +71,11 @@
             background: #1d4ed8;
         }
 
+        button:disabled {
+            background: #93c5fd;
+            cursor: not-allowed;
+        }
+
         .criar-conta {
             text-align: center;
             margin-top: 20px;
@@ -85,7 +93,6 @@
         .criar-conta a:hover {
             text-decoration: underline;
         }
-    
     </style>
 </head>
 
@@ -103,21 +110,24 @@
 
         <h2>Entrar</h2>
 
-        <form>
+        <form id="formLogin">
 
             <input
-                type="cpf"
+                type="text"
+                id="loginCpf"
                 placeholder="CPF"
+                maxlength="14"
                 required
             >
 
             <input
                 type="password"
+                id="loginSenha"
                 placeholder="Senha"
                 required
             >
 
-            <button type="submit">
+            <button type="submit" id="btnEntrar">
                 Entrar
             </button>
 
@@ -131,6 +141,83 @@
         </div>
 
     </div>
+
+    <script>
+        // CONFIGURAÇÃO DE CREDENCIAIS DO SEU SUPABASE
+        const SUPABASE_URL = "https://bpvijatnsluwsgnzklrd.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwdmlqYXRuc2x1d3NnbnprbHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MzkxNDMsImV4cCI6MjEwMjQxNTE0M30.uvyfm9mgl6MON0v75CwfGzNz6FBqw58uzR4ZcRAOLNQ";
+
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Máscara de CPF automática na tela de login
+        document.getElementById("loginCpf").addEventListener("input", function () {
+            let cpf = this.value.replace(/\D/g, "");
+
+            if (cpf.length > 11) {
+                cpf = cpf.substring(0, 11);
+            }
+
+            cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
+            cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
+            cpf = cpf.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+
+            this.value = cpf;
+        });
+
+        // Evento de envio do formulário de autenticação
+        document.getElementById("formLogin").addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            const cpfDigitado = document.getElementById("loginCpf").value;
+            const senhaDigitada = document.getElementById("loginSenha").value;
+            const btnEntrar = document.getElementById("btnEntrar");
+
+            // Limpa o CPF para usar apenas os números puros na busca (igual está salvo no SQL)
+            const cpfLimpo = cpfDigitado.replace(/\D/g, "");
+
+            // Desabilita o botão enquanto faz a verificação
+            btnEntrar.disabled = true;
+            btnEntrar.innerText = "Verificando...";
+
+            try {
+                // Busca direta na tabela 'usuarios' usando o CPF puro
+                const { data, error } = await supabaseClient
+                    .from('usuarios')
+                    .select('*')
+                    .eq('cpf', cpfLimpo);
+
+                if (error) throw error;
+
+                // Verifica se o usuário foi localizado e se a senha confere perfeitamente
+                if (data && data.length > 0 && data[0].senha === senhaDigitada) {
+                    const usuario = data[0];
+                    
+                    // Salva os dados básicos na sessão do navegador para usar na tela menu.html
+                    localStorage.setItem("usuario_logado", JSON.stringify({
+                        id: usuario.id,
+                        nome_guerra: usuario.nome_guerra,
+                        patente: usuario.patente,
+                        secao: usuario.secao,
+                        posicao: usuario.posicao
+                    }));
+
+                    alert(`Acesso liberado! Bem-vindo, ${usuario.patente} ${usuario.nome_guerra}.`);
+                    
+                    // Redireciona para a tela informada
+                    window.location.href = "menu.html";
+                } else {
+                    alert("CPF ou Senha incorretos.");
+                }
+
+            } catch (error) {
+                alert("Erro ao conectar com o banco de dados: " + error.message);
+            } finally {
+                // Restaura o estado original do botão
+                btnEntrar.disabled = false;
+                btnEntrar.innerText = "Entrar";
+            }
+        });
+    </script>
 
 </body>
 </html>
