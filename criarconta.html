@@ -6,6 +6,9 @@
 
     <title>TAREFAS - Criar conta</title>
 
+    <!-- CDN DO SDK DO SUPABASE OBRIGATÓRIA PARA A CONEXÃO -->
+    <script src="https://jsdelivr.net"></script>
+
     <style>
         * {
             box-sizing: border-box;
@@ -91,6 +94,11 @@
 
         button:hover {
             background: #1d4ed8;
+        }
+
+        button:disabled {
+            background: #93c5fd;
+            cursor: not-allowed;
         }
 
         .voltar {
@@ -208,7 +216,7 @@
                 required
             >
 
-            <button type="submit">
+            <button type="submit" id="btnEnviar">
                 Criar conta
             </button>
 
@@ -222,10 +230,14 @@
     </div>
 
     <script>
+        // INICIALIZAÇÃO DO CLIENTE SUPABASE COM AS SUAS CREDENCIAIS
+        const SUPABASE_URL = "https://bpvijatnsluwsgnzklrd.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwdmlqYXRuc2x1d3NnbnprbHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MzkxNDMsImV4cCI6MjEwMjQxNTE0M30.uvyfm9mgl6MON0v75CwfGzNz6FBqw58uzR4ZcRAOLNQ";
+        
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // Máscara de CPF
         document.getElementById("cpf").addEventListener("input", function () {
-
             let cpf = this.value.replace(/\D/g, "");
 
             if (cpf.length > 11) {
@@ -239,25 +251,69 @@
             this.value = cpf;
         });
 
-
-        // Validação do formulário
-        document.getElementById("formCadastro").addEventListener("submit", function(event) {
-
+        // Integração e Envio de Dados ao Supabase
+        document.getElementById("formCadastro").addEventListener("submit", async function(event) {
             event.preventDefault();
 
+            const nome = document.getElementById("nome").value;
+            const guerra = document.getElementById("guerra").value;
+            const cpfLimpo = document.getElementById("cpf").value.replace(/\D/g, "");
+            const patente = document.getElementById("patente").value;
+            const secao = document.getElementById("secao").value;
+            const posicao = document.getElementById("posicao").value;
             const senha = document.getElementById("senha").value;
             const confirmarSenha = document.getElementById("confirmarSenha").value;
+            const btnEnviar = document.getElementById("btnEnviar");
 
+            // Validações básicas antes do envio
             if (senha !== confirmarSenha) {
                 alert("As senhas não são iguais.");
                 return;
             }
 
-            alert("Cadastro preenchido com sucesso!");
+            if (senha.length < 6) {
+                alert("Por segurança, o Supabase exige senhas com no mínimo 6 caracteres.");
+                return;
+            }
 
+            // Desabilita o botão para evitar cliques múltiplos acidentais
+            btnEnviar.disabled = true;
+            btnEnviar.innerText = "Salvando no Banco...";
+
+            // Cria um padrão de e-mail fictício estruturado com o CPF do usuário
+            const emailFalso = `${cpfLimpo}@tarefas.com`;
+
+            try {
+                // Envia os dados para a autenticação central do Supabase carregando os metadados militares
+                const { data, error } = await supabaseClient.auth.signUp({
+                    email: emailFalso,
+                    password: senha,
+                    options: {
+                        data: {
+                            nome_completo: nome,
+                            nome_guerra: guerra,
+                            cpf: cpfLimpo,
+                            patente: patente,
+                            secao: secao,
+                            posicao: posicao
+                        }
+                    }
+                });
+
+                if (error) {
+                    throw error;
+                }
+
+                alert("Cadastro realizado! Os dados militares foram salvos com sucesso.");
+                
+                // Limpa o formulário após salvar com sucesso
+                document.getElementById("formCadastro").reset();
+
+            } catch (error) {
+                alert("Erro ao salvar no banco de dados: " + error.message);
+            } finally {
+                // Devolve o estado normal do botão de cadastro
+                btnEnviar.disabled = false;
+                btnEnviar.innerText = "Criar conta";
+            }
         });
-
-    </script>
-
-</body>
-</html>
