@@ -1003,8 +1003,8 @@
                     <option value="Comandante">Comandante</option>
                 </select>
 
-                <label for="taskResponsavel">Militar Responsável *</label>
-                <input type="text" id="taskResponsavel" placeholder="Ex: Cb Santos" required>
+                <label for="taskResponsavel">Responsável inicial (opcional)</label>
+                <input type="text" id="taskResponsavel" placeholder="Opcional. Após criar, use “Selecionar responsáveis” para o despacho múltiplo.">
 
                 <label for="taskPrioridade">Prioridade *</label>
                 <select id="taskPrioridade" required>
@@ -1311,6 +1311,118 @@
             return JSON.stringify(compacta);
         }
 
+        // ---------- FASE 2: responsáveis em tabela própria ----------
+        function erroTabelaResponsaveisNaoInstalada(error) {
+            const codigo = String(error?.code || '');
+            const msg = String(error?.message || '').toLowerCase();
+            return ['42P01','PGRST205','PGRST204'].includes(codigo)
+                || msg.includes('tarefa_responsaveis')
+                && (msg.includes('not find') || msg.includes('does not exist') || msg.includes('schema cache'));
+        }
+
+        async function hidratarResponsaveisFase2(listaTarefas) {
+            const tarefas = Array.isArray(listaTarefas) ? listaTarefas : [];
+            if (!tarefas.length) return false;
+
+            const idsTarefas = tarefas.map(t => t.id).filter(v => v !== undefined && v !== null);
+            const vinculos = await supabaseClient
+                .from('tarefa_responsaveis')
+                .select('tarefa_id,usuario_id,atribuido_por,atribuido_em')
+                .in('tarefa_id', idsTarefas);
+
+            if (vinculos.error) {
+                if (erroTabelaResponsaveisNaoInstalada(vinculos.error)) {
+                    console.warn('Fase 2 ainda não instalada no banco; usando campo legado responsavel.');
+                    return false;
+                }
+                throw vinculos.error;
+            }
+
+            const idsUsuarios = [...new Set((vinculos.data || []).map(v => String(v.usuario_id)))];
+            let usuariosPorId = new Map();
+
+            if (idsUsuarios.length) {
+                const usuariosResp = await supabaseClient
+                    .from('usuarios')
+                    .select('id,nome_guerra,patente,secao,posicao')
+                    .in('id', idsUsuarios);
+
+                if (usuariosResp.error) throw usuariosResp.error;
+                usuariosPorId = new Map((usuariosResp.data || []).map(u => [String(u.id), u]));
+            }
+
+            const porTarefa = new Map();
+            (vinculos.data || []).forEach(v => {
+                const u = usuariosPorId.get(String(v.usuario_id));
+                if (!u) return;
+                const obj = {
+                    id: String(u.id),
+                    nome: nomeExibicaoUsuario(u),
+                    nome_guerra: u.nome_guerra || '',
+                    patente: u.patente || '',
+                    secao: u.secao || '',
+                    posicao: u.posicao || '',
+                    atribuido_em: v.atribuido_em || null,
+                    atribuido_por: v.atribuido_por || null
+                };
+                const chave = String(v.tarefa_id);
+                if (!porTarefa.has(chave)) porTarefa.set(chave, []);
+                porTarefa.get(chave).push(obj);
+            });
+
+            tarefas.forEach(t => {
+                const lista = porTarefa.get(String(t.id)) || [];
+                t.responsaveis_fase2 = lista;
+                // Espelho apenas em memória para as rotinas antigas de renderização.
+                // A fonte oficial no banco é public.tarefa_responsaveis.
+                if (lista.length) t.responsavel = serializarResponsaveisParaBanco(lista);
+            });
+
+            return true;
+        }
+
+        async function gravarResponsaveisFase2(tarefaId, lista) {
+            const ids = [...new Set((lista || [])
+                .map(r => String(r?.id ?? '').trim())
+                .filter(id => /^\d+$/.test(id))
+                .map(Number))];
+
+            // Primeiro tenta a função transacional criada pelo SQL da Fase 2.
+            const rpc = await supabaseClient.rpc('definir_responsaveis_tarefa', {
+                p_tarefa_id: Number(tarefaId),
+                p_usuario_ids: ids,
+                p_atribuido_por: Number(usuarioLogado.id)
+            });
+
+            if (!rpc.error) return true;
+
+            // Compatibilidade: se a função ainda não entrou no cache, tenta a tabela diretamente.
+            const del = await supabaseClient
+                .from('tarefa_responsaveis')
+                .delete()
+                .eq('tarefa_id', tarefaId);
+
+            if (del.error) {
+                if (erroTabelaResponsaveisNaoInstalada(del.error)) {
+                    console.warn('Fase 2 ainda não instalada; despacho mantido no campo legado.');
+                    return false;
+                }
+                throw del.error;
+            }
+
+            if (ids.length) {
+                const linhas = ids.map(usuarioId => ({
+                    tarefa_id: Number(tarefaId),
+                    usuario_id: usuarioId,
+                    atribuido_por: Number(usuarioLogado.id)
+                }));
+                const ins = await supabaseClient.from('tarefa_responsaveis').insert(linhas);
+                if (ins.error) throw ins.error;
+            }
+            return true;
+        }
+
+
         function usuarioCorrespondeResponsavel(usuario, responsavel) {
             if (!usuario || !responsavel) return false;
             if (responsavel.id && String(responsavel.id) === String(usuario.id)) return true;
@@ -1490,6 +1602,11 @@
                 historicoNovo.push(criarEntradaHistorico(`Responsáveis alterados de "${antes}" para "${depois}". Tarefa despachada.`));
                 const valorBanco = serializarResponsaveisParaBanco(responsaveisSelecionadosLocal);
 
+                // FASE 2: grava a relação muitos-para-muitos.
+                // Auxiliar, Chefe, Admin e Comandante podem despachar tarefas.
+                await gravarResponsaveisFase2(tarefaSelecionadaId, responsaveisSelecionadosLocal);
+
+                // Espelho legado temporário para páginas antigas durante a transição.
                 const { error } = await supabaseClient.from('tarefas').update({
                     responsavel: valorBanco,
                     historico: historicoNovo
@@ -1638,6 +1755,7 @@
                 const { data, error } = await consulta;
                 if (error) throw error;
                 todasAsTarefas = data || [];
+                await hidratarResponsaveisFase2(todasAsTarefas);
                 renderizarQuadroKanban();
             } catch (err) {
                 console.error('Erro ao puxar tarefas:', err.message);

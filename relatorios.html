@@ -477,6 +477,7 @@
                 const { data, error } = await query;
                 if (error) throw error;
                 tarefasBanco = data || [];
+                await hidratarResponsaveisFase2(tarefasBanco);
                 popularSecoes();
                 renderizarRelatorio();
                 $('syncStatus').textContent = '● Sincronizado com o Supabase';
@@ -572,6 +573,70 @@
             const nomes = lista.map(r => typeof r === 'string' ? r : (r.nome || r.nome_guerra || r.name || '')).filter(Boolean);
             return nomes.join(', ') || '-';
         }
+
+        // ---------- FASE 2: leitura de responsáveis ----------
+        function erroTabelaResponsaveisNaoInstalada(error) {
+            const codigo = String(error?.code || '');
+            const msg = String(error?.message || '').toLowerCase();
+            return ['42P01','PGRST205','PGRST204'].includes(codigo)
+                || msg.includes('tarefa_responsaveis')
+                && (msg.includes('not find') || msg.includes('does not exist') || msg.includes('schema cache'));
+        }
+
+        async function hidratarResponsaveisFase2(listaTarefas) {
+            const tarefas = Array.isArray(listaTarefas) ? listaTarefas : [];
+            if (!tarefas.length) return false;
+            const idsTarefas = tarefas.map(t => t.id).filter(v => v !== undefined && v !== null);
+
+            const vinculos = await supabaseClient.from('tarefa_responsaveis')
+                .select('tarefa_id,usuario_id,atribuido_por,atribuido_em')
+                .in('tarefa_id', idsTarefas);
+
+            if (vinculos.error) {
+                if (erroTabelaResponsaveisNaoInstalada(vinculos.error)) return false;
+                throw vinculos.error;
+            }
+
+            const idsUsuarios = [...new Set((vinculos.data || []).map(v => String(v.usuario_id)))];
+            let usuariosPorId = new Map();
+            if (idsUsuarios.length) {
+                const r = await supabaseClient.from('usuarios')
+                    .select('id,nome_guerra,patente,secao,posicao')
+                    .in('id', idsUsuarios);
+                if (r.error) throw r.error;
+                usuariosPorId = new Map((r.data || []).map(u => [String(u.id), u]));
+            }
+
+            const porTarefa = new Map();
+            (vinculos.data || []).forEach(v => {
+                const u = usuariosPorId.get(String(v.usuario_id));
+                if (!u) return;
+                const nome = [u.patente,u.nome_guerra].filter(Boolean).join(' ').trim() || `Usuário ${u.id}`;
+                const obj = {id:String(u.id),nome,nome_guerra:u.nome_guerra||'',patente:u.patente||'',secao:u.secao||'',posicao:u.posicao||''};
+                const chave = String(v.tarefa_id);
+                if (!porTarefa.has(chave)) porTarefa.set(chave,[]);
+                porTarefa.get(chave).push(obj);
+            });
+
+            tarefas.forEach(t => {
+                const lista = porTarefa.get(String(t.id)) || [];
+                t.responsaveis_fase2 = lista;
+                if (lista.length) t.responsavel = JSON.stringify(lista);
+            });
+            return true;
+        }
+
+        async function buscarIdsTarefasAtribuidasFase2(usuarioId) {
+            const r = await supabaseClient.from('tarefa_responsaveis')
+                .select('tarefa_id')
+                .eq('usuario_id', usuarioId);
+            if (r.error) {
+                if (erroTabelaResponsaveisNaoInstalada(r.error)) return null;
+                throw r.error;
+            }
+            return [...new Set((r.data || []).map(x => x.tarefa_id))];
+        }
+
 
         function renderTabela(tarefas) {
             const prioridade = {atrasada:0, pendente:1, processo:2, concluida:3};

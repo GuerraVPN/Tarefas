@@ -423,6 +423,70 @@
             return lista.length ? lista.map(r => r.nome).filter(Boolean).join(', ') : '-';
         }
 
+        // ---------- FASE 2: leitura de responsáveis ----------
+        function erroTabelaResponsaveisNaoInstalada(error) {
+            const codigo = String(error?.code || '');
+            const msg = String(error?.message || '').toLowerCase();
+            return ['42P01','PGRST205','PGRST204'].includes(codigo)
+                || msg.includes('tarefa_responsaveis')
+                && (msg.includes('not find') || msg.includes('does not exist') || msg.includes('schema cache'));
+        }
+
+        async function hidratarResponsaveisFase2(listaTarefas) {
+            const tarefas = Array.isArray(listaTarefas) ? listaTarefas : [];
+            if (!tarefas.length) return false;
+            const idsTarefas = tarefas.map(t => t.id).filter(v => v !== undefined && v !== null);
+
+            const vinculos = await supabaseClient.from('tarefa_responsaveis')
+                .select('tarefa_id,usuario_id,atribuido_por,atribuido_em')
+                .in('tarefa_id', idsTarefas);
+
+            if (vinculos.error) {
+                if (erroTabelaResponsaveisNaoInstalada(vinculos.error)) return false;
+                throw vinculos.error;
+            }
+
+            const idsUsuarios = [...new Set((vinculos.data || []).map(v => String(v.usuario_id)))];
+            let usuariosPorId = new Map();
+            if (idsUsuarios.length) {
+                const r = await supabaseClient.from('usuarios')
+                    .select('id,nome_guerra,patente,secao,posicao')
+                    .in('id', idsUsuarios);
+                if (r.error) throw r.error;
+                usuariosPorId = new Map((r.data || []).map(u => [String(u.id), u]));
+            }
+
+            const porTarefa = new Map();
+            (vinculos.data || []).forEach(v => {
+                const u = usuariosPorId.get(String(v.usuario_id));
+                if (!u) return;
+                const nome = [u.patente,u.nome_guerra].filter(Boolean).join(' ').trim() || `Usuário ${u.id}`;
+                const obj = {id:String(u.id),nome,nome_guerra:u.nome_guerra||'',patente:u.patente||'',secao:u.secao||'',posicao:u.posicao||''};
+                const chave = String(v.tarefa_id);
+                if (!porTarefa.has(chave)) porTarefa.set(chave,[]);
+                porTarefa.get(chave).push(obj);
+            });
+
+            tarefas.forEach(t => {
+                const lista = porTarefa.get(String(t.id)) || [];
+                t.responsaveis_fase2 = lista;
+                if (lista.length) t.responsavel = JSON.stringify(lista);
+            });
+            return true;
+        }
+
+        async function buscarIdsTarefasAtribuidasFase2(usuarioId) {
+            const r = await supabaseClient.from('tarefa_responsaveis')
+                .select('tarefa_id')
+                .eq('usuario_id', usuarioId);
+            if (r.error) {
+                if (erroTabelaResponsaveisNaoInstalada(r.error)) return null;
+                throw r.error;
+            }
+            return [...new Set((r.data || []).map(x => x.tarefa_id))];
+        }
+
+
         function variantesResponsavelUsuario() {
             const u = usuarioPerfilAtual || usuarioLogado;
             const nomeGuerra = String(u.nome_guerra || '').trim();
@@ -573,24 +637,37 @@
                 if (criadas.error) throw criadas.error;
                 adicionar(criadas.data);
 
-                const variantes = variantesResponsavelUsuario();
-                const consultas = [
-                    supabaseClient.from('tarefas').select('*')
-                        .ilike('responsavel', `%"id":"${String(usuarioLogado.id)}"%`)
-                        .order('id', { ascending:true }),
-                    ...variantes.map(v => supabaseClient.from('tarefas').select('*')
-                        .ilike('responsavel', `%${v}%`).order('id', { ascending:true }))
-                ];
+                const idsAtribuidas = await buscarIdsTarefasAtribuidasFase2(usuarioLogado.id);
 
-                const recebidas = await Promise.all(consultas);
-                recebidas.forEach(r => {
-                    if (r.error) console.warn('Consulta de tarefa encaminhada:', r.error.message);
-                    else adicionar(r.data);
-                });
+                if (idsAtribuidas !== null) {
+                    if (idsAtribuidas.length) {
+                        const recebidas = await supabaseClient.from('tarefas').select('*')
+                            .in('id', idsAtribuidas)
+                            .order('id', { ascending:true });
+                        if (recebidas.error) throw recebidas.error;
+                        adicionar(recebidas.data);
+                    }
+                } else {
+                    // Fallback legado enquanto o SQL da Fase 2 não estiver instalado.
+                    const variantes = variantesResponsavelUsuario();
+                    const consultas = [
+                        supabaseClient.from('tarefas').select('*')
+                            .ilike('responsavel', `%"id":"${String(usuarioLogado.id)}"%`)
+                            .order('id', { ascending:true }),
+                        ...variantes.map(v => supabaseClient.from('tarefas').select('*')
+                            .ilike('responsavel', `%${v}%`).order('id', { ascending:true }))
+                    ];
+                    const recebidas = await Promise.all(consultas);
+                    recebidas.forEach(r => {
+                        if (r.error) console.warn('Consulta legada:', r.error.message);
+                        else adicionar(r.data);
+                    });
+                }
 
                 todasAsTarefas = [...mapa.values()]
-                    .filter(t => tarefaCriadaPorMim(t) || tarefaEncaminhadaParaMim(t))
                     .sort((a,b) => Number(a.id)-Number(b.id));
+
+                await hidratarResponsaveisFase2(todasAsTarefas);
 
                 renderizarTudo();
                 setSyncStatus(`Sincronizado: ${todasAsTarefas.length} tarefa(s) vinculada(s) à sua conta.`, 'ok');
@@ -753,6 +830,7 @@
                 realtimeChannel = supabaseClient
                     .channel('calendario-minhas-tarefas')
                     .on('postgres_changes', { event:'*', schema:'public', table:'tarefas' }, () => buscarTarefasDoBanco(true))
+                    .on('postgres_changes', { event:'*', schema:'public', table:'tarefa_responsaveis' }, () => buscarTarefasDoBanco(true))
                     .subscribe();
             } catch (err) {
                 console.warn('Realtime indisponível:', err.message);
