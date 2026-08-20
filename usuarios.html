@@ -8,15 +8,62 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <link rel="stylesheet" href="notificacoes.css">
   <style>
-    *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}:root{--bg:#f3f4f6;--card:#fff;--text:#111827;--muted:#6b7280;--border:#e5e7eb;--green:#047857;--green2:#065f46;--dark:#111827;--yellow:#eab308;--red:#dc2626}
-    body{display:flex;min-height:100vh;background:var(--bg);color:var(--text)}button,input,select,textarea{font:inherit}
-    .sidebar{width:260px;background:#111827;color:#9ca3af;padding:20px;display:flex;flex-direction:column;flex-shrink:0;min-height:100vh}.brand{display:flex;align-items:center;gap:12px;margin-bottom:30px;padding:0 10px}.star{width:34px;height:34px;background:#eab308;color:#111827;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:bold}.brand h1{color:#fff;font-size:20px}.brand p{color:#eab308;font-size:12px;margin-top:2px}.nav{list-style:none;flex:1}.nav li{padding:12px 15px;border-radius:8px;cursor:pointer;margin-bottom:7px;display:flex;align-items:center;gap:12px;font-size:15px;transition:.2s}.nav li:hover,.nav li.active{background:#1f2937;color:#fff}.nav li.active{color:#facc15;border:1px solid #eab308}.side-user{border-top:1px solid #1f2937;padding-top:18px}.mini{display:flex;align-items:center;gap:10px;padding:9px;border-radius:8px;color:#fff}.mini-avatar,.top-avatar,.user-avatar{border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;font-weight:700}.mini-avatar{width:38px;height:38px;background:#4b5563}.mini-avatar img,.top-avatar img,.user-avatar img{width:100%;height:100%;object-fit:cover}.mini strong{display:block;font-size:13px}.mini span{font-size:11px;color:#9ca3af}.logout{width:100%;background:none;border:0;color:#ef4444;text-align:left;padding:11px 14px;cursor:pointer}
-    .main{flex:1;min-width:0}.topbar{height:64px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px}.topbar-left{color:#4b5563}.topbar-right{display:flex;align-items:center;gap:14px}.top-avatar{width:38px;height:38px;background:#111827;color:#facc15;border:2px solid #eab308}.content{padding:24px 28px 34px}.page-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:18px}.page-head h2{font-size:24px}.breadcrumb{font-size:13px;color:#6b7280;margin-top:4px}.head-actions{display:flex;gap:10px;align-items:center}.scope{font-size:12px;background:#ecfdf5;color:#047857;border:1px solid #a7f3d0;border-radius:999px;padding:7px 11px;font-weight:700}.btn-primary{border:0;background:var(--green);color:#fff;border-radius:8px;padding:10px 14px;font-weight:700;cursor:pointer;display:none}.btn-primary:hover{background:var(--green2)}
-    .toolbar{display:flex;align-items:center;gap:12px;margin-bottom:18px}.search{position:relative;flex:1;max-width:620px}.search i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#9ca3af}.search input,.section-filter{width:100%;padding:11px 13px;border:1px solid #d1d5db;border-radius:9px;background:#fff;outline:none}.search input{padding-left:40px}.search input:focus,.section-filter:focus{border-color:#047857;box-shadow:0 0 0 2px rgba(4,120,87,.08)}.section-filter{width:220px}
-    .layout{display:grid;grid-template-columns:minmax(620px,1.5fr) minmax(320px,.7fr);gap:20px}.panel{background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.04);overflow:hidden}.panel-title{padding:16px 18px;border-bottom:1px solid var(--border);font-size:16px;font-weight:700}.users-list{min-height:300px}.user-row{display:grid;grid-template-columns:minmax(210px,1.1fr) minmax(115px,.55fr) minmax(175px,.85fr) minmax(160px,.7fr);align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #f1f5f9;transition:.15s}.user-row:hover,.user-row.selected{background:#f8fafc}.user-main{display:flex;align-items:center;gap:12px;min-width:0}.user-avatar{width:46px;height:46px;background:#e5e7eb;color:#374151;flex-shrink:0;border:2px solid #f3f4f6}.user-name{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.user-sub{font-size:12px;color:#6b7280;margin-top:3px}.cell-label{font-size:11px;color:#9ca3af;margin-bottom:3px;display:none}.cell{font-size:13px;color:#374151;min-width:0}.contact{line-height:1.45;overflow:hidden}.contact div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.actions{display:flex;justify-content:flex-end;gap:7px;flex-wrap:wrap}.icon-btn{width:36px;height:36px;border:1px solid #d1d5db;background:#fff;border-radius:8px;color:#374151;cursor:pointer}.icon-btn:hover{border-color:#047857;color:#047857;background:#ecfdf5}.icon-btn.danger:hover{border-color:#dc2626;color:#dc2626;background:#fef2f2}.empty{padding:34px;text-align:center;color:#9ca3af}.count-line{padding:12px 16px;font-size:12px;color:#6b7280;background:#f9fafb}
-    .right-stack{display:flex;flex-direction:column;gap:18px}.profile-body{padding:18px}.profile-top{display:flex;align-items:center;gap:14px;padding-bottom:16px;border-bottom:1px solid var(--border)}.profile-top .user-avatar{width:68px;height:68px}.profile-name{font-size:18px;font-weight:700}.profile-role{font-size:13px;color:#6b7280;margin-top:4px}.details{margin-top:14px;display:grid;gap:11px}.detail{display:grid;grid-template-columns:120px 1fr;gap:10px;font-size:13px}.detail span{color:#6b7280}.detail strong{font-weight:600;color:#1f2937;overflow-wrap:anywhere}.placeholder{padding:32px 20px;color:#9ca3af;text-align:center}.msg-body{padding:16px}.msg-to{font-size:13px;color:#6b7280;margin-bottom:10px}.conversation{border:1px solid var(--border);background:#f9fafb;border-radius:9px;min-height:110px;max-height:220px;overflow:auto;padding:10px;margin-bottom:10px}.bubble{max-width:85%;padding:8px 10px;border-radius:9px;font-size:12px;line-height:1.4;margin-bottom:8px}.bubble.me{margin-left:auto;background:#d1fae5;color:#065f46}.bubble.other{background:#fff;border:1px solid #e5e7eb;color:#374151}.bubble-time{font-size:10px;opacity:.65;margin-top:4px}.msg-body textarea{width:100%;min-height:95px;resize:vertical;border:1px solid #d1d5db;border-radius:9px;padding:11px;outline:none}.msg-body textarea:focus{border-color:#047857}.send{width:100%;margin-top:10px;background:#047857;color:#fff;border:0;border-radius:8px;padding:11px;font-weight:700;cursor:pointer}.send:hover{background:#065f46}.send:disabled{opacity:.6;cursor:wait}
-    .modal-bg{position:fixed;inset:0;background:rgba(17,24,39,.52);display:none;align-items:center;justify-content:center;padding:18px;z-index:4000}.modal-bg.show{display:flex}.modal{width:min(680px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:14px;box-shadow:0 25px 60px rgba(0,0,0,.22);padding:22px}.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.modal-head h3{font-size:20px}.close{border:0;background:none;font-size:25px;color:#6b7280;cursor:pointer}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field.full{grid-column:1/-1}.field label{display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px}.field input,.field select{width:100%;border:1px solid #d1d5db;border-radius:8px;padding:10px 11px;outline:none;background:#fff}.field input:focus,.field select:focus{border-color:#047857}.field input:disabled,.field select:disabled{background:#f3f4f6;color:#6b7280}.protected{font-size:12px;color:#92400e;background:#fffbeb;border:1px solid #fde68a;padding:9px 10px;border-radius:8px}.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid #e5e7eb}.btn{border:1px solid #d1d5db;background:#fff;border-radius:8px;padding:10px 15px;font-weight:700;cursor:pointer}.btn.green{background:#047857;border-color:#047857;color:#fff}.btn.red{background:#dc2626;border-color:#dc2626;color:#fff}.toast{position:fixed;bottom:24px;right:24px;background:#111827;color:#fff;padding:12px 16px;border-radius:9px;box-shadow:0 8px 24px rgba(0,0,0,.18);opacity:0;transform:translateY(8px);pointer-events:none;transition:.2s;z-index:9999}.toast.show{opacity:1;transform:none}.toast.error{background:#991b1b}
-    @media(max-width:1180px){.layout{grid-template-columns:1fr}.right-stack{display:grid;grid-template-columns:1fr 1fr}.user-row{grid-template-columns:minmax(200px,1fr) 120px minmax(170px,.8fr) 160px}}
+    *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
+    :root{--bg:#f3f4f6;--card:#fff;--text:#111827;--muted:#6b7280;--border:#e5e7eb;--green:#047857;--green2:#065f46;--dark:#111827;--yellow:#eab308;--red:#dc2626}
+    body{display:flex;min-height:100vh;background:var(--bg);color:var(--text)}
+    button,input,select,textarea{font:inherit}
+    .sidebar{width:260px;background:#111827;color:#9ca3af;padding:20px;display:flex;flex-direction:column;flex-shrink:0;min-height:100vh}
+    .brand{display:flex;align-items:center;gap:12px;margin-bottom:30px;padding:0 10px}
+    .star{width:34px;height:34px;background:#eab308;color:#111827;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:bold}
+    .brand h1{color:#fff;font-size:20px}.brand p{color:#eab308;font-size:12px;margin-top:2px}
+    .nav{list-style:none;flex:1}.nav li{padding:12px 15px;border-radius:8px;cursor:pointer;margin-bottom:7px;display:flex;align-items:center;gap:12px;font-size:15px;transition:.2s}
+    .nav li:hover,.nav li.active{background:#1f2937;color:#fff}.nav li.active{color:#facc15;border:1px solid #eab308}
+    .side-user{border-top:1px solid #1f2937;padding-top:18px}.mini{display:flex;align-items:center;gap:10px;padding:9px;border-radius:8px;color:#fff}
+    .mini-avatar,.top-avatar,.user-avatar{border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;font-weight:700}
+    .mini-avatar{width:38px;height:38px;background:#4b5563}.mini-avatar img,.top-avatar img,.user-avatar img{width:100%;height:100%;object-fit:cover}
+    .mini strong{display:block;font-size:13px}.mini span{font-size:11px;color:#9ca3af}.logout{width:100%;background:none;border:0;color:#ef4444;text-align:left;padding:11px 14px;cursor:pointer}
+    .main{flex:1;min-width:0}.topbar{height:64px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px}
+    .topbar-left{color:#4b5563}.topbar-right{display:flex;align-items:center;gap:14px}.top-avatar{width:38px;height:38px;background:#111827;color:#facc15;border:2px solid #eab308}
+    .content{padding:24px 28px 34px}.page-head{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:18px}.page-head h2{font-size:24px}
+    .breadcrumb{font-size:13px;color:#6b7280;margin-top:4px}.head-actions{display:flex;gap:10px;align-items:center}
+    .scope{font-size:12px;background:#ecfdf5;color:#047857;border:1px solid #a7f3d0;border-radius:999px;padding:7px 11px;font-weight:700}
+    .btn-primary{border:0;background:var(--green);color:#fff;border-radius:8px;padding:10px 14px;font-weight:700;cursor:pointer;display:none;align-items:center;gap:7px}
+    .btn-primary:hover{background:var(--green2)}
+    .toolbar{display:flex;align-items:center;gap:12px;margin-bottom:18px}.search{position:relative;flex:1;max-width:620px}
+    .search i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#9ca3af}
+    .search input,.section-filter{width:100%;padding:11px 13px;border:1px solid #d1d5db;border-radius:9px;background:#fff;outline:none}
+    .search input{padding-left:40px}.search input:focus,.section-filter:focus{border-color:#047857;box-shadow:0 0 0 2px rgba(4,120,87,.08)}.section-filter{width:220px}
+    .layout{display:grid;grid-template-columns:minmax(620px,1.5fr) minmax(320px,.7fr);gap:20px}
+    .panel{background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 1px 3px rgba(0,0,0,.04);overflow:hidden}
+    .panel-title{padding:16px 18px;border-bottom:1px solid var(--border);font-size:16px;font-weight:700}.users-list{min-height:300px}
+    .user-row{display:grid;grid-template-columns:minmax(220px,1.1fr) minmax(115px,.55fr) minmax(175px,.85fr) minmax(190px,.8fr);align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid #f1f5f9;transition:.15s}
+    .user-row:hover,.user-row.selected{background:#f8fafc}.user-main{display:flex;align-items:center;gap:12px;min-width:0}
+    .user-avatar{width:46px;height:46px;background:#e5e7eb;color:#374151;flex-shrink:0;border:2px solid #f3f4f6}
+    .user-name{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.user-sub{font-size:12px;color:#6b7280;margin-top:3px}
+    .cell-label{font-size:11px;color:#9ca3af;margin-bottom:3px;display:none}.cell{font-size:13px;color:#374151;min-width:0}.contact{line-height:1.45;overflow:hidden}.contact div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .actions{display:flex;justify-content:flex-end;gap:7px;flex-wrap:wrap}.icon-btn{width:36px;height:36px;border:1px solid #d1d5db;background:#fff;border-radius:8px;color:#374151;cursor:pointer}
+    .icon-btn:hover{border-color:#047857;color:#047857;background:#ecfdf5}.icon-btn.danger:hover{border-color:#dc2626;color:#dc2626;background:#fef2f2}
+    .empty{padding:34px;text-align:center;color:#9ca3af}.count-line{padding:12px 16px;font-size:12px;color:#6b7280;background:#f9fafb}
+    .right-stack{display:flex;flex-direction:column;gap:18px}.profile-body{padding:18px}.profile-top{display:flex;align-items:center;gap:14px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+    .profile-top .user-avatar{width:68px;height:68px}.profile-name{font-size:18px;font-weight:700}.profile-role{font-size:13px;color:#6b7280;margin-top:4px}
+    .details{margin-top:14px;display:grid;gap:11px}.detail{display:grid;grid-template-columns:120px 1fr;gap:10px;font-size:13px}.detail span{color:#6b7280}.detail strong{font-weight:600;color:#1f2937;overflow-wrap:anywhere}
+    .placeholder{padding:32px 20px;color:#9ca3af;text-align:center}.msg-body{padding:16px}.msg-to{font-size:13px;color:#6b7280;margin-bottom:10px}
+    .conversation{border:1px solid var(--border);background:#f9fafb;border-radius:9px;min-height:110px;max-height:220px;overflow:auto;padding:10px;margin-bottom:10px}
+    .bubble{max-width:85%;padding:8px 10px;border-radius:9px;font-size:12px;line-height:1.4;margin-bottom:8px}.bubble.me{margin-left:auto;background:#d1fae5;color:#065f46}
+    .bubble.other{background:#fff;border:1px solid #e5e7eb;color:#374151}.bubble-time{font-size:10px;opacity:.65;margin-top:4px}
+    .msg-body textarea{width:100%;min-height:95px;resize:vertical;border:1px solid #d1d5db;border-radius:9px;padding:11px;outline:none}.msg-body textarea:focus{border-color:#047857}
+    .send{width:100%;margin-top:10px;background:#047857;color:#fff;border:0;border-radius:8px;padding:11px;font-weight:700;cursor:pointer}.send:hover{background:#065f46}.send:disabled{opacity:.6;cursor:wait}
+    .modal-bg{position:fixed;inset:0;background:rgba(17,24,39,.52);display:none;align-items:center;justify-content:center;padding:18px;z-index:4000}.modal-bg.show{display:flex}
+    .modal{width:min(720px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:14px;box-shadow:0 25px 60px rgba(0,0,0,.22);padding:22px}
+    .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.modal-head h3{font-size:20px}.close{border:0;background:none;font-size:25px;color:#6b7280;cursor:pointer}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field.full{grid-column:1/-1}.field label{display:block;font-size:12px;font-weight:700;color:#374151;margin-bottom:6px}
+    .field input,.field select{width:100%;border:1px solid #d1d5db;border-radius:8px;padding:10px 11px;outline:none;background:#fff}.field input:focus,.field select:focus{border-color:#047857}
+    .field input:disabled,.field select:disabled{background:#f3f4f6;color:#6b7280}.protected{font-size:12px;color:#92400e;background:#fffbeb;border:1px solid #fde68a;padding:9px 10px;border-radius:8px}
+    .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid #e5e7eb}.btn{border:1px solid #d1d5db;background:#fff;border-radius:8px;padding:10px 15px;font-weight:700;cursor:pointer}
+    .btn.green{background:#047857;border-color:#047857;color:#fff}.btn.red{background:#dc2626;border-color:#dc2626;color:#fff}
+    .toast{position:fixed;bottom:24px;right:24px;background:#111827;color:#fff;padding:12px 16px;border-radius:9px;box-shadow:0 8px 24px rgba(0,0,0,.18);opacity:0;transform:translateY(8px);pointer-events:none;transition:.2s;z-index:9999}
+    .toast.show{opacity:1;transform:none}.toast.error{background:#991b1b}
+    @media(max-width:1180px){.layout{grid-template-columns:1fr}.right-stack{display:grid;grid-template-columns:1fr 1fr}.user-row{grid-template-columns:minmax(200px,1fr) 120px minmax(170px,.8fr) 190px}}
     @media(max-width:800px){body{display:block}.sidebar{width:100%;min-height:auto}.nav{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}.nav li{margin:0}.side-user{display:none}.topbar{padding:0 14px}.content{padding:16px}.page-head,.toolbar{flex-direction:column;align-items:stretch}.head-actions{align-items:stretch;flex-direction:column}.search,.section-filter{max-width:none;width:100%}.right-stack{display:flex}.user-row{display:block}.user-main{margin-bottom:11px}.cell{margin:8px 0}.cell-label{display:block}.actions{justify-content:flex-start;margin-top:10px}.layout{display:block}.right-stack{margin-top:16px}.detail{grid-template-columns:105px 1fr}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}}
   </style>
 </head>
@@ -25,61 +72,464 @@
   const usuarioLogado=(()=>{try{return JSON.parse(localStorage.getItem('usuarioLogado')||'null')}catch(_){return null}})();
   if(!usuarioLogado||usuarioLogado.id===undefined||usuarioLogado.id===null){alert('Acesso negado. Faça login primeiro.');location.href='index.html'}
 </script>
+
 <aside class="sidebar">
   <div class="brand"><div class="star">★</div><div><h1>TAREFAS</h1><p>26º Pel PE Mec</p></div></div>
-  <ul class="nav"><li onclick="location.href='menu.html'">■ Quadro</li><li onclick="location.href='minhas_tarefas.html'">👤 Minhas tarefas</li><li onclick="location.href='calendario.html'">📅 Calendário</li><li onclick="location.href='relatorios.html'">📊 Relatórios</li><li class="active">👥 Usuários</li><li onclick="location.href='configuracoes.html'">⚙️ Configurações</li></ul>
-  <div class="side-user"><div class="mini"><div class="mini-avatar" id="sideAvatar">U</div><div><strong id="sideName">Carregando...</strong><span id="sideDetail">-</span></div></div><button class="logout" id="logoutBtn">➔ Sair</button></div>
+  <ul class="nav">
+    <li onclick="location.href='menu.html'">■ Quadro</li>
+    <li onclick="location.href='minhas_tarefas.html'">👤 Minhas tarefas</li>
+    <li onclick="location.href='calendario.html'">📅 Calendário</li>
+    <li onclick="location.href='relatorios.html'">📊 Relatórios</li>
+    <li class="active">👥 Usuários</li>
+    <li onclick="location.href='configuracoes.html'">⚙️ Configurações</li>
+  </ul>
+  <div class="side-user">
+    <div class="mini"><div class="mini-avatar" id="sideAvatar">U</div><div><strong id="sideName">Carregando...</strong><span id="sideDetail">-</span></div></div>
+    <button class="logout" id="logoutBtn">➔ Sair</button>
+  </div>
 </aside>
+
 <main class="main">
   <div class="topbar"><div class="topbar-left">☰</div><div class="topbar-right"><div class="top-avatar" id="topAvatar">U</div></div></div>
   <section class="content">
-    <div class="page-head"><div><h2>Usuários</h2><div class="breadcrumb">Início &gt; Usuários</div></div><div class="head-actions"><div class="scope" id="scopeLabel">Todos os usuários cadastrados</div><button id="newUserBtn" class="btn-primary"><i class="fa-solid fa-user-plus"></i> Novo usuário</button></div></div>
-    <div class="toolbar"><div class="search"><i class="fa-solid fa-magnifying-glass"></i><input id="searchInput" placeholder="Buscar por nome, patente, função, telefone ou e-mail..."></div><select id="sectionFilter" class="section-filter"><option value="Todas">Todas as seções</option><option>S1</option><option>S2</option><option>S3</option><option>S4</option><option>Fiscalização</option><option>Pagamento</option><option>SALC</option><option>Garagem</option><option>ResMat</option><option>ResArmt</option><option>Informática</option><option>Comandante</option></select></div>
+    <div class="page-head">
+      <div><h2>Usuários</h2><div class="breadcrumb">Início &gt; Usuários</div></div>
+      <div class="head-actions"><div class="scope" id="scopeLabel">Todos os usuários cadastrados</div><button id="newUserBtn" class="btn-primary"><i class="fa-solid fa-user-plus"></i> Novo usuário</button></div>
+    </div>
+    <div class="toolbar">
+      <div class="search"><i class="fa-solid fa-magnifying-glass"></i><input id="searchInput" placeholder="Buscar por nome, CPF, patente, função, telefone ou e-mail..."></div>
+      <select id="sectionFilter" class="section-filter">
+        <option value="Todas">Todas as seções</option><option>S1</option><option>S2</option><option>S3</option><option>S4</option>
+        <option>Fiscalização</option><option>Pagamento</option><option>SALC</option><option>Garagem</option>
+        <option>ResMat</option><option>ResArmt</option><option>Informática</option><option>Comandante</option>
+      </select>
+    </div>
     <div class="layout">
       <section class="panel"><div class="panel-title">Lista de usuários</div><div id="usersList" class="users-list"><div class="empty">Carregando usuários...</div></div><div id="countLine" class="count-line"></div></section>
-      <div class="right-stack"><section class="panel"><div class="panel-title">Propriedades do usuário</div><div id="profilePanel" class="placeholder">Clique em <b>⚙</b> para ver contato, seção, graduação e função.</div></section><section class="panel"><div class="panel-title">Enviar mensagem</div><div id="messagePanel" class="placeholder">Clique em <b>💬</b> para abrir a conversa com o usuário.</div></section></div>
+      <div class="right-stack">
+        <section class="panel"><div class="panel-title">Propriedades do usuário</div><div id="profilePanel" class="placeholder">Clique em <b>⚙</b> para ver os dados do usuário.</div></section>
+        <section class="panel"><div class="panel-title">Enviar mensagem</div><div id="messagePanel" class="placeholder">Clique em <b>💬</b> para abrir a conversa com o usuário.</div></section>
+      </div>
     </div>
   </section>
 </main>
-<div id="userModal" class="modal-bg"><div class="modal"><div class="modal-head"><h3 id="userModalTitle">Novo usuário</h3><button class="close" data-close="userModal">×</button></div><form id="userForm"><input type="hidden" id="editUserId"><div class="form-grid"><div class="field full"><label>Nome de Guerra *</label><input id="formNomeGuerra" required maxlength="80"></div><div class="field"><label>Posto / Graduação *</label><select id="formPatente" required><option>Sd</option><option>Cb</option><option>3º Sgt</option><option>2º Sgt</option><option>1º Sgt</option><option>ST</option><option>Asp</option><option>2º Ten</option><option>1º Ten</option><option>Cap</option><option>Maj</option><option>Ten Cel</option><option>Cel</option></select></div><div class="field"><label>Seção *</label><select id="formSecao" required><option>S1</option><option>S2</option><option>S3</option><option>S4</option><option>Fiscalização</option><option>Pagamento</option><option>SALC</option><option>Garagem</option><option>ResMat</option><option>ResArmt</option><option>Informática</option><option>Comandante</option></select><div id="adminSectionNotice" class="protected" style="display:none;margin-top:7px">A seção administrativa é protegida e não pode ser alterada pela interface.</div></div><div class="field"><label>Posição Executiva</label><select id="formPosicao"><option value="">Selecione...</option><option>Auxiliar</option><option>Chefe</option><option>Comandante</option></select></div><div class="field"><label>Telefone</label><input id="formTelefone" type="tel"></div><div class="field"><label>E-mail</label><input id="formEmail" type="email"></div><div class="field full" id="createPasswordField"><label>Senha inicial *</label><input id="formSenha" type="password" minlength="6" autocomplete="new-password"></div></div><div class="modal-actions"><button type="button" class="btn" data-close="userModal">Cancelar</button><button type="submit" class="btn green">Salvar usuário</button></div></form></div></div>
-<div id="passwordModal" class="modal-bg"><div class="modal" style="max-width:480px"><div class="modal-head"><h3>Alterar senha</h3><button class="close" data-close="passwordModal">×</button></div><form id="passwordForm"><input type="hidden" id="passwordUserId"><div class="field"><label>Nova senha *</label><input id="newPassword" type="password" minlength="6" required autocomplete="new-password"></div><div class="field" style="margin-top:12px"><label>Confirmar nova senha *</label><input id="confirmPassword" type="password" minlength="6" required autocomplete="new-password"></div><div class="modal-actions"><button type="button" class="btn" data-close="passwordModal">Cancelar</button><button type="submit" class="btn green">Atualizar senha</button></div></form></div></div>
+
+<div id="userModal" class="modal-bg">
+  <div class="modal">
+    <div class="modal-head"><h3 id="userModalTitle">Novo usuário</h3><button class="close" data-close="userModal">×</button></div>
+    <form id="userForm">
+      <input type="hidden" id="editUserId">
+      <div class="form-grid">
+        <div class="field full"><label>Nome completo *</label><input id="formNomeCompleto" required maxlength="140"></div>
+        <div class="field"><label>Nome de Guerra *</label><input id="formNomeGuerra" required maxlength="80"></div>
+        <div class="field"><label>CPF *</label><input id="formCpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" required></div>
+        <div class="field"><label>Posto / Graduação *</label>
+          <select id="formPatente" required>
+            <option value="Sd">Sd</option><option value="Cb">Cb</option><option value="3º Sgt">3º Sgt</option>
+            <option value="2º Sgt">2º Sgt</option><option value="1º Sgt">1º Sgt</option><option value="ST">ST</option>
+            <option value="Asp">Asp</option><option value="2º Ten">2º Ten</option><option value="1º Ten">1º Ten</option>
+            <option value="Cap">Cap</option><option value="Maj">Maj</option><option value="Ten Cel">Ten Cel</option><option value="Cel">Cel</option>
+          </select>
+        </div>
+        <div class="field"><label>Seção *</label>
+          <select id="formSecao" required>
+            <option>S1</option><option>S2</option><option>S3</option><option>S4</option><option>Fiscalização</option>
+            <option>Pagamento</option><option>SALC</option><option>Garagem</option><option>ResMat</option>
+            <option>ResArmt</option><option>Informática</option><option>Comandante</option>
+          </select>
+          <div id="sectionNotice" class="protected" style="display:none;margin-top:7px"></div>
+        </div>
+        <div class="field"><label>Posição Executiva</label>
+          <select id="formPosicao"><option value="">Selecione...</option><option>Auxiliar</option><option>Chefe</option><option>Comandante</option></select>
+        </div>
+        <div class="field"><label>Telefone</label><input id="formTelefone" type="tel"></div>
+        <div class="field"><label>E-mail</label><input id="formEmail" type="email"></div>
+        <div class="field" id="createPasswordField"><label>Senha inicial *</label><input id="formSenha" type="password" minlength="6" autocomplete="new-password"></div>
+        <div class="field" id="createPasswordConfirmField"><label>Confirmar senha *</label><input id="formConfirmarSenha" type="password" minlength="6" autocomplete="new-password"></div>
+      </div>
+      <div class="modal-actions"><button type="button" class="btn" data-close="userModal">Cancelar</button><button type="submit" class="btn green">Salvar usuário</button></div>
+    </form>
+  </div>
+</div>
+
+<div id="passwordModal" class="modal-bg">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-head"><h3>Alterar senha</h3><button class="close" data-close="passwordModal">×</button></div>
+    <form id="passwordForm">
+      <input type="hidden" id="passwordUserId">
+      <div class="field"><label>Nova senha *</label><input id="newPassword" type="password" minlength="6" required autocomplete="new-password"></div>
+      <div class="field" style="margin-top:12px"><label>Confirmar nova senha *</label><input id="confirmPassword" type="password" minlength="6" required autocomplete="new-password"></div>
+      <div class="modal-actions"><button type="button" class="btn" data-close="passwordModal">Cancelar</button><button type="submit" class="btn green">Atualizar senha</button></div>
+    </form>
+  </div>
+</div>
+
 <div id="toast" class="toast"></div>
+
 <script>
   const SUPABASE_URL='https://bpvijatnsluwsgnzklrd.supabase.co';
   const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwdmlqYXRuc2x1d3NnbnprbHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MzkxNDMsImV4cCI6MjEwMjQxNTE0M30.uvyfm9mgl6MON0v75CwfGzNz6FBqw58uzR4ZcRAOLNQ';
   const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-  const $=id=>document.getElementById(id), norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase(), esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
-  let perfil={...usuarioLogado},usuarios=[],selecionado=null,privilegio=false,tipoPrivilegio='',toastTimer=null;
+  const $=id=>document.getElementById(id);
+  const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
+  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+  const cpfLimpo=v=>String(v??'').replace(/\D/g,'').slice(0,11);
+  const cpfFormatado=v=>{const n=cpfLimpo(v);if(n.length!==11)return n||'-';return n.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4')};
+
+  let perfil={...usuarioLogado},usuarios=[],selecionado=null,toastTimer=null;
+
   function secaoNorm(u){return norm(u?.secao)}
   function ehAdmin(u){return secaoNorm(u)==='admin'}
   function ehComandante(u){return secaoNorm(u)==='comandante'}
-  function ehGestor(u){return ehAdmin(u)||ehComandante(u)}
+  function ehGestorGeral(u){return ehAdmin(u)||ehComandante(u)}
+  function ehChefe(u){return norm(u?.posicao)==='chefe'&&!ehAdmin(u)&&!ehComandante(u)}
+  function podeCriarUsuario(){return ehGestorGeral(perfil)||ehChefe(perfil)}
   function secaoVisivel(u){return ehAdmin(u)?'Protegida':(u?.secao||'-')}
   function avatarValor(u){return u?.avatar||u?.avatar_url||u?.icone||u?.foto_url||''}
   function nomeExibicao(u){return [u?.patente,u?.nome_guerra].filter(Boolean).join(' ')||'Usuário'}
-  function avatarHtml(u,classe='user-avatar'){const a=avatarValor(u);if(a&&(/^(data:image\/|https?:\/\/)/).test(a))return `<div class="${classe}"><img src="${esc(a)}" alt="Avatar"></div>`;const letra=String(u?.nome_guerra||'U').charAt(0).toUpperCase();return `<div class="${classe}">${esc(letra)}</div>`}
-  function toast(msg,erro=false){const t=$('toast');t.textContent=msg;t.className='toast show'+(erro?' error':'');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.className='toast',2700)}
-  function renderAvatarTopo(){const a=avatarValor(perfil),letra=String(perfil.nome_guerra||'U').charAt(0).toUpperCase();for(const id of ['sideAvatar','topAvatar']){const el=$(id);el.innerHTML='';if(a&&(/^(data:image\/|https?:\/\/)/).test(a)){const im=new Image();im.src=a;el.appendChild(im)}else el.textContent=letra}$('sideName').textContent=nomeExibicao(perfil);$('sideDetail').textContent=ehAdmin(perfil)?'Acesso administrativo':`${perfil.secao||'-'} - ${perfil.posicao||'-'}`}
-  async function carregarPerfil(){const {data,error}=await supabaseClient.from('usuarios').select('id,nome_guerra,patente,secao,posicao,telefone,email,avatar').eq('id',usuarioLogado.id).single();if(error)console.warn(error.message);if(data)perfil={...perfil,...data};privilegio=ehGestor(perfil);tipoPrivilegio=ehAdmin(perfil)?'Admin':ehComandante(perfil)?'Comandante':'';renderAvatarTopo();$('newUserBtn').style.display=privilegio?'inline-flex':'none';$('scopeLabel').textContent=privilegio?`Gestão de usuários — ${tipoPrivilegio}`:'Todos os usuários cadastrados'}
-  async function carregarUsuarios(){const {data,error}=await supabaseClient.from('usuarios').select('id,nome_guerra,patente,secao,posicao,telefone,email,avatar').order('nome_guerra',{ascending:true});if(error){$('usersList').innerHTML=`<div class="empty">Erro ao carregar usuários: ${esc(error.message)}</div>`;return}usuarios=data||[];renderLista()}
+  function avatarHtml(u,classe='user-avatar'){
+    const a=avatarValor(u);
+    if(a&&(/^(data:image\/|https?:\/\/)/).test(a))return `<div class="${classe}"><img src="${esc(a)}" alt="Avatar"></div>`;
+    const letra=String(u?.nome_guerra||'U').charAt(0).toUpperCase();
+    return `<div class="${classe}">${esc(letra)}</div>`;
+  }
+  function toast(msg,erro=false){
+    const t=$('toast');t.textContent=msg;t.className='toast show'+(erro?' error':'');
+    clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.className='toast',3200);
+  }
+
+  function podeEditarAlvo(u){
+    if(!ehGestorGeral(perfil))return false;
+    if(ehAdmin(u)&&!ehAdmin(perfil))return false;
+    return true;
+  }
+  function podeAlterarSenhaAlvo(u){return podeEditarAlvo(u)}
+  function podeExcluirAlvo(u){
+    if(!u||String(u.id)===String(perfil.id))return false;
+    if(ehAdmin(perfil))return true;
+    if(ehComandante(perfil))return !ehAdmin(u);
+    if(ehChefe(perfil)){
+      return !ehAdmin(u)&&!ehComandante(u)&&norm(u.secao)===norm(perfil.secao);
+    }
+    return false;
+  }
+
+  function renderAvatarTopo(){
+    const a=avatarValor(perfil),letra=String(perfil.nome_guerra||'U').charAt(0).toUpperCase();
+    for(const id of ['sideAvatar','topAvatar']){
+      const el=$(id);el.innerHTML='';
+      if(a&&(/^(data:image\/|https?:\/\/)/).test(a)){const im=new Image();im.src=a;el.appendChild(im)}
+      else el.textContent=letra;
+    }
+    $('sideName').textContent=nomeExibicao(perfil);
+    $('sideDetail').textContent=ehAdmin(perfil)?'Acesso administrativo':`${perfil.secao||'-'} - ${perfil.posicao||'-'}`;
+  }
+
+  async function carregarPerfil(){
+    const {data,error}=await supabaseClient.from('usuarios')
+      .select('id,nome_completo,nome_guerra,cpf,patente,secao,posicao,telefone,email,avatar')
+      .eq('id',usuarioLogado.id).single();
+    if(error)console.warn(error.message);
+    if(data)perfil={...perfil,...data};
+
+    renderAvatarTopo();
+    $('newUserBtn').style.display=podeCriarUsuario()?'inline-flex':'none';
+
+    if(ehAdmin(perfil)) $('scopeLabel').textContent='Gestão geral de usuários — Admin';
+    else if(ehComandante(perfil)) $('scopeLabel').textContent='Gestão geral de usuários — Comandante';
+    else if(ehChefe(perfil)) $('scopeLabel').textContent=`Gestão da seção ${perfil.secao||'-'} — Chefe`;
+    else $('scopeLabel').textContent='Todos os usuários cadastrados';
+  }
+
+  async function carregarUsuarios(){
+    const {data,error}=await supabaseClient.from('usuarios')
+      .select('id,nome_completo,nome_guerra,cpf,patente,secao,posicao,telefone,email,avatar')
+      .order('nome_guerra',{ascending:true});
+    if(error){
+      $('usersList').innerHTML=`<div class="empty">Erro ao carregar usuários: ${esc(error.message)}</div>`;
+      return;
+    }
+    usuarios=data||[];
+    renderLista();
+  }
+
   function encontrar(id){return usuarios.find(u=>String(u.id)===String(id))}
-  function podeAdministrarAlvo(u){if(!privilegio)return false;if(ehAdmin(u)&&!ehAdmin(perfil))return false;return true}
-  function renderLista(){const termo=norm($('searchInput').value),secaoFiltro=$('sectionFilter').value;const filtrados=usuarios.filter(u=>(secaoFiltro==='Todas'||norm(u.secao)===norm(secaoFiltro))&&(!termo||norm([nomeExibicao(u),u.posicao,secaoVisivel(u),u.telefone,u.email].join(' ')).includes(termo)));const list=$('usersList');if(!filtrados.length){list.innerHTML='<div class="empty">Nenhum usuário encontrado.</div>';$('countLine').textContent='0 usuários';return}list.innerHTML=filtrados.map(u=>{const adminBtns=podeAdministrarAlvo(u)?`<button class="icon-btn edit-btn" title="Editar usuário" data-id="${esc(u.id)}">✎</button><button class="icon-btn pass-btn" title="Alterar senha" data-id="${esc(u.id)}">🔑</button>${String(u.id)!==String(perfil.id)?`<button class="icon-btn danger del-btn" title="Excluir usuário" data-id="${esc(u.id)}">🗑</button>`:''}`:'';return `<div class="user-row ${selecionado&&String(selecionado.id)===String(u.id)?'selected':''}"><div class="user-main">${avatarHtml(u)}<div><div class="user-name">${esc(nomeExibicao(u))}</div><div class="user-sub">${esc(secaoVisivel(u))} · ${esc(u.posicao||'Sem função')}</div></div></div><div class="cell"><span class="cell-label">Função</span>${esc(u.posicao||'-')}</div><div class="cell contact"><span class="cell-label">Contato</span><div>${esc(u.telefone||'Não informado')}</div><div>${esc(u.email||'Não informado')}</div></div><div class="actions"><button class="icon-btn prop-btn" title="Propriedades" data-id="${esc(u.id)}">⚙</button><button class="icon-btn msg-btn" title="Enviar mensagem" data-id="${esc(u.id)}">💬</button>${adminBtns}</div></div>`}).join('');$('countLine').textContent=`Mostrando ${filtrados.length} usuário(s) cadastrado(s)`}
-  function abrirPropriedades(u){selecionado=u;renderLista();$('profilePanel').className='profile-body';$('profilePanel').innerHTML=`<div class="profile-top">${avatarHtml(u)}<div><div class="profile-name">${esc(nomeExibicao(u))}</div><div class="profile-role">${esc(u.posicao||'Sem função cadastrada')}</div></div></div><div class="details"><div class="detail"><span>Posto / Grad.</span><strong>${esc(u.patente||'-')}</strong></div><div class="detail"><span>Seção</span><strong>${esc(secaoVisivel(u))}</strong></div><div class="detail"><span>Função</span><strong>${esc(u.posicao||'-')}</strong></div><div class="detail"><span>Telefone</span><strong>${esc(u.telefone||'Não informado')}</strong></div><div class="detail"><span>E-mail</span><strong>${esc(u.email||'Não informado')}</strong></div></div>`}
-  async function carregarConversa(u){const meu=String(perfil.id),outro=String(u.id);const {data,error}=await supabaseClient.from('mensagens').select('id,remetente_id,destinatario_id,conteudo,criada_em,lida_em').or(`remetente_id.eq.${meu},destinatario_id.eq.${meu}`).order('criada_em',{ascending:true}).limit(120);if(error)return{erro:error.message,itens:[]};return{itens:(data||[]).filter(m=>(String(m.remetente_id)===meu&&String(m.destinatario_id)===outro)||(String(m.remetente_id)===outro&&String(m.destinatario_id)===meu))}}
-  async function abrirMensagem(u){selecionado=u;renderLista();$('messagePanel').className='msg-body';$('messagePanel').innerHTML=`<div class="msg-to">Para: <b>${esc(nomeExibicao(u))}</b></div><div id="conversation" class="conversation"><div class="empty">Carregando conversa...</div></div><textarea id="messageText" maxlength="2000" placeholder="Digite sua mensagem..."></textarea><button id="sendMessage" class="send">✈ Enviar mensagem</button>`;await atualizarConversa(u);$('sendMessage').onclick=()=>enviarMensagem(u)}
-  async function atualizarConversa(u){const box=$('conversation');if(!box)return;const r=await carregarConversa(u);if(r.erro){box.innerHTML='<div class="empty">Execute o SQL de mensagens/notificações para habilitar a conversa.</div>';return}if(!r.itens.length){box.innerHTML='<div class="empty">Nenhuma mensagem ainda.</div>';return}const meu=String(perfil.id);box.innerHTML=r.itens.map(m=>`<div class="bubble ${String(m.remetente_id)===meu?'me':'other'}">${esc(m.conteudo)}<div class="bubble-time">${new Date(m.criada_em).toLocaleString('pt-BR')}</div></div>`).join('');box.scrollTop=box.scrollHeight;const ids=r.itens.filter(m=>String(m.destinatario_id)===meu&&!m.lida_em).map(m=>m.id);if(ids.length)await supabaseClient.from('mensagens').update({lida_em:new Date().toISOString()}).in('id',ids)}
-  async function enviarMensagem(u){const txt=$('messageText').value.trim();if(!txt)return toast('Digite uma mensagem antes de enviar.',true);const btn=$('sendMessage');btn.disabled=true;const {error}=await supabaseClient.from('mensagens').insert([{remetente_id:String(perfil.id),destinatario_id:String(u.id),conteudo:txt}]);btn.disabled=false;if(error)return toast('Não foi possível enviar: '+error.message,true);$('messageText').value='';toast('Mensagem enviada.');await atualizarConversa(u)}
-  function abrirNovo(){if(!privilegio)return;$('userForm').reset();$('editUserId').value='';$('userModalTitle').textContent='Cadastrar usuário';$('createPasswordField').style.display='block';$('formSenha').required=true;$('formSecao').disabled=false;$('adminSectionNotice').style.display='none';$('userModal').classList.add('show')}
-  function abrirEditar(u){if(!podeAdministrarAlvo(u))return toast('Você não possui permissão para editar este usuário.',true);$('editUserId').value=u.id;$('userModalTitle').textContent='Editar usuário';$('formNomeGuerra').value=u.nome_guerra||'';$('formPatente').value=u.patente||'Sd';$('formPosicao').value=u.posicao||'';$('formTelefone').value=u.telefone||'';$('formEmail').value=u.email||'';$('createPasswordField').style.display='none';$('formSenha').required=false;const protegido=ehAdmin(u);$('formSecao').disabled=protegido;$('adminSectionNotice').style.display=protegido?'block':'none';if(!protegido){const secaoAlvo=ehComandante(u)?'Comandante':(u.secao||'S1');if(![...$('formSecao').options].some(o=>o.value===secaoAlvo))$('formSecao').add(new Option(secaoAlvo,secaoAlvo));$('formSecao').value=secaoAlvo}$('userModal').classList.add('show')}
-  function abrirSenha(u){if(!podeAdministrarAlvo(u))return toast('Você não possui permissão para alterar este usuário.',true);$('passwordUserId').value=u.id;$('passwordForm').reset();$('passwordUserId').value=u.id;$('passwordModal').classList.add('show')}
-  async function excluirUsuario(u){if(!podeAdministrarAlvo(u))return toast('Você não possui permissão para excluir este usuário.',true);if(String(u.id)===String(perfil.id))return toast('Não é possível excluir o usuário atualmente logado.',true);if(!confirm(`Excluir definitivamente ${nomeExibicao(u)}?`))return;const {error}=await supabaseClient.from('usuarios').delete().eq('id',u.id);if(error)return toast('Erro ao excluir: '+error.message,true);toast('Usuário excluído.');selecionado=null;await carregarUsuarios()}
-  $('userForm').addEventListener('submit',async e=>{e.preventDefault();if(!privilegio)return;const id=$('editUserId').value;const payload={nome_guerra:$('formNomeGuerra').value.trim(),patente:$('formPatente').value,secao:$('formSecao').value,posicao:$('formPosicao').value||null,telefone:$('formTelefone').value.trim()||null,email:$('formEmail').value.trim()||null};if(id){const alvo=encontrar(id);if(!alvo||!podeAdministrarAlvo(alvo))return toast('Ação não permitida.',true);if(ehAdmin(alvo))delete payload.secao;const {error}=await supabaseClient.from('usuarios').update(payload).eq('id',id);if(error)return toast('Erro ao atualizar: '+error.message,true);toast('Usuário atualizado.')}else{const senha=$('formSenha').value;if(senha.length<6)return toast('A senha inicial deve ter no mínimo 6 caracteres.',true);if(norm(payload.secao)==='admin')return toast('A seção administrativa não pode ser criada pela interface.',true);payload.senha=senha;const {error}=await supabaseClient.from('usuarios').insert([payload]);if(error)return toast('Erro ao cadastrar: '+error.message,true);toast('Usuário cadastrado.')}closeModal('userModal');await carregarUsuarios()})
-  $('passwordForm').addEventListener('submit',async e=>{e.preventDefault();const id=$('passwordUserId').value,u=encontrar(id);if(!u||!podeAdministrarAlvo(u))return toast('Ação não permitida.',true);const a=$('newPassword').value,b=$('confirmPassword').value;if(a.length<6)return toast('A senha deve ter no mínimo 6 caracteres.',true);if(a!==b)return toast('As senhas não coincidem.',true);const {error}=await supabaseClient.from('usuarios').update({senha:a}).eq('id',id);if(error)return toast('Erro ao alterar senha: '+error.message,true);closeModal('passwordModal');toast('Senha atualizada com sucesso.')})
+
+  function renderLista(){
+    const termo=norm($('searchInput').value),secaoFiltro=$('sectionFilter').value;
+    const filtrados=usuarios.filter(u=>{
+      const secaoOk=secaoFiltro==='Todas'||norm(u.secao)===norm(secaoFiltro);
+      const texto=norm([u.nome_completo,nomeExibicao(u),cpfFormatado(u.cpf),u.posicao,secaoVisivel(u),u.telefone,u.email].join(' '));
+      return secaoOk&&(!termo||texto.includes(termo));
+    });
+    const list=$('usersList');
+    if(!filtrados.length){
+      list.innerHTML='<div class="empty">Nenhum usuário encontrado.</div>';
+      $('countLine').textContent='0 usuários';
+      return;
+    }
+
+    list.innerHTML=filtrados.map(u=>{
+      const editar=podeEditarAlvo(u)?`<button class="icon-btn edit-btn" title="Editar usuário" data-id="${esc(u.id)}">✎</button>`:'';
+      const senha=podeAlterarSenhaAlvo(u)?`<button class="icon-btn pass-btn" title="Alterar senha" data-id="${esc(u.id)}">🔑</button>`:'';
+      const excluir=podeExcluirAlvo(u)?`<button class="icon-btn danger del-btn" title="Excluir usuário" data-id="${esc(u.id)}">🗑</button>`:'';
+      return `<div class="user-row ${selecionado&&String(selecionado.id)===String(u.id)?'selected':''}">
+        <div class="user-main">${avatarHtml(u)}<div><div class="user-name">${esc(nomeExibicao(u))}</div><div class="user-sub">${esc(secaoVisivel(u))} · ${esc(u.posicao||'Sem função')}</div></div></div>
+        <div class="cell"><span class="cell-label">Função</span>${esc(u.posicao||'-')}</div>
+        <div class="cell contact"><span class="cell-label">Contato</span><div>${esc(u.telefone||'Não informado')}</div><div>${esc(u.email||'Não informado')}</div></div>
+        <div class="actions">
+          <button class="icon-btn prop-btn" title="Propriedades" data-id="${esc(u.id)}">⚙</button>
+          <button class="icon-btn msg-btn" title="Enviar mensagem" data-id="${esc(u.id)}">💬</button>
+          ${editar}${senha}${excluir}
+        </div>
+      </div>`;
+    }).join('');
+    $('countLine').textContent=`Mostrando ${filtrados.length} de ${usuarios.length} usuário(s) cadastrado(s)`;
+  }
+
+  function abrirPropriedades(u){
+    selecionado=u;renderLista();
+    $('profilePanel').className='profile-body';
+    $('profilePanel').innerHTML=`<div class="profile-top">${avatarHtml(u)}<div><div class="profile-name">${esc(nomeExibicao(u))}</div><div class="profile-role">${esc(u.posicao||'Sem função cadastrada')}</div></div></div>
+      <div class="details">
+        <div class="detail"><span>Nome completo</span><strong>${esc(u.nome_completo||'-')}</strong></div>
+        <div class="detail"><span>CPF</span><strong>${esc(cpfFormatado(u.cpf))}</strong></div>
+        <div class="detail"><span>Posto / Grad.</span><strong>${esc(u.patente||'-')}</strong></div>
+        <div class="detail"><span>Seção</span><strong>${esc(secaoVisivel(u))}</strong></div>
+        <div class="detail"><span>Função</span><strong>${esc(u.posicao||'-')}</strong></div>
+        <div class="detail"><span>Telefone</span><strong>${esc(u.telefone||'Não informado')}</strong></div>
+        <div class="detail"><span>E-mail</span><strong>${esc(u.email||'Não informado')}</strong></div>
+      </div>`;
+  }
+
+  async function carregarConversa(u){
+    const meu=String(perfil.id),outro=String(u.id);
+    const {data,error}=await supabaseClient.from('mensagens')
+      .select('id,remetente_id,destinatario_id,conteudo,criada_em,lida_em')
+      .or(`remetente_id.eq.${meu},destinatario_id.eq.${meu}`)
+      .order('criada_em',{ascending:true}).limit(120);
+    if(error)return{erro:error.message,itens:[]};
+    return{itens:(data||[]).filter(m=>(String(m.remetente_id)===meu&&String(m.destinatario_id)===outro)||(String(m.remetente_id)===outro&&String(m.destinatario_id)===meu))};
+  }
+
+  async function abrirMensagem(u){
+    selecionado=u;renderLista();
+    $('messagePanel').className='msg-body';
+    $('messagePanel').innerHTML=`<div class="msg-to">Para: <b>${esc(nomeExibicao(u))}</b></div><div id="conversation" class="conversation"><div class="empty">Carregando conversa...</div></div><textarea id="messageText" maxlength="2000" placeholder="Digite sua mensagem..."></textarea><button id="sendMessage" class="send">✈ Enviar mensagem</button>`;
+    await atualizarConversa(u);
+    $('sendMessage').onclick=()=>enviarMensagem(u);
+  }
+
+  async function atualizarConversa(u){
+    const box=$('conversation');if(!box)return;
+    const r=await carregarConversa(u);
+    if(r.erro){box.innerHTML='<div class="empty">Execute o SQL de mensagens/notificações para habilitar a conversa.</div>';return}
+    if(!r.itens.length){box.innerHTML='<div class="empty">Nenhuma mensagem ainda.</div>';return}
+    const meu=String(perfil.id);
+    box.innerHTML=r.itens.map(m=>`<div class="bubble ${String(m.remetente_id)===meu?'me':'other'}">${esc(m.conteudo)}<div class="bubble-time">${new Date(m.criada_em).toLocaleString('pt-BR')}</div></div>`).join('');
+    box.scrollTop=box.scrollHeight;
+    const ids=r.itens.filter(m=>String(m.destinatario_id)===meu&&!m.lida_em).map(m=>m.id);
+    if(ids.length)await supabaseClient.from('mensagens').update({lida_em:new Date().toISOString()}).in('id',ids);
+  }
+
+  async function enviarMensagem(u){
+    const txt=$('messageText').value.trim();
+    if(!txt)return toast('Digite uma mensagem antes de enviar.',true);
+    const btn=$('sendMessage');btn.disabled=true;
+    const {error}=await supabaseClient.from('mensagens').insert([{remetente_id:String(perfil.id),destinatario_id:String(u.id),conteudo:txt}]);
+    btn.disabled=false;
+    if(error)return toast('Não foi possível enviar: '+error.message,true);
+    $('messageText').value='';toast('Mensagem enviada.');await atualizarConversa(u);
+  }
+
+  function aplicarMascaraCpf(input){
+    let n=cpfLimpo(input.value);
+    if(n.length>9)n=n.replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/,'$1.$2.$3-$4');
+    else if(n.length>6)n=n.replace(/(\d{3})(\d{3})(\d{0,3})/,'$1.$2.$3');
+    else if(n.length>3)n=n.replace(/(\d{3})(\d{0,3})/,'$1.$2');
+    input.value=n;
+  }
+
+  function prepararNovo(){
+    $('userForm').reset();
+    $('editUserId').value='';
+    $('userModalTitle').textContent='Cadastrar usuário';
+    $('createPasswordField').style.display='block';
+    $('createPasswordConfirmField').style.display='block';
+    $('formSenha').required=true;
+    $('formConfirmarSenha').required=true;
+    $('formCpf').disabled=false;
+    $('formSecao').disabled=false;
+    $('formPosicao').disabled=false;
+    $('sectionNotice').style.display='none';
+
+    if(ehChefe(perfil)&&!ehGestorGeral(perfil)){
+      const secao=perfil.secao||'';
+      if(![...$('formSecao').options].some(o=>norm(o.value)===norm(secao))) $('formSecao').add(new Option(secao,secao));
+      $('formSecao').value=secao;
+      $('formSecao').disabled=true;
+      $('sectionNotice').textContent=`Como Chefe, você só pode cadastrar usuários da seção ${secao}.`;
+      $('sectionNotice').style.display='block';
+      [...$('formPosicao').options].forEach(o=>{o.disabled=norm(o.value)==='comandante'});
+      if(norm($('formPosicao').value)==='comandante')$('formPosicao').value='Auxiliar';
+    }else{
+      [...$('formPosicao').options].forEach(o=>o.disabled=false);
+    }
+  }
+
+  function abrirNovo(){
+    if(!podeCriarUsuario())return toast('Você não possui permissão para cadastrar usuários.',true);
+    prepararNovo();
+    $('userModal').classList.add('show');
+  }
+
+  function abrirEditar(u){
+    if(!podeEditarAlvo(u))return toast('Você não possui permissão para editar este usuário.',true);
+
+    $('userForm').reset();
+    $('editUserId').value=u.id;
+    $('userModalTitle').textContent='Editar usuário';
+    $('formNomeCompleto').value=u.nome_completo||'';
+    $('formNomeGuerra').value=u.nome_guerra||'';
+    $('formCpf').value=cpfFormatado(u.cpf)==='-'?'':cpfFormatado(u.cpf);
+    $('formPatente').value=u.patente||'Sd';
+    $('formPosicao').value=u.posicao||'';
+    $('formTelefone').value=u.telefone||'';
+    $('formEmail').value=u.email||'';
+    $('createPasswordField').style.display='none';
+    $('createPasswordConfirmField').style.display='none';
+    $('formSenha').required=false;
+    $('formConfirmarSenha').required=false;
+    $('formCpf').disabled=false;
+    $('formPosicao').disabled=false;
+    [...$('formPosicao').options].forEach(o=>o.disabled=false);
+
+    const protegido=ehAdmin(u);
+    $('formSecao').disabled=protegido;
+    $('sectionNotice').style.display=protegido?'block':'none';
+    $('sectionNotice').textContent=protegido?'A seção Admin é protegida e não pode ser alterada pela interface.':'';
+
+    if(!protegido){
+      const secaoAlvo=ehComandante(u)?'Comandante':(u.secao||'S1');
+      if(![...$('formSecao').options].some(o=>norm(o.value)===norm(secaoAlvo)))$('formSecao').add(new Option(secaoAlvo,secaoAlvo));
+      $('formSecao').value=secaoAlvo;
+    }
+    $('userModal').classList.add('show');
+  }
+
+  function abrirSenha(u){
+    if(!podeAlterarSenhaAlvo(u))return toast('Você não possui permissão para alterar a senha deste usuário.',true);
+    $('passwordForm').reset();$('passwordUserId').value=u.id;$('passwordModal').classList.add('show');
+  }
+
+  async function excluirUsuario(u){
+    if(!podeExcluirAlvo(u))return toast('Você não possui permissão para excluir este usuário.',true);
+    if(!confirm(`Excluir definitivamente ${nomeExibicao(u)}?`))return;
+
+    const {error}=await supabaseClient.from('usuarios').delete().eq('id',u.id);
+    if(error)return toast('Erro ao excluir: '+error.message,true);
+    toast('Usuário excluído.');
+    selecionado=null;
+    await carregarUsuarios();
+  }
+
+  $('userForm').addEventListener('submit',async e=>{
+    e.preventDefault();
+    const id=$('editUserId').value;
+    const cpf=cpfLimpo($('formCpf').value);
+
+    if(cpf.length!==11)return toast('Informe um CPF com 11 dígitos.',true);
+
+    let secao=$('formSecao').value;
+    if(ehChefe(perfil)&&!ehGestorGeral(perfil))secao=perfil.secao;
+
+    const payload={
+      nome_completo:$('formNomeCompleto').value.trim(),
+      nome_guerra:$('formNomeGuerra').value.trim(),
+      cpf,
+      patente:$('formPatente').value,
+      secao,
+      posicao:$('formPosicao').value||null,
+      telefone:$('formTelefone').value.trim()||null,
+      email:$('formEmail').value.trim()||null
+    };
+
+    if(!payload.nome_completo||!payload.nome_guerra)return toast('Preencha nome completo e nome de guerra.',true);
+    if(norm(payload.secao)==='admin')return toast('A seção Admin não pode ser criada ou atribuída por esta tela.',true);
+
+    if(id){
+      const alvo=encontrar(id);
+      if(!alvo||!podeEditarAlvo(alvo))return toast('Ação não permitida.',true);
+      if(ehAdmin(alvo))delete payload.secao;
+
+      const duplicado=usuarios.find(u=>String(u.id)!==String(id)&&cpfLimpo(u.cpf)===cpf);
+      if(duplicado)return toast('Já existe outro usuário cadastrado com este CPF.',true);
+
+      const {error}=await supabaseClient.from('usuarios').update(payload).eq('id',id);
+      if(error)return toast('Erro ao atualizar: '+error.message,true);
+      toast('Usuário atualizado.');
+    }else{
+      if(!podeCriarUsuario())return toast('Você não possui permissão para cadastrar usuários.',true);
+
+      if(ehChefe(perfil)&&!ehGestorGeral(perfil)){
+        if(norm(payload.secao)!==norm(perfil.secao))return toast('Chefe só pode cadastrar na própria seção.',true);
+        if(norm(payload.posicao)==='comandante')return toast('Chefe de seção não pode cadastrar Comandante.',true);
+      }
+
+      const senha=$('formSenha').value;
+      const confirmar=$('formConfirmarSenha').value;
+      if(senha.length<6)return toast('A senha inicial deve ter no mínimo 6 caracteres.',true);
+      if(senha!==confirmar)return toast('As senhas não coincidem.',true);
+
+      const duplicado=usuarios.find(u=>cpfLimpo(u.cpf)===cpf);
+      if(duplicado)return toast('Já existe um usuário cadastrado com este CPF.',true);
+
+      payload.senha=senha;
+
+      const {error}=await supabaseClient.from('usuarios').insert([payload]);
+      if(error)return toast('Erro ao cadastrar: '+error.message,true);
+      toast('Usuário cadastrado e pronto para login.');
+    }
+
+    closeModal('userModal');
+    await carregarUsuarios();
+  });
+
+  $('passwordForm').addEventListener('submit',async e=>{
+    e.preventDefault();
+    const id=$('passwordUserId').value,u=encontrar(id);
+    if(!u||!podeAlterarSenhaAlvo(u))return toast('Ação não permitida.',true);
+
+    const a=$('newPassword').value,b=$('confirmPassword').value;
+    if(a.length<6)return toast('A senha deve ter no mínimo 6 caracteres.',true);
+    if(a!==b)return toast('As senhas não coincidem.',true);
+
+    const {error}=await supabaseClient.from('usuarios').update({senha:a}).eq('id',id);
+    if(error)return toast('Erro ao alterar senha: '+error.message,true);
+    closeModal('passwordModal');toast('Senha atualizada com sucesso.');
+  });
+
   function closeModal(id){$(id).classList.remove('show')}
-  document.addEventListener('click',e=>{const c=e.target.closest('[data-close]');if(c)closeModal(c.dataset.close);const p=e.target.closest('.prop-btn'),m=e.target.closest('.msg-btn'),ed=e.target.closest('.edit-btn'),pa=e.target.closest('.pass-btn'),de=e.target.closest('.del-btn');for(const [el,fn] of [[p,abrirPropriedades],[m,abrirMensagem],[ed,abrirEditar],[pa,abrirSenha],[de,excluirUsuario]])if(el){const u=encontrar(el.dataset.id);if(u)fn(u);break}})
+
+  document.addEventListener('click',e=>{
+    const c=e.target.closest('[data-close]');if(c)closeModal(c.dataset.close);
+    const p=e.target.closest('.prop-btn'),m=e.target.closest('.msg-btn'),ed=e.target.closest('.edit-btn'),pa=e.target.closest('.pass-btn'),de=e.target.closest('.del-btn');
+    for(const [el,fn] of [[p,abrirPropriedades],[m,abrirMensagem],[ed,abrirEditar],[pa,abrirSenha],[de,excluirUsuario]]){
+      if(el){const u=encontrar(el.dataset.id);if(u)fn(u);break}
+    }
+  });
+
   for(const id of ['userModal','passwordModal'])$(id).addEventListener('click',e=>{if(e.target.id===id)closeModal(id)});
-  $('formSecao').addEventListener('change',()=>{if(norm($('formSecao').value)==='comandante')$('formPosicao').value='Comandante'});$('newUserBtn').onclick=abrirNovo;$('searchInput').addEventListener('input',renderLista);$('sectionFilter').addEventListener('change',renderLista);$('logoutBtn').onclick=()=>{localStorage.removeItem('usuarioLogado');location.href='index.html'};
+
+  $('formCpf').addEventListener('input',e=>aplicarMascaraCpf(e.target));
+  $('formSecao').addEventListener('change',()=>{
+    if(norm($('formSecao').value)==='comandante')$('formPosicao').value='Comandante';
+  });
+  $('newUserBtn').onclick=abrirNovo;
+  $('searchInput').addEventListener('input',renderLista);
+  $('sectionFilter').addEventListener('change',renderLista);
+  $('logoutBtn').onclick=()=>{localStorage.removeItem('usuarioLogado');location.href='index.html'};
+
   (async()=>{await carregarPerfil();await carregarUsuarios()})();
 </script>
 <script src="notificacoes.js"></script>
