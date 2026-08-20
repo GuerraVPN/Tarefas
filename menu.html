@@ -7,8 +7,8 @@
 
     <!-- CDN DO SDK DO SUPABASE -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="perfis.js?v=3"></script>
-    <script src="responsaveis_perfis.js?v=3"></script>
+    <script src="perfis.js?v=5.0"></script>
+    <script src="responsaveis_perfis.js?v=5.0"></script>
 
     <style>
         * {
@@ -856,8 +856,23 @@
         .btn-salvar-secao-tarefa:hover{background:#065f46}.btn-salvar-secao-tarefa:disabled{opacity:.6;cursor:wait}
         .aviso-permissao-secao{font-size:10px;line-height:1.35;margin-top:6px}
 
+    
+        .task-last-activity {
+            margin-top: 7px;
+            padding-top: 6px;
+            border-top: 1px dashed #e5e7eb;
+            font-size: 9px;
+            line-height: 1.35;
+            color: #6b7280;
+            overflow-wrap: anywhere;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
     </style>
-        <link rel="stylesheet" href="notificacoes.css?v=3">
+    <link rel="stylesheet" href="notificacoes.css">
 </head>
 <body>
 
@@ -1012,18 +1027,9 @@
                     <option value="Informática">Informática</option>
                     <option value="Comandante">Comandante</option>
                 </select>
-                <label>Responsáveis iniciais</label>
-                <div class="v3-create-resp" id="v3CreateResp">
-                    <div class="v3-create-resp-head">
-                        <span>Selecione um ou mais perfis. Cada perfil é um destino independente.</span>
-                        <button type="button" id="v3CreateRespToggle">Selecionar perfis</button>
-                    </div>
-                    <div class="v3-create-selected" id="v3CreateSelected"><span class="v3-create-empty">Nenhum perfil selecionado.</span></div>
-                    <div class="v3-create-panel" id="v3CreatePanel">
-                        <input type="search" id="v3CreateSearch" placeholder="Buscar militar, seção ou função...">
-                        <div class="v3-create-list" id="v3CreateList"></div>
-                    </div>
-                </div>
+
+                <label for="taskResponsavel">Responsável inicial (opcional)</label>
+                <input type="text" id="taskResponsavel" placeholder="Opcional. Após criar, use “Selecionar responsáveis” para o despacho múltiplo.">
 
                 <label for="taskPrioridade">Prioridade *</label>
                 <select id="taskPrioridade" required>
@@ -1250,6 +1256,108 @@
 
         function criarEntradaHistorico(texto) {
             return `${texto} | ${agoraFormatado()} | ${nomeUsuarioAtual()}`;
+        }
+
+
+        // ---------- V3: última atualização baseada na última atividade do histórico ----------
+        function obterUltimaAtividadeTarefa(tarefa) {
+            const historico = normalizarHistorico(tarefa?.historico);
+
+            for (let i = historico.length - 1; i >= 0; i--) {
+                const entrada = historico[i];
+
+                if (typeof entrada === 'string') {
+                    const texto = entrada.trim();
+                    if (!texto) continue;
+
+                    // Formato atual do sistema:
+                    // Atividade | DD/MM/AAAA HH:MM | Posto Nome
+                    const partes = texto.split('|').map(p => p.trim());
+
+                    if (partes.length >= 3) {
+                        return {
+                            atividade: partes.slice(0, -2).join(' | ').trim() || 'Tarefa atualizada.',
+                            dataHora: partes[partes.length - 2] || '',
+                            usuario: partes[partes.length - 1] || 'Usuário'
+                        };
+                    }
+
+                    return {
+                        atividade: texto,
+                        dataHora: '',
+                        usuario: 'Usuário'
+                    };
+                }
+
+                if (entrada && typeof entrada === 'object') {
+                    const atividade = String(
+                        entrada.texto ||
+                        entrada.descricao ||
+                        entrada.mensagem ||
+                        entrada.acao ||
+                        entrada.atividade ||
+                        ''
+                    ).trim();
+
+                    if (!atividade) continue;
+
+                    let dataHora = String(
+                        entrada.data_hora ||
+                        entrada.dataHora ||
+                        entrada.data ||
+                        entrada.criado_em ||
+                        entrada.criadoEm ||
+                        ''
+                    ).trim();
+
+                    if (dataHora) {
+                        const data = new Date(dataHora);
+                        if (!Number.isNaN(data.getTime())) {
+                            dataHora = data.toLocaleDateString('pt-BR') + ' ' +
+                                data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                        }
+                    }
+
+                    return {
+                        atividade,
+                        dataHora,
+                        usuario: String(
+                            entrada.usuario ||
+                            entrada.autor ||
+                            entrada.nome_usuario ||
+                            entrada.nomeUsuario ||
+                            'Usuário'
+                        ).trim()
+                    };
+                }
+            }
+
+            // Compatibilidade com tarefas antigas que ainda não possuem histórico.
+            let dataHora = '';
+            if (tarefa?.atualizado_em) {
+                const data = new Date(tarefa.atualizado_em);
+                if (!Number.isNaN(data.getTime())) {
+                    dataHora = data.toLocaleDateString('pt-BR') + ' ' +
+                        data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                }
+            }
+
+            return {
+                atividade: 'Tarefa atualizada.',
+                usuario: 'Sistema',
+                dataHora
+            };
+        }
+
+        function formatarUltimaAtividadeTarefa(tarefa) {
+            const ultima = obterUltimaAtividadeTarefa(tarefa);
+            const partes = [
+                ultima.atividade,
+                ultima.usuario,
+                ultima.dataHora
+            ].filter(Boolean);
+
+            return `Última atualização: ${partes.join(' — ')}`;
         }
 
         function adicionarHistoricoLocal(texto) {
@@ -1649,10 +1757,7 @@
                             'Nova tarefa despachada para um de seus perfis',
                             `${nomeUsuarioAtual()} despachou a tarefa ${tarefa.codigo || ('#' + tarefa.id)} - ${tarefa.titulo || 'Sem título'} para ${resp.secao || '-'} — ${resp.posicao || '-'}.`,
                             'tarefa',
-                            tarefa.id,
-                            resp.perfil_id || null,
-                            false,
-                            'minhas_tarefas.html?tarefa=' + tarefa.id
+                            tarefa.id
                         ).then(r => { if (r?.error) console.warn('Notificação de despacho:', r.error.message); }).catch(e => console.warn('Notificação de despacho:', e));
                     });
                 }
@@ -1938,7 +2043,9 @@
                         <div class="progress-mini-bar">
                             <div class="progress-mini-fill" style="width:${pct}%; background:${tarefa.status === 'Concluída' ? '#10b981' : '#3b82f6'};"></div>
                         </div>
-                        <div class="task-last-update">↻ Última atualização: ${v3UltimaAtualizacao(tarefa.atualizado_em)}</div>
+                        <div class="task-last-activity" title="${escaparHtml(formatarUltimaAtividadeTarefa(tarefa))}">
+                            ↻ ${escaparHtml(formatarUltimaAtividadeTarefa(tarefa))}
+                        </div>
                         ${qtdAnexos ? `<div class="drag-hint">📎 ${qtdAnexos} anexo(s)</div>` : ''}
                     </div>
                 `;
@@ -2387,7 +2494,6 @@
         // ---------- Modal de criação ----------
         const modalTarefa = document.getElementById('modalNovaTarefa');
         function abrirModalNovaTarefa(statusColumn) {
-            if (typeof v3ResetCreateResp === 'function') v3ResetCreateResp();
             document.getElementById('taskStatusAlvo').value = statusColumn;
             const secaoInput = document.getElementById('taskSecao');
             if (!privilegioGlobal) {
@@ -2412,131 +2518,6 @@
             document.getElementById('taskStatusAlvo').value = 'Pendente';
         }
 
-
-        // ---------- V3: responsáveis na criação + andamento instantâneo ----------
-        let v3NovaTarefaResponsaveis = [];
-        let v3NovaTarefaPerfis = [];
-
-        function v3RespLabel(r) {
-            return window.ResponsaveisPerfis26
-                ? ResponsaveisPerfis26.label(r)
-                : `${r.nome || r.nome_guerra || 'Usuário'} — ${r.secao || '-'} / ${r.posicao || '-'}`;
-        }
-
-        function v3RenderSelected() {
-            const box = document.getElementById('v3CreateSelected');
-            if (!box) return;
-            box.innerHTML = v3NovaTarefaResponsaveis.length
-                ? v3NovaTarefaResponsaveis.map(r => `<span class="v3-create-chip">${escaparHtml(v3RespLabel(r))}</span>`).join('')
-                : '<span class="v3-create-empty">Nenhum perfil selecionado.</span>';
-        }
-
-        function v3RenderCreateList() {
-            const list = document.getElementById('v3CreateList');
-            if (!list) return;
-            const termo = String(document.getElementById('v3CreateSearch')?.value || '').toLowerCase();
-            const dados = v3NovaTarefaPerfis.filter(r =>
-                `${r.nome || ''} ${r.secao || ''} ${r.posicao || ''}`.toLowerCase().includes(termo)
-            );
-            list.innerHTML = dados.length ? dados.map(r => {
-                const checked = v3NovaTarefaResponsaveis.some(x => String(x.perfil_id) === String(r.perfil_id));
-                return `<label class="v3-create-row">
-                    <input type="checkbox" data-v3-create-profile="${r.perfil_id}" ${checked ? 'checked' : ''}>
-                    <span><strong>${escaparHtml(r.nome || '')}</strong><small>${escaparHtml((r.secao || '-') + ' — ' + (r.posicao || '-'))}${r.principal ? ' · Principal' : ''}</small></span>
-                </label>`;
-            }).join('') : '<div class="v3-create-empty">Nenhum perfil encontrado.</div>';
-        }
-
-        async function v3OpenCreateResp() {
-            const panel = document.getElementById('v3CreatePanel');
-            if (!panel) return;
-            panel.classList.toggle('open');
-            if (!panel.classList.contains('open')) return;
-            try {
-                v3NovaTarefaPerfis = await ResponsaveisPerfis26.listProfiles(supabaseClient, usuarioPerfilAtual);
-                v3RenderCreateList();
-                setTimeout(() => document.getElementById('v3CreateSearch')?.focus(), 20);
-            } catch (err) {
-                alert('Erro ao carregar perfis: ' + err.message);
-            }
-        }
-
-        function v3ResetCreateResp() {
-            v3NovaTarefaResponsaveis = [];
-            document.getElementById('v3CreatePanel')?.classList.remove('open');
-            const search = document.getElementById('v3CreateSearch');
-            if (search) search.value = '';
-            v3RenderSelected();
-        }
-
-        document.getElementById('v3CreateRespToggle').onclick = v3OpenCreateResp;
-        document.getElementById('v3CreateSearch').addEventListener('input', v3RenderCreateList);
-        document.getElementById('v3CreateList').addEventListener('change', e => {
-            const cb = e.target.closest('[data-v3-create-profile]');
-            if (!cb) return;
-            const p = v3NovaTarefaPerfis.find(x => String(x.perfil_id) === String(cb.dataset.v3CreateProfile));
-            if (!p) return;
-            v3NovaTarefaResponsaveis = v3NovaTarefaResponsaveis.filter(x => String(x.perfil_id) !== String(p.perfil_id));
-            if (cb.checked) v3NovaTarefaResponsaveis.push({ ...p });
-            v3RenderSelected();
-        });
-
-        function v3UltimaAtualizacao(valor) {
-            if (!valor) return 'Sem atualização registrada';
-            const d = new Date(valor);
-            if (Number.isNaN(d.getTime())) return 'Sem atualização registrada';
-            return d.toLocaleString('pt-BR', {
-                day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'
-            });
-        }
-
-        let v3SalvandoAndamento = false;
-        async function v3SalvarAndamentoImediato() {
-            if (!tarefaSelecionadaId || v3SalvandoAndamento) return;
-            const t = encontrarTarefa(tarefaSelecionadaId);
-            if (!t) return;
-
-            const slider = document.getElementById('detalheAndamento');
-            let valor = Math.max(0, Math.min(100, Number(slider.value) || 0));
-            const novoStatus = valor === 0 ? 'Pendente' : valor >= 100 ? 'Concluída' : 'Em andamento';
-            const anterior = Number(t.andamento) || 0;
-            const statusAnterior = t.status || 'Pendente';
-            if (valor === anterior && novoStatus === statusAnterior) return;
-
-            v3SalvandoAndamento = true;
-            document.getElementById('txtAndamentoPorcentagem').innerText = valor;
-            document.getElementsByName('detalheStatus').forEach(r => r.checked = r.value === novoStatus);
-
-            const hist = normalizarHistorico(t.historico);
-            if (valor !== anterior) hist.push(criarEntradaHistorico(`Andamento atualizado de ${anterior}% para ${valor}%.`));
-            if (novoStatus !== statusAnterior) hist.push(criarEntradaHistorico(`Status alterado de "${statusAnterior}" para "${novoStatus}".`));
-
-            try {
-                const { data, error } = await supabaseClient.from('tarefas')
-                    .update({ andamento: valor, status: novoStatus, historico: hist })
-                    .eq('id', t.id)
-                    .select('andamento,status,atualizado_em,historico')
-                    .maybeSingle();
-                if (error) throw error;
-                t.andamento = Number(data?.andamento ?? valor);
-                t.status = data?.status || novoStatus;
-                t.atualizado_em = data?.atualizado_em || new Date().toISOString();
-                t.historico = data?.historico || hist;
-                listaHistoricoLocal = normalizarHistorico(t.historico);
-                renderizarHistoricoLocal();
-                renderizarQuadroKanban();
-            } catch (err) {
-                alert('Erro ao salvar o andamento: ' + err.message);
-            } finally {
-                v3SalvandoAndamento = false;
-            }
-        }
-
-        document.getElementById('detalheAndamento').addEventListener('change', v3SalvarAndamentoImediato);
-        document.getElementsByName('detalheStatus').forEach(r => r.addEventListener('change', () => {
-            setTimeout(v3SalvarAndamentoImediato, 0);
-        }));
-
         document.getElementById('btnNovaTarefaTop').onclick = () => abrirModalNovaTarefa('Pendente');
         document.getElementById('fecharModalTarefa').onclick = fecharModalNovaTarefa;
         document.getElementById('btnCancelaTarefa').onclick = fecharModalNovaTarefa;
@@ -2556,6 +2537,7 @@
             const tTitulo = document.getElementById('taskTitulo').value.trim();
             const tDesc = document.getElementById('taskDescricao').value.trim();
             const tSecao = document.getElementById('taskSecao').value;
+            const tResp = document.getElementById('taskResponsavel').value.trim();
             const tPrio = document.getElementById('taskPrioridade').value;
             const tPrazo = document.getElementById('taskPrazo').value || null;
             const tStatus = document.getElementById('taskStatusAlvo').value;
@@ -2563,13 +2545,12 @@
             const andamentoInicial = tStatus === 'Concluída' ? 100 : tStatus === 'Em andamento' ? 1 : 0;
 
             try {
-                const valorResponsaveis = ResponsaveisPerfis26.serialize(v3NovaTarefaResponsaveis);
-                const { data: novaTarefa, error } = await supabaseClient.from('tarefas').insert([{
+                const { error } = await supabaseClient.from('tarefas').insert([{
                     codigo: codGerado,
                     titulo: tTitulo,
                     descricao: tDesc,
                     secao: tSecao,
-                    responsavel: valorResponsaveis,
+                    responsavel: tResp,
                     prioridade: tPrio,
                     prazo: tPrazo,
                     status: tStatus,
@@ -2578,23 +2559,8 @@
                     andamento: andamentoInicial,
                     arquivos: [],
                     historico: [criarEntradaHistorico('Tarefa criada.')]
-                }]).select('*').single();
+                }]);
                 if (error) throw error;
-
-                try {
-                    if (v3NovaTarefaResponsaveis.length) {
-                        await ResponsaveisPerfis26.save(
-                            supabaseClient,
-                            novaTarefa.id,
-                            v3NovaTarefaResponsaveis,
-                            usuarioLogado.id,
-                            usuarioPerfilAtual?.perfil_id
-                        );
-                    }
-                } catch (erroDespacho) {
-                    await supabaseClient.from('tarefas').delete().eq('id', novaTarefa.id);
-                    throw new Error('A tarefa não foi criada porque os responsáveis não puderam ser vinculados: ' + erroDespacho.message);
-                }
 
                 fecharModalNovaTarefa();
                 await buscarTarefasDoBanco();
@@ -2676,10 +2642,9 @@
 
         inicializarQuadro();
     </script>
-        <script src="sistema_comum.js?v=3"></script>
-    <script src="auditoria.js?v=3"></script>
-        <script src="notificacoes.js?v=3"></script>
-    <script src="v3_ui.js?v=3"></script>
-    <script src="bloco_notas.js?v=3"></script>
+        <script src="sistema_comum.js?v=5.0"></script>
+    <script src="auditoria.js?v=5.0"></script>
+    <script src="bloco_notas.js?v=5.0"></script>
+    <script src="notificacoes.js"></script>
 </body>
 </html>
