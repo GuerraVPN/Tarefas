@@ -8,6 +8,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       min-height: 100vh;
@@ -16,14 +17,18 @@
       justify-content: center;
       align-items: center;
       font-family: Arial, sans-serif;
+      padding: 20px;
     }
+
     .login {
-      width: 320px;
+      width: 100%;
+      max-width: 350px;
       padding: 30px;
       background: white;
       border-radius: 15px;
       box-shadow: 0 10px 30px #0006;
     }
+
     .logo {
       text-align: center;
       color: #2563eb;
@@ -31,70 +36,112 @@
       font-weight: bold;
       margin-bottom: 5px;
     }
-    .subtitle { text-align: center; color: #666; margin-bottom: 25px; }
-    h2 { text-align: center; margin-bottom: 20px; }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin: 0 0 25px;
+    }
+
+    h2 {
+      text-align: center;
+      margin: 0 0 20px;
+      color: #111827;
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      margin-bottom: 5px;
+      color: #374151;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
     input {
       width: 100%;
       padding: 12px;
-      margin: 8px 0 15px;
       box-sizing: border-box;
       border: 1px solid #ccc;
       border-radius: 8px;
+      font-size: 16px;
+      outline: none;
     }
+
+    input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+    }
+
     button {
       width: 100%;
+      margin-top: 22px;
       padding: 12px;
       border: 0;
       border-radius: 8px;
       background: #2563eb;
       color: white;
       font-size: 16px;
+      font-weight: 700;
       cursor: pointer;
     }
+
     button:hover { background: #1d4ed8; }
     button:disabled { background: #93c5fd; cursor: not-allowed; }
-    .criar-conta {
+
+    .status {
+      min-height: 20px;
+      margin-top: 14px;
+      text-align: center;
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .status.erro { color: #dc2626; }
+    .status.ok { color: #047857; }
+
+    .rodape {
       text-align: center;
       margin-top: 20px;
-      color: #666;
-      font-size: 14px;
+      color: #9ca3af;
+      font-size: 12px;
+      line-height: 1.5;
     }
-    .criar-conta a {
-      color: #2563eb;
-      font-weight: bold;
-      text-decoration: none;
-      cursor: pointer;
-    }
-    .criar-conta a:hover { text-decoration: underline; }
   </style>
 </head>
-
 <body>
   <div class="login">
     <div class="logo">TAREFAS</div>
-    <p class="subtitle">Organize suas tarefas</p>
+    <p class="subtitle">26º Pel PE Mec</p>
     <h2>Entrar</h2>
 
-    <form id="formLogin">
+    <form id="formLogin" autocomplete="on">
+      <label for="loginCpf">CPF</label>
       <input
         type="text"
         id="loginCpf"
-        placeholder="CPF"
+        placeholder="000.000.000-00"
+        inputmode="numeric"
+        autocomplete="username"
         maxlength="14"
         required
       />
+
+      <label for="loginSenha">Senha</label>
       <input
         type="password"
         id="loginSenha"
         placeholder="Senha"
+        autocomplete="current-password"
         required
       />
+
       <button type="submit" id="btnEntrar">Entrar</button>
+      <div id="statusLogin" class="status" aria-live="polite"></div>
     </form>
 
-    <div class="criar-conta">
-      Não possui uma conta?
-      <a href="criarconta.html">Criar conta</a>
+    <div class="rodape">
+      O cadastro de usuários é realizado somente pela administração do sistema.
     </div>
   </div>
 
@@ -104,69 +151,114 @@
 
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // CPF máscara
-    document.getElementById("loginCpf").addEventListener("input", function () {
-      let cpf = this.value.replace(/\D/g, "");
-      if (cpf.length > 11) cpf = cpf.substring(0, 11);
+    function cpfSomenteNumeros(valor) {
+      return String(valor || "").replace(/\D/g, "").slice(0, 11);
+    }
 
+    function emailTecnicoDoCpf(cpf) {
+      return `${cpf}@auth.26pel.local`;
+    }
+
+    function setStatus(texto, tipo = "") {
+      const el = document.getElementById("statusLogin");
+      el.textContent = texto || "";
+      el.className = `status ${tipo}`.trim();
+    }
+
+    document.getElementById("loginCpf").addEventListener("input", function () {
+      let cpf = cpfSomenteNumeros(this.value);
       cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
       cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
       cpf = cpf.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
       this.value = cpf;
     });
 
+    async function carregarPerfilDaSessao(authUser) {
+      const { data, error } = await supabaseClient
+        .from("usuarios")
+        .select("id,nome_completo,nome_guerra,cpf,patente,secao,posicao,telefone,email,avatar,auth_user_id")
+        .eq("auth_user_id", authUser.id)
+        .single();
+
+      if (error || !data) {
+        throw new Error("Sua conta foi autenticada, mas o perfil não está vinculado na tabela usuarios.");
+      }
+
+      // Compatibilidade temporária com as páginas atuais.
+      // A segurança real passa a vir da sessão Auth/RLS, não deste objeto.
+      localStorage.setItem("usuarioLogado", JSON.stringify({
+        id: data.id,
+        auth_user_id: data.auth_user_id,
+        nome_completo: data.nome_completo,
+        nome_guerra: data.nome_guerra,
+        cpf: data.cpf,
+        patente: data.patente,
+        secao: data.secao,
+        posicao: data.posicao,
+        telefone: data.telefone || "",
+        email: data.email || "",
+        avatar: data.avatar || ""
+      }));
+
+      return data;
+    }
+
     document.getElementById("formLogin").addEventListener("submit", async function (event) {
       event.preventDefault();
 
-      const cpfLimpo = document.getElementById("loginCpf").value.replace(/\D/g, "");
-      const senhaDigitada = document.getElementById("loginSenha").value;
-      const btnEntrar = document.getElementById("btnEntrar");
+      const cpf = cpfSomenteNumeros(document.getElementById("loginCpf").value);
+      const senha = document.getElementById("loginSenha").value;
+      const btn = document.getElementById("btnEntrar");
 
-      btnEntrar.disabled = true;
-      btnEntrar.innerText = "Autenticando...";
+      if (cpf.length !== 11) {
+        setStatus("Informe um CPF com 11 dígitos.", "erro");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = "Autenticando...";
+      setStatus("Validando credenciais...");
 
       try {
-        // Busca usuário pelo CPF
-        const { data, error } = await supabaseClient
-          .from("usuarios")
-          .select("*")
-          .eq("cpf", cpfLimpo)
-          .single();
+        // O usuário continua digitando CPF, mas o Supabase Auth usa um e-mail técnico determinístico.
+        const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
+          email: emailTecnicoDoCpf(cpf),
+          password: senha
+        });
 
-        if (error || !data) {
-          alert("CPF não cadastrado ou erro na busca.");
-          return;
+        if (authError || !authData?.user) {
+          throw new Error("CPF ou senha incorretos.");
         }
 
-        // Verifica senha (igual ao seu código atual)
-        if (data.senha === senhaDigitada) {
-          localStorage.setItem(
-            "usuarioLogado",
-            JSON.stringify({
-              id: data.id,
-              nome_completo: data.nome_completo,
-              nome_guerra: data.nome_guerra,
-              patente: data.patente,
-              secao: data.secao,
-              posicao: data.posicao
-            })
-          );
+        const perfil = await carregarPerfilDaSessao(authData.user);
+        setStatus(`Bem-vindo, ${[perfil.patente, perfil.nome_guerra].filter(Boolean).join(" ")}!`, "ok");
 
-          alert(`Bem-vindo, ${data.patente} ${data.nome_guerra}!`);
+        setTimeout(() => {
           window.location.href = "menu.html";
-        } else {
-          alert("Senha incorreta.");
-        }
+        }, 250);
       } catch (err) {
-        alert("Erro ao conectar ao servidor: " + err.message);
+        await supabaseClient.auth.signOut().catch(() => {});
+        localStorage.removeItem("usuarioLogado");
+        setStatus(err.message || "Não foi possível entrar.", "erro");
       } finally {
-        btnEntrar.disabled = false;
-        btnEntrar.innerText = "Entrar";
+        btn.disabled = false;
+        btn.textContent = "Entrar";
       }
     });
 
-    // O index é a tela de login.
-    // O menu só é aberto após um login bem-sucedido.
+    // Se já houver sessão Auth válida, tenta restaurar o perfil e seguir para o menu.
+    (async () => {
+      try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session?.user) return;
+
+        await carregarPerfilDaSessao(session.user);
+        window.location.href = "menu.html";
+      } catch (_) {
+        await supabaseClient.auth.signOut().catch(() => {});
+        localStorage.removeItem("usuarioLogado");
+      }
+    })();
   </script>
 </body>
 </html>
