@@ -6,7 +6,7 @@
     <title>Configurações do Sistema - 26º Pel PE Mec</title>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="perfis.js?v=3"></script>
+    <script src="perfis.js?v=5.0"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -62,8 +62,23 @@
         .loading-cover{position:fixed;inset:0;background:rgba(243,244,246,.88);display:grid;place-items:center;z-index:200;color:#374151;font-size:13px}.loading-box{display:flex;align-items:center;gap:10px}.spinner{width:18px;height:18px;border:2px solid #cbd5e1;border-top-color:#111827;border-radius:50%;animation:spin .75s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
         @media(max-width:900px){body{display:block}.sidebar{position:fixed;left:0;top:0;height:100vh;transform:translateX(-100%);transition:.22s ease}.sidebar.open{transform:translateX(0)}.main-content{width:100%}.header{padding:15px}.menu-toggle{display:inline-flex}.content{padding:18px}.grid{grid-template-columns:1fr}}
         @media(max-width:560px){.two-col{grid-template-columns:1fr}.header{align-items:flex-start}.header-actions{gap:8px}.content{padding:15px}.status-strip{align-items:flex-start;flex-direction:column}.avatar-large{width:68px;height:68px}}
+    
+        .theme-previews{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:10px}
+        .theme-preview{border:2px solid #e5e7eb;background:#fff;border-radius:10px;padding:9px;text-align:left;cursor:pointer;transition:.15s}
+        .theme-preview:hover{transform:translateY(-1px);border-color:#9ca3af}
+        .theme-preview.selected{border-color:#047857;box-shadow:0 0 0 2px rgba(4,120,87,.10)}
+        .theme-preview strong{display:block;font-size:11px;margin-top:7px}.theme-preview small{display:block;font-size:9px;color:#6b7280;margin-top:2px;line-height:1.3}
+        .theme-shot{height:54px;border-radius:7px;display:grid;grid-template-columns:28% 1fr;grid-template-rows:16px 1fr;overflow:hidden;border:1px solid rgba(0,0,0,.12)}
+        .theme-shot i{grid-row:1/3}.theme-shot b{grid-column:2;grid-row:1}.theme-shot em{grid-column:2;grid-row:2;margin:7px;border-radius:4px}
+        .theme-preview.light .theme-shot{background:#f3f4f6}.theme-preview.light .theme-shot i{background:#111827}.theme-preview.light .theme-shot b{background:#fff}.theme-preview.light .theme-shot em{background:#fff}
+        .theme-preview.dark .theme-shot{background:#17191d}.theme-preview.dark .theme-shot i{background:#0f1115}.theme-preview.dark .theme-shot b{background:#22252b}.theme-preview.dark .theme-shot em{background:#292d34}
+        .theme-preview.night .theme-shot{background:#070b14}.theme-preview.night .theme-shot i{background:#030711}.theme-preview.night .theme-shot b{background:#0d1422}.theme-preview.night .theme-shot em{background:#111a2b}
+        .theme-preview.military .theme-shot{background:#d9d6bf}.theme-preview.military .theme-shot i{background:#29351f}.theme-preview.military .theme-shot b{background:#eeecd9}.theme-preview.military .theme-shot em{background:#d4d0b6}
+        @media(max-width:560px){.theme-previews{grid-template-columns:1fr}}
+
     </style>
-        <link rel="stylesheet" href="notificacoes.css?v=3">
+    <link rel="stylesheet" href="notificacoes.css">
+    <link rel="stylesheet" href="temas.css?v=3.2">
 </head>
 <body>
     <!-- Acesso baseado no usuário já autenticado pelo seu sistema -->
@@ -208,10 +223,32 @@
                     <div class="card-body">
                         <div class="field" style="margin-top:0">
                             <label for="tema">Tema de Interface</label>
-                            <select id="tema" disabled>
-                                <option value="light" selected>Claro</option>
+                            <select id="tema">
+                                <option value="light">Claro</option>
+                                <option value="dark">Escuro</option>
+                                <option value="night">Noturno</option>
+                                <option value="military">Militar</option>
                             </select>
-                            <div class="hint">Por enquanto o sistema utiliza somente o tema claro.</div>
+                            <div class="hint">O tema é salvo na sua conta e acompanha você em todas as abas.</div>
+
+                            <div class="theme-previews" id="themePreviews">
+                                <button type="button" class="theme-preview light" data-theme-choice="light">
+                                    <span class="theme-shot"><i></i><b></b><em></em></span>
+                                    <strong>Claro</strong><small>Branco e cinza, maior luminosidade.</small>
+                                </button>
+                                <button type="button" class="theme-preview dark" data-theme-choice="dark">
+                                    <span class="theme-shot"><i></i><b></b><em></em></span>
+                                    <strong>Escuro</strong><small>Grafite, contraste confortável.</small>
+                                </button>
+                                <button type="button" class="theme-preview night" data-theme-choice="night">
+                                    <span class="theme-shot"><i></i><b></b><em></em></span>
+                                    <strong>Noturno</strong><small>Azul-marinho quase preto, menos brilho.</small>
+                                </button>
+                                <button type="button" class="theme-preview military" data-theme-choice="military">
+                                    <span class="theme-shot"><i></i><b></b><em></em></span>
+                                    <strong>Militar</strong><small>Oliva, cáqui e verde operacional.</small>
+                                </button>
+                            </div>
                         </div>
 
                         <div class="section-label">Acesso Rápido (Atalhos da Sidebar)</div>
@@ -221,7 +258,6 @@
                             <label class="check-row"><input type="checkbox" id="prefCalendario" checked> Exibir Calendário</label>
                             <label class="check-row"><input type="checkbox" id="prefRelatorios" checked> Exibir Relatórios</label>
                             <label class="check-row"><input type="checkbox" id="prefUsuarios" checked> Exibir Usuários</label>
-                            <label class="check-row"><input type="checkbox" id="prefCentral" checked> Exibir Central de notificações</label>
                         </div>
 
                         <button class="save-system" id="btnSalvarPreferencias" type="button">Salvar Configurações do Sistema</button>
@@ -433,14 +469,13 @@
 
         function prefsDaTela() {
             return {
-                tema: 'light',
+                tema: $('tema').value || 'light',
                 sidebar: {
                     quadro: $('prefQuadro').checked,
                     minhas: $('prefMinhas').checked,
                     calendario: $('prefCalendario').checked,
                     relatorios: $('prefRelatorios').checked,
-                    usuarios: $('prefUsuarios').checked,
-                    central: $('prefCentral').checked
+                    usuarios: $('prefUsuarios').checked
                 }
             };
         }
@@ -448,19 +483,27 @@
         function aplicarPreferencias(prefs) {
             const p = prefs || {};
             const sidebar = p.sidebar || {};
-            $('tema').value = 'light';
+            $('tema').value = ['light','dark','night','military'].includes(p.tema) ? p.tema : 'light';
             $('prefQuadro').checked = sidebar.quadro !== false;
             $('prefMinhas').checked = sidebar.minhas !== false;
             $('prefCalendario').checked = sidebar.calendario !== false;
             $('prefRelatorios').checked = sidebar.relatorios !== false;
             $('prefUsuarios').checked = sidebar.usuarios !== false;
-            $('prefCentral').checked = sidebar.central !== false;
             aplicarTema();
             aplicarSidebar();
         }
 
         function aplicarTema() {
-            document.body.dataset.theme = 'light';
+            const temaAtual = $('tema').value || 'light';
+            if (window.Temas26) Temas26.aplicar(temaAtual, true);
+            else {
+                document.documentElement.dataset.theme = temaAtual;
+                document.body.dataset.theme = temaAtual;
+            }
+
+            document.querySelectorAll('[data-theme-choice]').forEach(btn => {
+                btn.classList.toggle('selected', btn.dataset.themeChoice === temaAtual);
+            });
         }
 
         function aplicarSidebar() {
@@ -758,7 +801,15 @@
         $('btnSalvarPerfil').addEventListener('click', () => salvarPerfil(true, true));
 
         // Preferências
-        ['prefQuadro', 'prefMinhas', 'prefCalendario', 'prefRelatorios', 'prefUsuarios', 'prefCentral']
+        $('tema').addEventListener('change', agendarSalvarPrefs);
+        document.querySelectorAll('[data-theme-choice]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                $('tema').value = btn.dataset.themeChoice;
+                agendarSalvarPrefs();
+            });
+        });
+
+        ['prefQuadro', 'prefMinhas', 'prefCalendario', 'prefRelatorios', 'prefUsuarios']
             .forEach(id => $(id).addEventListener('change', agendarSalvarPrefs));
         $('btnSalvarPreferencias').addEventListener('click', () => salvarPreferencias(true));
 
@@ -783,10 +834,10 @@
         // Inicialização
         carregarUsuario();
     </script>
-        <script src="sistema_comum.js?v=3"></script>
-    <script src="auditoria.js?v=3"></script>
-        <script src="notificacoes.js?v=3"></script>
-    <script src="v3_ui.js?v=3"></script>
-    <script src="bloco_notas.js?v=3"></script>
+        <script src="sistema_comum.js?v=5.0"></script>
+    <script src="auditoria.js?v=5.0"></script>
+    <script src="bloco_notas.js?v=5.0"></script>
+    <script src="notificacoes.js"></script>
+    <script src="temas.js?v=3.2"></script>
 </body>
 </html>

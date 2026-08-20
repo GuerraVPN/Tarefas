@@ -1,0 +1,390 @@
+/* ==========================================================
+   V3 — TEMAS GLOBAIS
+   Claro / Escuro / Noturno / Militar
+   ========================================================== */
+
+:root,
+html[data-theme="light"] {
+  --v3-bg: #f3f4f6;
+  --v3-surface: #ffffff;
+  --v3-surface-2: #f9fafb;
+  --v3-surface-3: #f3f4f6;
+  --v3-text: #111827;
+  --v3-text-2: #374151;
+  --v3-muted: #6b7280;
+  --v3-border: #e5e7eb;
+  --v3-border-2: #d1d5db;
+  --v3-sidebar: #111827;
+  --v3-sidebar-hover: #1f2937;
+  --v3-sidebar-text: #d1d5db;
+  --v3-accent: #047857;
+  --v3-accent-hover: #065f46;
+  --v3-accent-soft: #ecfdf5;
+  --v3-gold: #eab308;
+  --v3-danger: #dc2626;
+  --v3-shadow: rgba(0,0,0,.08);
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  --v3-bg: #17191d;
+  --v3-surface: #22252b;
+  --v3-surface-2: #292d34;
+  --v3-surface-3: #30343c;
+  --v3-text: #f3f4f6;
+  --v3-text-2: #d1d5db;
+  --v3-muted: #9ca3af;
+  --v3-border: #3d424b;
+  --v3-border-2: #4b5563;
+  --v3-sidebar: #0f1115;
+  --v3-sidebar-hover: #292d34;
+  --v3-sidebar-text: #e5e7eb;
+  --v3-accent: #10b981;
+  --v3-accent-hover: #059669;
+  --v3-accent-soft: #123a30;
+  --v3-gold: #facc15;
+  --v3-danger: #f87171;
+  --v3-shadow: rgba(0,0,0,.34);
+  color-scheme: dark;
+}
+
+html[data-theme="night"] {
+  --v3-bg: #070b14;
+  --v3-surface: #0d1422;
+  --v3-surface-2: #111a2b;
+  --v3-surface-3: #162136;
+  --v3-text: #dce7f7;
+  --v3-text-2: #bac9df;
+  --v3-muted: #7f91aa;
+  --v3-border: #1f304b;
+  --v3-border-2: #2c4264;
+  --v3-sidebar: #030711;
+  --v3-sidebar-hover: #111d31;
+  --v3-sidebar-text: #c7d4e7;
+  --v3-accent: #4f9cf9;
+  --v3-accent-hover: #3b82f6;
+  --v3-accent-soft: #102744;
+  --v3-gold: #d8b84e;
+  --v3-danger: #fb7185;
+  --v3-shadow: rgba(0,0,0,.5);
+  color-scheme: dark;
+}
+
+html[data-theme="military"] {
+  --v3-bg: #d9d6bf;
+  --v3-surface: #eeecd9;
+  --v3-surface-2: #e4e1ca;
+  --v3-surface-3: #d4d0b6;
+  --v3-text: #25291c;
+  --v3-text-2: #3e4430;
+  --v3-muted: #666c51;
+  --v3-border: #b8b594;
+  --v3-border-2: #9ca17b;
+  --v3-sidebar: #29351f;
+  --v3-sidebar-hover: #3c4c2c;
+  --v3-sidebar-text: #e3e3c9;
+  --v3-accent: #4e642f;
+  --v3-accent-hover: #3e5225;
+  --v3-accent-soft: #dce6c3;
+  --v3-gold: #c7a640;
+  --v3-danger: #9f3c32;
+  --v3-shadow: rgba(43,53,31,.18);
+  color-scheme: light;
+}
+
+/* Estrutura */
+html,
+body {
+  background: var(--v3-bg) !important;
+  color: var(--v3-text) !important;
+}
+
+body,
+.main,
+.main-content,
+.content,
+.page,
+.kanban-board {
+  background-color: var(--v3-bg) !important;
+  color: var(--v3-text) !important;
+}
+
+.sidebar {
+  background: var(--v3-sidebar) !important;
+  color: var(--v3-sidebar-text) !important;
+  border-color: var(--v3-border) !important;
+}
+
+.sidebar li,
+.sidebar a,
+.menu-items li,
+.nav li {
+  color: var(--v3-sidebar-text) !important;
+}
+
+.sidebar li:hover,
+.sidebar li.active,
+.menu-items li:hover,
+.menu-items li.active,
+.nav li:hover,
+.nav li.active {
+  background: var(--v3-sidebar-hover) !important;
+}
+
+.header,
+.topbar {
+  background: var(--v3-surface) !important;
+  color: var(--v3-text) !important;
+  border-color: var(--v3-border) !important;
+  box-shadow: 0 1px 5px var(--v3-shadow) !important;
+}
+
+/* Superfícies */
+.card,
+.panel,
+.kanban-column,
+.task-card,
+.modal,
+.modal-content,
+.modal-card,
+.profile-panel,
+.profile-body,
+.dropdown-menu,
+.user-dropdown,
+.v3-profile-menu,
+.v3-password-box,
+.bn-panel,
+.bn-note,
+.notification-card,
+.user-row,
+.stat,
+.filters,
+.status-strip,
+.message-panel,
+.chat,
+.conversations,
+.new-msg,
+.detail,
+.detail-card,
+.calendar-container,
+.calendar-grid,
+.day-panel {
+  background-color: var(--v3-surface) !important;
+  color: var(--v3-text) !important;
+  border-color: var(--v3-border) !important;
+  box-shadow: 0 2px 10px var(--v3-shadow);
+}
+
+.kanban-column,
+.table-wrap,
+.bn-list,
+.chat-body,
+.v3-create-panel,
+.v3-create-resp,
+.user-profile-chip,
+.profile-item-card,
+.profile-detail-line {
+  background-color: var(--v3-surface-2) !important;
+  border-color: var(--v3-border) !important;
+}
+
+.task-card:hover,
+.user-row:hover,
+.conv:hover,
+.conv.active,
+.notif:hover,
+.usuario-responsavel-item:hover,
+.v3-create-row:hover,
+.v3-profile-option:hover,
+.v3-menu-action:hover {
+  background-color: var(--v3-surface-3) !important;
+}
+
+/* Tipografia */
+h1,h2,h3,h4,h5,h6,
+.card-title,
+.task-title,
+.user-name,
+.profile-name,
+.detail-title,
+.panel-head h3,
+.header-title h2,
+.v3-user-text strong,
+.bn-title {
+  color: var(--v3-text) !important;
+}
+
+p,
+small,
+.hint,
+.subtitle,
+.user-sub,
+.profile-role,
+.cell-label,
+.detail span,
+.task-last-update,
+.task-last-activity,
+.bn-note-foot,
+.bn-note-state,
+.v3-user-text span,
+.v3-menu-title,
+.aviso-permissao-secao {
+  color: var(--v3-muted) !important;
+}
+
+/* Formulários */
+input,
+textarea,
+select,
+.bn-editor,
+.bn-text,
+.detалhe-secao-select,
+.v3-create-panel input,
+.chat-form textarea,
+.conv-search input {
+  background: var(--v3-surface) !important;
+  color: var(--v3-text) !important;
+  border-color: var(--v3-border-2) !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--v3-muted) !important;
+  opacity: .9;
+}
+
+input:disabled,
+textarea:disabled,
+select:disabled {
+  background: var(--v3-surface-3) !important;
+  color: var(--v3-muted) !important;
+}
+
+/* Botões */
+.btn.green,
+.btn-primary,
+.btn-save,
+.btn-salvar-secao-tarefa,
+.v3-create-resp-head button,
+.v3-password-actions .save,
+.bn-save,
+.bn-new,
+.chat-form button {
+  background: var(--v3-accent) !important;
+  border-color: var(--v3-accent) !important;
+  color: #fff !important;
+}
+
+.btn.green:hover,
+.btn-primary:hover,
+.btn-save:hover,
+.btn-salvar-secao-tarefa:hover,
+.v3-create-resp-head button:hover,
+.bn-save:hover,
+.bn-new:hover {
+  background: var(--v3-accent-hover) !important;
+}
+
+.btn,
+.btn-secondary,
+.icon-btn,
+.v3-top-icon,
+.v3-password-actions button,
+.bn-tools button,
+.bn-tools label,
+.bn-note-actions button,
+.tab,
+.pager button {
+  background: var(--v3-surface) !important;
+  color: var(--v3-text-2) !important;
+  border-color: var(--v3-border) !important;
+}
+
+/* Tabelas */
+table,
+thead,
+tbody,
+tr,
+td,
+th {
+  color: var(--v3-text) !important;
+  border-color: var(--v3-border) !important;
+}
+th,
+thead {
+  background: var(--v3-surface-2) !important;
+}
+tbody tr:hover {
+  background: var(--v3-surface-3) !important;
+}
+
+/* Menus / chips */
+.v3-profile-option.active,
+.perfis26-option.ativo,
+.user-profile-chip.primary,
+.responsavel-chip,
+.v3-create-chip {
+  background: var(--v3-accent-soft) !important;
+  color: var(--v3-accent) !important;
+  border-color: color-mix(in srgb, var(--v3-accent) 40%, var(--v3-border)) !important;
+}
+
+.v3-avatar,
+.avatar,
+.avatar-small,
+.avatar-large,
+.mini-avatar {
+  border-color: var(--v3-gold) !important;
+}
+
+/* Notas: mantém sensação de post-it, mas adapta por tema */
+html[data-theme="dark"] .bn-note {
+  background: #343024 !important;
+  border-color: #665f3b !important;
+}
+html[data-theme="dark"] .bn-editor {
+  background: #27251e !important;
+}
+
+html[data-theme="night"] .bn-note {
+  background: #172033 !important;
+  border-color: #3c4d69 !important;
+}
+html[data-theme="night"] .bn-editor {
+  background: #0c1421 !important;
+}
+
+html[data-theme="military"] .bn-note {
+  background: #ddd5a5 !important;
+  border-color: #a79d63 !important;
+}
+html[data-theme="military"] .bn-editor {
+  background: #f0ecd1 !important;
+}
+
+/* Tema militar: identidade visual */
+html[data-theme="military"] .star-icon,
+html[data-theme="military"] .star {
+  background: #b79a3a !important;
+  color: #182013 !important;
+}
+html[data-theme="military"] .progress-fill,
+html[data-theme="military"] .progress-mini-fill {
+  filter: saturate(.72);
+}
+
+/* Tema noturno: brilho reduzido */
+html[data-theme="night"] img:not(.v3-avatar img):not(.avatar img) {
+  filter: brightness(.88) saturate(.9);
+}
+html[data-theme="night"] .modal-bg,
+html[data-theme="night"] .v3-password-bg,
+html[data-theme="night"] .new-msg-bg {
+  background: rgba(0,0,0,.72) !important;
+}
+
+/* Scrollbars */
+html[data-theme="dark"] *,
+html[data-theme="night"] * {
+  scrollbar-color: var(--v3-border-2) var(--v3-bg);
+}

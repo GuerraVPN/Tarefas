@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Histórico / Auditoria - 26º Pel PE Mec</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="perfis.js?v=3"></script>
+<script src="perfis.js?v=5.0"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
@@ -51,7 +51,7 @@ button,input,select{font:inherit}
 @media(max-width:1200px){.filters{grid-template-columns:repeat(3,1fr)}.summary{grid-template-columns:repeat(3,1fr)}.workspace{grid-template-columns:1fr}}
 @media(max-width:760px){body{display:block}.sidebar{width:100%;min-height:auto}.nav{display:grid;grid-template-columns:repeat(2,1fr)}.content{padding:16px}.filters{grid-template-columns:1fr}.summary{grid-template-columns:1fr 1fr}.topbar{padding:0 14px}}
 </style>
-    <link rel="stylesheet" href="notificacoes.css?v=3">
+    <link rel="stylesheet" href="temas.css?v=3.2">
 </head>
 <body>
 <aside class="sidebar">
@@ -276,8 +276,6 @@ $('busca').addEventListener('keydown',e=>{if(e.key==='Enter')carregarEventos(tru
 
 (async()=>{if(await confirmarAdmin()){try{await Promise.all([carregarResumo(),carregarEventos(true)])}catch(e){toast(e.message,true)}}})();
 </script>
-    <script src="sistema_comum.js?v=3"></script><script src="notificacoes.js?v=3"></script>
-    <script src="v3_ui.js?v=3"></script>
-    <script src="bloco_notas.js?v=3"></script>
+    <script src="temas.js?v=3.2"></script>
 </body>
 </html>

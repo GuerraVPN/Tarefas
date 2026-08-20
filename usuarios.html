@@ -5,9 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Usuários - 26º Pel PE Mec</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="perfis.js?v=3"></script>
-    <script src="responsaveis_perfis.js?v=3"></script>
+    <script src="perfis.js?v=5.0"></script>
+    <script src="responsaveis_perfis.js?v=5.0"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="notificacoes.css">
   <style>
     *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
     :root{--bg:#f3f4f6;--card:#fff;--text:#111827;--muted:#6b7280;--border:#e5e7eb;--green:#047857;--green2:#065f46;--dark:#111827;--yellow:#eab308;--red:#dc2626}
@@ -76,7 +77,7 @@
     .user-profile-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}.user-profile-chip{display:inline-flex;align-items:center;padding:3px 7px;border-radius:999px;background:#f3f4f6;border:1px solid #e5e7eb;color:#4b5563;font-size:10px;font-weight:700}.user-profile-chip.primary{background:#ecfdf5;border-color:#a7f3d0;color:#047857}.profile-detail-list{display:grid;gap:7px;margin-top:4px}.profile-detail-line{padding:8px 10px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;font-size:12px;color:#374151}
 
   </style>
-    <link rel="stylesheet" href="notificacoes.css?v=3">
+    <link rel="stylesheet" href="temas.css?v=3.2">
 </head>
 <body>
 <script>
@@ -415,7 +416,7 @@
     const txt=$('messageText').value.trim();
     if(!txt)return toast('Digite uma mensagem antes de enviar.',true);
     const btn=$('sendMessage');btn.disabled=true;
-    const {error}=await supabaseClient.from('mensagens').insert([{remetente_id:String(perfil.id),destinatario_id:String(u.id),remetente_perfil_id:perfil.perfil_id?Number(perfil.perfil_id):null,conteudo:txt}]);
+    const {error}=await supabaseClient.from('mensagens').insert([{remetente_id:String(perfil.id),destinatario_id:String(u.id),conteudo:txt}]);
     btn.disabled=false;
     if(error)return toast('Não foi possível enviar: '+error.message,true);
     $('messageText').value='';toast('Mensagem enviada.');await atualizarConversa(u);
@@ -783,10 +784,10 @@ $('passwordForm').addEventListener('submit',async e=>{
 
   (async()=>{await carregarPerfil();await carregarUsuarios()})();
 </script>
-    <script src="sistema_comum.js?v=3"></script>
-    <script src="auditoria.js?v=3"></script>
-        <script src="notificacoes.js?v=3"></script>
-    <script src="v3_ui.js?v=3"></script>
-    <script src="bloco_notas.js?v=3"></script>
+    <script src="sistema_comum.js?v=5.0"></script>
+    <script src="auditoria.js?v=5.0"></script>
+    <script src="bloco_notas.js?v=5.0"></script>
+    <script src="notificacoes.js"></script>
+    <script src="temas.js?v=3.2"></script>
 </body>
 </html>
