@@ -388,3 +388,280 @@ html[data-theme="dark"] *,
 html[data-theme="night"] * {
   scrollbar-color: var(--v3-border-2) var(--v3-bg);
 }
+
+
+/* ==========================================================
+   V3.3 — CORREÇÃO DE CONTRASTE
+   Corrige textos neutros herdados da interface originalmente clara.
+   ========================================================== */
+
+/* Textos principais que ainda possuíam cores fixas. */
+html:not([data-theme="light"]) :where(
+  .column-title,
+  .task-title,
+  .file-name-link,
+  .responsaveis-painel-header strong,
+  .usuario-responsavel-info strong,
+  .personal-stat strong,
+  .no-deadline strong,
+  .detail strong,
+  .profile-item-title,
+  .topbar-left,
+  .topbar-right,
+  .topbar-menu,
+  .menu-toggle,
+  .kpi-label,
+  .cell,
+  .check-row,
+  .modal-content label,
+  .field label,
+  .msg-to,
+  .profile-detail-line
+) {
+  color: var(--v3-text) !important;
+}
+
+/* Textos secundários. */
+html:not([data-theme="light"]) :where(
+  .header-title p,
+  .breadcrumb,
+  .task-code,
+  .card-footer,
+  .history-date,
+  .drag-hint,
+  .responsaveis-vazio,
+  .usuario-responsavel-info span,
+  .personal-stat span,
+  .personal-info,
+  .task-meta,
+  .more-tasks,
+  .legend,
+  .empty-state,
+  .summary-item small,
+  .no-deadline,
+  .sync-status,
+  .info-box small,
+  .user-sub,
+  .cell-label,
+  .count-line,
+  .profile-role,
+  .profile-item-meta,
+  .placeholder,
+  .status-pill,
+  .hint,
+  .subtitle,
+  .stat span,
+  .pagination,
+  .detail-meta,
+  .kv span,
+  .warning,
+  .notif p,
+  .notif time,
+  .conv small,
+  .bubble small,
+  .empty,
+  .theme-preview small
+) {
+  color: var(--v3-muted) !important;
+}
+
+/* Controles e botões neutros. */
+html:not([data-theme="light"]) :where(
+  .column-badge,
+  .mass-actions button,
+  .btn-add-card-footer,
+  .btn-cancelar,
+  .btn-responsaveis,
+  .arrow-btn,
+  .period-tab,
+  .control,
+  .icon-btn,
+  .close,
+  .modal-close
+) {
+  color: var(--v3-text-2) !important;
+  border-color: var(--v3-border) !important;
+}
+
+/* Fundos claros que ficavam "soltos" em temas escuros. */
+html:not([data-theme="light"]) :where(
+  .column-badge,
+  .mass-actions button,
+  .btn-add-card-footer,
+  .btn-cancelar,
+  .file-upload-box,
+  .btn-responsaveis,
+  .legend,
+  .modal-description,
+  .period-tab,
+  .control,
+  .user-avatar,
+  .icon-btn,
+  .bubble.other,
+  .hint,
+  .profile-detail-line,
+  .pagination,
+  .diff-key,
+  .loading-cover
+) {
+  background: var(--v3-surface-2) !important;
+  border-color: var(--v3-border) !important;
+}
+
+/* Campos, dropdowns e opções. */
+html:not([data-theme="light"]) :where(
+  input,
+  textarea,
+  select,
+  option,
+  optgroup
+) {
+  background-color: var(--v3-surface) !important;
+  color: var(--v3-text) !important;
+  border-color: var(--v3-border-2) !important;
+}
+
+html:not([data-theme="light"]) :where(
+  input:disabled,
+  textarea:disabled,
+  select:disabled
+) {
+  background-color: var(--v3-surface-3) !important;
+  color: var(--v3-muted) !important;
+}
+
+/* Modais e textos descritivos. */
+html:not([data-theme="light"]) :where(
+  .modal-description,
+  .diff-row,
+  .before,
+  .after
+) {
+  color: var(--v3-text-2) !important;
+  border-color: var(--v3-border) !important;
+}
+
+html[data-theme="dark"] .before,
+html[data-theme="night"] .before {
+  background: color-mix(in srgb, #7f1d1d 28%, var(--v3-surface)) !important;
+}
+
+html[data-theme="dark"] .after,
+html[data-theme="night"] .after {
+  background: color-mix(in srgb, #14532d 28%, var(--v3-surface)) !important;
+}
+
+html[data-theme="military"] .before {
+  background: #e5c7b5 !important;
+  color: #3c2119 !important;
+}
+
+html[data-theme="military"] .after {
+  background: #cfd8b2 !important;
+  color: #29351f !important;
+}
+
+/* Loading: antes tinha fundo claro fixo e podia "estourar" no tema noturno. */
+html[data-theme="dark"] .loading-cover,
+html[data-theme="night"] .loading-cover {
+  background: color-mix(in srgb, var(--v3-bg) 91%, transparent) !important;
+  color: var(--v3-text) !important;
+}
+
+html[data-theme="military"] .loading-cover {
+  background: rgba(217,214,191,.92) !important;
+  color: var(--v3-text) !important;
+}
+
+/* Textos neutros escritos diretamente em style="" no HTML/JS.
+   Somente cores neutras são substituídas; cores semânticas
+   (vermelho, verde, amarelo, azul de status) permanecem intactas. */
+html:not([data-theme="light"]) [style*="color:#111827"],
+html:not([data-theme="light"]) [style*="color: #111827"],
+html:not([data-theme="light"]) [style*="color:#1f2937"],
+html:not([data-theme="light"]) [style*="color: #1f2937"] {
+  color: var(--v3-text) !important;
+}
+
+html:not([data-theme="light"]) [style*="color:#374151"],
+html:not([data-theme="light"]) [style*="color: #374151"],
+html:not([data-theme="light"]) [style*="color:#4b5563"],
+html:not([data-theme="light"]) [style*="color: #4b5563"] {
+  color: var(--v3-text-2) !important;
+}
+
+html:not([data-theme="light"]) [style*="color:#6b7280"],
+html:not([data-theme="light"]) [style*="color: #6b7280"],
+html:not([data-theme="light"]) [style*="color:#9ca3af"],
+html:not([data-theme="light"]) [style*="color: #9ca3af"] {
+  color: var(--v3-muted) !important;
+}
+
+/* Fundos neutros inline também acompanham o tema. */
+html:not([data-theme="light"]) [style*="background:#fff"],
+html:not([data-theme="light"]) [style*="background: #fff"],
+html:not([data-theme="light"]) [style*="background:#ffffff"],
+html:not([data-theme="light"]) [style*="background: #ffffff"] {
+  background-color: var(--v3-surface) !important;
+}
+
+html:not([data-theme="light"]) [style*="background:#f9fafb"],
+html:not([data-theme="light"]) [style*="background: #f9fafb"],
+html:not([data-theme="light"]) [style*="background:#f3f4f6"],
+html:not([data-theme="light"]) [style*="background: #f3f4f6"],
+html:not([data-theme="light"]) [style*="background:#f8fafc"],
+html:not([data-theme="light"]) [style*="background: #f8fafc"] {
+  background-color: var(--v3-surface-2) !important;
+}
+
+/* Links comuns precisam continuar visíveis. */
+html[data-theme="dark"] a:not(.sidebar a),
+html[data-theme="night"] a:not(.sidebar a) {
+  color: color-mix(in srgb, var(--v3-accent) 75%, #ffffff) !important;
+}
+
+html[data-theme="military"] a:not(.sidebar a) {
+  color: #3f5b26 !important;
+}
+
+/* Não sobrescrever botões/etiquetas que propositalmente usam texto branco. */
+html:not([data-theme="light"]) :where(
+  .btn-primary,
+  .btn.green,
+  .btn-save,
+  .bn-save,
+  .bn-new,
+  .chat-form button,
+  .v3-create-resp-head button,
+  .v3-password-actions .save,
+  .tag,
+  .badge,
+  .status-badge,
+  .priority-badge,
+  .v3-count,
+  .v3-central-nav-badge
+) {
+  color: inherit;
+}
+
+/* Correções específicas do tema militar para texto em fundos cáqui. */
+html[data-theme="military"] :where(
+  .theme-preview,
+  .bn-note,
+  .bn-editor
+) {
+  color: #25291c !important;
+}
+
+/* Evita texto "apagado" por opacidade herdada em elementos habilitados. */
+html:not([data-theme="light"]) :where(
+  button:not(:disabled),
+  input:not(:disabled),
+  select:not(:disabled),
+  textarea:not(:disabled),
+  label,
+  td,
+  th
+) {
+  opacity: 1;
+}
