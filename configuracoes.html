@@ -332,6 +332,7 @@
             .status-strip { align-items: flex-start; flex-direction: column; }
         }
     </style>
+    <link rel="stylesheet" href="notificacoes.css">
 </head>
 <body>
     <!-- Acesso baseado no usuário já autenticado pelo seu sistema -->
@@ -416,6 +417,17 @@
                             <input id="nomeGuerra" type="text">
                         </div>
 
+                        <div class="two-col">
+                            <div class="field">
+                                <label for="telefone">Telefone</label>
+                                <input id="telefone" type="tel" autocomplete="tel" placeholder="Ex.: (61) 99999-9999">
+                            </div>
+                            <div class="field">
+                                <label for="email">E-mail</label>
+                                <input id="email" type="email" autocomplete="email" placeholder="Ex.: usuario@exemplo.mil.br">
+                            </div>
+                        </div>
+
                         <div class="field">
                             <label for="patente">Posto / Graduação</label>
                             <select id="patente">
@@ -465,11 +477,10 @@
                     <div class="card-body">
                         <div class="field" style="margin-top:0">
                             <label for="tema">Tema de Interface</label>
-                            <select id="tema">
-                                <option value="militar">Padrão Militar</option>
-                                <option value="light">Claro</option>
-                                <option value="dark">Escuro</option>
+                            <select id="tema" disabled>
+                                <option value="light" selected>Claro</option>
                             </select>
+                            <div class="hint">Por enquanto o sistema utiliza somente o tema claro.</div>
                         </div>
 
                         <div class="section-label">Acesso Rápido (Atalhos da Sidebar)</div>
@@ -516,7 +527,9 @@
             nomeGuerra: ['nome_guerra', 'nome_de_guerra', 'nomeGuerra'],
             patente: ['patente', 'posto_graduacao', 'posto', 'graduacao'],
             secao: ['secao', 'secao_atendida'],
-            posicao: ['posicao', 'posicao_executiva', 'funcao']
+            posicao: ['posicao', 'posicao_executiva', 'funcao'],
+            telefone: ['telefone', 'celular', 'fone'],
+            email: ['email', 'e_mail', 'mail']
         };
         const PREF_CANDIDATES = ['preferencias', 'configuracoes', 'preferencias_visuais', 'config'];
         const AVATAR_CANDIDATES = ['avatar', 'avatar_url', 'icone', 'foto_url'];
@@ -632,7 +645,7 @@
 
         function prefsDaTela() {
             return {
-                tema: $('tema').value,
+                tema: 'light',
                 sidebar: {
                     quadro: $('prefQuadro').checked,
                     minhas: $('prefMinhas').checked,
@@ -646,7 +659,7 @@
         function aplicarPreferencias(prefs) {
             const p = prefs || {};
             const sidebar = p.sidebar || {};
-            $('tema').value = p.tema || 'militar';
+            $('tema').value = 'light';
             $('prefQuadro').checked = sidebar.quadro !== false;
             $('prefMinhas').checked = sidebar.minhas !== false;
             $('prefCalendario').checked = sidebar.calendario !== false;
@@ -657,8 +670,7 @@
         }
 
         function aplicarTema() {
-            const tema = $('tema').value;
-            document.body.dataset.theme = tema === 'dark' ? 'dark' : (tema === 'light' ? 'light' : 'militar');
+            document.body.dataset.theme = 'light';
         }
 
         function aplicarSidebar() {
@@ -685,6 +697,8 @@
 
                 $('nomeCompleto').value = valorCampo('nome', usuarioLogado.nome || '');
                 $('nomeGuerra').value = valorCampo('nomeGuerra', usuarioLogado.nome_guerra || '');
+                $('telefone').value = valorCampo('telefone', usuarioLogado.telefone || '');
+                $('email').value = valorCampo('email', usuarioLogado.email || '');
                 selecionarOuAdicionar($('patente'), normalizarPatenteConfiguracoes(valorCampo('patente', usuarioLogado.patente || 'Sd')));
                 selecionarOuAdicionar($('secao'), valorCampo('secao', usuarioLogado.secao || 'S3'));
                 $('posicao').value = normalizarPosicaoConfiguracoes(valorCampo('posicao', usuarioLogado.posicao || ''));
@@ -731,6 +745,8 @@
             const mapa = [
                 ['nome', $('nomeCompleto').value.trim()],
                 ['nomeGuerra', $('nomeGuerra').value.trim()],
+                ['telefone', $('telefone').value.trim()],
+                ['email', $('email').value.trim()],
                 ['patente', $('patente').value],
                 ['secao', $('secao').value],
                 ['posicao', $('posicao').value]
@@ -766,6 +782,8 @@
                     ...usuarioLogado,
                     nome: $('nomeCompleto').value.trim(),
                     nome_guerra: $('nomeGuerra').value.trim(),
+                    telefone: $('telefone').value.trim(),
+                    email: $('email').value.trim(),
                     patente: $('patente').value,
                     secao: $('secao').value,
                     posicao: $('posicao').value
@@ -884,12 +902,12 @@
         }
 
         // Eventos do perfil: autosave
-        ['nomeCompleto', 'nomeGuerra'].forEach(id => $(id).addEventListener('input', agendarSalvarPerfil));
+        ['nomeCompleto', 'nomeGuerra', 'telefone', 'email'].forEach(id => $(id).addEventListener('input', agendarSalvarPerfil));
         ['patente', 'secao', 'posicao'].forEach(id => $(id).addEventListener('change', agendarSalvarPerfil));
         $('btnSalvarPerfil').addEventListener('click', () => salvarPerfil(true));
 
         // Preferências
-        ['tema', 'prefQuadro', 'prefMinhas', 'prefCalendario', 'prefRelatorios', 'prefUsuarios']
+        ['prefQuadro', 'prefMinhas', 'prefCalendario', 'prefRelatorios', 'prefUsuarios']
             .forEach(id => $(id).addEventListener('change', agendarSalvarPrefs));
         $('btnSalvarPreferencias').addEventListener('click', () => salvarPreferencias(true));
 
@@ -914,5 +932,6 @@
         // Inicialização
         carregarUsuario();
     </script>
+    <script src="notificacoes.js"></script>
 </body>
 </html>
