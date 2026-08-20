@@ -539,7 +539,7 @@
                     $('prefHint').innerHTML = `Preferências vinculadas ao seu usuário e gravadas automaticamente na coluna <b>${colunaPreferencias}</b> da tabela <b>usuarios</b>.`;
                 }
 
-                setStatus('saved', 'Perfil sincronizado com o banco.');
+                setStatus('saved', 'Perfil sincronizado com o banco de dados.');
             } catch (err) {
                 console.error(err);
                 setStatus('error', 'Erro ao carregar o usuário: ' + err.message);
