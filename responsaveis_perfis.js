@@ -129,7 +129,19 @@
       throw new Error('Todos os responsáveis precisam ter um perfil funcional selecionado.');
     }
 
-    // Caminho principal: RPC transacional.
+    let antes=[];
+    let tarefa=null;
+    try{
+      const [rv,rt]=await Promise.all([
+        client.from('tarefa_responsaveis').select('*').eq('tarefa_id',Number(taskId)),
+        client.from('tarefas').select('id,codigo,titulo').eq('id',Number(taskId)).maybeSingle()
+      ]);
+      if(!rv.error)antes=rv.data||[];
+      if(!rt.error)tarefa=rt.data||null;
+    }catch(_){}
+
+    let ok=false;
+
     const rpc=await client.rpc('definir_responsaveis_perfis_tarefa',{
       p_tarefa_id:Number(taskId),
       p_perfil_ids:pids,
@@ -137,48 +149,67 @@
       p_atribuido_por_perfil_id:profileId?Number(profileId):null
     });
 
-    if(!rpc.error)return true;
+    if(!rpc.error){
+      ok=true;
+    }else{
+      const code=String(rpc.error?.code||'');
+      const msg=String(rpc.error?.message||'').toLowerCase();
+      const podeFallback=
+        code==='PGRST202'||code==='42883'||code==='42702'||
+        msg.includes('definir_responsaveis_perfis_tarefa')||
+        msg.includes('ambiguous')||msg.includes('tarefa_id');
 
-    // O Supabase pode manter por alguns segundos a versão antiga da função
-    // no cache. Também aceitamos como fallback o bug antigo:
-    // "column reference tarefa_id is ambiguous".
-    const code=String(rpc.error?.code||'');
-    const msg=String(rpc.error?.message||'').toLowerCase();
-    const podeFallback=
-      code==='PGRST202' ||
-      code==='42883' ||
-      code==='42702' ||
-      msg.includes('definir_responsaveis_perfis_tarefa') ||
-      msg.includes('ambiguous') ||
-      msg.includes('tarefa_id');
+      if(!podeFallback)throw rpc.error;
 
-    if(!podeFallback)throw rpc.error;
+      const executar=async()=>{
+        const del=await client.from('tarefa_responsaveis').delete().eq('tarefa_id',Number(taskId));
+        if(del.error)throw del.error;
 
-    console.warn('RPC de despacho indisponível/antigo; usando gravação direta:',rpc.error);
+        if(rows.length){
+          const payload=rows.map(r=>({
+            tarefa_id:Number(taskId),
+            usuario_id:Number(r.id),
+            perfil_id:Number(r.perfil_id),
+            atribuido_por:Number(userId),
+            atribuido_por_perfil_id:profileId?Number(profileId):null
+          }));
+          const ins=await client.from('tarefa_responsaveis').insert(payload);
+          if(ins.error)throw ins.error;
+        }
+        return true;
+      };
 
-    // Fallback direto.
-    const del=await client.from('tarefa_responsaveis')
-      .delete()
-      .eq('tarefa_id',Number(taskId));
+      if(window.Auditoria26)await Auditoria26.executarSemAuditoria(executar);
+      else await executar();
+      ok=true;
+    }
 
-    if(del.error)throw del.error;
-
-    if(rows.length){
-      const payload=rows.map(r=>({
-        tarefa_id:Number(taskId),
-        usuario_id:Number(r.id),
-        perfil_id:Number(r.perfil_id),
-        atribuido_por:Number(userId),
-        atribuido_por_perfil_id:profileId?Number(profileId):null
-      }));
-
-      const ins=await client.from('tarefa_responsaveis').insert(payload);
-      if(ins.error)throw ins.error;
+    if(ok&&window.Auditoria26){
+      try{
+        const depoisResp=await client.from('tarefa_responsaveis').select('*').eq('tarefa_id',Number(taskId));
+        const depois=depoisResp.error?[]:(depoisResp.data||[]);
+        const destinos=rows.map(label).join(', ')||'nenhum perfil';
+        await Auditoria26.registrarManual({
+          acao:'DESPACHO',
+          modulo:'Tarefas',
+          tabela:'tarefa_responsaveis',
+          registro_id:String(taskId),
+          descricao:`Despachou ${tarefa?.codigo||('#'+taskId)}${tarefa?.titulo?' — '+tarefa.titulo:''} para ${destinos}.`,
+          antes:null,
+          depois:null,
+          detalhes:{
+            tarefa_codigo:tarefa?.codigo||null,
+            tarefa_titulo:tarefa?.titulo||null,
+            responsaveis_antes:antes,
+            responsaveis_depois:depois
+          },
+          reversivel:true
+        });
+      }catch(err){console.warn('Auditoria do despacho:',err?.message||err)}
     }
 
     return true;
   }
-
   async function taskIds(client,userId,profileId){
     let q=client.from('tarefa_responsaveis').select('tarefa_id');
     q=profileId?q.eq('perfil_id',profileId):q.eq('usuario_id',userId);
@@ -199,9 +230,40 @@
   }
 
   async function changeSection(client,taskId,newSection,userId,profileId){
-    const r=await client.rpc('alterar_secao_tarefa_por_perfil_26pel',{p_tarefa_id:Number(taskId),p_nova_secao:newSection,p_usuario_id:Number(userId),p_perfil_id:profileId?Number(profileId):null});
-    if(!r.error)return true;
-    throw r.error;
+    let antes=null;
+    try{
+      const old=await client.from('tarefas').select('*').eq('id',Number(taskId)).maybeSingle();
+      if(!old.error)antes=old.data||null;
+    }catch(_){}
+
+    const r=await client.rpc('alterar_secao_tarefa_por_perfil_26pel',{
+      p_tarefa_id:Number(taskId),
+      p_nova_secao:newSection,
+      p_usuario_id:Number(userId),
+      p_perfil_id:profileId?Number(profileId):null
+    });
+
+    if(r.error)throw r.error;
+
+    if(window.Auditoria26){
+      try{
+        const novo=await client.from('tarefas').select('*').eq('id',Number(taskId)).maybeSingle();
+        const depois=novo.error?null:novo.data;
+        await Auditoria26.registrarManual({
+          acao:'SEÇÃO',
+          modulo:'Tarefas',
+          tabela:'tarefas',
+          registro_id:String(taskId),
+          descricao:`Alterou a seção responsável de "${antes?.secao||'-'}" para "${newSection}".`,
+          antes,
+          depois,
+          detalhes:{campos:['secao']},
+          reversivel:true
+        });
+      }catch(err){console.warn('Auditoria da seção:',err?.message||err)}
+    }
+
+    return true;
   }
 
   window.ResponsaveisPerfis26={norm,pessoa,label,normalize,serialize,sameProfile,listProfiles,hydrate,save,taskIds,assignedToProfile,canChangeSection,changeSection};
