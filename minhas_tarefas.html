@@ -8,7 +8,7 @@
     <!-- CDN DO SDK DO SUPABASE -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="perfis.js?v=5.0"></script>
-    <script src="responsaveis_perfis.js?v=5.0"></script>
+    <script src="responsaveis_perfis.js?v=3.5"></script>
 
     <style>
         * {
@@ -1085,9 +1085,20 @@
                     <option value="ResArmt">Reserva de Armamento</option>
                     <option value="Informática">Informática</option>
                 </select>
-
-                <label for="taskResponsavel">Responsável inicial (opcional)</label>
-                <input type="text" id="taskResponsavel" placeholder="Opcional. Depois use o despacho múltiplo.">
+                <label>Responsáveis iniciais</label>
+                <div class="v3-create-resp" id="v3CreateResp">
+                    <div class="v3-create-resp-head">
+                        <span>Escolha um ou mais perfis para receber a tarefa.</span>
+                        <button type="button" id="v3CreateRespToggle">Selecionar perfis</button>
+                    </div>
+                    <div class="v3-create-selected" id="v3CreateSelected">
+                        <span class="v3-create-empty">Nenhum perfil selecionado.</span>
+                    </div>
+                    <div class="v3-create-panel" id="v3CreatePanel">
+                        <input type="search" id="v3CreateSearch" placeholder="Buscar militar, seção ou função...">
+                        <div class="v3-create-list" id="v3CreateList"></div>
+                    </div>
+                </div>
 
                 <label for="taskPrioridade">Prioridade *</label>
                 <select id="taskPrioridade" required>
@@ -2586,6 +2597,7 @@
         // ---------- Modal de criação ----------
         const modalTarefa = document.getElementById('modalNovaTarefa');
         function abrirModalNovaTarefa(statusColumn) {
+            if (typeof v3LimparResponsaveisCriacao === 'function') v3LimparResponsaveisCriacao();
             document.getElementById('taskStatusAlvo').value = statusColumn;
             modalTarefa.style.display = 'flex';
             setTimeout(() => document.getElementById('taskTitulo').focus(), 0);
@@ -2608,6 +2620,139 @@
         document.getElementById('btnSalvarSecaoTarefa').onclick = salvarSecaoTarefa;
         document.getElementById('buscaUsuarioResponsavel').addEventListener('input', renderizarListaUsuariosResponsaveis);
 
+
+        // ============================================================
+        // V3 — responsáveis por PERFIL já na criação da tarefa
+        // ============================================================
+        let v3NovaTarefaResponsaveis = [];
+        let v3NovaTarefaPerfisDisponiveis = [];
+
+        function v3LabelResponsavelCriacao(r) {
+            return window.ResponsaveisPerfis26
+                ? ResponsaveisPerfis26.label(r)
+                : `${r.nome || r.nome_guerra || 'Usuário'} — ${r.secao || '-'} / ${r.posicao || '-'}`;
+        }
+
+        function v3RenderResponsaveisSelecionados() {
+            const box = document.getElementById('v3CreateSelected');
+            if (!box) return;
+
+            box.innerHTML = v3NovaTarefaResponsaveis.length
+                ? v3NovaTarefaResponsaveis
+                    .map(r => `<span class="v3-create-chip">${escaparHtml(v3LabelResponsavelCriacao(r))}</span>`)
+                    .join('')
+                : '<span class="v3-create-empty">Nenhum perfil selecionado.</span>';
+        }
+
+        function v3RenderListaPerfisCriacao() {
+            const list = document.getElementById('v3CreateList');
+            if (!list) return;
+
+            const busca = String(document.getElementById('v3CreateSearch')?.value || '')
+                .trim()
+                .toLowerCase();
+
+            const filtrados = v3NovaTarefaPerfisDisponiveis.filter(r =>
+                `${r.nome || ''} ${r.secao || ''} ${r.posicao || ''}`
+                    .toLowerCase()
+                    .includes(busca)
+            );
+
+            list.innerHTML = filtrados.length
+                ? filtrados.map(r => {
+                    const marcado = v3NovaTarefaResponsaveis
+                        .some(x => String(x.perfil_id) === String(r.perfil_id));
+
+                    return `<label class="v3-create-row">
+                        <input
+                            type="checkbox"
+                            data-v3-create-profile="${escaparHtml(r.perfil_id)}"
+                            ${marcado ? 'checked' : ''}
+                        >
+                        <span>
+                            <strong>${escaparHtml(r.nome || '')}</strong>
+                            <small>
+                                ${escaparHtml((r.secao || '-') + ' — ' + (r.posicao || '-'))}
+                                ${r.principal ? ' · Principal' : ''}
+                            </small>
+                        </span>
+                    </label>`;
+                }).join('')
+                : '<div class="v3-create-empty">Nenhum perfil encontrado.</div>';
+        }
+
+        async function v3AbrirSeletorResponsaveisCriacao() {
+            const panel = document.getElementById('v3CreatePanel');
+            if (!panel) return;
+
+            panel.classList.toggle('open');
+
+            if (!panel.classList.contains('open')) return;
+
+            try {
+                if (!window.ResponsaveisPerfis26) {
+                    throw new Error('responsaveis_perfis.js não foi carregado.');
+                }
+
+                v3NovaTarefaPerfisDisponiveis =
+                    await ResponsaveisPerfis26.listProfiles(
+                        supabaseClient,
+                        usuarioPerfilAtual
+                    );
+
+                v3RenderListaPerfisCriacao();
+
+                setTimeout(() => {
+                    document.getElementById('v3CreateSearch')?.focus();
+                }, 20);
+            } catch (err) {
+                alert('Erro ao carregar os perfis: ' + err.message);
+            }
+        }
+
+        function v3LimparResponsaveisCriacao() {
+            v3NovaTarefaResponsaveis = [];
+
+            const panel = document.getElementById('v3CreatePanel');
+            if (panel) panel.classList.remove('open');
+
+            const busca = document.getElementById('v3CreateSearch');
+            if (busca) busca.value = '';
+
+            v3RenderResponsaveisSelecionados();
+        }
+
+        document.getElementById('v3CreateRespToggle').addEventListener(
+            'click',
+            v3AbrirSeletorResponsaveisCriacao
+        );
+
+        document.getElementById('v3CreateSearch').addEventListener(
+            'input',
+            v3RenderListaPerfisCriacao
+        );
+
+        document.getElementById('v3CreateList').addEventListener('change', e => {
+            const checkbox = e.target.closest('[data-v3-create-profile]');
+            if (!checkbox) return;
+
+            const perfil = v3NovaTarefaPerfisDisponiveis.find(
+                x => String(x.perfil_id) === String(checkbox.dataset.v3CreateProfile)
+            );
+
+            if (!perfil) return;
+
+            v3NovaTarefaResponsaveis = v3NovaTarefaResponsaveis.filter(
+                x => String(x.perfil_id) !== String(perfil.perfil_id)
+            );
+
+            if (checkbox.checked) {
+                v3NovaTarefaResponsaveis.push({ ...perfil });
+            }
+
+            v3RenderResponsaveisSelecionados();
+        });
+
         document.getElementById('formNovaTarefa').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.getElementById('btnSalvaTarefa');
@@ -2616,7 +2761,6 @@
             const tTitulo = document.getElementById('taskTitulo').value.trim();
             const tDesc = document.getElementById('taskDescricao').value.trim();
             const tSecao = document.getElementById('taskSecao').value;
-            const tResp = document.getElementById('taskResponsavel').value.trim();
             const tPrio = document.getElementById('taskPrioridade').value;
             const tPrazo = document.getElementById('taskPrazo').value || null;
             const tStatus = document.getElementById('taskStatusAlvo').value;
@@ -2624,21 +2768,62 @@
             const andamentoInicial = tStatus === 'Concluída' ? 100 : tStatus === 'Em andamento' ? 1 : 0;
 
             try {
-                const { error } = await supabaseClient.from('tarefas').insert([{
-                    codigo: codGerado,
-                    titulo: tTitulo,
-                    descricao: tDesc,
-                    secao: tSecao,
-                    responsavel: tResp,
-                    prioridade: tPrio,
-                    prazo: tPrazo,
-                    status: tStatus,
-                    criado_por: usuarioLogado.id,
-                    andamento: andamentoInicial,
-                    arquivos: [],
-                    historico: [criarEntradaHistorico('Tarefa criada.')]
-                }]);
+                const responsavelCompat = ResponsaveisPerfis26.serialize(
+                    v3NovaTarefaResponsaveis
+                );
+
+                const { data: novaTarefa, error } = await supabaseClient
+                    .from('tarefas')
+                    .insert([{
+                        codigo: codGerado,
+                        titulo: tTitulo,
+                        descricao: tDesc,
+                        secao: tSecao,
+                        responsavel: responsavelCompat,
+                        prioridade: tPrio,
+                        prazo: tPrazo,
+                        status: tStatus,
+                        criado_por: usuarioLogado.id,
+                        criado_por_perfil_id: usuarioPerfilAtual?.perfil_id
+                            ? Number(usuarioPerfilAtual.perfil_id)
+                            : null,
+                        andamento: andamentoInicial,
+                        arquivos: [],
+                        historico: [
+                            criarEntradaHistorico(
+                                v3NovaTarefaResponsaveis.length
+                                    ? `Tarefa criada e despachada para ${v3NovaTarefaResponsaveis.map(v3LabelResponsavelCriacao).join(', ')}.`
+                                    : 'Tarefa criada.'
+                            )
+                        ]
+                    }])
+                    .select('*')
+                    .single();
+
                 if (error) throw error;
+
+                try {
+                    if (v3NovaTarefaResponsaveis.length) {
+                        await ResponsaveisPerfis26.save(
+                            supabaseClient,
+                            novaTarefa.id,
+                            v3NovaTarefaResponsaveis,
+                            usuarioLogado.id,
+                            usuarioPerfilAtual?.perfil_id
+                        );
+                    }
+                } catch (erroResponsaveis) {
+                    // Evita deixar tarefa criada sem os responsáveis escolhidos.
+                    await supabaseClient
+                        .from('tarefas')
+                        .delete()
+                        .eq('id', novaTarefa.id);
+
+                    throw new Error(
+                        'Não foi possível vincular os responsáveis selecionados. '
+                        + erroResponsaveis.message
+                    );
+                }
 
                 fecharModalNovaTarefa();
                 await buscarTarefasDoBanco();
