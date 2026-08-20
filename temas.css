@@ -665,3 +665,135 @@ html:not([data-theme="light"]) :where(
 ) {
   opacity: 1;
 }
+
+
+/* ==========================================================
+   V3.6 — BARRAS / TRILHOS / SCROLLBARS POR TEMA
+   ========================================================== */
+
+/* Barras de porcentagem dos cards. */
+.progress-mini-bar,
+.progress-bar,
+.progress-track,
+.task-progress-track {
+  background: var(--v3-surface-3) !important;
+  border: 1px solid var(--v3-border) !important;
+  box-shadow: none !important;
+}
+
+/* Evita aquele trilho quase branco nos temas escuros. */
+html[data-theme="dark"] .progress-mini-bar,
+html[data-theme="dark"] .progress-bar,
+html[data-theme="dark"] .progress-track,
+html[data-theme="dark"] .task-progress-track {
+  background: #343943 !important;
+  border-color: #454c58 !important;
+}
+
+html[data-theme="night"] .progress-mini-bar,
+html[data-theme="night"] .progress-bar,
+html[data-theme="night"] .progress-track,
+html[data-theme="night"] .task-progress-track {
+  background: #162238 !important;
+  border-color: #263b5a !important;
+}
+
+html[data-theme="military"] .progress-mini-bar,
+html[data-theme="military"] .progress-bar,
+html[data-theme="military"] .progress-track,
+html[data-theme="military"] .task-progress-track {
+  background: #c5c1a5 !important;
+  border-color: #a7a381 !important;
+}
+
+/* Divisórias dos cards não ficam brancas. */
+.card-footer,
+.task-last-activity,
+.task-last-update,
+.task-card hr,
+.kanban-column hr {
+  border-color: var(--v3-border) !important;
+}
+
+/* Slider de andamento no detalhe da tarefa. */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 7px;
+  border: 0 !important;
+  border-radius: 999px;
+  background: var(--v3-surface-3) !important;
+  accent-color: var(--v3-accent);
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 7px;
+  border-radius: 999px;
+  background: var(--v3-surface-3);
+  border: 1px solid var(--v3-border);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 17px;
+  height: 17px;
+  margin-top: -6px;
+  border-radius: 50%;
+  background: var(--v3-accent);
+  border: 2px solid var(--v3-surface);
+  box-shadow: 0 1px 4px var(--v3-shadow);
+}
+
+input[type="range"]::-moz-range-track {
+  height: 7px;
+  border-radius: 999px;
+  background: var(--v3-surface-3);
+  border: 1px solid var(--v3-border);
+}
+
+input[type="range"]::-moz-range-progress {
+  height: 7px;
+  border-radius: 999px;
+  background: var(--v3-accent);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--v3-accent);
+  border: 2px solid var(--v3-surface);
+}
+
+/* Scrollbar do Edge/Chrome: antes o trilho podia continuar branco. */
+html:not([data-theme="light"]) *::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+
+html:not([data-theme="light"]) *::-webkit-scrollbar-track {
+  background: var(--v3-bg);
+}
+
+html:not([data-theme="light"]) *::-webkit-scrollbar-thumb {
+  background: var(--v3-border-2);
+  border-radius: 999px;
+  border: 2px solid var(--v3-bg);
+}
+
+html:not([data-theme="light"]) *::-webkit-scrollbar-thumb:hover {
+  background: var(--v3-muted);
+}
+
+html[data-theme="dark"] {
+  scrollbar-color: #4b5563 #17191d;
+}
+
+html[data-theme="night"] {
+  scrollbar-color: #2c4264 #070b14;
+}
+
+html[data-theme="military"] {
+  scrollbar-color: #8f9470 #d9d6bf;
+}

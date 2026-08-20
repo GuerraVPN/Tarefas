@@ -2,7 +2,35 @@
 'use strict';
 const $=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));let u=null,notifs=[],filter='todas',users=[],profiles=new Map(),messages=[],otherId=null,channel=null;
 function user(){try{return JSON.parse(localStorage.getItem('usuarioLogado')||'null')}catch(_){return null}}function visible(n){return n.perfil_id==null||String(n.perfil_id)===String(u.perfil_id??'')}function time(v){const d=new Date(v),diff=(Date.now()-d)/60000;if(diff<1)return'Agora';if(diff<60)return Math.floor(diff)+' min';if(diff<1440)return Math.floor(diff/60)+' h';return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}
-async function loadNotifs(){const r=await supabaseClient.from('notificacoes').select('*').eq('usuario_id',String(u.id)).order('criada_em',{ascending:false}).limit(250);if(r.error)throw r.error;notifs=(r.data||[]).filter(visible);renderNotifs();stats()}function stats(){$('sUnread').textContent=notifs.filter(x=>!x.lida).length;$('sUrgent').textContent=notifs.filter(x=>!x.lida&&x.urgente).length;$('sMsg').textContent=notifs.filter(x=>!x.lida&&x.tipo==='mensagem').length;$('sSystem').textContent=notifs.filter(x=>!x.lida&&x.tipo==='sistema').length;window.Notificacoes26?.atualizarContadores()}
+function dedupeNotificacoes(lista){
+  const resultado=[];
+  const vistos=new Map();
+
+  for(const item of (lista||[])){
+    const chave=[
+      item.usuario_id||'',
+      item.perfil_id??'global',
+      item.tipo||'',
+      item.referencia_tipo||'',
+      item.referencia_id||'',
+      item.titulo||'',
+      item.mensagem||''
+    ].join('|');
+
+    const ts=new Date(item.criada_em).getTime();
+    const anterior=vistos.get(chave);
+
+    // Notificações iguais geradas praticamente juntas são uma só.
+    if(anterior!=null && Math.abs(anterior-ts)<=120000)continue;
+
+    vistos.set(chave,ts);
+    resultado.push(item);
+  }
+
+  return resultado;
+}
+
+async function loadNotifs(){const r=await supabaseClient.from('notificacoes').select('*').eq('usuario_id',String(u.id)).order('criada_em',{ascending:false}).limit(250);if(r.error)throw r.error;notifs=dedupeNotificacoes((r.data||[]).filter(visible));renderNotifs();stats()}function stats(){$('sUnread').textContent=notifs.filter(x=>!x.lida).length;$('sUrgent').textContent=notifs.filter(x=>!x.lida&&x.urgente).length;$('sMsg').textContent=notifs.filter(x=>!x.lida&&x.tipo==='mensagem').length;$('sSystem').textContent=notifs.filter(x=>!x.lida&&x.tipo==='sistema').length;window.Notificacoes26?.atualizarContadores()}
 function filtered(){if(filter==='nao_lidas')return notifs.filter(x=>!x.lida);if(filter!=='todas')return notifs.filter(x=>x.tipo===filter);return notifs}function renderNotifs(){const a=filtered();$('notifList').innerHTML=a.length?a.map(n=>`<div class="notif ${n.lida?'':'unread'}" data-id="${n.id}"><span class="dot"></span><div><strong>${esc(n.titulo)}</strong><p>${esc(n.mensagem||'')}</p><span class="pill ${esc(n.tipo)} ${n.urgente?'urgent':''}">${n.urgente?'URGENTE · ':''}${esc(n.tipo||'sistema')}</span></div><time>${time(n.criada_em)}</time></div>`).join(''):'<div class="empty">Nenhuma notificação neste filtro.</div>'}
 async function openNotif(n){if(!n.lida){await supabaseClient.from('notificacoes').update({lida:true,lida_em:new Date().toISOString()}).eq('id',n.id);n.lida=true;renderNotifs();stats()}if(n.destino_url)location.href=n.destino_url}async function markAll(){const ids=notifs.filter(x=>!x.lida).map(x=>x.id);if(!ids.length)return;const r=await supabaseClient.from('notificacoes').update({lida:true,lida_em:new Date().toISOString()}).in('id',ids);if(r.error)return alert(r.error.message);await loadNotifs()}
 async function loadUsers(){const [r,p]=await Promise.all([supabaseClient.from('usuarios').select('id,nome_guerra,patente,secao,posicao').order('nome_guerra'),supabaseClient.from('usuario_perfis').select('id,usuario_id,secao,posicao').eq('ativo',true)]);if(r.error)throw r.error;if(p.error)throw p.error;users=(r.data||[]).filter(x=>String(x.id)!==String(u.id));profiles=new Map((p.data||[]).map(x=>[String(x.id),x]));renderPick()}function renderPick(){const q=$('userSearch').value.trim().toLowerCase(),a=users.filter(x=>`${x.patente} ${x.nome_guerra} ${x.secao}`.toLowerCase().includes(q));$('userPick').innerHTML=a.map(x=>`<button data-user="${x.id}"><b>${esc([x.patente,x.nome_guerra].filter(Boolean).join(' '))}</b><br><small>${esc(x.secao||'-')} — ${esc(x.posicao||'-')}</small></button>`).join('')}

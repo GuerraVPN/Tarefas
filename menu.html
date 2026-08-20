@@ -873,7 +873,7 @@
 
     </style>
     <link rel="stylesheet" href="notificacoes.css">
-    <link rel="stylesheet" href="temas.css?v=3.3">
+    <link rel="stylesheet" href="temas.css?v=3.6">
 </head>
 <body>
 
@@ -1758,21 +1758,7 @@
                     historico: historicoNovo
                 }).eq('id', tarefaSelecionadaId);
                 if (error) throw error;
-
-                // Notifica cada usuário que recebeu o despacho. A falha da notificação não desfaz o despacho.
-                if (typeof window.registrarNotificacao === 'function') {
-                    responsaveisSelecionadosLocal.forEach(resp => {
-                        if (!resp?.id || String(resp.id) === String(usuarioLogado.id)) return;
-                        window.registrarNotificacao(
-                            resp.id,
-                            'tarefa',
-                            'Nova tarefa despachada para um de seus perfis',
-                            `${nomeUsuarioAtual()} despachou a tarefa ${tarefa.codigo || ('#' + tarefa.id)} - ${tarefa.titulo || 'Sem título'} para ${resp.secao || '-'} — ${resp.posicao || '-'}.`,
-                            'tarefa',
-                            tarefa.id
-                        ).then(r => { if (r?.error) console.warn('Notificação de despacho:', r.error.message); }).catch(e => console.warn('Notificação de despacho:', e));
-                    });
-                }
+                // V3.6: a notificação de despacho é criada somente pelo trigger do banco.
 
                 const idSalvo = tarefaSelecionadaId;
                 tarefa.responsavel = valorBanco;
@@ -2830,7 +2816,7 @@
         <script src="sistema_comum.js?v=5.0"></script>
     <script src="auditoria.js?v=5.0"></script>
     <script src="bloco_notas.js?v=5.0"></script>
-    <script src="notificacoes.js?v=3.4"></script>
+    <script src="notificacoes.js?v=3.6"></script>
     <script src="v3_ui.js?v=3.4"></script>
     <script src="temas.js?v=3.3"></script>
 </body>
