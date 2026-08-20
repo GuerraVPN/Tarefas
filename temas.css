@@ -797,3 +797,196 @@ html[data-theme="night"] {
 html[data-theme="military"] {
   scrollbar-color: #8f9470 #d9d6bf;
 }
+
+
+/* ==========================================================
+   V3.7 — MODAL DE DETALHES DA TAREFA
+   Corrige áreas internas que ainda herdavam o tema claro.
+   ========================================================== */
+
+/* Caixa do histórico da tarefa */
+.history-list,
+#detalheListaHistorico {
+  background: var(--v3-surface-2) !important;
+  color: var(--v3-text) !important;
+  border-color: var(--v3-border) !important;
+  scrollbar-color: var(--v3-border-2) var(--v3-surface-2);
+}
+
+.history-item {
+  color: var(--v3-text-2) !important;
+  border-bottom-color: var(--v3-border) !important;
+}
+
+.history-item > span:first-child,
+.history-item > div:first-child {
+  color: var(--v3-text) !important;
+}
+
+.history-date {
+  color: var(--v3-muted) !important;
+}
+
+/* Scrollbar específica do histórico */
+.history-list::-webkit-scrollbar,
+#detalheListaHistorico::-webkit-scrollbar,
+.modal-content::-webkit-scrollbar {
+  width: 10px;
+}
+
+.history-list::-webkit-scrollbar-track,
+#detalheListaHistorico::-webkit-scrollbar-track,
+.modal-content::-webkit-scrollbar-track {
+  background: var(--v3-surface-2) !important;
+}
+
+.history-list::-webkit-scrollbar-thumb,
+#detalheListaHistorico::-webkit-scrollbar-thumb,
+.modal-content::-webkit-scrollbar-thumb {
+  background: var(--v3-border-2) !important;
+  border-radius: 999px;
+  border: 2px solid var(--v3-surface-2);
+}
+
+/* Arquivos / anexos */
+.file-upload-box {
+  background: var(--v3-surface-2) !important;
+  color: var(--v3-muted) !important;
+  border-color: var(--v3-border-2) !important;
+}
+
+.file-upload-box:hover {
+  background: var(--v3-surface-3) !important;
+}
+
+.files-list {
+  color: var(--v3-text) !important;
+}
+
+.file-item {
+  background: var(--v3-surface-2) !important;
+  color: var(--v3-text) !important;
+  border: 1px solid var(--v3-border) !important;
+}
+
+.file-item span,
+.file-item a,
+.file-name-link {
+  color: var(--v3-text-2) !important;
+}
+
+.file-item button {
+  background: var(--v3-surface-3) !important;
+  color: var(--v3-text) !important;
+  border-color: var(--v3-border) !important;
+}
+
+/* Campos de atualização e descrição dentro do modal */
+.modal-content input,
+.modal-content textarea,
+.modal-content select,
+#inputAtualizacaoTarefa,
+#detalheDescricao {
+  background: var(--v3-surface) !important;
+  color: var(--v3-text) !important;
+  border-color: var(--v3-border-2) !important;
+}
+
+.modal-content input::placeholder,
+.modal-content textarea::placeholder {
+  color: var(--v3-muted) !important;
+}
+
+/* Modal completo */
+.modal-content {
+  background: var(--v3-surface) !important;
+  color: var(--v3-text) !important;
+  border: 1px solid var(--v3-border) !important;
+}
+
+.modal-content h3,
+.modal-content label {
+  color: var(--v3-text) !important;
+}
+
+.modal-close {
+  color: var(--v3-muted) !important;
+}
+
+.modal-close:hover {
+  color: var(--v3-text) !important;
+}
+
+/* Radios de status */
+.status-radio-group,
+.status-radio-group label {
+  color: var(--v3-text-2) !important;
+}
+
+.status-radio-group input[type="radio"] {
+  accent-color: var(--v3-accent);
+}
+
+/* Linha de andamento */
+.slider-wrapper,
+.slider-wrapper span,
+#txtAndamentoPorcentagem {
+  color: var(--v3-text) !important;
+}
+
+/* Botões do modal */
+.modal-buttons {
+  border-color: var(--v3-border) !important;
+}
+
+.btn-cancelar {
+  background: var(--v3-surface-3) !important;
+  color: var(--v3-text-2) !important;
+  border: 1px solid var(--v3-border) !important;
+}
+
+.btn-cancelar:hover {
+  background: var(--v3-surface-2) !important;
+}
+
+/* Noturno: histórico mais escuro que o corpo do modal. */
+html[data-theme="night"] .history-list,
+html[data-theme="night"] #detalheListaHistorico {
+  background: #0a111d !important;
+  border-color: #263b5a !important;
+}
+
+html[data-theme="night"] .history-list::-webkit-scrollbar-track,
+html[data-theme="night"] #detalheListaHistorico::-webkit-scrollbar-track {
+  background: #0a111d !important;
+}
+
+html[data-theme="night"] .history-list::-webkit-scrollbar-thumb,
+html[data-theme="night"] #detalheListaHistorico::-webkit-scrollbar-thumb {
+  background: #2c4264 !important;
+  border-color: #0a111d !important;
+}
+
+/* Escuro: remove qualquer branco residual. */
+html[data-theme="dark"] .history-list,
+html[data-theme="dark"] #detalheListaHistorico {
+  background: #1b1e23 !important;
+  border-color: #3d424b !important;
+}
+
+/* Militar: histórico em cáqui suave, sem branco puro. */
+html[data-theme="military"] .history-list,
+html[data-theme="military"] #detalheListaHistorico {
+  background: #e1dec6 !important;
+  color: #25291c !important;
+  border-color: #aaa787 !important;
+}
+
+html[data-theme="military"] .history-item {
+  color: #3e4430 !important;
+  border-bottom-color: #b8b594 !important;
+}
+
+html[data-theme="military"] .history-date {
+  color: #666c51 !important;
+}
