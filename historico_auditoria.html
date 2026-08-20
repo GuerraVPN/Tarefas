@@ -51,7 +51,7 @@ button,input,select{font:inherit}
 @media(max-width:1200px){.filters{grid-template-columns:repeat(3,1fr)}.summary{grid-template-columns:repeat(3,1fr)}.workspace{grid-template-columns:1fr}}
 @media(max-width:760px){body{display:block}.sidebar{width:100%;min-height:auto}.nav{display:grid;grid-template-columns:repeat(2,1fr)}.content{padding:16px}.filters{grid-template-columns:1fr}.summary{grid-template-columns:1fr 1fr}.topbar{padding:0 14px}}
 </style>
-    <link rel="stylesheet" href="temas.css?v=3.2">
+    <link rel="stylesheet" href="temas.css?v=3.3">
 </head>
 <body>
 <aside class="sidebar">
@@ -276,6 +276,8 @@ $('busca').addEventListener('keydown',e=>{if(e.key==='Enter')carregarEventos(tru
 
 (async()=>{if(await confirmarAdmin()){try{await Promise.all([carregarResumo(),carregarEventos(true)])}catch(e){toast(e.message,true)}}})();
 </script>
-    <script src="temas.js?v=3.2"></script>
+    <script src="temas.js?v=3.3"></script>
+    <script src="notificacoes.js?v=3.4"></script>
+    <script src="v3_ui.js?v=3.4"></script>
 </body>
 </html>
