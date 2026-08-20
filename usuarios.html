@@ -180,13 +180,13 @@
             <option>S1</option><option>S2</option><option>S3</option><option>S4</option>
             <option>Fiscalização</option><option>Pagamento</option><option>SALC</option>
             <option>Garagem</option><option>ResMat</option><option>ResArmt</option><option>Informática</option>
-            <option>Comandante</option>
+            <option>Comandante</option><option value="admin">Admin</option>
           </select>
         </div>
         <div class="field">
           <label>Função neste perfil</label>
           <select id="profilePosicao" required>
-            <option>Auxiliar</option><option>Chefe</option><option>Comandante</option>
+            <option>Auxiliar</option><option>Chefe</option><option>Comandante</option><option>Administrador</option>
           </select>
         </div>
       </div>
@@ -244,24 +244,25 @@
     clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.className='toast',3200);
   }
 
+  function contaTemPerfilAdmin(u){return ehAdmin(u)||Boolean(u?._tem_admin)}
   function podeEditarAlvo(u){
     if(!ehGestorGeral(perfil))return false;
-    if(ehAdmin(u)&&!ehAdmin(perfil))return false;
+    if(contaTemPerfilAdmin(u)&&!ehAdmin(perfil))return false;
     return true;
   }
   function podeAlterarSenhaAlvo(u){return podeEditarAlvo(u)}
   function podeGerenciarPerfisAlvo(u){
     if(!u)return false;
     if(ehAdmin(perfil))return true;
-    if(ehComandante(perfil))return !ehAdmin(u);
+    if(ehComandante(perfil))return !contaTemPerfilAdmin(u);
     return false;
   }
   function podeExcluirAlvo(u){
     if(!u||String(u.id)===String(perfil.id))return false;
     if(ehAdmin(perfil))return true;
-    if(ehComandante(perfil))return !ehAdmin(u);
+    if(ehComandante(perfil))return !contaTemPerfilAdmin(u);
     if(ehChefe(perfil)){
-      return !ehAdmin(u)&&!ehComandante(u)&&norm(u.secao)===norm(perfil.secao);
+      return !contaTemPerfilAdmin(u)&&!ehComandante(u)&&norm(u.secao)===norm(perfil.secao);
     }
     return false;
   }
@@ -311,16 +312,36 @@
     if(error){$('usersList').innerHTML=`<div class="empty">Erro ao carregar usuários: ${esc(error.message)}</div>`;return;}
     usuarios=data||[];
     try{
-      const rp=await supabaseClient.from('usuario_perfis').select('id,usuario_id,secao,posicao,principal,ativo').eq('ativo',true).order('usuario_id',{ascending:true}).order('principal',{ascending:false}).order('id',{ascending:true});
+      const rp=await supabaseClient.from('usuario_perfis')
+        .select('id,usuario_id,secao,posicao,principal,ativo')
+        .eq('ativo',true)
+        .order('usuario_id',{ascending:true})
+        .order('principal',{ascending:false})
+        .order('id',{ascending:true});
       if(rp.error)throw rp.error;
+
       const mapa=new Map();
+      const contasAdmin=new Set();
+
       (rp.data||[]).forEach(p=>{
+        const k=String(p.usuario_id);
+        if(norm(p.secao)==='admin')contasAdmin.add(k);
         if(norm(p.secao)==='admin'&&!ehAdmin(perfil))return;
-        const k=String(p.usuario_id);if(!mapa.has(k))mapa.set(k,[]);mapa.get(k).push(p);
+        if(!mapa.has(k))mapa.set(k,[]);
+        mapa.get(k).push(p);
       });
-      usuarios.forEach(u=>{u._perfis=mapa.get(String(u.id))||[];u._perfis_count=u._perfis.length||1;});
+
+      usuarios.forEach(u=>{
+        u._tem_admin=contasAdmin.has(String(u.id));
+        u._perfis=mapa.get(String(u.id))||[];
+        u._perfis_count=u._perfis.length||1;
+      });
     }catch(_){
-      usuarios.forEach(u=>{u._perfis=[{id:null,usuario_id:u.id,secao:u.secao,posicao:u.posicao,principal:true,ativo:true}];u._perfis_count=1;});
+      usuarios.forEach(u=>{
+        u._tem_admin=ehAdmin(u);
+        u._perfis=[{id:null,usuario_id:u.id,secao:u.secao,posicao:u.posicao,principal:true,ativo:true}];
+        u._perfis_count=1;
+      });
     }
     renderLista();
   }
@@ -493,13 +514,13 @@
       return;
     }
     box.innerHTML=perfisModalLista.map(p=>{
-      const protegido=norm(p.secao)==='admin';
+      const perfilAdmin=norm(p.secao)==='admin';
       const comandanteSensivel=norm(p.secao)==='comandante'&&!ehAdmin(perfil);
-      const contaTemAdmin=perfisModalLista.some(x=>norm(x.secao)==='admin');
+      const alvoEhMinhaConta=String(usuarioPerfisModal?.id)===String(perfil.id);
       const principal=p.principal?'<span class="profile-pill">Principal</span>':'';
-      const admin=protegido?'<span class="profile-pill admin">Protegido</span>':'';
-      const podeExcluir=!protegido&&!comandanteSensivel&&perfisModalLista.length>1;
-      const podeTornarPrincipal=!p.principal&&!protegido&&!comandanteSensivel&&!(contaTemAdmin&&norm(p.secao)!=='admin');
+      const admin=perfilAdmin?'<span class="profile-pill admin">Admin</span>':'';
+      const podeExcluir=!comandanteSensivel&&perfisModalLista.length>1&&(!perfilAdmin||(ehAdmin(perfil)&&!alvoEhMinhaConta));
+      const podeTornarPrincipal=!p.principal&&!comandanteSensivel&&(!perfilAdmin||ehAdmin(perfil));
       return `<div class="profile-item-card">
         <div class="profile-item-main">
           <div class="profile-item-title">${esc(p.secao)} — ${esc(p.posicao)} ${principal}${admin}</div>
@@ -520,12 +541,17 @@
     $('profilesModalTitle').textContent=`Perfis — ${nomeExibicao(u)}`;
     $('profileAddForm').reset();
 
-    // Comandante não pode promover outro usuário a Comandante.
+    // Somente Admin pode atribuir perfis Comandante e Admin.
     const opComandante=[...$('profileSecao').options].find(o=>norm(o.value)==='comandante');
+    const opAdmin=[...$('profileSecao').options].find(o=>norm(o.value)==='admin');
     if(opComandante)opComandante.disabled=!ehAdmin(perfil);
+    if(opAdmin)opAdmin.disabled=!ehAdmin(perfil);
 
     try{
       perfisModalLista=await carregarPerfisDoUsuario(u.id);
+      if(!ehAdmin(perfil)&&perfisModalLista.some(p=>norm(p.secao)==='admin')){
+        return toast('Somente Admin pode gerenciar uma conta que possua perfil Admin.',true);
+      }
       renderPerfisModal();
       $('profilesModal').classList.add('show');
     }catch(err){
@@ -538,9 +564,7 @@
     const alvo=perfisModalLista.find(p=>String(p.id)===String(perfilId));
     if(!alvo)return;
     if(norm(alvo.secao)==='comandante'&&!ehAdmin(perfil))return toast('Somente Admin pode alterar o perfil principal de Comandante.',true);
-    if(perfisModalLista.some(p=>norm(p.secao)==='admin')&&norm(alvo.secao)!=='admin'){
-      return toast('Em uma conta Admin, o perfil Admin deve permanecer principal.',true);
-    }
+    if(norm(alvo.secao)==='admin'&&!ehAdmin(perfil))return toast('Somente Admin pode definir um perfil Admin como principal.',true);
     const {error}=await supabaseClient.rpc('definir_perfil_principal_usuario',{
       p_usuario_id:Number(usuarioPerfisModal.id),
       p_perfil_id:Number(perfilId)
@@ -556,7 +580,10 @@
     if(!usuarioPerfisModal)return;
     const alvo=perfisModalLista.find(p=>String(p.id)===String(perfilId));
     if(!alvo)return;
-    if(norm(alvo.secao)==='admin')return toast('O perfil Admin é protegido.',true);
+    if(norm(alvo.secao)==='admin'){
+      if(!ehAdmin(perfil))return toast('Somente Admin pode remover um perfil Admin.',true);
+      if(String(usuarioPerfisModal.id)===String(perfil.id))return toast('O perfil Admin da conta atualmente logada é protegido.',true);
+    }
     if(norm(alvo.secao)==='comandante'&&!ehAdmin(perfil))return toast('Somente Admin pode remover um perfil Comandante.',true);
     if(perfisModalLista.length<=1)return toast('O usuário precisa manter pelo menos um perfil.',true);
     if(!confirm(`Excluir o perfil ${alvo.secao} — ${alvo.posicao}?`))return;
@@ -655,7 +682,10 @@
     const secao=$('profileSecao').value;
     let posicao=$('profilePosicao').value;
 
-    if(norm(secao)==='admin')return toast('Perfil Admin não pode ser criado pela interface.',true);
+    if(norm(secao)==='admin'){
+      if(!ehAdmin(perfil))return toast('Somente Admin pode atribuir o perfil Admin.',true);
+      posicao='Administrador';
+    }
     if(norm(secao)==='comandante'){
       if(!ehAdmin(perfil))return toast('Somente Admin pode atribuir o perfil Comandante.',true);
       posicao='Comandante';
@@ -720,7 +750,9 @@ $('passwordForm').addEventListener('submit',async e=>{
     if(norm($('formSecao').value)==='comandante')$('formPosicao').value='Comandante';
   });
   $('profileSecao').addEventListener('change',()=>{
-    if(norm($('profileSecao').value)==='comandante')$('profilePosicao').value='Comandante';
+    const s=norm($('profileSecao').value);
+    if(s==='comandante')$('profilePosicao').value='Comandante';
+    if(s==='admin')$('profilePosicao').value='Administrador';
   });
   $('newUserBtn').onclick=abrirNovo;
   $('searchInput').addEventListener('input',renderLista);
@@ -729,6 +761,7 @@ $('passwordForm').addEventListener('submit',async e=>{
 
   (async()=>{await carregarPerfil();await carregarUsuarios()})();
 </script>
+    <script src="sistema_comum.js"></script>
     <script src="bloco_notas.js"></script>
     <script src="notificacoes.js"></script>
 </body>
