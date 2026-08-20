@@ -124,16 +124,58 @@
   async function save(client,taskId,list,userId,profileId){
     const rows=normalize(list);
     const pids=[...new Set(rows.map(r=>String(r.perfil_id||'')).filter(x=>/^\d+$/.test(x)).map(Number))];
-    if(pids.length!==rows.length)throw new Error('Todos os responsáveis precisam ter um perfil funcional selecionado.');
-    const rpc=await client.rpc('definir_responsaveis_perfis_tarefa',{p_tarefa_id:Number(taskId),p_perfil_ids:pids,p_atribuido_por:Number(userId),p_atribuido_por_perfil_id:profileId?Number(profileId):null});
+
+    if(pids.length!==rows.length){
+      throw new Error('Todos os responsáveis precisam ter um perfil funcional selecionado.');
+    }
+
+    // Caminho principal: RPC transacional.
+    const rpc=await client.rpc('definir_responsaveis_perfis_tarefa',{
+      p_tarefa_id:Number(taskId),
+      p_perfil_ids:pids,
+      p_atribuido_por:Number(userId),
+      p_atribuido_por_perfil_id:profileId?Number(profileId):null
+    });
+
     if(!rpc.error)return true;
+
+    // O Supabase pode manter por alguns segundos a versão antiga da função
+    // no cache. Também aceitamos como fallback o bug antigo:
+    // "column reference tarefa_id is ambiguous".
+    const code=String(rpc.error?.code||'');
     const msg=String(rpc.error?.message||'').toLowerCase();
-    if(!(String(rpc.error?.code||'')==='PGRST202'||String(rpc.error?.code||'')==='42883'||msg.includes('definir_responsaveis_perfis_tarefa')))throw rpc.error;
-    const del=await client.from('tarefa_responsaveis').delete().eq('tarefa_id',taskId); if(del.error)throw del.error;
+    const podeFallback=
+      code==='PGRST202' ||
+      code==='42883' ||
+      code==='42702' ||
+      msg.includes('definir_responsaveis_perfis_tarefa') ||
+      msg.includes('ambiguous') ||
+      msg.includes('tarefa_id');
+
+    if(!podeFallback)throw rpc.error;
+
+    console.warn('RPC de despacho indisponível/antigo; usando gravação direta:',rpc.error);
+
+    // Fallback direto.
+    const del=await client.from('tarefa_responsaveis')
+      .delete()
+      .eq('tarefa_id',Number(taskId));
+
+    if(del.error)throw del.error;
+
     if(rows.length){
-      const ins=await client.from('tarefa_responsaveis').insert(rows.map(r=>({tarefa_id:Number(taskId),usuario_id:Number(r.id),perfil_id:Number(r.perfil_id),atribuido_por:Number(userId),atribuido_por_perfil_id:profileId?Number(profileId):null})));
+      const payload=rows.map(r=>({
+        tarefa_id:Number(taskId),
+        usuario_id:Number(r.id),
+        perfil_id:Number(r.perfil_id),
+        atribuido_por:Number(userId),
+        atribuido_por_perfil_id:profileId?Number(profileId):null
+      }));
+
+      const ins=await client.from('tarefa_responsaveis').insert(payload);
       if(ins.error)throw ins.error;
     }
+
     return true;
   }
 
