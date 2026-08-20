@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Usuários - 26º Pel PE Mec</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="perfis.js"></script>
-    <script src="responsaveis_perfis.js?v=2.3.1"></script>
+    <script src="perfis.js?v=5.0"></script>
+    <script src="responsaveis_perfis.js?v=5.0"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <link rel="stylesheet" href="notificacoes.css">
   <style>
@@ -565,17 +565,39 @@
     if(!alvo)return;
     if(norm(alvo.secao)==='comandante'&&!ehAdmin(perfil))return toast('Somente Admin pode alterar o perfil principal de Comandante.',true);
     if(norm(alvo.secao)==='admin'&&!ehAdmin(perfil))return toast('Somente Admin pode definir um perfil Admin como principal.',true);
+
+    const antes=perfisModalLista.map(p=>({...p}));
+
     const {error}=await supabaseClient.rpc('definir_perfil_principal_usuario',{
       p_usuario_id:Number(usuarioPerfisModal.id),
       p_perfil_id:Number(perfilId)
     });
     if(error)return toast('Erro ao definir principal: '+error.message,true);
-    toast('Perfil principal atualizado.');
+
     perfisModalLista=await carregarPerfisDoUsuario(usuarioPerfisModal.id);
+
+    if(window.Auditoria26){
+      await Auditoria26.registrarManual({
+        acao:'PERFIL PRINCIPAL',
+        modulo:'Perfis',
+        tabela:'usuario_perfis',
+        registro_id:String(perfilId),
+        descricao:`Definiu ${alvo.secao} — ${alvo.posicao} como perfil principal de ${nomeExibicao(usuarioPerfisModal)}.`,
+        antes:null,
+        depois:null,
+        detalhes:{
+          usuario_alvo_id:String(usuarioPerfisModal.id),
+          perfis_antes:antes,
+          perfis_depois:perfisModalLista
+        },
+        reversivel:true
+      });
+    }
+
+    toast('Perfil principal atualizado.');
     renderPerfisModal();
     await carregarUsuarios();
   }
-
   async function excluirPerfil(perfilId){
     if(!usuarioPerfisModal)return;
     const alvo=perfisModalLista.find(p=>String(p.id)===String(perfilId));
@@ -761,8 +783,9 @@ $('passwordForm').addEventListener('submit',async e=>{
 
   (async()=>{await carregarPerfil();await carregarUsuarios()})();
 </script>
-    <script src="sistema_comum.js"></script>
-    <script src="bloco_notas.js?v=2.3.1"></script>
+    <script src="sistema_comum.js?v=5.0"></script>
+    <script src="auditoria.js?v=5.0"></script>
+    <script src="bloco_notas.js?v=5.0"></script>
     <script src="notificacoes.js"></script>
 </body>
 </html>
