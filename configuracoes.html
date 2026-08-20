@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações do Sistema - 26º Pel PE Mec</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+        :root {
+            --sidebar: #111827;
+            --sidebar-2: #0f172a;
+            --sidebar-hover: #1f2937;
+            --yellow: #eab308;
+            --yellow-soft: #facc15;
+            --green: #159447;
+            --green-dark: #0f7a39;
+            --bg: #f4f6f8;
+            --card: #ffffff;
+            --text: #111827;
+            --muted: #6b7280;
+            --border: #d9dee5;
+            --danger: #dc2626;
+            --shadow: 0 1px 4px rgba(15, 23, 42, .10);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { min-height: 100%; }
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        button, input, select { font: inherit; }
+        button { cursor: pointer; }
+
+        /* ================= SIDEBAR ================= */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(180deg, var(--sidebar), var(--sidebar-2));
+            color: #cbd5e1;
+            min-height: 100vh;
+            padding: 18px 14px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            border-right: 1px solid #1f2937;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+        }
+
+        .brand {
+            text-align: center;
+            padding: 0 10px 22px;
+            border-bottom: 1px solid rgba(255,255,255,.08);
+            margin-bottom: 12px;
+        }
+        .brand-star { color: var(--yellow-soft); font-size: 42px; line-height: 1; margin-bottom: 7px; }
+        .brand h1 { color: white; font-size: 17px; letter-spacing: .4px; }
+        .brand p { font-size: 12px; color: #9ca3af; margin-top: 4px; }
+
+        .nav { display: flex; flex-direction: column; gap: 5px; }
+        .nav a, .nav button {
+            width: 100%;
+            border: 0;
+            background: transparent;
+            color: #aeb7c4;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 12px;
+            border-radius: 6px;
+            text-align: left;
+            font-size: 13px;
+            transition: .18s ease;
+        }
+        .nav a i, .nav button i { width: 18px; text-align: center; }
+        .nav a:hover, .nav button:hover { background: var(--sidebar-hover); color: #fff; }
+        .nav .active {
+            color: #fef3c7;
+            border: 1px solid var(--yellow);
+            background: rgba(234,179,8,.08);
+            box-shadow: inset 0 0 0 1px rgba(234,179,8,.12);
+        }
+        .nav .active i { color: var(--yellow-soft); }
+
+        .sidebar-spacer { flex: 1; }
+        .side-user {
+            border-top: 1px solid rgba(255,255,255,.08);
+            padding-top: 14px;
+            margin-top: 14px;
+        }
+        .mini-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px;
+            border-radius: 7px;
+            background: rgba(255,255,255,.04);
+        }
+        .mini-avatar {
+            width: 34px; height: 34px; border-radius: 50%;
+            background: #202a39; border: 2px solid var(--yellow);
+            color: #facc15; display: grid; place-items: center;
+            font-weight: 700; overflow: hidden; flex-shrink: 0;
+        }
+        .mini-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .mini-profile strong { display: block; color: white; font-size: 12px; }
+        .mini-profile span { display: block; font-size: 10px; color: #9ca3af; margin-top: 2px; }
+        .logout {
+            margin-top: 8px; width: 100%; border: 0; background: transparent;
+            color: #fca5a5; display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px; border-radius: 6px; font-size: 12px;
+        }
+        .logout:hover { background: rgba(220,38,38,.10); }
+
+        /* ================= MAIN ================= */
+        .main { flex: 1; min-width: 0; }
+        .topbar {
+            height: 58px;
+            background: white;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 22px;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+        .top-left, .top-right { display: flex; align-items: center; gap: 15px; }
+        .menu-toggle { border: 0; background: transparent; color: #374151; padding: 6px; }
+        .top-icon { color: #4b5563; }
+        .top-avatar {
+            width: 30px; height: 30px; border-radius: 50%;
+            background: #202a39; border: 2px solid var(--yellow);
+            color: #facc15; display: grid; place-items: center;
+            font-size: 12px; font-weight: 700; overflow: hidden;
+        }
+        .top-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+        .content { padding: 18px 20px 34px; max-width: 1200px; margin: 0 auto; }
+        .page-title h2 { font-size: 24px; letter-spacing: -.4px; }
+        .breadcrumb { color: #6b7280; font-size: 12px; margin-top: 4px; }
+
+        .status-strip {
+            margin-top: 14px;
+            min-height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: rgba(255,255,255,.75);
+            font-size: 12px;
+        }
+        .status-pill { display: flex; align-items: center; gap: 8px; color: var(--muted); }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #94a3b8; }
+        .status-strip.saving .status-dot { background: #f59e0b; animation: pulse 1s infinite; }
+        .status-strip.saved .status-dot { background: #10b981; }
+        .status-strip.error .status-dot { background: #ef4444; }
+        @keyframes pulse { 50% { opacity: .35; } }
+
+        .grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(330px, .95fr);
+            gap: 18px;
+            margin-top: 14px;
+            align-items: start;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        .card-title {
+            padding: 12px 16px;
+            font-size: 15px;
+            font-weight: 700;
+            border-bottom: 1px solid var(--border);
+        }
+        .card-body { padding: 15px 16px 16px; }
+
+        .avatar-row { display: flex; align-items: center; gap: 16px; margin-bottom: 14px; }
+        .avatar-large {
+            width: 76px; height: 76px; border-radius: 50%;
+            background: #1f2937; color: #facc15; border: 4px solid var(--yellow);
+            box-shadow: 0 0 0 4px #fef3c7;
+            display: grid; place-items: center; font-size: 34px; font-weight: 500;
+            overflow: hidden; flex-shrink: 0;
+        }
+        .avatar-large img { width: 100%; height: 100%; object-fit: cover; }
+        .btn-secondary {
+            border: 1px solid #4b5563;
+            color: #fff;
+            background: #374151;
+            border-radius: 5px;
+            padding: 8px 12px;
+            font-size: 12px;
+            box-shadow: 0 1px 2px rgba(0,0,0,.12);
+        }
+        .btn-secondary:hover { background: #1f2937; }
+
+        .field { margin-top: 11px; }
+        .field label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: #374151;
+            margin-bottom: 5px;
+        }
+        .field input, .field select {
+            width: 100%;
+            height: 36px;
+            padding: 7px 10px;
+            border: 1px solid #cfd5dc;
+            border-radius: 5px;
+            background: white;
+            color: #111827;
+            outline: none;
+            font-size: 12px;
+            transition: border-color .15s, box-shadow .15s;
+        }
+        .field input:focus, .field select:focus {
+            border-color: #94a3b8;
+            box-shadow: 0 0 0 3px rgba(148,163,184,.18);
+        }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+        .btn-green {
+            width: 100%;
+            border: 0;
+            border-radius: 5px;
+            padding: 9px 12px;
+            background: linear-gradient(180deg, #22a754, var(--green));
+            color: white;
+            font-size: 12px;
+            margin-top: 13px;
+            box-shadow: 0 1px 2px rgba(0,0,0,.12);
+        }
+        .btn-green:hover { background: var(--green-dark); }
+        .btn-green:disabled { opacity: .55; cursor: not-allowed; }
+
+        .section-label { font-size: 16px; font-weight: 700; margin: 18px 0 10px; }
+        .checks { display: flex; flex-direction: column; gap: 9px; }
+        .check-row { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #222; }
+        .check-row input { width: 15px; height: 15px; accent-color: #111; }
+
+        .hint {
+            margin-top: 10px;
+            padding: 9px 10px;
+            border-radius: 6px;
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            color: #64748b;
+            font-size: 10px;
+            line-height: 1.45;
+        }
+        .hint.warning { background: #fffbeb; border-color: #fde68a; color: #92400e; }
+
+        .save-system {
+            width: 100%; margin-top: 13px; background: #050505; color: white;
+            border: 0; border-radius: 5px; padding: 9px 12px; font-size: 12px;
+        }
+        .save-system:hover { background: #1f2937; }
+
+        .toast {
+            position: fixed;
+            right: 18px;
+            bottom: 18px;
+            z-index: 100;
+            background: #111827;
+            color: white;
+            padding: 11px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.22);
+            opacity: 0;
+            transform: translateY(12px);
+            pointer-events: none;
+            transition: .2s ease;
+            max-width: 330px;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.error { background: #991b1b; }
+
+        .loading-cover {
+            position: fixed; inset: 0; background: rgba(244,246,248,.88);
+            display: grid; place-items: center; z-index: 200;
+            color: #374151; font-size: 13px;
+        }
+        .loading-box { display: flex; align-items: center; gap: 10px; }
+        .spinner { width: 18px; height: 18px; border: 2px solid #cbd5e1; border-top-color: #111827; border-radius: 50%; animation: spin .75s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* temas */
+        body[data-theme="dark"] { --bg:#0f172a; --card:#111827; --text:#f8fafc; --muted:#9ca3af; --border:#334155; }
+        body[data-theme="dark"] .topbar,
+        body[data-theme="dark"] .status-strip { background:#111827; }
+        body[data-theme="dark"] .field input,
+        body[data-theme="dark"] .field select { background:#0f172a; color:#f8fafc; border-color:#475569; }
+        body[data-theme="dark"] .field label,
+        body[data-theme="dark"] .check-row { color:#e5e7eb; }
+        body[data-theme="dark"] .hint { background:#0f172a; border-color:#334155; }
+
+        @media (max-width: 900px) {
+            .grid { grid-template-columns: 1fr; }
+            .sidebar { position: fixed; transform: translateX(-100%); transition: .22s ease; }
+            .sidebar.open { transform: translateX(0); }
+            .main { width: 100%; }
+            .content { padding: 16px; }
+        }
+        @media (max-width: 520px) {
+            .two-col { grid-template-columns: 1fr; }
+            .page-title h2 { font-size: 20px; }
+            .avatar-large { width: 68px; height: 68px; }
+            .status-strip { align-items: flex-start; flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Acesso baseado no usuário já autenticado pelo seu sistema -->
+    <script>
+        const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado') || 'null');
+        if (!usuarioLogado || !usuarioLogado.id) {
+            alert('Acesso negado. Faça login primeiro.');
+            window.location.href = 'index.html';
+        }
+    </script>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="brand">
+            <div class="brand-star">★</div>
+            <h1>TAREFAS</h1>
+            <p>26º Pel PE Mec</p>
+        </div>
+
+        <nav class="nav">
+            <a href="#" class="active"><i class="fa-solid fa-gear"></i> Configurações</a>
+            <a href="menu.html" data-pref-item="quadro"><i class="fa-solid fa-table-columns"></i> Quadro Kanban</a>
+            <a href="#" data-pref-item="minhas"><i class="fa-solid fa-user"></i> Minhas tarefas</a>
+            <a href="#" data-pref-item="calendario"><i class="fa-solid fa-calendar-days"></i> Calendário</a>
+            <a href="#" data-pref-item="relatorios"><i class="fa-solid fa-chart-column"></i> Relatórios</a>
+            <a href="#" data-pref-item="usuarios"><i class="fa-solid fa-users"></i> Usuários</a>
+        </nav>
+
+        <div class="sidebar-spacer"></div>
+        <div class="side-user">
+            <div class="mini-profile">
+                <div class="mini-avatar" id="miniAvatar">S</div>
+                <div>
+                    <strong id="miniNome">Carregando...</strong>
+                    <span id="miniDetalhes">-</span>
+                </div>
+            </div>
+            <button class="logout" id="btnSair"><i class="fa-solid fa-arrow-right-from-bracket"></i> Sair</button>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <div class="top-left">
+                <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
+            </div>
+            <div class="top-right">
+                <i class="fa-regular fa-bell top-icon"></i>
+                <div class="top-avatar" id="topAvatar">S</div>
+            </div>
+        </header>
+
+        <section class="content">
+            <div class="page-title">
+                <h2>Configurações do Sistema</h2>
+                <div class="breadcrumb">Painel &gt; Configurações</div>
+            </div>
+
+            <div class="status-strip" id="saveStatus">
+                <div class="status-pill"><span class="status-dot"></span><span id="statusText">Conectando ao banco...</span></div>
+                <div id="statusTime"></div>
+            </div>
+
+            <div class="grid">
+                <section class="card">
+                    <div class="card-title">Perfil do Usuário</div>
+                    <div class="card-body">
+                        <div class="avatar-row">
+                            <div class="avatar-large" id="avatarLarge">S</div>
+                            <div>
+                                <button class="btn-secondary" id="btnAvatar" type="button">Alterar Ícone</button>
+                                <input type="file" id="avatarInput" accept="image/*" hidden>
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <label for="nomeCompleto">Nome Completo</label>
+                            <input id="nomeCompleto" type="text" autocomplete="name">
+                        </div>
+
+                        <div class="field">
+                            <label for="nomeGuerra">Nome de Guerra</label>
+                            <input id="nomeGuerra" type="text">
+                        </div>
+
+                        <div class="field">
+                            <label for="patente">Posto / Graduação</label>
+                            <select id="patente">
+                                <option value="Soldado">Soldado</option>
+                                <option value="Cabo">Cabo</option>
+                                <option value="3º Sgt">3º Sgt</option>
+                                <option value="2º Sgt">2º Sgt</option>
+                                <option value="1º Sgt">1º Sgt</option>
+                                <option value="Subtenente">Subtenente</option>
+                                <option value="Aspirante">Aspirante</option>
+                                <option value="2º Ten">2º Ten</option>
+                                <option value="1º Ten">1º Ten</option>
+                                <option value="Capitão">Capitão</option>
+                                <option value="Major">Major</option>
+                                <option value="Ten Cel">Ten Cel</option>
+                                <option value="Cel">Cel</option>
+                            </select>
+                        </div>
+
+                        <div class="two-col">
+                            <div class="field">
+                                <label for="secao">Seção Atendida</label>
+                                <select id="secao">
+                                    <option>S1</option><option>S2</option><option>S3</option><option>S4</option>
+                                    <option>Fiscalização</option><option>Pagamento</option><option>SALC</option>
+                                    <option>Garagem</option><option>ResMat</option><option>ResArmt</option><option>Informática</option>
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label for="posicao">Posição Executiva</label>
+                                <select id="posicao">
+                                    <option value="Auxiliar">Auxiliar</option>
+                                    <option value="Aux">Aux</option>
+                                    <option value="Chefe">Chefe</option>
+                                    <option value="Ch">Ch</option>
+                                    <option value="Cmt">Cmt</option>
+                                    <option value="Encarregado">Encarregado</option>
+                                    <option value="Fiscal">Fiscal</option>
+                                    <option value="Operador">Operador</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button class="btn-green" id="btnSalvarPerfil" type="button">Salvar Alterações de Perfil</button>
+                        <div class="hint">Os campos do perfil são salvos automaticamente no registro do usuário logado. O botão acima força uma gravação imediata.</div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <div class="card-title">Preferências Visuais</div>
+                    <div class="card-body">
+                        <div class="field" style="margin-top:0">
+                            <label for="tema">Tema de Interface</label>
+                            <select id="tema">
+                                <option value="militar">Padrão Militar</option>
+                                <option value="light">Claro</option>
+                                <option value="dark">Escuro</option>
+                            </select>
+                        </div>
+
+                        <div class="section-label">Acesso Rápido (Atalhos da Sidebar)</div>
+                        <div class="checks">
+                            <label class="check-row"><input type="checkbox" id="prefQuadro" checked> Exibir Quadro Kanban</label>
+                            <label class="check-row"><input type="checkbox" id="prefMinhas" checked> Exibir Minhas tarefas</label>
+                            <label class="check-row"><input type="checkbox" id="prefCalendario" checked> Exibir Calendário</label>
+                            <label class="check-row"><input type="checkbox" id="prefRelatorios" checked> Exibir Relatórios</label>
+                            <label class="check-row"><input type="checkbox" id="prefUsuarios" checked> Exibir Usuários</label>
+                        </div>
+
+                        <button class="save-system" id="btnSalvarPreferencias" type="button">Salvar Configurações do Sistema</button>
+                        <div class="hint" id="prefHint">As preferências serão salvas no banco quando a tabela <b>usuarios</b> possuir uma coluna JSON de preferências/configurações. A página detecta automaticamente nomes comuns dessa coluna.</div>
+                    </div>
+                </section>
+            </div>
+        </section>
+    </main>
+
+    <div class="toast" id="toast"></div>
+    <div class="loading-cover" id="loadingCover"><div class="loading-box"><div class="spinner"></div> Carregando dados do usuário...</div></div>
+
+    <script>
+        // =============================================================
+        // SUPABASE - mesmas credenciais públicas (anon) do menu atual
+        // IMPORTANTE: nunca use SERVICE_ROLE no HTML do navegador.
+        // =============================================================
+        const SUPABASE_URL = 'https://bpvijatnsluwsgnzklrd.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwdmlqYXRuc2x1d3NnbnprbHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MzkxNDMsImV4cCI6MjEwMjQxNTE0M30.uvyfm9mgl6MON0v75CwfGzNz6FBqw58uzR4ZcRAOLNQ';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const $ = (id) => document.getElementById(id);
+        let usuarioBanco = null;
+        let colunaPreferencias = null;
+        let colunaAvatar = null;
+        let timerPerfil = null;
+        let timerPrefs = null;
+        let gravandoPerfil = false;
+        let gravandoPrefs = false;
+        let toastTimer = null;
+
+        const CAMPOS = {
+            nome: ['nome', 'nome_completo', 'nomeCompleto'],
+            nomeGuerra: ['nome_guerra', 'nome_de_guerra', 'nomeGuerra'],
+            patente: ['patente', 'posto_graduacao', 'posto', 'graduacao'],
+            secao: ['secao', 'secao_atendida'],
+            posicao: ['posicao', 'posicao_executiva', 'funcao']
+        };
+        const PREF_CANDIDATES = ['preferencias', 'configuracoes', 'preferencias_visuais', 'config'];
+        const AVATAR_CANDIDATES = ['avatar', 'avatar_url', 'icone', 'foto_url'];
+
+        function resolverColuna(candidatos) {
+            if (!usuarioBanco) return null;
+            return candidatos.find(nome => Object.prototype.hasOwnProperty.call(usuarioBanco, nome)) || null;
+        }
+
+        function valorCampo(chave, fallback='') {
+            const col = resolverColuna(CAMPOS[chave]);
+            if (col && usuarioBanco[col] !== null && usuarioBanco[col] !== undefined) return usuarioBanco[col];
+            return fallback;
+        }
+
+        function selecionarOuAdicionar(select, valor) {
+            if (valor === null || valor === undefined || valor === '') return;
+            const str = String(valor);
+            let existe = Array.from(select.options).some(o => o.value === str || o.text === str);
+            if (!existe) select.add(new Option(str, str));
+            select.value = str;
+        }
+
+        function escapeText(v) { return String(v ?? '').trim(); }
+
+        function mostrarToast(msg, erro=false) {
+            const t = $('toast');
+            t.textContent = msg;
+            t.className = 'toast show' + (erro ? ' error' : '');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => t.className = 'toast', 2800);
+        }
+
+        function setStatus(tipo, texto) {
+            const el = $('saveStatus');
+            el.className = 'status-strip' + (tipo ? ' ' + tipo : '');
+            $('statusText').textContent = texto;
+            $('statusTime').textContent = tipo === 'saved' ? 'Atualizado às ' + new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}) : '';
+        }
+
+        function avatarInicial() {
+            const ng = escapeText($('nomeGuerra').value) || escapeText($('nomeCompleto').value) || 'U';
+            return ng.charAt(0).toUpperCase();
+        }
+
+        function renderAvatar(valor) {
+            const destinos = [$('avatarLarge'), $('miniAvatar'), $('topAvatar')];
+            destinos.forEach(el => {
+                el.innerHTML = '';
+                if (valor && /^data:image\//.test(valor)) {
+                    const img = new Image();
+                    img.src = valor;
+                    img.alt = 'Avatar';
+                    el.appendChild(img);
+                } else if (valor && /^https?:\/\//.test(valor)) {
+                    const img = new Image();
+                    img.src = valor;
+                    img.alt = 'Avatar';
+                    el.appendChild(img);
+                } else {
+                    el.textContent = avatarInicial();
+                }
+            });
+        }
+
+        function atualizarResumoLateral() {
+            const nome = `${escapeText($('patente').value)} ${escapeText($('nomeGuerra').value)}`.trim() || escapeText($('nomeCompleto').value) || 'Usuário';
+            $('miniNome').textContent = nome;
+            $('miniDetalhes').textContent = `${escapeText($('secao').value) || '-'} - ${escapeText($('posicao').value) || '-'}`;
+            if (!colunaAvatar || !usuarioBanco?.[colunaAvatar]) renderAvatar(null);
+        }
+
+        function prefsDaTela() {
+            return {
+                tema: $('tema').value,
+                sidebar: {
+                    quadro: $('prefQuadro').checked,
+                    minhas: $('prefMinhas').checked,
+                    calendario: $('prefCalendario').checked,
+                    relatorios: $('prefRelatorios').checked,
+                    usuarios: $('prefUsuarios').checked
+                }
+            };
+        }
+
+        function aplicarPreferencias(prefs) {
+            const p = prefs || {};
+            const sidebar = p.sidebar || {};
+            $('tema').value = p.tema || 'militar';
+            $('prefQuadro').checked = sidebar.quadro !== false;
+            $('prefMinhas').checked = sidebar.minhas !== false;
+            $('prefCalendario').checked = sidebar.calendario !== false;
+            $('prefRelatorios').checked = sidebar.relatorios !== false;
+            $('prefUsuarios').checked = sidebar.usuarios !== false;
+            aplicarTema();
+            aplicarSidebar();
+        }
+
+        function aplicarTema() {
+            const tema = $('tema').value;
+            document.body.dataset.theme = tema === 'dark' ? 'dark' : (tema === 'light' ? 'light' : 'militar');
+        }
+
+        function aplicarSidebar() {
+            const p = prefsDaTela().sidebar;
+            document.querySelector('[data-pref-item="quadro"]').style.display = p.quadro ? '' : 'none';
+            document.querySelector('[data-pref-item="minhas"]').style.display = p.minhas ? '' : 'none';
+            document.querySelector('[data-pref-item="calendario"]').style.display = p.calendario ? '' : 'none';
+            document.querySelector('[data-pref-item="relatorios"]').style.display = p.relatorios ? '' : 'none';
+            document.querySelector('[data-pref-item="usuarios"]').style.display = p.usuarios ? '' : 'none';
+        }
+
+        async function carregarUsuario() {
+            try {
+                setStatus('', 'Buscando seu perfil no banco...');
+                const { data, error } = await supabaseClient
+                    .from('usuarios')
+                    .select('*')
+                    .eq('id', usuarioLogado.id)
+                    .single();
+
+                if (error) throw error;
+                if (!data) throw new Error('Usuário não encontrado no banco.');
+                usuarioBanco = data;
+
+                $('nomeCompleto').value = valorCampo('nome', usuarioLogado.nome || '');
+                $('nomeGuerra').value = valorCampo('nomeGuerra', usuarioLogado.nome_guerra || '');
+                selecionarOuAdicionar($('patente'), valorCampo('patente', usuarioLogado.patente || 'Soldado'));
+                selecionarOuAdicionar($('secao'), valorCampo('secao', usuarioLogado.secao || 'S3'));
+                selecionarOuAdicionar($('posicao'), valorCampo('posicao', usuarioLogado.posicao || 'Auxiliar'));
+
+                colunaPreferencias = PREF_CANDIDATES.find(c => Object.prototype.hasOwnProperty.call(usuarioBanco, c)) || null;
+                colunaAvatar = AVATAR_CANDIDATES.find(c => Object.prototype.hasOwnProperty.call(usuarioBanco, c)) || null;
+
+                let prefs = null;
+                if (colunaPreferencias && usuarioBanco[colunaPreferencias]) {
+                    const raw = usuarioBanco[colunaPreferencias];
+                    if (typeof raw === 'string') {
+                        try { prefs = JSON.parse(raw); } catch (_) { prefs = null; }
+                    } else if (typeof raw === 'object') prefs = raw;
+                }
+                if (!prefs) {
+                    try { prefs = JSON.parse(localStorage.getItem(`prefs_usuario_${usuarioLogado.id}`) || 'null'); } catch (_) {}
+                }
+                aplicarPreferencias(prefs || {});
+
+                let avatar = colunaAvatar ? usuarioBanco[colunaAvatar] : null;
+                if (!avatar) avatar = localStorage.getItem(`avatar_usuario_${usuarioLogado.id}`);
+                renderAvatar(avatar);
+                atualizarResumoLateral();
+
+                if (!colunaPreferencias) {
+                    $('prefHint').classList.add('warning');
+                    $('prefHint').innerHTML = 'Seu perfil já salva no banco automaticamente. Para salvar também estas preferências visuais no banco, adicione à tabela <b>usuarios</b> uma coluna JSON/JSONB chamada <b>preferencias</b>. Enquanto ela não existir, as preferências ficam salvas neste dispositivo.';
+                } else {
+                    $('prefHint').innerHTML = `Preferências vinculadas ao seu usuário e gravadas automaticamente na coluna <b>${colunaPreferencias}</b> da tabela <b>usuarios</b>.`;
+                }
+
+                setStatus('saved', 'Perfil sincronizado com o banco.');
+            } catch (err) {
+                console.error(err);
+                setStatus('error', 'Erro ao carregar o usuário: ' + err.message);
+                mostrarToast('Não foi possível carregar seus dados do banco.', true);
+            } finally {
+                $('loadingCover').style.display = 'none';
+            }
+        }
+
+        function montarPayloadPerfil() {
+            const payload = {};
+            const mapa = [
+                ['nome', $('nomeCompleto').value.trim()],
+                ['nomeGuerra', $('nomeGuerra').value.trim()],
+                ['patente', $('patente').value],
+                ['secao', $('secao').value],
+                ['posicao', $('posicao').value]
+            ];
+            mapa.forEach(([chave, valor]) => {
+                const col = resolverColuna(CAMPOS[chave]);
+                if (col) payload[col] = valor;
+            });
+            return payload;
+        }
+
+        async function salvarPerfil(manual=false) {
+            if (!usuarioBanco || gravandoPerfil) return;
+            const payload = montarPayloadPerfil();
+            if (Object.keys(payload).length === 0) {
+                setStatus('error', 'Nenhuma coluna compatível encontrada na tabela usuarios.');
+                return;
+            }
+
+            gravandoPerfil = true;
+            $('btnSalvarPerfil').disabled = true;
+            setStatus('saving', 'Salvando alterações do perfil no banco...');
+
+            try {
+                const { error } = await supabaseClient
+                    .from('usuarios')
+                    .update(payload)
+                    .eq('id', usuarioLogado.id);
+                if (error) throw error;
+
+                usuarioBanco = { ...usuarioBanco, ...payload };
+                const atualizadoLocal = {
+                    ...usuarioLogado,
+                    nome: $('nomeCompleto').value.trim(),
+                    nome_guerra: $('nomeGuerra').value.trim(),
+                    patente: $('patente').value,
+                    secao: $('secao').value,
+                    posicao: $('posicao').value
+                };
+                localStorage.setItem('usuarioLogado', JSON.stringify(atualizadoLocal));
+                Object.assign(usuarioLogado, atualizadoLocal);
+
+                atualizarResumoLateral();
+                setStatus('saved', 'Alterações salvas automaticamente no banco.');
+                if (manual) mostrarToast('Perfil atualizado no banco com sucesso.');
+            } catch (err) {
+                console.error(err);
+                setStatus('error', 'Erro ao salvar perfil: ' + err.message);
+                mostrarToast('Erro ao atualizar o perfil no banco.', true);
+            } finally {
+                gravandoPerfil = false;
+                $('btnSalvarPerfil').disabled = false;
+            }
+        }
+
+        function agendarSalvarPerfil() {
+            atualizarResumoLateral();
+            setStatus('saving', 'Alteração detectada. Salvando automaticamente...');
+            clearTimeout(timerPerfil);
+            timerPerfil = setTimeout(() => salvarPerfil(false), 650);
+        }
+
+        async function salvarPreferencias(manual=false) {
+            if (!usuarioBanco || gravandoPrefs) return;
+            const prefs = prefsDaTela();
+            localStorage.setItem(`prefs_usuario_${usuarioLogado.id}`, JSON.stringify(prefs));
+            aplicarTema();
+            aplicarSidebar();
+
+            if (!colunaPreferencias) {
+                if (manual) mostrarToast('Preferências salvas neste dispositivo. Falta a coluna JSONB no banco.');
+                return;
+            }
+
+            gravandoPrefs = true;
+            setStatus('saving', 'Salvando preferências no banco...');
+            try {
+                const { error } = await supabaseClient
+                    .from('usuarios')
+                    .update({ [colunaPreferencias]: prefs })
+                    .eq('id', usuarioLogado.id);
+                if (error) throw error;
+                usuarioBanco[colunaPreferencias] = prefs;
+                setStatus('saved', 'Preferências salvas automaticamente no banco.');
+                if (manual) mostrarToast('Configurações do sistema atualizadas.');
+            } catch (err) {
+                console.error(err);
+                setStatus('error', 'Erro ao salvar preferências: ' + err.message);
+                mostrarToast('Não foi possível salvar as preferências no banco.', true);
+            } finally {
+                gravandoPrefs = false;
+            }
+        }
+
+        function agendarSalvarPrefs() {
+            aplicarTema();
+            aplicarSidebar();
+            clearTimeout(timerPrefs);
+            timerPrefs = setTimeout(() => salvarPreferencias(false), 500);
+        }
+
+        function redimensionarImagem(file, max=160, qualidade=.82) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onerror = reject;
+                reader.onload = () => {
+                    const img = new Image();
+                    img.onerror = reject;
+                    img.onload = () => {
+                        const ratio = Math.min(max / img.width, max / img.height, 1);
+                        const w = Math.max(1, Math.round(img.width * ratio));
+                        const h = Math.max(1, Math.round(img.height * ratio));
+                        const canvas = document.createElement('canvas');
+                        canvas.width = w; canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+                        resolve(canvas.toDataURL('image/jpeg', qualidade));
+                    };
+                    img.src = reader.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function alterarAvatar(file) {
+            if (!file || !file.type.startsWith('image/')) return;
+            try {
+                setStatus('saving', 'Processando novo ícone...');
+                const dataUrl = await redimensionarImagem(file);
+                renderAvatar(dataUrl);
+                localStorage.setItem(`avatar_usuario_${usuarioLogado.id}`, dataUrl);
+
+                if (colunaAvatar) {
+                    const { error } = await supabaseClient
+                        .from('usuarios')
+                        .update({ [colunaAvatar]: dataUrl })
+                        .eq('id', usuarioLogado.id);
+                    if (error) throw error;
+                    usuarioBanco[colunaAvatar] = dataUrl;
+                    setStatus('saved', 'Ícone salvo no banco.');
+                    mostrarToast('Ícone atualizado com sucesso.');
+                } else {
+                    setStatus('saved', 'Ícone alterado neste dispositivo.');
+                    mostrarToast('Ícone salvo localmente. Para banco, adicione uma coluna avatar/avatar_url em usuarios.');
+                }
+            } catch (err) {
+                console.error(err);
+                setStatus('error', 'Erro ao salvar o ícone: ' + err.message);
+                mostrarToast('Erro ao salvar o ícone.', true);
+            }
+        }
+
+        // Eventos do perfil: autosave
+        ['nomeCompleto', 'nomeGuerra'].forEach(id => $(id).addEventListener('input', agendarSalvarPerfil));
+        ['patente', 'secao', 'posicao'].forEach(id => $(id).addEventListener('change', agendarSalvarPerfil));
+        $('btnSalvarPerfil').addEventListener('click', () => salvarPerfil(true));
+
+        // Preferências
+        ['tema', 'prefQuadro', 'prefMinhas', 'prefCalendario', 'prefRelatorios', 'prefUsuarios']
+            .forEach(id => $(id).addEventListener('change', agendarSalvarPrefs));
+        $('btnSalvarPreferencias').addEventListener('click', () => salvarPreferencias(true));
+
+        // Avatar
+        $('btnAvatar').addEventListener('click', () => $('avatarInput').click());
+        $('avatarInput').addEventListener('change', e => alterarAvatar(e.target.files?.[0]));
+
+        // Menu mobile
+        $('menuToggle').addEventListener('click', () => $('sidebar').classList.toggle('open'));
+        document.addEventListener('click', e => {
+            if (window.innerWidth <= 900 && $('sidebar').classList.contains('open') && !e.target.closest('#sidebar') && !e.target.closest('#menuToggle')) {
+                $('sidebar').classList.remove('open');
+            }
+        });
+
+        // Logout
+        $('btnSair').addEventListener('click', () => {
+            localStorage.removeItem('usuarioLogado');
+            window.location.href = 'index.html';
+        });
+
+        // Inicialização
+        carregarUsuario();
+    </script>
+</body>
+</html>
