@@ -135,6 +135,16 @@
                             <input id="nomeGuerra" type="text">
                         </div>
 
+                        <div class="field">
+                            <label for="cpf">CPF de Login</label>
+                            <input id="cpf" type="text" inputmode="numeric" maxlength="14"
+                                   autocomplete="off" placeholder="000.000.000-00">
+                            <div class="hint">
+                                O CPF é usado no login. Pode ser um CPF provisório/fake, desde que tenha 11 dígitos e não esteja cadastrado em outra conta.
+                                Depois de alterar, o próximo login deve usar o novo CPF.
+                            </div>
+                        </div>
+
                         <div class="two-col">
                             <div class="field">
                                 <label for="telefone">Telefone</label>
@@ -244,10 +254,12 @@
         let gravandoPerfil = false;
         let gravandoPrefs = false;
         let toastTimer = null;
+        let cpfBancoOriginal = '';
 
         const CAMPOS = {
             nome: ['nome', 'nome_completo', 'nomeCompleto'],
             nomeGuerra: ['nome_guerra', 'nome_de_guerra', 'nomeGuerra'],
+            cpf: ['cpf'],
             patente: ['patente', 'posto_graduacao', 'posto', 'graduacao'],
             secao: ['secao', 'secao_atendida'],
             posicao: ['posicao', 'posicao_executiva', 'funcao'],
@@ -283,6 +295,50 @@
         function usuarioEhComandante(u) { return normalizarSecaoPermissao(u?.secao) === 'comandante'; }
 
 
+        function cpfSomenteDigitos(valor) {
+            return String(valor ?? '').replace(/\D/g, '').slice(0, 11);
+        }
+
+        function formatarCpfConfiguracoes(valor) {
+            const n = cpfSomenteDigitos(valor);
+            if (!n) return '';
+            let s = n;
+            if (s.length > 3) s = s.slice(0,3) + '.' + s.slice(3);
+            if (n.length > 6) s = n.slice(0,3) + '.' + n.slice(3,6) + '.' + n.slice(6);
+            if (n.length > 9) s = n.slice(0,3) + '.' + n.slice(3,6) + '.' + n.slice(6,9) + '-' + n.slice(9,11);
+            return s;
+        }
+
+        function aplicarMascaraCpfConfiguracoes() {
+            $('cpf').value = formatarCpfConfiguracoes($('cpf').value);
+        }
+
+        async function validarCpfParaSalvar(cpf) {
+            const limpo = cpfSomenteDigitos(cpf);
+
+            if (limpo.length !== 11) {
+                throw new Error('O CPF de login precisa ter exatamente 11 dígitos.');
+            }
+
+            const atual = cpfSomenteDigitos(cpfBancoOriginal);
+            if (limpo === atual) return limpo;
+
+            const { data, error } = await supabaseClient
+                .from('usuarios')
+                .select('id,nome_guerra')
+                .eq('cpf', limpo)
+                .neq('id', usuarioLogado.id)
+                .limit(1);
+
+            if (error) throw error;
+
+            if (Array.isArray(data) && data.length) {
+                throw new Error('Este CPF já está cadastrado em outra conta.');
+            }
+
+            return limpo;
+        }
+
         function normalizarPatenteConfiguracoes(valor) {
             const original = escapeText(valor);
             if (!original) return '';
@@ -291,6 +347,8 @@
                 .toLowerCase().replace(/\./g, '').replace(/\s+/g, ' ').trim();
 
             const mapa = {
+                'sd ev': 'Sd Ev', 'sdev': 'Sd Ev', 'sd ev ': 'Sd Ev',
+                'soldado ev': 'Sd Ev', 'soldado do efetivo variável': 'Sd Ev',
                 'soldado': 'Sd', 'sd': 'Sd',
                 'cabo': 'Cb', 'cb': 'Cb',
                 '3 sgt': '3º Sgt', '3º sgt': '3º Sgt', '3o sgt': '3º Sgt', 'terceiro sargento': '3º Sgt',
@@ -436,6 +494,8 @@
 
                 $('nomeCompleto').value = valorCampo('nome', usuarioLogado.nome || '');
                 $('nomeGuerra').value = valorCampo('nomeGuerra', usuarioLogado.nome_guerra || '');
+                cpfBancoOriginal = cpfSomenteDigitos(valorCampo('cpf', usuarioLogado.cpf || ''));
+                $('cpf').value = formatarCpfConfiguracoes(cpfBancoOriginal);
                 $('telefone').value = valorCampo('telefone', usuarioLogado.telefone || '');
                 $('email').value = valorCampo('email', usuarioLogado.email || '');
                 selecionarOuAdicionar($('patente'), normalizarPatenteConfiguracoes(valorCampo('patente', usuarioLogado.patente || 'Sd')));
@@ -489,7 +549,7 @@
             }
         }
 
-        function montarPayloadPerfil() {
+        function montarPayloadPerfil(incluirCpf=false) {
             const payload = {};
             const mapa = [
                 ['nome', $('nomeCompleto').value.trim()],
@@ -498,16 +558,37 @@
                 ['email', $('email').value.trim()],
                 ['patente', $('patente').value]
             ];
+
             mapa.forEach(([chave, valor]) => {
                 const col = resolverColuna(CAMPOS[chave]);
                 if (col) payload[col] = valor;
             });
+
+            if (incluirCpf) {
+                const colunaCpf = resolverColuna(CAMPOS.cpf);
+                if (colunaCpf) payload[colunaCpf] = cpfSomenteDigitos($('cpf').value);
+            }
+
             return payload;
         }
 
-        async function salvarPerfil(manual=false) {
+        async function salvarPerfil(manual=false, incluirCpf=false) {
             if (!usuarioBanco || gravandoPerfil) return;
-            const payload = montarPayloadPerfil();
+
+            let cpfValidado = null;
+            if (incluirCpf) {
+                try {
+                    cpfValidado = await validarCpfParaSalvar($('cpf').value);
+                    $('cpf').value = formatarCpfConfiguracoes(cpfValidado);
+                } catch (err) {
+                    setStatus('error', err.message);
+                    mostrarToast(err.message, true);
+                    $('cpf').focus();
+                    return;
+                }
+            }
+
+            const payload = montarPayloadPerfil(incluirCpf);
             if (Object.keys(payload).length === 0) {
                 setStatus('error', 'Nenhuma coluna compatível encontrada na tabela usuarios.');
                 return;
@@ -525,6 +606,11 @@
                 if (error) throw error;
 
                 usuarioBanco = { ...usuarioBanco, ...payload };
+
+                if (incluirCpf && cpfValidado) {
+                    cpfBancoOriginal = cpfValidado;
+                }
+
                 const atualizadoLocal = {
                     ...usuarioLogado,
                     nome: $('nomeCompleto').value.trim(),
@@ -532,6 +618,7 @@
                     telefone: $('telefone').value.trim(),
                     email: $('email').value.trim(),
                     patente: $('patente').value,
+                    cpf: incluirCpf && cpfValidado ? cpfValidado : (cpfSomenteDigitos(usuarioLogado.cpf || cpfBancoOriginal) || cpfBancoOriginal),
                     secao: perfilAtivoConfiguracoes.secao || valorCampo('secao', usuarioLogado.secao || ''),
                     posicao: perfilAtivoConfiguracoes.posicao || $('posicao').value,
                     perfil_id: perfilAtivoConfiguracoes.perfil_id ?? usuarioLogado.perfil_id ?? null
@@ -541,7 +628,11 @@
 
                 atualizarResumoLateral();
                 setStatus('saved', 'Alterações salvas automaticamente no banco.');
-                if (manual) mostrarToast('Perfil atualizado no banco com sucesso.');
+                if (manual) {
+                    mostrarToast(incluirCpf
+                        ? 'Perfil e CPF de login atualizados com sucesso.'
+                        : 'Perfil atualizado no banco com sucesso.');
+                }
             } catch (err) {
                 console.error(err);
                 setStatus('error', 'Erro ao salvar perfil: ' + err.message);
@@ -652,7 +743,12 @@
         // Eventos do perfil: autosave
         ['nomeCompleto', 'nomeGuerra', 'telefone', 'email'].forEach(id => $(id).addEventListener('input', agendarSalvarPerfil));
         ['patente'].forEach(id => $(id).addEventListener('change', agendarSalvarPerfil));
-        $('btnSalvarPerfil').addEventListener('click', () => salvarPerfil(true));
+
+        $('cpf').addEventListener('input', aplicarMascaraCpfConfiguracoes);
+        $('cpf').addEventListener('change', () => salvarPerfil(true, true));
+
+        // O botão salva todos os campos e também confirma eventual alteração do CPF.
+        $('btnSalvarPerfil').addEventListener('click', () => salvarPerfil(true, true));
 
         // Preferências
         ['prefQuadro', 'prefMinhas', 'prefCalendario', 'prefRelatorios', 'prefUsuarios']
