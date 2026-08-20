@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calendário - 26º Pel PE Mec</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="perfis.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -565,25 +566,27 @@
         }
 
         async function carregarPerfilUsuarioDoBanco() {
+            let base = { ...usuarioLogado };
             try {
-                let { data, error } = await supabaseClient
+                const { data, error } = await supabaseClient
                     .from('usuarios')
-                    .select('id,nome_guerra,patente,secao,posicao,avatar')
+                    .select('*')
                     .eq('id', usuarioLogado.id)
                     .limit(1);
-                if (error) {
-                    const fallback = await supabaseClient.from('usuarios')
-                        .select('id,nome_guerra,patente,secao,posicao')
-                        .eq('id', usuarioLogado.id).limit(1);
-                    data = fallback.data; error = fallback.error;
-                }
                 if (error) throw error;
-                if (Array.isArray(data) && data[0]) {
-                    usuarioPerfilAtual = { ...usuarioLogado, ...data[0] };
-                    localStorage.setItem('usuarioLogado', JSON.stringify(usuarioPerfilAtual));
-                }
+                if (data && data[0]) base = { ...usuarioLogado, ...data[0] };
             } catch (err) {
-                console.warn('Não foi possível atualizar o perfil:', err.message);
+                console.warn('Não foi possível atualizar os dados do usuário:', err.message);
+            }
+
+            try {
+                const estado = window.Perfis26
+                    ? await Perfis26.carregar(supabaseClient, base)
+                    : { usuario: base };
+                usuarioPerfilAtual = estado.usuario;
+            } catch (err) {
+                usuarioPerfilAtual = base;
+                console.warn('Não foi possível aplicar o perfil ativo:', err.message);
             }
             atualizarPerfilNaTela();
         }

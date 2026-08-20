@@ -6,6 +6,7 @@
     <title>Relatórios - 26º Pel PE Mec</title>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="perfis.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 
     <style>
@@ -345,9 +346,10 @@
         }
 
         async function carregarPerfilUsuario() {
+            let base = { ...usuarioLogado };
             try {
                 let { data, error } = await supabaseClient.from('usuarios')
-                    .select('id,nome_guerra,patente,secao,posicao,avatar')
+                    .select('id,nome_completo,nome_guerra,patente,secao,posicao,avatar')
                     .eq('id', usuarioLogado.id)
                     .limit(1);
                 if (error) {
@@ -357,13 +359,21 @@
                     data = fallback.data; error = fallback.error;
                 }
                 if (error) throw error;
-                if (data && data[0]) {
-                    usuarioPerfilAtual = { ...usuarioLogado, ...data[0] };
-                    localStorage.setItem('usuarioLogado', JSON.stringify(usuarioPerfilAtual));
-                }
+                if (data && data[0]) base = { ...usuarioLogado, ...data[0] };
             } catch (err) {
-                console.warn('Não foi possível atualizar o perfil do usuário:', err.message);
+                console.warn('Não foi possível atualizar os dados do usuário:', err.message);
             }
+
+            try {
+                const estado = window.Perfis26
+                    ? await Perfis26.carregar(supabaseClient, base)
+                    : { usuario: base };
+                usuarioPerfilAtual = estado.usuario;
+            } catch (err) {
+                usuarioPerfilAtual = base;
+                console.warn('Não foi possível aplicar o perfil ativo:', err.message);
+            }
+
             privilegioGlobal = ehAdminOuComandante(usuarioPerfilAtual);
             atualizarPerfilNaTela();
             configurarEscopo();

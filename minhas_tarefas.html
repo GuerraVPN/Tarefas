@@ -7,6 +7,7 @@
 
     <!-- CDN DO SDK DO SUPABASE -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="perfis.js"></script>
 
     <style>
         * {
@@ -1728,6 +1729,7 @@
         atualizarPerfilNaTela();
 
         async function carregarPerfilUsuarioDoBanco() {
+            let base = { ...usuarioLogado };
             try {
                 const { data, error } = await supabaseClient
                     .from('usuarios')
@@ -1736,15 +1738,24 @@
                     .limit(1);
 
                 if (error) throw error;
-                if (Array.isArray(data) && data[0]) {
-                    usuarioPerfilAtual = { ...usuarioLogado, ...data[0] };
-                    localStorage.setItem('usuarioLogado', JSON.stringify(usuarioPerfilAtual));
-                    atualizarPerfilNaTela();
+                if (Array.isArray(data) && data[0]) base = { ...usuarioLogado, ...data[0] };
+            } catch (err) {
+                console.warn('Não foi possível atualizar os dados do usuário pelo banco:', err.message);
+            }
+
+            try {
+                const estado = window.Perfis26
+                    ? await Perfis26.carregar(supabaseClient, base)
+                    : { usuario: base, perfis: [], ativo: null, disponivel: false };
+                usuarioPerfilAtual = estado.usuario;
+                if (window.Perfis26) {
+                    Perfis26.renderizarDropdown(document.getElementById('userDropdown'), estado, usuarioPerfilAtual);
                 }
             } catch (err) {
-                console.warn('Não foi possível atualizar o perfil do usuário pelo banco:', err.message);
-                usuarioPerfilAtual = { ...usuarioLogado };
+                console.warn('Não foi possível aplicar o perfil ativo:', err.message);
+                usuarioPerfilAtual = base;
             }
+            atualizarPerfilNaTela();
         }
 
         function normalizarIdentidade(valor) {

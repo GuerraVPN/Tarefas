@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Usuários - 26º Pel PE Mec</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="perfis.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <link rel="stylesheet" href="notificacoes.css">
   <style>
@@ -65,6 +66,12 @@
     .toast.show{opacity:1;transform:none}.toast.error{background:#991b1b}
     @media(max-width:1180px){.layout{grid-template-columns:1fr}.right-stack{display:grid;grid-template-columns:1fr 1fr}.user-row{grid-template-columns:minmax(200px,1fr) 120px minmax(170px,.8fr) 190px}}
     @media(max-width:800px){body{display:block}.sidebar{width:100%;min-height:auto}.nav{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}.nav li{margin:0}.side-user{display:none}.topbar{padding:0 14px}.content{padding:16px}.page-head,.toolbar{flex-direction:column;align-items:stretch}.head-actions{align-items:stretch;flex-direction:column}.search,.section-filter{max-width:none;width:100%}.right-stack{display:flex}.user-row{display:block}.user-main{margin-bottom:11px}.cell{margin:8px 0}.cell-label{display:block}.actions{justify-content:flex-start;margin-top:10px}.layout{display:block}.right-stack{margin-top:16px}.detail{grid-template-columns:105px 1fr}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}}
+  
+    .profile-item-card{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #e5e7eb;border-radius:10px;padding:12px 13px;background:#f9fafb}
+    .profile-item-main{min-width:0}.profile-item-title{font-weight:800;font-size:14px;color:#1f2937}.profile-item-meta{font-size:11px;color:#6b7280;margin-top:3px}
+    .profile-item-actions{display:flex;gap:7px;flex-wrap:wrap}.profile-pill{display:inline-flex;align-items:center;border-radius:999px;padding:3px 8px;font-size:10px;font-weight:800;background:#dcfce7;color:#166534;margin-left:6px}
+    .profile-pill.admin{background:#fef3c7;color:#92400e}.btn.small{padding:7px 9px;font-size:11px}
+
   </style>
 </head>
 <body>
@@ -125,13 +132,13 @@
         <div class="field"><label>CPF *</label><input id="formCpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" required></div>
         <div class="field"><label>Posto / Graduação *</label>
           <select id="formPatente" required>
-            <option value="Sd">Sd</option><option value="Cb">Cb</option><option value="3º Sgt">3º Sgt</option>
+            <option value="Sd Ev">Sd Ev</option><option value="Sd">Sd</option><option value="Cb">Cb</option><option value="3º Sgt">3º Sgt</option>
             <option value="2º Sgt">2º Sgt</option><option value="1º Sgt">1º Sgt</option><option value="ST">ST</option>
             <option value="Asp">Asp</option><option value="2º Ten">2º Ten</option><option value="1º Ten">1º Ten</option>
             <option value="Cap">Cap</option><option value="Maj">Maj</option><option value="Ten Cel">Ten Cel</option><option value="Cel">Cel</option>
           </select>
         </div>
-        <div class="field"><label>Seção *</label>
+        <div class="field"><label>Perfil principal — Seção *</label>
           <select id="formSecao" required>
             <option>S1</option><option>S2</option><option>S3</option><option>S4</option><option>Fiscalização</option>
             <option>Pagamento</option><option>SALC</option><option>Garagem</option><option>ResMat</option>
@@ -139,7 +146,7 @@
           </select>
           <div id="sectionNotice" class="protected" style="display:none;margin-top:7px"></div>
         </div>
-        <div class="field"><label>Posição Executiva</label>
+        <div class="field"><label>Perfil principal — Posição</label>
           <select id="formPosicao"><option value="">Selecione...</option><option>Auxiliar</option><option>Chefe</option><option>Comandante</option></select>
         </div>
         <div class="field"><label>Telefone</label><input id="formTelefone" type="tel"></div>
@@ -148,6 +155,41 @@
         <div class="field" id="createPasswordConfirmField"><label>Confirmar senha *</label><input id="formConfirmarSenha" type="password" minlength="6" autocomplete="new-password"></div>
       </div>
       <div class="modal-actions"><button type="button" class="btn" data-close="userModal">Cancelar</button><button type="submit" class="btn green">Salvar usuário</button></div>
+    </form>
+  </div>
+</div>
+
+
+<div id="profilesModal" class="modal-bg">
+  <div class="modal" style="max-width:760px">
+    <div class="modal-head"><h3 id="profilesModalTitle">Perfis do usuário</h3><button class="close" data-close="profilesModal">×</button></div>
+    <div id="profilesList" style="display:grid;gap:10px;margin-bottom:18px"></div>
+    <div class="protected" style="margin-bottom:14px">
+      Um usuário pode ter vários perfis. A graduação é única; cada perfil define a seção e a função utilizadas no sistema.
+    </div>
+    <form id="profileAddForm">
+      <input type="hidden" id="profileUserId">
+      <div class="form-grid">
+        <div class="field">
+          <label>Nova seção</label>
+          <select id="profileSecao" required>
+            <option>S1</option><option>S2</option><option>S3</option><option>S4</option>
+            <option>Fiscalização</option><option>Pagamento</option><option>SALC</option>
+            <option>Garagem</option><option>ResMat</option><option>ResArmt</option><option>Informática</option>
+            <option>Comandante</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Função neste perfil</label>
+          <select id="profilePosicao" required>
+            <option>Auxiliar</option><option>Chefe</option><option>Comandante</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn" data-close="profilesModal">Fechar</button>
+        <button type="submit" class="btn green"><i class="fa-solid fa-plus"></i> Adicionar perfil</button>
+      </div>
     </form>
   </div>
 </div>
@@ -176,7 +218,7 @@
   const cpfLimpo=v=>String(v??'').replace(/\D/g,'').slice(0,11);
   const cpfFormatado=v=>{const n=cpfLimpo(v);if(n.length!==11)return n||'-';return n.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4')};
 
-  let perfil={...usuarioLogado},usuarios=[],selecionado=null,toastTimer=null;
+  let perfil={...usuarioLogado},usuarios=[],selecionado=null,toastTimer=null,estadoPerfisAtual=null,usuarioPerfisModal=null,perfisModalLista=[];
 
   function secaoNorm(u){return norm(u?.secao)}
   function ehAdmin(u){return secaoNorm(u)==='admin'}
@@ -204,6 +246,12 @@
     return true;
   }
   function podeAlterarSenhaAlvo(u){return podeEditarAlvo(u)}
+  function podeGerenciarPerfisAlvo(u){
+    if(!u)return false;
+    if(ehAdmin(perfil))return true;
+    if(ehComandante(perfil))return !ehAdmin(u);
+    return false;
+  }
   function podeExcluirAlvo(u){
     if(!u||String(u.id)===String(perfil.id))return false;
     if(ehAdmin(perfil))return true;
@@ -226,11 +274,22 @@
   }
 
   async function carregarPerfil(){
+    let base={...usuarioLogado};
     const {data,error}=await supabaseClient.from('usuarios')
       .select('id,nome_completo,nome_guerra,cpf,patente,secao,posicao,telefone,email,avatar')
       .eq('id',usuarioLogado.id).single();
     if(error)console.warn(error.message);
-    if(data)perfil={...perfil,...data};
+    if(data)base={...base,...data};
+
+    try{
+      estadoPerfisAtual=window.Perfis26
+        ? await Perfis26.carregar(supabaseClient,base)
+        : {usuario:base,perfis:[],ativo:null,disponivel:false};
+      perfil=estadoPerfisAtual.usuario;
+    }catch(err){
+      console.warn('Erro ao aplicar perfil ativo:',err.message);
+      perfil=base;
+    }
 
     renderAvatarTopo();
     $('newUserBtn').style.display=podeCriarUsuario()?'inline-flex':'none';
@@ -238,7 +297,7 @@
     if(ehAdmin(perfil)) $('scopeLabel').textContent='Gestão geral de usuários — Admin';
     else if(ehComandante(perfil)) $('scopeLabel').textContent='Gestão geral de usuários — Comandante';
     else if(ehChefe(perfil)) $('scopeLabel').textContent=`Gestão da seção ${perfil.secao||'-'} — Chefe`;
-    else $('scopeLabel').textContent='Todos os usuários cadastrados';
+    else $('scopeLabel').textContent=`Perfil ativo: ${perfil.secao||'-'} — ${perfil.posicao||'-'}`;
   }
 
   async function carregarUsuarios(){
@@ -250,6 +309,17 @@
       return;
     }
     usuarios=data||[];
+
+    try{
+      const rp=await supabaseClient.from('usuario_perfis').select('usuario_id');
+      if(!rp.error){
+        const cont=new Map();
+        (rp.data||[]).forEach(x=>cont.set(String(x.usuario_id),(cont.get(String(x.usuario_id))||0)+1));
+        usuarios.forEach(u=>u._perfis_count=cont.get(String(u.id))||1);
+      }else usuarios.forEach(u=>u._perfis_count=1);
+    }catch(_){
+      usuarios.forEach(u=>u._perfis_count=1);
+    }
     renderLista();
   }
 
@@ -273,14 +343,15 @@
       const editar=podeEditarAlvo(u)?`<button class="icon-btn edit-btn" title="Editar usuário" data-id="${esc(u.id)}">✎</button>`:'';
       const senha=podeAlterarSenhaAlvo(u)?`<button class="icon-btn pass-btn" title="Alterar senha" data-id="${esc(u.id)}">🔑</button>`:'';
       const excluir=podeExcluirAlvo(u)?`<button class="icon-btn danger del-btn" title="Excluir usuário" data-id="${esc(u.id)}">🗑</button>`:'';
+      const perfisBtn=podeGerenciarPerfisAlvo(u)?`<button class="icon-btn profiles-btn" title="Gerenciar perfis" data-id="${esc(u.id)}">🪪</button>`:'';
       return `<div class="user-row ${selecionado&&String(selecionado.id)===String(u.id)?'selected':''}">
-        <div class="user-main">${avatarHtml(u)}<div><div class="user-name">${esc(nomeExibicao(u))}</div><div class="user-sub">${esc(secaoVisivel(u))} · ${esc(u.posicao||'Sem função')}</div></div></div>
+        <div class="user-main">${avatarHtml(u)}<div><div class="user-name">${esc(nomeExibicao(u))}</div><div class="user-sub">${esc(secaoVisivel(u))} · ${esc(u.posicao||'Sem função')} · ${Number(u._perfis_count||1)} perfil(is)</div></div></div>
         <div class="cell"><span class="cell-label">Função</span>${esc(u.posicao||'-')}</div>
         <div class="cell contact"><span class="cell-label">Contato</span><div>${esc(u.telefone||'Não informado')}</div><div>${esc(u.email||'Não informado')}</div></div>
         <div class="actions">
           <button class="icon-btn prop-btn" title="Propriedades" data-id="${esc(u.id)}">⚙</button>
           <button class="icon-btn msg-btn" title="Enviar mensagem" data-id="${esc(u.id)}">💬</button>
-          ${editar}${senha}${excluir}
+          ${perfisBtn}${editar}${senha}${excluir}
         </div>
       </div>`;
     }).join('');
@@ -417,6 +488,100 @@
     $('userModal').classList.add('show');
   }
 
+
+  async function carregarPerfisDoUsuario(usuarioId){
+    const {data,error}=await supabaseClient.from('usuario_perfis')
+      .select('id,usuario_id,secao,posicao,principal,ativo,criado_em')
+      .eq('usuario_id',usuarioId)
+      .order('principal',{ascending:false})
+      .order('id',{ascending:true});
+    if(error)throw error;
+    return data||[];
+  }
+
+  function renderPerfisModal(){
+    const box=$('profilesList');
+    if(!perfisModalLista.length){
+      box.innerHTML='<div class="empty">Nenhum perfil cadastrado. Execute o SQL 03 se esta conta for antiga.</div>';
+      return;
+    }
+    box.innerHTML=perfisModalLista.map(p=>{
+      const protegido=norm(p.secao)==='admin';
+      const comandanteSensivel=norm(p.secao)==='comandante'&&!ehAdmin(perfil);
+      const contaTemAdmin=perfisModalLista.some(x=>norm(x.secao)==='admin');
+      const principal=p.principal?'<span class="profile-pill">Principal</span>':'';
+      const admin=protegido?'<span class="profile-pill admin">Protegido</span>':'';
+      const podeExcluir=!protegido&&!comandanteSensivel&&perfisModalLista.length>1;
+      const podeTornarPrincipal=!p.principal&&!protegido&&!comandanteSensivel&&!(contaTemAdmin&&norm(p.secao)!=='admin');
+      return `<div class="profile-item-card">
+        <div class="profile-item-main">
+          <div class="profile-item-title">${esc(p.secao)} — ${esc(p.posicao)} ${principal}${admin}</div>
+          <div class="profile-item-meta">${p.principal?'Usado como perfil padrão do login clássico':'Perfil adicional'}</div>
+        </div>
+        <div class="profile-item-actions">
+          ${podeTornarPrincipal?`<button type="button" class="btn small principal-profile-btn" data-id="${esc(p.id)}">Tornar principal</button>`:''}
+          ${podeExcluir?`<button type="button" class="btn small red delete-profile-btn" data-id="${esc(p.id)}">Excluir</button>`:''}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  async function abrirPerfis(u){
+    if(!podeGerenciarPerfisAlvo(u))return toast('Você não possui permissão para gerenciar perfis deste usuário.',true);
+    usuarioPerfisModal=u;
+    $('profileUserId').value=u.id;
+    $('profilesModalTitle').textContent=`Perfis — ${nomeExibicao(u)}`;
+    $('profileAddForm').reset();
+
+    // Comandante não pode promover outro usuário a Comandante.
+    const opComandante=[...$('profileSecao').options].find(o=>norm(o.value)==='comandante');
+    if(opComandante)opComandante.disabled=!ehAdmin(perfil);
+
+    try{
+      perfisModalLista=await carregarPerfisDoUsuario(u.id);
+      renderPerfisModal();
+      $('profilesModal').classList.add('show');
+    }catch(err){
+      toast('Erro ao carregar perfis: '+err.message,true);
+    }
+  }
+
+  async function tornarPerfilPrincipal(perfilId){
+    if(!usuarioPerfisModal)return;
+    const alvo=perfisModalLista.find(p=>String(p.id)===String(perfilId));
+    if(!alvo)return;
+    if(norm(alvo.secao)==='comandante'&&!ehAdmin(perfil))return toast('Somente Admin pode alterar o perfil principal de Comandante.',true);
+    if(perfisModalLista.some(p=>norm(p.secao)==='admin')&&norm(alvo.secao)!=='admin'){
+      return toast('Em uma conta Admin, o perfil Admin deve permanecer principal.',true);
+    }
+    const {error}=await supabaseClient.rpc('definir_perfil_principal_usuario',{
+      p_usuario_id:Number(usuarioPerfisModal.id),
+      p_perfil_id:Number(perfilId)
+    });
+    if(error)return toast('Erro ao definir principal: '+error.message,true);
+    toast('Perfil principal atualizado.');
+    perfisModalLista=await carregarPerfisDoUsuario(usuarioPerfisModal.id);
+    renderPerfisModal();
+    await carregarUsuarios();
+  }
+
+  async function excluirPerfil(perfilId){
+    if(!usuarioPerfisModal)return;
+    const alvo=perfisModalLista.find(p=>String(p.id)===String(perfilId));
+    if(!alvo)return;
+    if(norm(alvo.secao)==='admin')return toast('O perfil Admin é protegido.',true);
+    if(norm(alvo.secao)==='comandante'&&!ehAdmin(perfil))return toast('Somente Admin pode remover um perfil Comandante.',true);
+    if(perfisModalLista.length<=1)return toast('O usuário precisa manter pelo menos um perfil.',true);
+    if(!confirm(`Excluir o perfil ${alvo.secao} — ${alvo.posicao}?`))return;
+
+    const {error}=await supabaseClient.from('usuario_perfis').delete().eq('id',perfilId);
+    if(error)return toast('Erro ao excluir perfil: '+error.message,true);
+    toast('Perfil excluído.');
+    perfisModalLista=await carregarPerfisDoUsuario(usuarioPerfisModal.id);
+    renderPerfisModal();
+    await carregarUsuarios();
+  }
+
   function abrirSenha(u){
     if(!podeAlterarSenhaAlvo(u))return toast('Você não possui permissão para alterar a senha deste usuário.',true);
     $('passwordForm').reset();$('passwordUserId').value=u.id;$('passwordModal').classList.add('show');
@@ -495,7 +660,42 @@
     await carregarUsuarios();
   });
 
-  $('passwordForm').addEventListener('submit',async e=>{
+  
+  $('profileAddForm').addEventListener('submit',async e=>{
+    e.preventDefault();
+    if(!usuarioPerfisModal||!podeGerenciarPerfisAlvo(usuarioPerfisModal))return toast('Ação não permitida.',true);
+
+    const secao=$('profileSecao').value;
+    let posicao=$('profilePosicao').value;
+
+    if(norm(secao)==='admin')return toast('Perfil Admin não pode ser criado pela interface.',true);
+    if(norm(secao)==='comandante'){
+      if(!ehAdmin(perfil))return toast('Somente Admin pode atribuir o perfil Comandante.',true);
+      posicao='Comandante';
+    }
+    if(norm(posicao)==='comandante'&&norm(secao)!=='comandante'){
+      return toast('A função Comandante deve usar a seção Comandante.',true);
+    }
+
+    const jaExiste=perfisModalLista.some(p=>norm(p.secao)===norm(secao)&&norm(p.posicao)===norm(posicao));
+    if(jaExiste)return toast('Este usuário já possui esse perfil.',true);
+
+    const {error}=await supabaseClient.from('usuario_perfis').insert([{
+      usuario_id:Number(usuarioPerfisModal.id),
+      secao,
+      posicao,
+      principal:false,
+      ativo:true
+    }]);
+    if(error)return toast('Erro ao adicionar perfil: '+error.message,true);
+
+    toast('Novo perfil adicionado.');
+    perfisModalLista=await carregarPerfisDoUsuario(usuarioPerfisModal.id);
+    renderPerfisModal();
+    await carregarUsuarios();
+  });
+
+$('passwordForm').addEventListener('submit',async e=>{
     e.preventDefault();
     const id=$('passwordUserId').value,u=encontrar(id);
     if(!u||!podeAlterarSenhaAlvo(u))return toast('Ação não permitida.',true);
@@ -513,17 +713,27 @@
 
   document.addEventListener('click',e=>{
     const c=e.target.closest('[data-close]');if(c)closeModal(c.dataset.close);
-    const p=e.target.closest('.prop-btn'),m=e.target.closest('.msg-btn'),ed=e.target.closest('.edit-btn'),pa=e.target.closest('.pass-btn'),de=e.target.closest('.del-btn');
-    for(const [el,fn] of [[p,abrirPropriedades],[m,abrirMensagem],[ed,abrirEditar],[pa,abrirSenha],[de,excluirUsuario]]){
+    const p=e.target.closest('.prop-btn'),m=e.target.closest('.msg-btn'),pr=e.target.closest('.profiles-btn'),ed=e.target.closest('.edit-btn'),pa=e.target.closest('.pass-btn'),de=e.target.closest('.del-btn');
+    for(const [el,fn] of [[p,abrirPropriedades],[m,abrirMensagem],[pr,abrirPerfis],[ed,abrirEditar],[pa,abrirSenha],[de,excluirUsuario]]){
       if(el){const u=encontrar(el.dataset.id);if(u)fn(u);break}
     }
   });
 
-  for(const id of ['userModal','passwordModal'])$(id).addEventListener('click',e=>{if(e.target.id===id)closeModal(id)});
+  document.addEventListener('click',e=>{
+    const pp=e.target.closest('.principal-profile-btn');
+    if(pp)tornarPerfilPrincipal(pp.dataset.id);
+    const dp=e.target.closest('.delete-profile-btn');
+    if(dp)excluirPerfil(dp.dataset.id);
+  });
+
+  for(const id of ['userModal','passwordModal','profilesModal'])$(id).addEventListener('click',e=>{if(e.target.id===id)closeModal(id)});
 
   $('formCpf').addEventListener('input',e=>aplicarMascaraCpf(e.target));
   $('formSecao').addEventListener('change',()=>{
     if(norm($('formSecao').value)==='comandante')$('formPosicao').value='Comandante';
+  });
+  $('profileSecao').addEventListener('change',()=>{
+    if(norm($('profileSecao').value)==='comandante')$('profilePosicao').value='Comandante';
   });
   $('newUserBtn').onclick=abrirNovo;
   $('searchInput').addEventListener('input',renderLista);

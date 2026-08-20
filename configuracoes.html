@@ -6,6 +6,7 @@
     <title>Configurações do Sistema - 26º Pel PE Mec</title>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="perfis.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -174,7 +175,7 @@
                                     <option>Garagem</option><option>ResMat</option><option>ResArmt</option><option>Informática</option>
                                     <option value="Comandante">Comandante</option>
                                 </select>
-                                <div class="hint">A seção é definida pela gestão. Usuários da seção Comandante veem esta informação; a seção administrativa não é exibida na interface.</div>
+                                <div class="hint">A seção e a função vêm do perfil ativo. Para trocar de perfil, clique no rosto no menu principal.</div>
                             </div>
                             <div class="field">
                                 <label for="posicao">Posição Executiva</label>
@@ -234,6 +235,8 @@
 
         const $ = (id) => document.getElementById(id);
         let usuarioBanco = null;
+        let perfilAtivoConfiguracoes = { ...usuarioLogado };
+        let estadoPerfisConfiguracoes = null;
         let colunaPreferencias = null;
         let colunaAvatar = null;
         let timerPerfil = null;
@@ -363,8 +366,9 @@
         function atualizarResumoLateral() {
             const nome = `${escapeText($('patente').value)} ${escapeText($('nomeGuerra').value)}`.trim() || escapeText($('nomeCompleto').value) || 'Usuário';
             $('miniNome').textContent = nome;
-            const secaoPerfil = usuarioEhAdmin(usuarioBanco || usuarioLogado) ? 'Acesso administrativo' : (escapeText(valorCampo('secao', usuarioLogado.secao || '')) || '-');
-            $('miniDetalhes').textContent = `${secaoPerfil}${usuarioEhAdmin(usuarioBanco || usuarioLogado) ? '' : ' - ' + (escapeText($('posicao').value) || '-')}`;
+            const basePerfil = perfilAtivoConfiguracoes || usuarioBanco || usuarioLogado;
+            const secaoPerfil = usuarioEhAdmin(basePerfil) ? 'Acesso administrativo' : (escapeText(basePerfil.secao || valorCampo('secao', usuarioLogado.secao || '')) || '-');
+            $('miniDetalhes').textContent = `${secaoPerfil}${usuarioEhAdmin(basePerfil) ? '' : ' - ' + (escapeText(basePerfil.posicao || $('posicao').value) || '-')}`;
             if (!colunaAvatar || !usuarioBanco?.[colunaAvatar]) renderAvatar(null);
         }
 
@@ -420,12 +424,22 @@
                 if (!data) throw new Error('Usuário não encontrado no banco.');
                 usuarioBanco = data;
 
+                try {
+                    estadoPerfisConfiguracoes = window.Perfis26
+                        ? await Perfis26.carregar(supabaseClient, { ...usuarioLogado, ...data })
+                        : { usuario: { ...usuarioLogado, ...data } };
+                    perfilAtivoConfiguracoes = estadoPerfisConfiguracoes.usuario;
+                } catch (err) {
+                    console.warn('Erro ao carregar perfil ativo:', err.message);
+                    perfilAtivoConfiguracoes = { ...usuarioLogado, ...data };
+                }
+
                 $('nomeCompleto').value = valorCampo('nome', usuarioLogado.nome || '');
                 $('nomeGuerra').value = valorCampo('nomeGuerra', usuarioLogado.nome_guerra || '');
                 $('telefone').value = valorCampo('telefone', usuarioLogado.telefone || '');
                 $('email').value = valorCampo('email', usuarioLogado.email || '');
                 selecionarOuAdicionar($('patente'), normalizarPatenteConfiguracoes(valorCampo('patente', usuarioLogado.patente || 'Sd')));
-                const secaoBancoAtual = valorCampo('secao', usuarioLogado.secao || '');
+                const secaoBancoAtual = perfilAtivoConfiguracoes.secao || valorCampo('secao', usuarioLogado.secao || '');
                 if (usuarioEhAdmin(usuarioBanco)) {
                     $('secaoField').style.display = 'none';
                     $('secao').disabled = true;
@@ -434,7 +448,9 @@
                     selecionarOuAdicionar($('secao'), normalizarSecaoPermissao(secaoBancoAtual) === 'comandante' ? 'Comandante' : secaoBancoAtual);
                     $('secao').disabled = true;
                 }
-                $('posicao').value = normalizarPosicaoConfiguracoes(valorCampo('posicao', usuarioLogado.posicao || ''));
+                $('posicao').value = normalizarPosicaoConfiguracoes(perfilAtivoConfiguracoes.posicao || valorCampo('posicao', usuarioLogado.posicao || ''));
+                $('posicao').disabled = true;
+                $('posicao').title = 'A função vem do perfil ativo. Troque o perfil pelo rosto no menu principal.';
 
                 colunaPreferencias = PREF_CANDIDATES.find(c => Object.prototype.hasOwnProperty.call(usuarioBanco, c)) || null;
                 colunaAvatar = AVATAR_CANDIDATES.find(c => Object.prototype.hasOwnProperty.call(usuarioBanco, c)) || null;
@@ -480,8 +496,7 @@
                 ['nomeGuerra', $('nomeGuerra').value.trim()],
                 ['telefone', $('telefone').value.trim()],
                 ['email', $('email').value.trim()],
-                ['patente', $('patente').value],
-                ['posicao', $('posicao').value]
+                ['patente', $('patente').value]
             ];
             mapa.forEach(([chave, valor]) => {
                 const col = resolverColuna(CAMPOS[chave]);
@@ -517,8 +532,9 @@
                     telefone: $('telefone').value.trim(),
                     email: $('email').value.trim(),
                     patente: $('patente').value,
-                    secao: valorCampo('secao', usuarioLogado.secao || ''),
-                    posicao: $('posicao').value
+                    secao: perfilAtivoConfiguracoes.secao || valorCampo('secao', usuarioLogado.secao || ''),
+                    posicao: perfilAtivoConfiguracoes.posicao || $('posicao').value,
+                    perfil_id: perfilAtivoConfiguracoes.perfil_id ?? usuarioLogado.perfil_id ?? null
                 };
                 localStorage.setItem('usuarioLogado', JSON.stringify(atualizadoLocal));
                 Object.assign(usuarioLogado, atualizadoLocal);
@@ -635,7 +651,7 @@
 
         // Eventos do perfil: autosave
         ['nomeCompleto', 'nomeGuerra', 'telefone', 'email'].forEach(id => $(id).addEventListener('input', agendarSalvarPerfil));
-        ['patente', 'secao', 'posicao'].forEach(id => $(id).addEventListener('change', agendarSalvarPerfil));
+        ['patente'].forEach(id => $(id).addEventListener('change', agendarSalvarPerfil));
         $('btnSalvarPerfil').addEventListener('click', () => salvarPerfil(true));
 
         // Preferências
