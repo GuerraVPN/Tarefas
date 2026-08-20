@@ -120,7 +120,10 @@
             font-size: 16px;
             color: white;
             flex-shrink: 0;
+            overflow: hidden;
         }
+
+        .avatar-circle img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
         .btn-sair-sidebar {
             width: 100%;
@@ -1568,12 +1571,30 @@
         }
 
         // ---------- Perfil do militar logado ----------
+        function obterAvatarUsuarioAtual() {
+            const u = usuarioPerfilAtual || usuarioLogado || {};
+            return u.avatar || u.avatar_url || u.icone || u.foto_url || localStorage.getItem(`avatar_usuario_${usuarioLogado.id}`) || '';
+        }
+
+        function renderizarAvatarUsuarioAtual() {
+            const el = document.getElementById('avatarLetra');
+            const u = usuarioPerfilAtual || usuarioLogado || {};
+            const nome = u.nome_guerra || u.nome || 'Usuário';
+            const avatar = obterAvatarUsuarioAtual();
+            el.innerHTML = '';
+            if (avatar && /^(data:image\/|https?:\/\/)/i.test(avatar)) {
+                const img = new Image(); img.src = avatar; img.alt = 'Foto de perfil';
+                img.onerror = () => { el.innerHTML = ''; el.textContent = nome.charAt(0).toUpperCase(); };
+                el.appendChild(img);
+            } else el.textContent = nome.charAt(0).toUpperCase();
+        }
+
         function atualizarPerfilNaTela() {
             const u = usuarioPerfilAtual || usuarioLogado;
             const nomeGuerra = u.nome_guerra || u.nome || 'Usuário';
             document.getElementById('sbMilitarNome').innerText = `${u.patente || ''} ${nomeGuerra}`.trim();
             document.getElementById('sbMilitarDetalhes').innerText = `${u.secao || '-'} - ${u.posicao || '-'}`;
-            document.getElementById('avatarLetra').innerText = nomeGuerra.charAt(0).toUpperCase();
+            renderizarAvatarUsuarioAtual();
         }
 
         atualizarPerfilNaTela();

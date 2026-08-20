@@ -120,7 +120,10 @@
             font-size: 16px;
             color: white;
             flex-shrink: 0;
+            overflow: hidden;
         }
+
+        .avatar-circle img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
         .btn-sair-sidebar {
             width: 100%;
@@ -1534,12 +1537,35 @@
         }
 
         // ---------- Perfil do militar logado / escopo por seção ----------
+        function obterAvatarUsuarioAtual() {
+            const u = usuarioPerfilAtual || usuarioLogado || {};
+            return u.avatar || u.avatar_url || u.icone || u.foto_url || localStorage.getItem(`avatar_usuario_${usuarioLogado.id}`) || '';
+        }
+
+        function renderizarAvatarUsuarioAtual() {
+            const el = document.getElementById('avatarLetra');
+            if (!el) return;
+            const u = usuarioPerfilAtual || usuarioLogado || {};
+            const nome = u.nome_guerra || u.nome || 'Usuário';
+            const avatar = obterAvatarUsuarioAtual();
+            el.innerHTML = '';
+            if (avatar && /^(data:image\/|https?:\/\/)/i.test(avatar)) {
+                const img = new Image();
+                img.src = avatar;
+                img.alt = 'Foto de perfil';
+                img.onerror = () => { el.innerHTML = ''; el.textContent = nome.charAt(0).toUpperCase(); };
+                el.appendChild(img);
+            } else {
+                el.textContent = nome.charAt(0).toUpperCase();
+            }
+        }
+
         function atualizarPerfilNaTela() {
             const nomeGuerra = usuarioPerfilAtual.nome_guerra || usuarioPerfilAtual.nome || 'Usuário';
             document.getElementById('sbMilitarNome').innerText = `${usuarioPerfilAtual.patente || ''} ${nomeGuerra}`.trim();
             const detalheSecao = normalizarPermissao(usuarioPerfilAtual.secao) === 'admin' ? 'Acesso administrativo' : `${usuarioPerfilAtual.secao || '-'} - ${usuarioPerfilAtual.posicao || '-'}`;
             document.getElementById('sbMilitarDetalhes').innerText = detalheSecao;
-            document.getElementById('avatarLetra').innerText = nomeGuerra.charAt(0).toUpperCase();
+            renderizarAvatarUsuarioAtual();
         }
 
         function configurarEscopoQuadro() {
@@ -1566,11 +1592,20 @@
 
         async function carregarPerfilUsuario() {
             try {
-                const { data, error } = await supabaseClient
+                let { data, error } = await supabaseClient
                     .from('usuarios')
-                    .select('id,nome_guerra,patente,secao,posicao')
+                    .select('id,nome_guerra,patente,secao,posicao,avatar')
                     .eq('id', usuarioLogado.id)
                     .limit(1);
+                // Compatibilidade com bancos que ainda não receberam a coluna avatar.
+                if (error) {
+                    const fallback = await supabaseClient
+                        .from('usuarios')
+                        .select('id,nome_guerra,patente,secao,posicao')
+                        .eq('id', usuarioLogado.id)
+                        .limit(1);
+                    data = fallback.data; error = fallback.error;
+                }
                 if (error) throw error;
                 if (data && data[0]) {
                     usuarioPerfilAtual = { ...usuarioLogado, ...data[0] };

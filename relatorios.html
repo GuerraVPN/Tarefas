@@ -44,7 +44,8 @@
         .menu-items li.active { color: #facc15; border-color: #eab308; background: #1f2937; }
         .sidebar-footer { border-top: 1px solid var(--sidebar-line); padding-top: 18px; margin-top: 18px; }
         .sb-user-profile { display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 8px; color: #fff; }
-        .avatar-circle { width: 40px; height: 40px; background: #374151; border: 2px solid #eab308; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .avatar-circle { width: 40px; height: 40px; background: #374151; border: 2px solid #eab308; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; overflow:hidden; }
+        .avatar-circle img { width:100%; height:100%; object-fit:cover; display:block; }
         .btn-sair-sidebar { width: 100%; background: transparent; border: none; color: #ef4444; padding: 12px 15px; text-align: left; cursor: pointer; font-size: 15px; margin-top: 8px; }
 
         /* CONTEÚDO */
@@ -53,7 +54,8 @@
         .topbar-menu { font-size: 21px; color: #374151; }
         .topbar-right { display: flex; align-items: center; gap: 18px; }
         .bell { font-size: 19px; }
-        .mini-avatar { width: 36px; height: 36px; border-radius: 50%; border: 2px solid #eab308; background: #111827; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .mini-avatar { width: 36px; height: 36px; border-radius: 50%; border: 2px solid #eab308; background: #111827; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; overflow:hidden; }
+        .mini-avatar img { width:100%; height:100%; object-fit:cover; display:block; }
 
         .page { padding: 24px 28px 34px; }
         .heading-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 18px; margin-bottom: 18px; flex-wrap: wrap; }
@@ -316,22 +318,44 @@
             return [patente, nome].filter(Boolean).join(' ') || 'Usuário';
         }
 
+        function obterAvatarUsuarioAtual() {
+            const u = usuarioPerfilAtual || usuarioLogado || {};
+            return u.avatar || u.avatar_url || u.icone || u.foto_url || localStorage.getItem(`avatar_usuario_${usuarioLogado.id}`) || '';
+        }
+
+        function preencherAvatar(id, letra) {
+            const el = $(id); if (!el) return;
+            const avatar = obterAvatarUsuarioAtual();
+            el.innerHTML = '';
+            if (avatar && /^(data:image\/|https?:\/\/)/i.test(avatar)) {
+                const img = new Image(); img.src = avatar; img.alt = 'Foto de perfil';
+                img.onerror = () => { el.innerHTML = ''; el.textContent = letra; };
+                el.appendChild(img);
+            } else el.textContent = letra;
+        }
+
         function atualizarPerfilNaTela() {
             const u = usuarioPerfilAtual;
             const nome = formatarNomeUsuario(u);
             $('sbMilitarNome').textContent = nome;
-            $('sbMilitarDetalhes').textContent = normalizar(u.secao) === 'admin' ? 'Acesso administrativo' : `${u.secao || '-'} - ${u.posicao || '-'}`;
+            $('sbMilitarDetalhes').textContent = norm(u.secao) === 'admin' ? 'Acesso administrativo' : `${u.secao || '-'} - ${u.posicao || '-'}`;
             const letra = String(u.nome_guerra || nome || 'U').charAt(0).toUpperCase();
-            $('avatarLetra').textContent = letra;
-            $('miniAvatar').textContent = letra;
+            preencherAvatar('avatarLetra', letra);
+            preencherAvatar('miniAvatar', letra);
         }
 
         async function carregarPerfilUsuario() {
             try {
-                const { data, error } = await supabaseClient.from('usuarios')
-                    .select('id,nome_guerra,patente,secao,posicao')
+                let { data, error } = await supabaseClient.from('usuarios')
+                    .select('id,nome_guerra,patente,secao,posicao,avatar')
                     .eq('id', usuarioLogado.id)
                     .limit(1);
+                if (error) {
+                    const fallback = await supabaseClient.from('usuarios')
+                        .select('id,nome_guerra,patente,secao,posicao')
+                        .eq('id', usuarioLogado.id).limit(1);
+                    data = fallback.data; error = fallback.error;
+                }
                 if (error) throw error;
                 if (data && data[0]) {
                     usuarioPerfilAtual = { ...usuarioLogado, ...data[0] };
@@ -424,8 +448,8 @@
             const { inicio, fim } = obterIntervalo();
             const secaoEscolhida = privilegioGlobal ? $('sectionSelect').value : String(usuarioPerfilAtual.secao || '');
             return tarefasBanco.filter(t => {
-                if (privilegioGlobal && secaoEscolhida !== 'Todas' && String(t.secao || '') !== secaoEscolhida) return false;
-                if (!privilegioGlobal && String(t.secao || '') !== String(usuarioPerfilAtual.secao || '')) return false;
+                if (privilegioGlobal && secaoEscolhida !== 'Todas' && norm(t.secao) !== norm(secaoEscolhida)) return false;
+                if (!privilegioGlobal && norm(t.secao) !== norm(usuarioPerfilAtual.secao)) return false;
                 const prazo = parsePrazo(t.prazo);
                 return prazo && prazo >= inicio && prazo <= fim;
             });
@@ -448,7 +472,7 @@
                 if (!privilegioGlobal) {
                     const secao = String(usuarioPerfilAtual.secao || '').trim();
                     if (!secao) throw new Error('Seu usuário não possui seção definida no perfil.');
-                    query = query.eq('secao', secao);
+                    query = query.ilike('secao', secao);
                 }
                 const { data, error } = await query;
                 if (error) throw error;
@@ -625,12 +649,34 @@
         $('btnPrint').addEventListener('click', () => window.print());
         $('btnSairSessao').addEventListener('click', () => { localStorage.removeItem('usuarioLogado'); window.location.href = 'index.html'; });
 
+        let canalRelatorios = null;
+        function iniciarSincronizacaoTempoReal() {
+            try {
+                if (canalRelatorios) supabaseClient.removeChannel(canalRelatorios);
+                canalRelatorios = supabaseClient
+                    .channel(`relatorios-${usuarioLogado.id}`)
+                    .on('postgres_changes', { event:'*', schema:'public', table:'tarefas' }, () => carregarTarefas())
+                    .on('postgres_changes', { event:'UPDATE', schema:'public', table:'usuarios', filter:`id=eq.${usuarioLogado.id}` }, async () => {
+                        await carregarPerfilUsuario();
+                        await carregarTarefas();
+                    })
+                    .subscribe();
+            } catch (err) {
+                console.warn('Realtime indisponível nos relatórios:', err.message);
+            }
+        }
+
         async function iniciar() {
             configurarControlesPeriodo();
             atualizarPerfilNaTela();
             await carregarPerfilUsuario();
             await carregarTarefas();
+            iniciarSincronizacaoTempoReal();
         }
+
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) carregarTarefas();
+        });
 
         iniciar();
     </script>

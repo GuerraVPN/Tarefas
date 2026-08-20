@@ -69,8 +69,9 @@
         .sb-user-profile { display:flex; align-items:center; gap:12px; padding:10px; border-radius:8px; color:#fff; }
         .avatar-circle {
             width:40px; height:40px; border-radius:50%; background:#222c39; border:2px solid #eab308;
-            display:flex; justify-content:center; align-items:center; color:#eab308; font-weight:bold;
+            display:flex; justify-content:center; align-items:center; color:#eab308; font-weight:bold; overflow:hidden;
         }
+        .avatar-circle img { width:100%; height:100%; object-fit:cover; display:block; }
         .btn-sair-sidebar {
             width:100%; background:transparent; border:none; color:#ef4444; padding:12px 15px;
             text-align:left; cursor:pointer; display:flex; align-items:center; gap:12px; font-size:15px; margin-top:8px;
@@ -86,8 +87,9 @@
         .topbar-right { display:flex; align-items:center; gap:20px; color:#374151; }
         .mini-avatar {
             width:32px; height:32px; border-radius:50%; border:2px solid #eab308; background:#17202e;
-            color:#eab308; display:flex; align-items:center; justify-content:center; font-weight:bold;
+            color:#eab308; display:flex; align-items:center; justify-content:center; font-weight:bold; overflow:hidden;
         }
+        .mini-avatar img { width:100%; height:100%; object-fit:cover; display:block; }
         .page-wrap { padding:24px; }
         .page-header {
             display:flex; justify-content:space-between; gap:20px; align-items:flex-start; margin-bottom:18px;
@@ -500,11 +502,17 @@
 
         async function carregarPerfilUsuarioDoBanco() {
             try {
-                const { data, error } = await supabaseClient
+                let { data, error } = await supabaseClient
                     .from('usuarios')
-                    .select('id,nome_guerra,patente,secao,posicao')
+                    .select('id,nome_guerra,patente,secao,posicao,avatar')
                     .eq('id', usuarioLogado.id)
                     .limit(1);
+                if (error) {
+                    const fallback = await supabaseClient.from('usuarios')
+                        .select('id,nome_guerra,patente,secao,posicao')
+                        .eq('id', usuarioLogado.id).limit(1);
+                    data = fallback.data; error = fallback.error;
+                }
                 if (error) throw error;
                 if (Array.isArray(data) && data[0]) {
                     usuarioPerfilAtual = { ...usuarioLogado, ...data[0] };
@@ -516,13 +524,29 @@
             atualizarPerfilNaTela();
         }
 
+        function obterAvatarUsuarioAtual() {
+            const u = usuarioPerfilAtual || usuarioLogado || {};
+            return u.avatar || u.avatar_url || u.icone || u.foto_url || localStorage.getItem(`avatar_usuario_${usuarioLogado.id}`) || '';
+        }
+
+        function preencherAvatar(id, nome) {
+            const el = document.getElementById(id); if (!el) return;
+            const avatar = obterAvatarUsuarioAtual();
+            el.innerHTML = '';
+            if (avatar && /^(data:image\/|https?:\/\/)/i.test(avatar)) {
+                const img = new Image(); img.src = avatar; img.alt = 'Foto de perfil';
+                img.onerror = () => { el.innerHTML = ''; el.textContent = nome.charAt(0).toUpperCase(); };
+                el.appendChild(img);
+            } else el.textContent = nome.charAt(0).toUpperCase();
+        }
+
         function atualizarPerfilNaTela() {
             const u = usuarioPerfilAtual || usuarioLogado;
             const nome = u.nome_guerra || 'Usuário';
             document.getElementById('sbMilitarNome').textContent = `${u.patente || ''} ${nome}`.trim();
             document.getElementById('sbMilitarDetalhes').textContent = `${u.secao || '-'} - ${u.posicao || '-'}`;
-            document.getElementById('avatarLetra').textContent = nome.charAt(0).toUpperCase();
-            document.getElementById('topAvatar').textContent = nome.charAt(0).toUpperCase();
+            preencherAvatar('avatarLetra', nome);
+            preencherAvatar('topAvatar', nome);
         }
 
         function setSyncStatus(texto, tipo='') {
