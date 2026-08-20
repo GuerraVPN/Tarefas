@@ -909,6 +909,7 @@
                     <option value="ResMat">Reserva de Materiais</option>
                     <option value="ResArmt">Reserva de Armamento</option>
                     <option value="Informática">Informática</option>
+                    <option value="Comandante">Comandante</option>
                 </select>
                 <button class="btn-nova-tarefa" id="btnNovaTarefaTop">+ Nova tarefa</button>
             </div>
@@ -996,6 +997,7 @@
                     <option value="ResMat">Reserva de Materiais</option>
                     <option value="ResArmt">Reserva de Armamento</option>
                     <option value="Informática">Informática</option>
+                    <option value="Comandante">Comandante</option>
                 </select>
 
                 <label for="taskResponsavel">Militar Responsável *</label>
@@ -1154,19 +1156,8 @@
         }
 
         function ehAdminOuComandante(usuario) {
-            const posicao = normalizarPermissao(usuario?.posicao);
-            if (posicao === 'comandante' || posicao === 'cmt') return true;
-
-            const camposAdmin = [
-                usuario?.nome_guerra, usuario?.patente, usuario?.tipo, usuario?.perfil,
-                usuario?.role, usuario?.nivel, usuario?.cargo, usuario?.funcao,
-                usuario?.usuario, usuario?.login
-            ];
-
-            return camposAdmin.some(valor => {
-                const normalizado = normalizarPermissao(valor);
-                return normalizado === 'admin' || normalizado === 'administrador' || normalizado.includes('admin');
-            });
+            const secao = normalizarPermissao(usuario?.secao);
+            return secao === 'admin' || secao === 'comandante';
         }
 
         function agoraFormatado() {
@@ -1546,7 +1537,8 @@
         function atualizarPerfilNaTela() {
             const nomeGuerra = usuarioPerfilAtual.nome_guerra || usuarioPerfilAtual.nome || 'Usuário';
             document.getElementById('sbMilitarNome').innerText = `${usuarioPerfilAtual.patente || ''} ${nomeGuerra}`.trim();
-            document.getElementById('sbMilitarDetalhes').innerText = `${usuarioPerfilAtual.secao || '-'} - ${usuarioPerfilAtual.posicao || '-'}`;
+            const detalheSecao = normalizarPermissao(usuarioPerfilAtual.secao) === 'admin' ? 'Acesso administrativo' : `${usuarioPerfilAtual.secao || '-'} - ${usuarioPerfilAtual.posicao || '-'}`;
+            document.getElementById('sbMilitarDetalhes').innerText = detalheSecao;
             document.getElementById('avatarLetra').innerText = nomeGuerra.charAt(0).toUpperCase();
         }
 

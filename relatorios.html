@@ -306,14 +306,8 @@
         const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 
         function ehAdminOuComandante(u) {
-            const pos = norm(u?.posicao);
-            if (pos === 'comandante' || pos === 'cmt') return true;
-
-            const camposAdmin = [u?.nome_guerra, u?.patente, u?.tipo, u?.perfil, u?.role, u?.nivel, u?.cargo, u?.funcao, u?.usuario, u?.login];
-            return camposAdmin.some(v => {
-                const n = norm(v);
-                return n === 'admin' || n === 'administrador' || n.includes('admin');
-            });
+            const secao = norm(u?.secao);
+            return secao === 'admin' || secao === 'comandante';
         }
 
         function formatarNomeUsuario(u) {
@@ -326,7 +320,7 @@
             const u = usuarioPerfilAtual;
             const nome = formatarNomeUsuario(u);
             $('sbMilitarNome').textContent = nome;
-            $('sbMilitarDetalhes').textContent = `${u.secao || '-'} - ${u.posicao || '-'}`;
+            $('sbMilitarDetalhes').textContent = normalizar(u.secao) === 'admin' ? 'Acesso administrativo' : `${u.secao || '-'} - ${u.posicao || '-'}`;
             const letra = String(u.nome_guerra || nome || 'U').charAt(0).toUpperCase();
             $('avatarLetra').textContent = letra;
             $('miniAvatar').textContent = letra;
