@@ -99,6 +99,54 @@
 
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    // ============================================================
+    // V3 — Sessão de 30 minutos de INATIVIDADE
+    // ============================================================
+    const SESSAO26_CHAVE = "sessao26_ultima_atividade";
+    const SESSAO26_TEMPO = 30 * 60 * 1000;
+
+    function lerUsuarioJaLogado() {
+      try {
+        return JSON.parse(localStorage.getItem("usuarioLogado") || "null");
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function encerrarSessaoLocal() {
+      localStorage.removeItem("usuarioLogado");
+      localStorage.removeItem(SESSAO26_CHAVE);
+    }
+
+    function sessaoAindaValida() {
+      const usuario = lerUsuarioJaLogado();
+      if (!usuario || !usuario.id) return false;
+
+      const agora = Date.now();
+      let ultimaAtividade = Number(localStorage.getItem(SESSAO26_CHAVE) || 0);
+
+      // Compatibilidade: usuário que já estava logado antes deste patch.
+      // Na primeira abertura, inicia os 30 minutos sem obrigar novo login.
+      if (!ultimaAtividade) {
+        ultimaAtividade = agora;
+        localStorage.setItem(SESSAO26_CHAVE, String(agora));
+        return true;
+      }
+
+      if ((agora - ultimaAtividade) >= SESSAO26_TEMPO) {
+        encerrarSessaoLocal();
+        return false;
+      }
+
+      return true;
+    }
+
+    // Se já está autenticado e a sessão não expirou, nem exibe o login.
+    if (sessaoAindaValida()) {
+      window.location.replace("menu.html");
+    }
+
+
     // CPF máscara
     document.getElementById("loginCpf").addEventListener("input", function () {
       let cpf = this.value.replace(/\D/g, "");
@@ -143,9 +191,12 @@
               nome_guerra: data.nome_guerra,
               patente: data.patente,
               secao: data.secao,
-              posicao: data.posicao
+              posicao: data.posicao,
+              cpf: data.cpf
             })
           );
+
+          localStorage.setItem(SESSAO26_CHAVE, String(Date.now()));
 
           alert(`Bem-vindo, ${data.patente} ${data.nome_guerra}!`);
           window.location.href = "menu.html";
