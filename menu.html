@@ -1130,6 +1130,8 @@
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwdmlqYXRuc2x1d3NnbnprbHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MzkxNDMsImV4cCI6MjEwMjQxNTE0M30.uvyfm9mgl6MON0v75CwfGzNz6FBqw58uzR4ZcRAOLNQ";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        let usuarioPerfilAtual = { ...usuarioLogado };
+        let privilegioGlobal = false;
         let todasAsTarefas = [];
         let tarefaSelecionadaId = null;
         let listaArquivosLocal = [];
@@ -1144,6 +1146,26 @@
             return String(valor ?? '').replace(/[&<>"']/g, caractere => ({
                 '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
             }[caractere]));
+        }
+
+        function normalizarPermissao(valor) {
+            return String(valor ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase();
+        }
+
+        function ehAdminOuComandante(usuario) {
+            const posicao = normalizarPermissao(usuario?.posicao);
+            if (posicao === 'comandante' || posicao === 'cmt') return true;
+
+            const camposAdmin = [
+                usuario?.nome_guerra, usuario?.patente, usuario?.tipo, usuario?.perfil,
+                usuario?.role, usuario?.nivel, usuario?.cargo, usuario?.funcao,
+                usuario?.usuario, usuario?.login
+            ];
+
+            return camposAdmin.some(valor => {
+                const normalizado = normalizarPermissao(valor);
+                return normalizado === 'admin' || normalizado === 'administrador' || normalizado.includes('admin');
+            });
         }
 
         function agoraFormatado() {
@@ -1504,18 +1526,73 @@
             }
         }
 
-        // ---------- Perfil do militar logado ----------
-        if (usuarioLogado) {
-            const nomeGuerra = usuarioLogado.nome_guerra || usuarioLogado.nome || 'Usuário';
-            document.getElementById('sbMilitarNome').innerText = `${usuarioLogado.patente || ''} ${nomeGuerra}`.trim();
-            document.getElementById('sbMilitarDetalhes').innerText = `${usuarioLogado.secao || '-'} - ${usuarioLogado.posicao || '-'}`;
+        // ---------- Perfil do militar logado / escopo por seção ----------
+        function atualizarPerfilNaTela() {
+            const nomeGuerra = usuarioPerfilAtual.nome_guerra || usuarioPerfilAtual.nome || 'Usuário';
+            document.getElementById('sbMilitarNome').innerText = `${usuarioPerfilAtual.patente || ''} ${nomeGuerra}`.trim();
+            document.getElementById('sbMilitarDetalhes').innerText = `${usuarioPerfilAtual.secao || '-'} - ${usuarioPerfilAtual.posicao || '-'}`;
             document.getElementById('avatarLetra').innerText = nomeGuerra.charAt(0).toUpperCase();
+        }
+
+        function configurarEscopoQuadro() {
+            const select = document.getElementById('filtroSecao');
+            const secao = String(usuarioPerfilAtual.secao || '').trim();
+
+            if (privilegioGlobal) {
+                select.disabled = false;
+                select.title = 'Comandante/Admin: selecione a seção que deseja visualizar';
+                if (![...select.options].some(op => op.value === select.value)) select.value = 'Todas';
+                return;
+            }
+
+            if (secao && ![...select.options].some(op => op.value === secao)) {
+                const option = document.createElement('option');
+                option.value = secao;
+                option.textContent = secao;
+                select.appendChild(option);
+            }
+            select.value = secao || 'Todas';
+            select.disabled = true;
+            select.title = secao ? `Quadro restrito à seção ${secao}` : 'Usuário sem seção cadastrada';
+        }
+
+        async function carregarPerfilUsuario() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('usuarios')
+                    .select('id,nome_guerra,patente,secao,posicao')
+                    .eq('id', usuarioLogado.id)
+                    .limit(1);
+                if (error) throw error;
+                if (data && data[0]) {
+                    usuarioPerfilAtual = { ...usuarioLogado, ...data[0] };
+                    localStorage.setItem('usuarioLogado', JSON.stringify(usuarioPerfilAtual));
+                }
+            } catch (err) {
+                console.warn('Não foi possível atualizar o perfil do usuário:', err.message);
+            }
+
+            privilegioGlobal = ehAdminOuComandante(usuarioPerfilAtual);
+            atualizarPerfilNaTela();
+            configurarEscopoQuadro();
         }
 
         // ---------- Banco / renderização ----------
         async function buscarTarefasDoBanco() {
             try {
-                const { data, error } = await supabaseClient.from('tarefas').select('*').order('id', { ascending: true });
+                const secaoUsuario = String(usuarioPerfilAtual.secao || '').trim();
+
+                if (!privilegioGlobal && !secaoUsuario) {
+                    todasAsTarefas = [];
+                    renderizarQuadroKanban();
+                    console.warn('Usuário comum sem seção cadastrada: nenhuma tarefa será exibida.');
+                    return;
+                }
+
+                let consulta = supabaseClient.from('tarefas').select('*').order('id', { ascending: true });
+                if (!privilegioGlobal) consulta = consulta.eq('secao', secaoUsuario);
+
+                const { data, error } = await consulta;
                 if (error) throw error;
                 todasAsTarefas = data || [];
                 renderizarQuadroKanban();
@@ -1526,7 +1603,8 @@
         }
 
         function renderizarQuadroKanban() {
-            const filtro = document.getElementById('filtroSecao').value;
+            const secaoUsuario = String(usuarioPerfilAtual.secao || '').trim();
+            const filtro = privilegioGlobal ? document.getElementById('filtroSecao').value : secaoUsuario;
             const termo = (document.getElementById('buscaTarefa')?.value || '').trim().toLowerCase();
 
             const contPendente = document.getElementById('container-pendente');
@@ -1540,7 +1618,10 @@
             let cP = 0, cA = 0, cC = 0;
 
             todasAsTarefas.forEach(tarefa => {
-                if (filtro !== 'Todas' && tarefa.secao !== filtro) return;
+                // Segunda barreira no front-end: usuário comum nunca renderiza outra seção,
+                // mesmo que o select seja alterado manualmente pelo navegador.
+                if (!privilegioGlobal && String(tarefa.secao || '') !== secaoUsuario) return;
+                if (privilegioGlobal && filtro !== 'Todas' && tarefa.secao !== filtro) return;
 
                 const nomesResponsaveis = formatarResponsaveis(tarefa.responsavel);
                 const textoBusca = `${tarefa.codigo || ''} ${tarefa.titulo || ''} ${tarefa.descricao || ''} ${tarefa.secao || ''} ${nomesResponsaveis}`.toLowerCase();
@@ -2128,7 +2209,9 @@
         };
 
         // ---------- Eventos gerais ----------
-        document.getElementById('filtroSecao').addEventListener('change', renderizarQuadroKanban);
+        document.getElementById('filtroSecao').addEventListener('change', () => {
+            if (privilegioGlobal) renderizarQuadroKanban();
+        });
         document.getElementById('buscaTarefa').addEventListener('input', renderizarQuadroKanban);
         document.getElementById('inputAnexoTarefa').addEventListener('change', processarAnexoArquivo);
 
@@ -2148,8 +2231,13 @@
             else if (modalTarefa.style.display === 'flex') fecharModalNovaTarefa();
         });
 
-        configurarDragDrop();
-        buscarTarefasDoBanco();
+        async function inicializarQuadro() {
+            await carregarPerfilUsuario();
+            configurarDragDrop();
+            await buscarTarefasDoBanco();
+        }
+
+        inicializarQuadro();
     </script>
 </body>
 </html>
