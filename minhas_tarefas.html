@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quadro de Tarefas - 26º Pel PE Mec</title>
+    <title>Minhas Tarefas - 26º Pel PE Mec</title>
 
     <!-- CDN DO SDK DO SUPABASE -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -587,6 +587,59 @@
         }
 
 
+        /* ===== Resumo de Minhas Tarefas ===== */
+        .personal-summary {
+            margin: 22px 30px 0;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .personal-stat {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 14px 16px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        }
+
+        .personal-stat span {
+            display: block;
+            color: #6b7280;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .personal-stat strong {
+            color: #111827;
+            font-size: 22px;
+        }
+
+        .ownership-badge {
+            display: inline-flex;
+            align-items: center;
+            width: fit-content;
+            font-size: 10px;
+            font-weight: bold;
+            border-radius: 999px;
+            padding: 3px 8px;
+            margin-bottom: 9px;
+        }
+
+        .ownership-created { background: #ecfdf5; color: #047857; }
+        .ownership-forwarded { background: #eff6ff; color: #1d4ed8; }
+
+        .personal-info {
+            margin: 12px 30px 0;
+            color: #6b7280;
+            font-size: 12px;
+        }
+
+        @media (max-width: 760px) {
+            .personal-summary { margin: 15px 15px 0; grid-template-columns: 1fr; }
+            .personal-info { margin: 10px 15px 0; }
+        }
+
         /* ===== Funções incorporadas do menu 3 ===== */
         .search-tarefa {
             width: 240px;
@@ -866,8 +919,8 @@
             </div>
         </div>
         <ul class="menu-items">
-            <li class="active">■ Quadro</li>
-            <li onclick="window.location.href='minhas_tarefas.html'" title="Abrir Minhas tarefas">👤 Minhas tarefas</li>
+            <li onclick="window.location.href='menu.html'" title="Abrir Quadro">■ Quadro</li>
+            <li class="active">👤 Minhas tarefas</li>
             <li>📅 Calendário</li>
             <li>📊 Relatórios</li>
             <li>👥 Usuários</li>
@@ -890,8 +943,8 @@
         <!-- Topbar -->
         <div class="header">
             <div class="header-title">
-                <h2>Quadro de Tarefas</h2>
-                <p>Início > Quadro</p>
+                <h2>Minhas Tarefas</h2>
+                <p>Início &gt; Minhas tarefas</p>
             </div>
             <div class="header-actions">
                 <input type="search" class="search-tarefa" id="buscaTarefa" placeholder="Buscar tarefas..." autocomplete="off">
@@ -916,6 +969,13 @@
                 <button id="btnAbrirModalSenha">Alterar Senha</button>
             </div>
         </div>
+
+        <div class="personal-summary" aria-label="Resumo das minhas tarefas">
+            <div class="personal-stat"><span>Total sincronizadas</span><strong id="resumoTotal">0</strong></div>
+            <div class="personal-stat"><span>Criadas por mim</span><strong id="resumoCriadas">0</strong></div>
+            <div class="personal-stat"><span>Encaminhadas para mim</span><strong id="resumoEncaminhadas">0</strong></div>
+        </div>
+        <div class="personal-info">Esta página exibe somente tarefas criadas pela sua conta ou atribuídas ao seu usuário como responsável.</div>
 
         <!-- Quadro Kanban de Colunas -->
         <div class="kanban-board">
@@ -1138,6 +1198,7 @@
         let usuariosResponsaveisCache = [];
         let responsaveisSelecionadosLocal = [];
         let responsaveisBackupLocal = [];
+        let usuarioPerfilAtual = { ...usuarioLogado };
 
         // ---------- Utilidades ----------
         function escaparHtml(valor) {
@@ -1225,7 +1286,7 @@
 
         function nomeExibicaoUsuario(usuario) {
             if (!usuario) return 'Usuário';
-            const nome = String(usuario.nome_guerra || '').trim();
+            const nome = String(usuario.nome_guerra || usuario.nome || '').trim();
             const patente = String(usuario.patente || '').trim();
             return [patente, nome].filter(Boolean).join(' ').trim() || `Usuário ${usuario.id ?? ''}`.trim();
         }
@@ -1309,6 +1370,8 @@
 
         async function carregarUsuariosResponsaveis(forcar = false) {
             if (!forcar && usuariosResponsaveisCache.length) return usuariosResponsaveisCache;
+            // A tabela `usuarios` deste projeto não possui a coluna `nome`.
+            // Para o despacho usamos somente campos que já existem no cadastro atual.
             const { data, error } = await supabaseClient
                 .from('usuarios')
                 .select('id,nome_guerra,patente,secao,posicao')
@@ -1364,7 +1427,7 @@
 
             const usuarios = usuariosResponsaveisCache.filter(u => {
                 const texto = normalizarTextoResponsavel([
-                    nomeExibicaoUsuario(u), u.nome_guerra || '', u.patente || '', u.secao || '', u.posicao || ''
+                    nomeExibicaoUsuario(u), u.nome || '', u.nome_guerra || '', u.patente || '', u.secao || '', u.posicao || ''
                 ].join(' '));
                 return !busca || texto.includes(busca);
             });
@@ -1505,23 +1568,141 @@
         }
 
         // ---------- Perfil do militar logado ----------
-        if (usuarioLogado) {
-            const nomeGuerra = usuarioLogado.nome_guerra || usuarioLogado.nome || 'Usuário';
-            document.getElementById('sbMilitarNome').innerText = `${usuarioLogado.patente || ''} ${nomeGuerra}`.trim();
-            document.getElementById('sbMilitarDetalhes').innerText = `${usuarioLogado.secao || '-'} - ${usuarioLogado.posicao || '-'}`;
+        function atualizarPerfilNaTela() {
+            const u = usuarioPerfilAtual || usuarioLogado;
+            const nomeGuerra = u.nome_guerra || u.nome || 'Usuário';
+            document.getElementById('sbMilitarNome').innerText = `${u.patente || ''} ${nomeGuerra}`.trim();
+            document.getElementById('sbMilitarDetalhes').innerText = `${u.secao || '-'} - ${u.posicao || '-'}`;
             document.getElementById('avatarLetra').innerText = nomeGuerra.charAt(0).toUpperCase();
         }
 
-        // ---------- Banco / renderização ----------
+        atualizarPerfilNaTela();
+
+        async function carregarPerfilUsuarioDoBanco() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('usuarios')
+                    .select('*')
+                    .eq('id', usuarioLogado.id)
+                    .limit(1);
+
+                if (error) throw error;
+                if (Array.isArray(data) && data[0]) {
+                    usuarioPerfilAtual = { ...usuarioLogado, ...data[0] };
+                    localStorage.setItem('usuarioLogado', JSON.stringify(usuarioPerfilAtual));
+                    atualizarPerfilNaTela();
+                }
+            } catch (err) {
+                console.warn('Não foi possível atualizar o perfil do usuário pelo banco:', err.message);
+                usuarioPerfilAtual = { ...usuarioLogado };
+            }
+        }
+
+        function normalizarIdentidade(valor) {
+            return String(valor || '').trim().replace(/\s+/g, ' ').toLocaleLowerCase('pt-BR');
+        }
+
+        function variantesResponsavelUsuario() {
+            const u = usuarioPerfilAtual || usuarioLogado;
+            const nomeGuerra = String(u.nome_guerra || '').trim();
+            const nomeCompleto = String(u.nome || '').trim();
+            const patente = String(u.patente || '').trim();
+            const variantes = [
+                nomeGuerra,
+                nomeCompleto,
+                [patente, nomeGuerra].filter(Boolean).join(' '),
+                [patente, nomeCompleto].filter(Boolean).join(' ')
+            ].filter(Boolean);
+
+            const unicos = new Map();
+            variantes.forEach(v => unicos.set(normalizarIdentidade(v), v));
+            return [...unicos.values()];
+        }
+
+        function tarefaCriadaPorMim(tarefa) {
+            return String(tarefa?.criado_por ?? '') === String(usuarioLogado.id);
+        }
+
+        function tarefaEncaminhadaParaMim(tarefa) {
+            if (!tarefa || tarefaCriadaPorMim(tarefa)) return false;
+            const lista = normalizarResponsaveis(tarefa.responsavel);
+            if (!lista.length) return false;
+
+            const idAtual = String(usuarioLogado.id);
+            const variantes = variantesResponsavelUsuario().map(normalizarIdentidade);
+            return lista.some(r => {
+                if (r.id && String(r.id) === idAtual) return true;
+                return variantes.includes(normalizarIdentidade(r.nome));
+            });
+        }
+
+        function atualizarResumoPessoal() {
+            const total = todasAsTarefas.length;
+            const criadas = todasAsTarefas.filter(tarefaCriadaPorMim).length;
+            const encaminhadas = todasAsTarefas.filter(t => !tarefaCriadaPorMim(t)).length;
+            document.getElementById('resumoTotal').innerText = total;
+            document.getElementById('resumoCriadas').innerText = criadas;
+            document.getElementById('resumoEncaminhadas').innerText = encaminhadas;
+        }
+
+        // ---------- Banco / sincronização somente do usuário ----------
         async function buscarTarefasDoBanco() {
             try {
-                const { data, error } = await supabaseClient.from('tarefas').select('*').order('id', { ascending: true });
-                if (error) throw error;
-                todasAsTarefas = data || [];
+                await carregarPerfilUsuarioDoBanco();
+
+                const tarefasPorId = new Map();
+                const adicionar = lista => (lista || []).forEach(t => tarefasPorId.set(String(t.id), t));
+
+                // 1) Tarefas criadas pela conta logada: vínculo seguro pelo ID do usuário.
+                const criadas = await supabaseClient
+                    .from('tarefas')
+                    .select('*')
+                    .eq('criado_por', usuarioLogado.id)
+                    .order('id', { ascending: true });
+
+                if (criadas.error) throw criadas.error;
+                adicionar(criadas.data);
+
+                // 2) Tarefas encaminhadas/atribuídas.
+                // As novas gravações trazem o ID do usuário dentro do campo responsavel (JSON em texto),
+                // e as consultas por nome mantêm compatibilidade com tarefas antigas.
+                const variantes = variantesResponsavelUsuario();
+                const consultasRecebidas = [
+                    supabaseClient
+                        .from('tarefas')
+                        .select('*')
+                        .ilike('responsavel', `%"id":"${String(usuarioLogado.id)}"%`)
+                        .order('id', { ascending: true }),
+                    ...variantes.map(responsavel =>
+                        supabaseClient
+                            .from('tarefas')
+                            .select('*')
+                            .ilike('responsavel', `%${responsavel}%`)
+                            .order('id', { ascending: true })
+                    )
+                ];
+
+                const recebidas = await Promise.all(consultasRecebidas);
+                recebidas.forEach(resultado => {
+                    if (resultado.error) {
+                        console.warn('Falha ao consultar tarefas atribuídas:', resultado.error.message);
+                        return;
+                    }
+                    adicionar(resultado.data);
+                });
+
+                todasAsTarefas = [...tarefasPorId.values()]
+                    .filter(t => tarefaCriadaPorMim(t) || tarefaEncaminhadaParaMim(t))
+                    .sort((a, b) => Number(a.id) - Number(b.id));
+
                 renderizarQuadroKanban();
+                atualizarResumoPessoal();
             } catch (err) {
-                console.error('Erro ao puxar tarefas:', err.message);
-                alert('Não foi possível carregar as tarefas do banco: ' + err.message);
+                console.error('Erro ao sincronizar minhas tarefas:', err.message);
+                todasAsTarefas = [];
+                renderizarQuadroKanban();
+                atualizarResumoPessoal();
+                alert('Não foi possível carregar suas tarefas do banco: ' + err.message);
             }
         }
 
@@ -1555,6 +1736,9 @@
                 const dataFormatada = tarefa.prazo ? String(tarefa.prazo).split('-').reverse().join('/') : '--/--/----';
                 const pct = Math.max(0, Math.min(100, Number(tarefa.andamento) || 0));
                 const qtdAnexos = normalizarArquivos(tarefa.arquivos).length;
+                const criadaPorMim = tarefaCriadaPorMim(tarefa);
+                const origemClasse = criadaPorMim ? 'ownership-created' : 'ownership-forwarded';
+                const origemTexto = criadaPorMim ? '✓ Criada por você' : '↪ Encaminhada para você';
 
                 card.innerHTML = `
                     <div class="card-top">
@@ -1564,6 +1748,7 @@
                         </div>
                         <span class="priority-badge ${classePrio}">${escaparHtml(tarefa.prioridade || 'Baixa')}</span>
                     </div>
+                    <div class="ownership-badge ${origemClasse}">${origemTexto}</div>
                     <div class="task-title">${escaparHtml(tarefa.titulo || 'Sem título')}</div>
                     <div class="card-footer">
                         <div class="footer-row">

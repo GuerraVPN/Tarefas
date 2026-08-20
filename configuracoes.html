@@ -353,7 +353,7 @@
         <nav class="nav">
             <a href="#" class="active"><i class="fa-solid fa-gear"></i> Configurações</a>
             <a href="menu.html" data-pref-item="quadro"><i class="fa-solid fa-table-columns"></i> Quadro Kanban</a>
-            <a href="#" data-pref-item="minhas"><i class="fa-solid fa-user"></i> Minhas tarefas</a>
+            <a href="minhas_tarefas.html" data-pref-item="minhas"><i class="fa-solid fa-user"></i> Minhas tarefas</a>
             <a href="#" data-pref-item="calendario"><i class="fa-solid fa-calendar-days"></i> Calendário</a>
             <a href="#" data-pref-item="relatorios"><i class="fa-solid fa-chart-column"></i> Relatórios</a>
             <a href="#" data-pref-item="usuarios"><i class="fa-solid fa-users"></i> Usuários</a>
@@ -419,17 +419,17 @@
                         <div class="field">
                             <label for="patente">Posto / Graduação</label>
                             <select id="patente">
-                                <option value="Soldado">Soldado</option>
-                                <option value="Cabo">Cabo</option>
+                                <option value="Sd">Sd</option>
+                                <option value="Cb">Cb</option>
                                 <option value="3º Sgt">3º Sgt</option>
                                 <option value="2º Sgt">2º Sgt</option>
                                 <option value="1º Sgt">1º Sgt</option>
-                                <option value="Subtenente">Subtenente</option>
-                                <option value="Aspirante">Aspirante</option>
+                                <option value="ST">ST</option>
+                                <option value="Asp">Asp</option>
                                 <option value="2º Ten">2º Ten</option>
                                 <option value="1º Ten">1º Ten</option>
-                                <option value="Capitão">Capitão</option>
-                                <option value="Major">Major</option>
+                                <option value="Cap">Cap</option>
+                                <option value="Maj">Maj</option>
                                 <option value="Ten Cel">Ten Cel</option>
                                 <option value="Cel">Cel</option>
                             </select>
@@ -447,14 +447,10 @@
                             <div class="field">
                                 <label for="posicao">Posição Executiva</label>
                                 <select id="posicao">
+                                    <option value="">Selecione...</option>
                                     <option value="Auxiliar">Auxiliar</option>
-                                    <option value="Aux">Aux</option>
                                     <option value="Chefe">Chefe</option>
-                                    <option value="Ch">Ch</option>
-                                    <option value="Cmt">Cmt</option>
-                                    <option value="Encarregado">Encarregado</option>
-                                    <option value="Fiscal">Fiscal</option>
-                                    <option value="Operador">Operador</option>
+                                    <option value="Comandante">Comandante</option>
                                 </select>
                             </div>
                         </div>
@@ -545,6 +541,47 @@
         }
 
         function escapeText(v) { return String(v ?? '').trim(); }
+
+
+        function normalizarPatenteConfiguracoes(valor) {
+            const original = escapeText(valor);
+            if (!original) return '';
+            const chave = original
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase().replace(/\./g, '').replace(/\s+/g, ' ').trim();
+
+            const mapa = {
+                'soldado': 'Sd', 'sd': 'Sd',
+                'cabo': 'Cb', 'cb': 'Cb',
+                '3 sgt': '3º Sgt', '3º sgt': '3º Sgt', '3o sgt': '3º Sgt', 'terceiro sargento': '3º Sgt',
+                '2 sgt': '2º Sgt', '2º sgt': '2º Sgt', '2o sgt': '2º Sgt', 'segundo sargento': '2º Sgt',
+                '1 sgt': '1º Sgt', '1º sgt': '1º Sgt', '1o sgt': '1º Sgt', 'primeiro sargento': '1º Sgt',
+                'subtenente': 'ST', 'sub tenente': 'ST', 'st': 'ST',
+                'aspirante': 'Asp', 'aspirante a oficial': 'Asp', 'asp': 'Asp',
+                '2 ten': '2º Ten', '2º ten': '2º Ten', '2o ten': '2º Ten', 'segundo tenente': '2º Ten',
+                '1 ten': '1º Ten', '1º ten': '1º Ten', '1o ten': '1º Ten', 'primeiro tenente': '1º Ten',
+                'capitao': 'Cap', 'cap': 'Cap',
+                'major': 'Maj', 'maj': 'Maj',
+                'tenente coronel': 'Ten Cel', 'ten cel': 'Ten Cel', 'tc': 'Ten Cel',
+                'coronel': 'Cel', 'cel': 'Cel'
+            };
+            return mapa[chave] || original;
+        }
+
+        function normalizarPosicaoConfiguracoes(valor) {
+            const original = escapeText(valor);
+            if (!original) return '';
+            const chave = original
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase().replace(/\./g, '').replace(/\s+/g, ' ').trim();
+
+            if (['aux', 'auxiliar'].includes(chave)) return 'Auxiliar';
+            if (['ch', 'chefe'].includes(chave)) return 'Chefe';
+            if (['cmt', 'comandante'].includes(chave)) return 'Comandante';
+            // Encarregado, Fiscal e Operador não fazem mais parte das opções.
+            if (['encarregado', 'fiscal', 'operador'].includes(chave)) return '';
+            return '';
+        }
 
         function mostrarToast(msg, erro=false) {
             const t = $('toast');
@@ -648,9 +685,9 @@
 
                 $('nomeCompleto').value = valorCampo('nome', usuarioLogado.nome || '');
                 $('nomeGuerra').value = valorCampo('nomeGuerra', usuarioLogado.nome_guerra || '');
-                selecionarOuAdicionar($('patente'), valorCampo('patente', usuarioLogado.patente || 'Soldado'));
+                selecionarOuAdicionar($('patente'), normalizarPatenteConfiguracoes(valorCampo('patente', usuarioLogado.patente || 'Sd')));
                 selecionarOuAdicionar($('secao'), valorCampo('secao', usuarioLogado.secao || 'S3'));
-                selecionarOuAdicionar($('posicao'), valorCampo('posicao', usuarioLogado.posicao || 'Auxiliar'));
+                $('posicao').value = normalizarPosicaoConfiguracoes(valorCampo('posicao', usuarioLogado.posicao || ''));
 
                 colunaPreferencias = PREF_CANDIDATES.find(c => Object.prototype.hasOwnProperty.call(usuarioBanco, c)) || null;
                 colunaAvatar = AVATAR_CANDIDATES.find(c => Object.prototype.hasOwnProperty.call(usuarioBanco, c)) || null;
