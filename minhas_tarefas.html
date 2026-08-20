@@ -8,6 +8,7 @@
     <!-- CDN DO SDK DO SUPABASE -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="perfis.js"></script>
+    <script src="responsaveis_perfis.js"></script>
 
     <style>
         * {
@@ -900,6 +901,14 @@
             .search-tarefa, .select-secao, .btn-nova-tarefa { width: 100%; }
             .kanban-board { padding: 15px; }
         }
+    
+        .detalhe-secao-select{width:100%;padding:9px 10px;border:1px solid #d1d5db;border-radius:7px;background:#fff;color:#1f2937;font-weight:700;outline:none}
+        .detalhe-secao-select:focus{border-color:#047857;box-shadow:0 0 0 2px rgba(4,120,87,.08)}
+        .detalhe-secao-select:disabled{background:#f3f4f6;color:#6b7280}
+        .btn-salvar-secao-tarefa{display:none;margin-top:7px;padding:8px 10px;width:100%;border:0;border-radius:7px;background:#047857;color:#fff;font-weight:700;cursor:pointer}
+        .btn-salvar-secao-tarefa:hover{background:#065f46}.btn-salvar-secao-tarefa:disabled{opacity:.6;cursor:wait}
+        .aviso-permissao-secao{font-size:10px;line-height:1.35;margin-top:6px}
+
     </style>
 </head>
 <body>
@@ -1104,8 +1113,15 @@
 
             <div style="display:grid; grid-template-columns: 1fr 1.35fr; gap:15px; margin-top:5px;">
                 <div>
-                    <label>Seção</label>
-                    <p id="detalheSecao" style="font-size:14px; color:#1f2937; background:#f3f4f6; padding:8px; border-radius:6px; font-weight:bold;">S3</p>
+                    <label>Seção responsável</label>
+                    <select id="detalheSecaoSelect" class="detalhe-secao-select">
+                        <option>S1</option><option>S2</option><option>S3</option><option>S4</option>
+                        <option>Fiscalização</option><option>Pagamento</option><option>SALC</option>
+                        <option>Garagem</option><option>ResMat</option><option>ResArmt</option>
+                        <option>Informática</option><option>Comandante</option>
+                    </select>
+                    <button type="button" id="btnSalvarSecaoTarefa" class="btn-salvar-secao-tarefa">Salvar seção</button>
+                    <div id="avisoPermissaoSecao" class="aviso-permissao-secao"></div>
                 </div>
                 <div>
                     <label>Responsáveis</label>
@@ -1120,9 +1136,9 @@
             <div class="responsaveis-painel" id="painelResponsaveis">
                 <div class="responsaveis-painel-header">
                     <strong>Despachar tarefa</strong>
-                    <span style="font-size:11px;color:#6b7280;">Marque um ou mais usuários</span>
+                    <span style="font-size:11px;color:#6b7280;">Cada perfil é um destino independente</span>
                 </div>
-                <input type="search" class="responsaveis-busca" id="buscaUsuarioResponsavel" placeholder="Buscar por nome, patente ou seção..." autocomplete="off">
+                <input type="search" class="responsaveis-busca" id="buscaUsuarioResponsavel" placeholder="Buscar por militar, seção ou função..." autocomplete="off">
                 <div class="lista-usuarios-responsaveis" id="listaUsuariosResponsaveis"></div>
                 <div class="responsaveis-painel-actions">
                     <button type="button" class="btn-cancelar" id="btnCancelarResponsaveis" style="padding:9px 14px;border:none;border-radius:7px;cursor:pointer;font-weight:bold;">Cancelar</button>
@@ -1699,6 +1715,86 @@
             return [...new Set((r.data || []).map(x => x.tarefa_id))];
         }
 
+        // ---------- FASE 2.2: sobrescritas por PERFIL ----------
+        normalizarResponsaveis = valor => ResponsaveisPerfis26.normalize(valor);
+        formatarResponsaveis = valor => {
+            const lista = Array.isArray(valor) ? valor : ResponsaveisPerfis26.normalize(valor);
+            return lista.length ? lista.map(ResponsaveisPerfis26.label).join(', ') : '-';
+        };
+        serializarResponsaveisParaBanco = lista => ResponsaveisPerfis26.serialize(lista);
+        hidratarResponsaveisFase2 = lista => ResponsaveisPerfis26.hydrate(supabaseClient, lista);
+        gravarResponsaveisFase2 = (tarefaId, lista) => ResponsaveisPerfis26.save(
+            supabaseClient, tarefaId, lista, usuarioLogado.id, usuarioPerfilAtual?.perfil_id
+        );
+        usuarioCorrespondeResponsavel = (destino, responsavel) => ResponsaveisPerfis26.sameProfile(destino, responsavel);
+        carregarUsuariosResponsaveis = async function(forcar=false){
+            if(!forcar && usuariosResponsaveisCache.length)return usuariosResponsaveisCache;
+            usuariosResponsaveisCache = await ResponsaveisPerfis26.listProfiles(supabaseClient, usuarioPerfilAtual);
+            return usuariosResponsaveisCache;
+        };
+        objetoResponsavelDoUsuario = destino => ({
+            ...destino,
+            id:String(destino.id),
+            usuario_id:String(destino.id),
+            perfil_id:String(destino.perfil_id),
+            nome:ResponsaveisPerfis26.pessoa(destino)
+        });
+        converterResponsaveisLegadosParaUsuarios = function(){
+            return responsaveisSelecionadosLocal.map(r=>{
+                if(r.perfil_id)return r;
+                let d=null;
+                if(r.id){
+                    d=usuariosResponsaveisCache.find(x=>String(x.id)===String(r.id)&&(!r.secao||ResponsaveisPerfis26.norm(x.secao)===ResponsaveisPerfis26.norm(r.secao))&&(!r.posicao||ResponsaveisPerfis26.norm(x.posicao)===ResponsaveisPerfis26.norm(r.posicao)));
+                    if(!d)d=usuariosResponsaveisCache.find(x=>String(x.id)===String(r.id)&&x.principal);
+                    if(!d)d=usuariosResponsaveisCache.find(x=>String(x.id)===String(r.id));
+                }
+                if(!d){
+                    d=usuariosResponsaveisCache.find(x=>ResponsaveisPerfis26.norm(ResponsaveisPerfis26.pessoa(x))===ResponsaveisPerfis26.norm(r.nome));
+                }
+                return d?objetoResponsavelDoUsuario(d):r;
+            });
+        };
+        atualizarResumoResponsaveis = function(){
+            const container=document.getElementById('detalheResponsavel');
+            const contador=document.getElementById('qtdResponsaveisSelecionados');
+            if(!container||!contador)return;
+            contador.textContent=String(responsaveisSelecionadosLocal.length);container.innerHTML='';
+            if(!responsaveisSelecionadosLocal.length){container.innerHTML='<span class="responsaveis-vazio">Nenhum perfil responsável selecionado.</span>';return;}
+            responsaveisSelecionadosLocal.forEach(r=>{const chip=document.createElement('span');chip.className='responsavel-chip';chip.textContent=ResponsaveisPerfis26.label(r);container.appendChild(chip);});
+        };
+        buscarIdsTarefasAtribuidasFase2 = (usuarioId, perfilId) => ResponsaveisPerfis26.taskIds(supabaseClient, usuarioId, perfilId);
+
+        function configurarEditorSecaoTarefa(tarefa){
+            const select=document.getElementById('detalheSecaoSelect'),btn=document.getElementById('btnSalvarSecaoTarefa'),aviso=document.getElementById('avisoPermissaoSecao');
+            if(!select||!btn||!aviso||!tarefa)return;
+            const atual=String(tarefa.secao||'').trim();
+            if(atual&&![...select.options].some(o=>o.value===atual))select.add(new Option(atual,atual));
+            select.value=atual;
+            const ok=ResponsaveisPerfis26.canChangeSection(tarefa,usuarioPerfilAtual,usuarioLogado.id);
+            select.disabled=!ok;btn.style.display=ok?'block':'none';
+            aviso.textContent=ok?(ResponsaveisPerfis26.norm(usuarioPerfilAtual?.secao)==='admin'||ResponsaveisPerfis26.norm(usuarioPerfilAtual?.secao)==='comandante'?'Admin/Comandante pode alterar a seção responsável.':`O perfil ${usuarioPerfilAtual.secao||'-'} — ${usuarioPerfilAtual.posicao||'-'} é responsável por esta tarefa.`):'Somente Admin, Comandante ou o perfil responsável pela tarefa pode alterar a seção.';
+            aviso.style.color=ok?'#047857':'#6b7280';
+        }
+
+        async function salvarSecaoTarefa(){
+            if(!tarefaSelecionadaId)return;
+            const tarefa=encontrarTarefa(tarefaSelecionadaId);if(!tarefa)return;
+            if(!ResponsaveisPerfis26.canChangeSection(tarefa,usuarioPerfilAtual,usuarioLogado.id))return alert('Seu perfil não possui permissão para alterar a seção desta tarefa.');
+            const select=document.getElementById('detalheSecaoSelect'),btn=document.getElementById('btnSalvarSecaoTarefa');
+            const nova=String(select?.value||'').trim();if(!nova)return alert('Selecione uma seção.');
+            if(nova===String(tarefa.secao||''))return;
+            const antiga=tarefa.secao||'-';if(btn)btn.disabled=true;
+            try{
+                await ResponsaveisPerfis26.changeSection(supabaseClient,tarefa.id,nova,usuarioLogado.id,usuarioPerfilAtual?.perfil_id);
+                const hist=normalizarHistorico(tarefa.historico);hist.push(criarEntradaHistorico(`Seção responsável alterada de "${antiga}" para "${nova}".`));
+                const rh=await supabaseClient.from('tarefas').update({historico:hist}).eq('id',tarefa.id);if(rh.error)throw rh.error;
+                tarefa.secao=nova;tarefa.historico=hist;listaHistoricoLocal=hist.slice();renderizarHistoricoLocal();
+                alert(`Seção da tarefa alterada para ${nova}.`);
+                const id=tarefa.id;await buscarTarefasDoBanco();
+                const atual=encontrarTarefa(id);if(atual){tarefaSelecionadaId=id;configurarEditorSecaoTarefa(atual);}else fecharModalDetalhes();
+            }catch(err){alert('Erro ao alterar a seção da tarefa: '+err.message)}finally{if(btn)btn.disabled=false;}
+        }
+
         // ---------- Perfil do militar logado ----------
         function obterAvatarUsuarioAtual() {
             const u = usuarioPerfilAtual || usuarioLogado || {};
@@ -1780,20 +1876,14 @@
         }
 
         function tarefaCriadaPorMim(tarefa) {
+            const pid=String(usuarioPerfilAtual?.perfil_id??'');
+            if(pid&&tarefa?.criado_por_perfil_id!=null)return String(tarefa.criado_por_perfil_id)===pid;
             return String(tarefa?.criado_por ?? '') === String(usuarioLogado.id);
         }
 
         function tarefaEncaminhadaParaMim(tarefa) {
             if (!tarefa || tarefaCriadaPorMim(tarefa)) return false;
-            const lista = normalizarResponsaveis(tarefa.responsavel);
-            if (!lista.length) return false;
-
-            const idAtual = String(usuarioLogado.id);
-            const variantes = variantesResponsavelUsuario().map(normalizarIdentidade);
-            return lista.some(r => {
-                if (r.id && String(r.id) === idAtual) return true;
-                return variantes.includes(normalizarIdentidade(r.nome));
-            });
+            return ResponsaveisPerfis26.assignedToProfile(tarefa,usuarioPerfilAtual,usuarioLogado.id);
         }
 
         function atualizarResumoPessoal() {
@@ -1813,18 +1903,17 @@
                 const tarefasPorId = new Map();
                 const adicionar = lista => (lista || []).forEach(t => tarefasPorId.set(String(t.id), t));
 
-                // Tarefas criadas pela conta logada.
-                const criadas = await supabaseClient
-                    .from('tarefas')
-                    .select('*')
-                    .eq('criado_por', usuarioLogado.id)
-                    .order('id', { ascending: true });
-
+                // Tarefas criadas pelo PERFIL ativo.
+                let consultaCriadas = supabaseClient.from('tarefas').select('*').order('id', { ascending: true });
+                consultaCriadas = usuarioPerfilAtual?.perfil_id
+                    ? consultaCriadas.eq('criado_por_perfil_id', usuarioPerfilAtual.perfil_id)
+                    : consultaCriadas.eq('criado_por', usuarioLogado.id);
+                const criadas = await consultaCriadas;
                 if (criadas.error) throw criadas.error;
                 adicionar(criadas.data);
 
-                // FASE 2: busca os IDs diretamente na tabela de relacionamento.
-                const idsAtribuidas = await buscarIdsTarefasAtribuidasFase2(usuarioLogado.id);
+                // Tarefas atribuídas exatamente ao PERFIL ativo.
+                const idsAtribuidas = await buscarIdsTarefasAtribuidasFase2(usuarioLogado.id, usuarioPerfilAtual?.perfil_id);
 
                 if (idsAtribuidas !== null) {
                     if (idsAtribuidas.length) {
@@ -2035,7 +2124,7 @@
 
             document.getElementById('detalheCodigoTitulo').innerText = `Tarefa ${t.codigo || ('#' + String(t.id).padStart(4, '0'))}`;
             document.getElementById('detalheFormTitulo').innerText = t.titulo || 'Sem título';
-            document.getElementById('detalheSecao').innerText = t.secao || '-';
+            configurarEditorSecaoTarefa(t);
             responsaveisSelecionadosLocal = normalizarResponsaveis(t.responsavel);
             responsaveisBackupLocal = responsaveisSelecionadosLocal.map(r => ({ ...r }));
             atualizarResumoResponsaveis();
@@ -2395,6 +2484,7 @@
         document.getElementById('btnSelecionarResponsaveis').onclick = abrirPainelResponsaveis;
         document.getElementById('btnCancelarResponsaveis').onclick = cancelarSelecaoResponsaveis;
         document.getElementById('btnDespacharResponsaveis').onclick = despacharParaResponsaveis;
+        document.getElementById('btnSalvarSecaoTarefa').onclick = salvarSecaoTarefa;
         document.getElementById('buscaUsuarioResponsavel').addEventListener('input', renderizarListaUsuariosResponsaveis);
 
         document.getElementById('formNovaTarefa').addEventListener('submit', async function(e) {

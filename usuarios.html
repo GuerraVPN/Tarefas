@@ -6,6 +6,7 @@
   <title>Usuários - 26º Pel PE Mec</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="perfis.js"></script>
+    <script src="responsaveis_perfis.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <link rel="stylesheet" href="notificacoes.css">
   <style>
@@ -71,6 +72,9 @@
     .profile-item-main{min-width:0}.profile-item-title{font-weight:800;font-size:14px;color:#1f2937}.profile-item-meta{font-size:11px;color:#6b7280;margin-top:3px}
     .profile-item-actions{display:flex;gap:7px;flex-wrap:wrap}.profile-pill{display:inline-flex;align-items:center;border-radius:999px;padding:3px 8px;font-size:10px;font-weight:800;background:#dcfce7;color:#166534;margin-left:6px}
     .profile-pill.admin{background:#fef3c7;color:#92400e}.btn.small{padding:7px 9px;font-size:11px}
+
+  
+    .user-profile-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}.user-profile-chip{display:inline-flex;align-items:center;padding:3px 7px;border-radius:999px;background:#f3f4f6;border:1px solid #e5e7eb;color:#4b5563;font-size:10px;font-weight:700}.user-profile-chip.primary{background:#ecfdf5;border-color:#a7f3d0;color:#047857}.profile-detail-list{display:grid;gap:7px;margin-top:4px}.profile-detail-line{padding:8px 10px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;font-size:12px;color:#374151}
 
   </style>
 </head>
@@ -304,73 +308,56 @@
     const {data,error}=await supabaseClient.from('usuarios')
       .select('id,nome_completo,nome_guerra,cpf,patente,secao,posicao,telefone,email,avatar')
       .order('nome_guerra',{ascending:true});
-    if(error){
-      $('usersList').innerHTML=`<div class="empty">Erro ao carregar usuários: ${esc(error.message)}</div>`;
-      return;
-    }
+    if(error){$('usersList').innerHTML=`<div class="empty">Erro ao carregar usuários: ${esc(error.message)}</div>`;return;}
     usuarios=data||[];
-
     try{
-      const rp=await supabaseClient.from('usuario_perfis').select('usuario_id');
-      if(!rp.error){
-        const cont=new Map();
-        (rp.data||[]).forEach(x=>cont.set(String(x.usuario_id),(cont.get(String(x.usuario_id))||0)+1));
-        usuarios.forEach(u=>u._perfis_count=cont.get(String(u.id))||1);
-      }else usuarios.forEach(u=>u._perfis_count=1);
+      const rp=await supabaseClient.from('usuario_perfis').select('id,usuario_id,secao,posicao,principal,ativo').eq('ativo',true).order('usuario_id',{ascending:true}).order('principal',{ascending:false}).order('id',{ascending:true});
+      if(rp.error)throw rp.error;
+      const mapa=new Map();
+      (rp.data||[]).forEach(p=>{
+        if(norm(p.secao)==='admin'&&!ehAdmin(perfil))return;
+        const k=String(p.usuario_id);if(!mapa.has(k))mapa.set(k,[]);mapa.get(k).push(p);
+      });
+      usuarios.forEach(u=>{u._perfis=mapa.get(String(u.id))||[];u._perfis_count=u._perfis.length||1;});
     }catch(_){
-      usuarios.forEach(u=>u._perfis_count=1);
+      usuarios.forEach(u=>{u._perfis=[{id:null,usuario_id:u.id,secao:u.secao,posicao:u.posicao,principal:true,ativo:true}];u._perfis_count=1;});
     }
     renderLista();
   }
 
   function encontrar(id){return usuarios.find(u=>String(u.id)===String(id))}
 
+  function chipsPerfisUsuario(u){
+    const perfis=u?._perfis||[];
+    const lista=perfis.length?perfis:[{secao:secaoVisivel(u),posicao:u?.posicao,principal:true}];
+    return `<div class="user-profile-chips">${lista.map(p=>`<span class="user-profile-chip ${p.principal?'primary':''}">${esc(p.secao||'-')} — ${esc(p.posicao||'Auxiliar')}${p.principal?' ★':''}</span>`).join('')}</div>`;
+  }
+
   function renderLista(){
     const termo=norm($('searchInput').value),secaoFiltro=$('sectionFilter').value;
     const filtrados=usuarios.filter(u=>{
-      const secaoOk=secaoFiltro==='Todas'||norm(u.secao)===norm(secaoFiltro);
-      const texto=norm([u.nome_completo,nomeExibicao(u),cpfFormatado(u.cpf),u.posicao,secaoVisivel(u),u.telefone,u.email].join(' '));
+      const perfis=u._perfis||[];
+      const secaoOk=secaoFiltro==='Todas'||perfis.some(p=>norm(p.secao)===norm(secaoFiltro))||(!perfis.length&&norm(u.secao)===norm(secaoFiltro));
+      const textoPerfis=perfis.map(p=>`${p.secao} ${p.posicao}`).join(' ');
+      const texto=norm([u.nome_completo,nomeExibicao(u),cpfFormatado(u.cpf),textoPerfis,u.posicao,secaoVisivel(u),u.telefone,u.email].join(' '));
       return secaoOk&&(!termo||texto.includes(termo));
     });
     const list=$('usersList');
-    if(!filtrados.length){
-      list.innerHTML='<div class="empty">Nenhum usuário encontrado.</div>';
-      $('countLine').textContent='0 usuários';
-      return;
-    }
-
+    if(!filtrados.length){list.innerHTML='<div class="empty">Nenhum usuário encontrado.</div>';$('countLine').textContent='0 usuários';return;}
     list.innerHTML=filtrados.map(u=>{
       const editar=podeEditarAlvo(u)?`<button class="icon-btn edit-btn" title="Editar usuário" data-id="${esc(u.id)}">✎</button>`:'';
       const senha=podeAlterarSenhaAlvo(u)?`<button class="icon-btn pass-btn" title="Alterar senha" data-id="${esc(u.id)}">🔑</button>`:'';
       const excluir=podeExcluirAlvo(u)?`<button class="icon-btn danger del-btn" title="Excluir usuário" data-id="${esc(u.id)}">🗑</button>`:'';
       const perfisBtn=podeGerenciarPerfisAlvo(u)?`<button class="icon-btn profiles-btn" title="Gerenciar perfis" data-id="${esc(u.id)}">🪪</button>`:'';
-      return `<div class="user-row ${selecionado&&String(selecionado.id)===String(u.id)?'selected':''}">
-        <div class="user-main">${avatarHtml(u)}<div><div class="user-name">${esc(nomeExibicao(u))}</div><div class="user-sub">${esc(secaoVisivel(u))} · ${esc(u.posicao||'Sem função')} · ${Number(u._perfis_count||1)} perfil(is)</div></div></div>
-        <div class="cell"><span class="cell-label">Função</span>${esc(u.posicao||'-')}</div>
-        <div class="cell contact"><span class="cell-label">Contato</span><div>${esc(u.telefone||'Não informado')}</div><div>${esc(u.email||'Não informado')}</div></div>
-        <div class="actions">
-          <button class="icon-btn prop-btn" title="Propriedades" data-id="${esc(u.id)}">⚙</button>
-          <button class="icon-btn msg-btn" title="Enviar mensagem" data-id="${esc(u.id)}">💬</button>
-          ${perfisBtn}${editar}${senha}${excluir}
-        </div>
-      </div>`;
+      return `<div class="user-row ${selecionado&&String(selecionado.id)===String(u.id)?'selected':''}"><div class="user-main">${avatarHtml(u)}<div style="min-width:0"><div class="user-name">${esc(nomeExibicao(u))}</div><div class="user-sub">${Number(u._perfis_count||1)} perfil(is) funcional(is)</div>${chipsPerfisUsuario(u)}</div></div><div class="cell"><span class="cell-label">Perfis</span>${Number(u._perfis_count||1)}</div><div class="cell contact"><span class="cell-label">Contato</span><div>${esc(u.telefone||'Não informado')}</div><div>${esc(u.email||'Não informado')}</div></div><div class="actions"><button class="icon-btn prop-btn" title="Propriedades" data-id="${esc(u.id)}">⚙</button><button class="icon-btn msg-btn" title="Enviar mensagem" data-id="${esc(u.id)}">💬</button>${perfisBtn}${editar}${senha}${excluir}</div></div>`;
     }).join('');
     $('countLine').textContent=`Mostrando ${filtrados.length} de ${usuarios.length} usuário(s) cadastrado(s)`;
   }
 
   function abrirPropriedades(u){
-    selecionado=u;renderLista();
+    selecionado=u;renderLista();const perfis=u?._perfis||[];
     $('profilePanel').className='profile-body';
-    $('profilePanel').innerHTML=`<div class="profile-top">${avatarHtml(u)}<div><div class="profile-name">${esc(nomeExibicao(u))}</div><div class="profile-role">${esc(u.posicao||'Sem função cadastrada')}</div></div></div>
-      <div class="details">
-        <div class="detail"><span>Nome completo</span><strong>${esc(u.nome_completo||'-')}</strong></div>
-        <div class="detail"><span>CPF</span><strong>${esc(cpfFormatado(u.cpf))}</strong></div>
-        <div class="detail"><span>Posto / Grad.</span><strong>${esc(u.patente||'-')}</strong></div>
-        <div class="detail"><span>Seção</span><strong>${esc(secaoVisivel(u))}</strong></div>
-        <div class="detail"><span>Função</span><strong>${esc(u.posicao||'-')}</strong></div>
-        <div class="detail"><span>Telefone</span><strong>${esc(u.telefone||'Não informado')}</strong></div>
-        <div class="detail"><span>E-mail</span><strong>${esc(u.email||'Não informado')}</strong></div>
-      </div>`;
+    $('profilePanel').innerHTML=`<div class="profile-top">${avatarHtml(u)}<div><div class="profile-name">${esc(nomeExibicao(u))}</div><div class="profile-role">${perfis.length||1} perfil(is) funcional(is)</div></div></div><div class="details"><div class="detail"><span>Nome completo</span><strong>${esc(u.nome_completo||'-')}</strong></div><div class="detail"><span>CPF</span><strong>${esc(cpfFormatado(u.cpf))}</strong></div><div class="detail"><span>Posto / Grad.</span><strong>${esc(u.patente||'-')}</strong></div><div class="detail"><span>Perfis</span><strong><div class="profile-detail-list">${(perfis.length?perfis:[{secao:secaoVisivel(u),posicao:u.posicao,principal:true}]).map(p=>`<div class="profile-detail-line">${esc(p.secao||'-')} — ${esc(p.posicao||'Auxiliar')}${p.principal?' · Principal':''}</div>`).join('')}</div></strong></div><div class="detail"><span>Telefone</span><strong>${esc(u.telefone||'Não informado')}</strong></div><div class="detail"><span>E-mail</span><strong>${esc(u.email||'Não informado')}</strong></div></div>`;
   }
 
   async function carregarConversa(u){

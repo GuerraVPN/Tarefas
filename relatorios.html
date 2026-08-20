@@ -7,6 +7,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="perfis.js"></script>
+    <script src="responsaveis_perfis.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 
     <style>
@@ -573,16 +574,12 @@
         }
 
         function formatarResponsaveis(valor) {
-            if (!valor) return '-';
-            let lista = valor;
-            if (typeof lista === 'string') {
-                try { const p = JSON.parse(lista); lista = Array.isArray(p) ? p : [p]; }
-                catch (_) { return String(valor); }
-            }
-            if (!Array.isArray(lista)) lista = [lista];
-            const nomes = lista.map(r => typeof r === 'string' ? r : (r.nome || r.nome_guerra || r.name || '')).filter(Boolean);
-            return nomes.join(', ') || '-';
+            let lista=valor;
+            if(typeof lista==='string'){try{lista=JSON.parse(lista)}catch(_){return String(valor||'-')}}
+            if(!Array.isArray(lista))lista=[lista];
+            return lista.length?lista.map(r=>typeof r==='string'?r:ResponsaveisPerfis26.label(r)).filter(Boolean).join(', '):'-';
         }
+
 
         // ---------- FASE 2: leitura de responsáveis ----------
         function erroTabelaResponsaveisNaoInstalada(error) {
@@ -647,6 +644,10 @@
             return [...new Set((r.data || []).map(x => x.tarefa_id))];
         }
 
+
+        // FASE 2.2 — responsáveis exibidos pelo perfil de destino
+        hidratarResponsaveisFase2 = lista => ResponsaveisPerfis26.hydrate(supabaseClient, lista);
+        buscarIdsTarefasAtribuidasFase2 = (usuarioId, perfilId) => ResponsaveisPerfis26.taskIds(supabaseClient, usuarioId, perfilId);
 
         function renderTabela(tarefas) {
             const prioridade = {atrasada:0, pendente:1, processo:2, concluida:3};

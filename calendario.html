@@ -6,6 +6,7 @@
     <title>Calendário - 26º Pel PE Mec</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="perfis.js"></script>
+    <script src="responsaveis_perfis.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -420,8 +421,10 @@
         }
 
         function formatarResponsaveis(valor) {
-            const lista = normalizarResponsaveis(valor);
-            return lista.length ? lista.map(r => r.nome).filter(Boolean).join(', ') : '-';
+            let lista = valor;
+            if(typeof lista==='string'){try{lista=JSON.parse(lista)}catch(_){lista=[]}}
+            if(!Array.isArray(lista))lista=[];
+            return lista.length ? lista.map(r => ResponsaveisPerfis26.label(r)).join(', ') : '-';
         }
 
         // ---------- FASE 2: leitura de responsáveis ----------
@@ -488,6 +491,10 @@
         }
 
 
+        // FASE 2.2 — leitura por perfil
+        hidratarResponsaveisFase2 = lista => ResponsaveisPerfis26.hydrate(supabaseClient, lista);
+        buscarIdsTarefasAtribuidasFase2 = (usuarioId, perfilId) => ResponsaveisPerfis26.taskIds(supabaseClient, usuarioId, perfilId);
+
         function variantesResponsavelUsuario() {
             const u = usuarioPerfilAtual || usuarioLogado;
             const nomeGuerra = String(u.nome_guerra || '').trim();
@@ -499,19 +506,14 @@
         }
 
         function tarefaCriadaPorMim(tarefa) {
+            const pid=String(usuarioPerfilAtual?.perfil_id??'');
+            if(pid&&tarefa?.criado_por_perfil_id!=null)return String(tarefa.criado_por_perfil_id)===pid;
             return String(tarefa?.criado_por ?? '') === String(usuarioLogado.id);
         }
 
         function tarefaEncaminhadaParaMim(tarefa) {
             if (!tarefa || tarefaCriadaPorMim(tarefa)) return false;
-            const lista = normalizarResponsaveis(tarefa.responsavel);
-            if (!lista.length) return false;
-            const idAtual = String(usuarioLogado.id);
-            const variantes = variantesResponsavelUsuario().map(normalizarIdentidade);
-            return lista.some(r => {
-                if (r.id && String(r.id) === idAtual) return true;
-                return variantes.includes(normalizarIdentidade(r.nome));
-            });
+            return ResponsaveisPerfis26.assignedToProfile(tarefa,usuarioPerfilAtual,usuarioLogado.id);
         }
 
         function chaveDataLocal(data) {
@@ -633,14 +635,15 @@
                 const mapa = new Map();
                 const adicionar = lista => (lista || []).forEach(t => mapa.set(String(t.id), t));
 
-                const criadas = await supabaseClient
-                    .from('tarefas').select('*')
-                    .eq('criado_por', usuarioLogado.id)
-                    .order('id', { ascending:true });
+                let consultaCriadas = supabaseClient.from('tarefas').select('*').order('id', { ascending:true });
+                consultaCriadas = usuarioPerfilAtual?.perfil_id
+                    ? consultaCriadas.eq('criado_por_perfil_id', usuarioPerfilAtual.perfil_id)
+                    : consultaCriadas.eq('criado_por', usuarioLogado.id);
+                const criadas = await consultaCriadas;
                 if (criadas.error) throw criadas.error;
                 adicionar(criadas.data);
 
-                const idsAtribuidas = await buscarIdsTarefasAtribuidasFase2(usuarioLogado.id);
+                const idsAtribuidas = await buscarIdsTarefasAtribuidasFase2(usuarioLogado.id, usuarioPerfilAtual?.perfil_id);
 
                 if (idsAtribuidas !== null) {
                     if (idsAtribuidas.length) {
