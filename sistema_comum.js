@@ -6,7 +6,8 @@
     minhas:'minhas_tarefas.html',
     calendario:'calendario.html',
     relatorios:'relatorios.html',
-    usuarios:'usuarios.html'
+    usuarios:'usuarios.html',
+    central:'central.html'
   };
   let usuario=null;
 
@@ -32,6 +33,8 @@
 
   function credits(){
     if(document.getElementById('creditos26Pel'))return;
+    const existente=document.querySelector('.sidebar .credit,.sidebar .creditos-26pel');
+    if(existente){existente.id='creditos26Pel';return;}
     const sidebar=document.querySelector('.sidebar');
     if(!sidebar)return;
 

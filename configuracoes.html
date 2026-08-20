@@ -6,7 +6,7 @@
     <title>Configurações do Sistema - 26º Pel PE Mec</title>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="perfis.js?v=5.0"></script>
+    <script src="perfis.js?v=3"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -63,7 +63,7 @@
         @media(max-width:900px){body{display:block}.sidebar{position:fixed;left:0;top:0;height:100vh;transform:translateX(-100%);transition:.22s ease}.sidebar.open{transform:translateX(0)}.main-content{width:100%}.header{padding:15px}.menu-toggle{display:inline-flex}.content{padding:18px}.grid{grid-template-columns:1fr}}
         @media(max-width:560px){.two-col{grid-template-columns:1fr}.header{align-items:flex-start}.header-actions{gap:8px}.content{padding:15px}.status-strip{align-items:flex-start;flex-direction:column}.avatar-large{width:68px;height:68px}}
     </style>
-    <link rel="stylesheet" href="notificacoes.css">
+        <link rel="stylesheet" href="notificacoes.css?v=3">
 </head>
 <body>
     <!-- Acesso baseado no usuário já autenticado pelo seu sistema -->
@@ -221,6 +221,7 @@
                             <label class="check-row"><input type="checkbox" id="prefCalendario" checked> Exibir Calendário</label>
                             <label class="check-row"><input type="checkbox" id="prefRelatorios" checked> Exibir Relatórios</label>
                             <label class="check-row"><input type="checkbox" id="prefUsuarios" checked> Exibir Usuários</label>
+                            <label class="check-row"><input type="checkbox" id="prefCentral" checked> Exibir Central de notificações</label>
                         </div>
 
                         <button class="save-system" id="btnSalvarPreferencias" type="button">Salvar Configurações do Sistema</button>
@@ -438,7 +439,8 @@
                     minhas: $('prefMinhas').checked,
                     calendario: $('prefCalendario').checked,
                     relatorios: $('prefRelatorios').checked,
-                    usuarios: $('prefUsuarios').checked
+                    usuarios: $('prefUsuarios').checked,
+                    central: $('prefCentral').checked
                 }
             };
         }
@@ -452,6 +454,7 @@
             $('prefCalendario').checked = sidebar.calendario !== false;
             $('prefRelatorios').checked = sidebar.relatorios !== false;
             $('prefUsuarios').checked = sidebar.usuarios !== false;
+            $('prefCentral').checked = sidebar.central !== false;
             aplicarTema();
             aplicarSidebar();
         }
@@ -755,7 +758,7 @@
         $('btnSalvarPerfil').addEventListener('click', () => salvarPerfil(true, true));
 
         // Preferências
-        ['prefQuadro', 'prefMinhas', 'prefCalendario', 'prefRelatorios', 'prefUsuarios']
+        ['prefQuadro', 'prefMinhas', 'prefCalendario', 'prefRelatorios', 'prefUsuarios', 'prefCentral']
             .forEach(id => $(id).addEventListener('change', agendarSalvarPrefs));
         $('btnSalvarPreferencias').addEventListener('click', () => salvarPreferencias(true));
 
@@ -780,9 +783,10 @@
         // Inicialização
         carregarUsuario();
     </script>
-        <script src="sistema_comum.js?v=5.0"></script>
-    <script src="auditoria.js?v=5.0"></script>
-    <script src="bloco_notas.js?v=5.0"></script>
-    <script src="notificacoes.js"></script>
+        <script src="sistema_comum.js?v=3"></script>
+    <script src="auditoria.js?v=3"></script>
+        <script src="notificacoes.js?v=3"></script>
+    <script src="v3_ui.js?v=3"></script>
+    <script src="bloco_notas.js?v=3"></script>
 </body>
 </html>
