@@ -1,307 +1,330 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>TAREFAS - Criar conta</title>
-
-    <!-- CDN DO SDK DO SUPABASE OBRIGATÓRIA PARA A CONEXÃO -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            min-height: 100vh;
-            background: #1e3a8a;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            font-family: Arial, sans-serif;
-        }
-
-        .cadastro {
-            width: 100%;
-            max-width: 430px;
-            padding: 30px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px #0006;
-        }
-
-        .logo {
-            text-align: center;
-            color: #2563eb;
-            font-size: 28px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .subtitle {
-            text-align: center;
-            color: #666;
-            margin-bottom: 25px;
-        }
-
-        h2 {
-            text-align: center;
-            margin-bottom: 25px;
-            color: #222;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: bold;
-            color: #333;
-            font-size: 14px;
-        }
-
-        input,
-        select {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 17px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 15px;
-            background: white;
-        }
-
-        input:focus,
-        select:focus {
-            outline: none;
-            border-color: #2563eb;
-        }
-
-        button {
-            width: 100%;
-            padding: 13px;
-            border: 0;
-            border-radius: 8px;
-            background: #2563eb;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 5px;
-        }
-
-        button:hover {
-            background: #1d4ed8;
-        }
-
-        button:disabled {
-            background: #93c5fd;
-            cursor: not-allowed;
-        }
-
-        .voltar {
-            text-align: center;
-            margin-top: 20px;
-            color: #666;
-            font-size: 14px;
-        }
-
-        .voltar a {
-            color: #2563eb;
-            font-weight: bold;
-            text-decoration: none;
-        }
-
-        .voltar a:hover {
-            text-decoration: underline;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TAREFAS - Cadastro reservado</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #1e3a8a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+      font-family: Arial, sans-serif;
+      color: #1f2937;
+    }
+    .cadastro {
+      width: 100%;
+      max-width: 720px;
+      padding: 30px;
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px #0006;
+    }
+    .logo { text-align:center; color:#2563eb; font-size:28px; font-weight:700; margin-bottom:5px; }
+    .subtitle { text-align:center; color:#6b7280; margin:0 0 10px; }
+    .reservado {
+      margin: 16px 0 22px;
+      padding: 12px 14px;
+      border: 1px solid #f59e0b;
+      background: #fffbeb;
+      color: #92400e;
+      border-radius: 9px;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    h2 { text-align:center; margin: 0 0 24px; color:#222; }
+    .grid { display:grid; grid-template-columns:1fr 1fr; gap:0 18px; }
+    .full { grid-column:1 / -1; }
+    label { display:block; margin-bottom:6px; font-weight:700; color:#374151; font-size:14px; }
+    input, select {
+      width:100%;
+      padding:12px;
+      margin-bottom:17px;
+      border:1px solid #d1d5db;
+      border-radius:8px;
+      font-size:15px;
+      background:#fff;
+    }
+    input:focus, select:focus { outline:none; border-color:#2563eb; box-shadow:0 0 0 3px #2563eb18; }
+    input:disabled, select:disabled { background:#f3f4f6; color:#6b7280; }
+    .hint { margin:-10px 0 16px; color:#6b7280; font-size:12px; }
+    button {
+      width:100%; padding:13px; border:0; border-radius:8px;
+      background:#2563eb; color:#fff; font-size:16px; font-weight:700;
+      cursor:pointer; margin-top:5px;
+    }
+    button:hover { background:#1d4ed8; }
+    button:disabled { background:#93c5fd; cursor:not-allowed; }
+    .status { display:none; margin-top:16px; padding:12px 14px; border-radius:8px; font-size:14px; line-height:1.45; }
+    .status.show { display:block; }
+    .status.ok { color:#065f46; background:#ecfdf5; border:1px solid #a7f3d0; }
+    .status.erro { color:#991b1b; background:#fef2f2; border:1px solid #fecaca; }
+    .status.info { color:#1e40af; background:#eff6ff; border:1px solid #bfdbfe; }
+    .voltar { text-align:center; margin-top:20px; color:#6b7280; font-size:14px; }
+    .voltar a { color:#2563eb; font-weight:700; text-decoration:none; }
+    .voltar a:hover { text-decoration:underline; }
+    @media (max-width: 640px) {
+      body { padding:12px; align-items:flex-start; }
+      .cadastro { padding:22px 18px; }
+      .grid { grid-template-columns:1fr; }
+      .full { grid-column:auto; }
+    }
+  </style>
 </head>
-
 <body>
-
-    <div class="cadastro">
-
-        <div class="logo">
-            TAREFAS
-        </div>
-
-        <p class="subtitle">
-            Crie sua conta
-        </p>
-
-        <h2>Cadastro</h2>
-
-        <form id="formCadastro">
-
-            <label for="nome">Nome completo</label>
-            <input
-                type="text"
-                id="nome"
-                placeholder="Digite seu nome completo"
-                required
-            >
-
-            <label for="guerra">Nome de guerra</label>
-            <input
-                type="text"
-                id="guerra"
-                placeholder="Digite seu nome de guerra"
-                required
-            >
-
-            <label for="cpf">CPF</label>
-            <input
-                type="text"
-                id="cpf"
-                placeholder="000.000.000-00"
-                maxlength="14"
-                required
-            >
-
-            <label for="patente">Patente</label>
-            <select id="patente" required>
-                <option value="">Selecione sua patente</option>
-                <option value="SdEv">Recruta</option>
-                <option value="Sd">Soldado</option>
-                <option value="Cb">Cabo</option>
-                <option value="3ºSgt">3º Sargento</option>
-                <option value="2°Sgt">2º Bento</option>
-                <option value="1ºSgt">1º Sargento</option>
-                <option value="ST">Subtenente</option>
-                <option value="Asp">Aspirante a Oficial</option>
-                <option value="2ºTen">2º Tenente</option>
-                <option value="1ºTen">1º Tenente</option>
-            </select>
-
-            <label for="secao">Seção</label>
-            <select id="secao" required>
-                <option value="">Selecione sua seção</option>
-                <option value="S1">S1</option>
-                <option value="S2">S2</option>
-                <option value="S3">S3</option>
-                <option value="S4">S4</option>
-                <option value="Fiscalização">Fiscalização</option>
-                <option value="Pagamento">Pagamento</option>
-                <option value="SALC">SALC</option>
-                <option value="Garagem">Garagem</option>
-                <option value="ResMat">Reserva de Materiais</option>
-                <option value="ResArmt">Reserva de Armamento</option>
-                <option value="Informática">Informática</option>
-            </select>
-
-            <label for="posicao">Posição</label>
-            <select id="posicao" required>
-                <option value="">Selecione sua posição</option>
-                <option value="Auxiliar">Auxiliar</option>
-                <option value="Chefe">Chefe</option>
-                <option value="Comandante">Comandante</option>
-            </select>
-
-            <label for="senha">Senha</label>
-            <input
-                type="password"
-                id="senha"
-                placeholder="Digite sua senha"
-                required
-            >
-
-            <label for="confirmarSenha">Confirmar senha</label>
-            <input
-                type="password"
-                id="confirmarSenha"
-                placeholder="Digite a senha novamente"
-                required
-            >
-
-            <button type="submit" id="btnEnviar">
-                Criar conta
-            </button>
-
-        </form>
-
-        <div class="voltar">
-            Já possui uma conta?
-            <a href="index.html">Entrar</a>
-        </div>
-
+  <div class="cadastro">
+    <div class="logo">TAREFAS</div>
+    <p class="subtitle">Cadastro reservado de usuários</p>
+    <div class="reservado">
+      <strong>Arquivo administrativo oculto.</strong> Esta página permite criar usuários comuns, Comandante e Admin.
+      Não coloque um link para ela no sistema e não publique este arquivo em um endereço público.
     </div>
 
-    <script>
-        // CONFIGURAÇÃO DO CLIENTE SUPABASE COM AS SUAS CREDENCIAIS
-        const SUPABASE_URL = "https://bpvijatnsluwsgnzklrd.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwdmlqYXRuc2x1d3NnbnprbHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MzkxNDMsImV4cCI6MjEwMjQxNTE0M30.uvyfm9mgl6MON0v75CwfGzNz6FBqw58uzR4ZcRAOLNQ";
-        
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    <h2>Criar conta</h2>
 
-        // Máscara de CPF
-        document.getElementById("cpf").addEventListener("input", function () {
-            let cpf = this.value.replace(/\D/g, "");
+    <form id="formCadastro">
+      <div class="grid">
+        <div class="full">
+          <label for="nome">Nome completo</label>
+          <input type="text" id="nome" placeholder="Digite o nome completo" autocomplete="name" required>
+        </div>
 
-            if (cpf.length > 11) {
-                cpf = cpf.substring(0, 11);
+        <div>
+          <label for="guerra">Nome de guerra</label>
+          <input type="text" id="guerra" placeholder="Ex.: Guerra" required>
+        </div>
+
+        <div>
+          <label for="cpf">CPF</label>
+          <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14" inputmode="numeric" autocomplete="off" required>
+        </div>
+
+        <div>
+          <label for="patente">Posto / Graduação</label>
+          <select id="patente" required>
+            <option value="">Selecione...</option>
+            <option value="Sd Ev">Sd Ev</option>
+            <option value="Sd">Sd</option>
+            <option value="Cb">Cb</option>
+            <option value="3º Sgt">3º Sgt</option>
+            <option value="2º Sgt">2º Sgt</option>
+            <option value="1º Sgt">1º Sgt</option>
+            <option value="ST">ST</option>
+            <option value="Asp">Asp</option>
+            <option value="2º Ten">2º Ten</option>
+            <option value="1º Ten">1º Ten</option>
+            <option value="Cap">Cap</option>
+            <option value="Maj">Maj</option>
+            <option value="Ten Cel">Ten Cel</option>
+            <option value="Cel">Cel</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="secao">Seção / Nível de acesso</label>
+          <select id="secao" required>
+            <option value="">Selecione...</option>
+            <option value="S1">S1</option>
+            <option value="S2">S2</option>
+            <option value="S3">S3</option>
+            <option value="S4">S4</option>
+            <option value="Fiscalização">Fiscalização</option>
+            <option value="Pagamento">Pagamento</option>
+            <option value="SALC">SALC</option>
+            <option value="Garagem">Garagem</option>
+            <option value="ResMat">Reserva de Materiais</option>
+            <option value="ResArmt">Reserva de Armamento</option>
+            <option value="Informática">Informática</option>
+            <option value="comandante">Comandante</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="posicao">Posição</label>
+          <select id="posicao" required>
+            <option value="">Selecione...</option>
+            <option value="Auxiliar">Auxiliar</option>
+            <option value="Chefe">Chefe</option>
+            <option value="Comandante">Comandante</option>
+            <option value="Administrador">Administrador</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="telefone">Telefone</label>
+          <input type="tel" id="telefone" placeholder="(00) 00000-0000" autocomplete="tel">
+        </div>
+
+        <div>
+          <label for="emailContato">E-mail de contato</label>
+          <input type="email" id="emailContato" placeholder="usuario@exemplo.mil.br" autocomplete="email">
+        </div>
+
+        <div>
+          <label for="senha">Senha</label>
+          <input type="password" id="senha" placeholder="Mínimo de 6 caracteres" minlength="6" autocomplete="new-password" required>
+        </div>
+
+        <div>
+          <label for="confirmarSenha">Confirmar senha</label>
+          <input type="password" id="confirmarSenha" placeholder="Repita a senha" minlength="6" autocomplete="new-password" required>
+        </div>
+
+        <div class="full hint">
+          O login continuará sendo feito com <strong>CPF + senha</strong>. Internamente, o Auth usa um endereço técnico derivado do CPF.
+        </div>
+      </div>
+
+      <button type="submit" id="btnEnviar">Criar conta no Supabase Auth</button>
+      <div id="status" class="status" aria-live="polite"></div>
+    </form>
+
+    <div class="voltar"><a href="index.html">← Voltar para o login</a></div>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://bpvijatnsluwsgnzklrd.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwdmlqYXRuc2x1d3NnbnprbHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MzkxNDMsImV4cCI6MjEwMjQxNTE0M30.uvyfm9mgl6MON0v75CwfGzNz6FBqw58uzR4ZcRAOLNQ";
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    function cpfSomenteNumeros(valor) {
+      return String(valor || "").replace(/\D/g, "").slice(0, 11);
+    }
+
+    function emailTecnicoDoCpf(cpf) {
+      return `${cpf}@auth.26pel.local`;
+    }
+
+    function mostrarStatus(texto, tipo = "info") {
+      const el = document.getElementById("status");
+      el.textContent = texto;
+      el.className = `status show ${tipo}`;
+    }
+
+    document.getElementById("cpf").addEventListener("input", function () {
+      let cpf = cpfSomenteNumeros(this.value);
+      cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
+      cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
+      cpf = cpf.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+      this.value = cpf;
+    });
+
+    document.getElementById("secao").addEventListener("change", function () {
+      const posicao = document.getElementById("posicao");
+      if (this.value === "admin") {
+        posicao.value = "Administrador";
+        posicao.disabled = true;
+      } else if (this.value === "comandante") {
+        posicao.value = "Comandante";
+        posicao.disabled = true;
+      } else {
+        posicao.disabled = false;
+        if (posicao.value === "Administrador") posicao.value = "";
+      }
+    });
+
+    document.getElementById("formCadastro").addEventListener("submit", async function (event) {
+      event.preventDefault();
+
+      const nome = document.getElementById("nome").value.trim();
+      const guerra = document.getElementById("guerra").value.trim();
+      const cpf = cpfSomenteNumeros(document.getElementById("cpf").value);
+      const patente = document.getElementById("patente").value;
+      const secao = document.getElementById("secao").value;
+      const posicaoEl = document.getElementById("posicao");
+      const posicao = secao === "admin" ? "Administrador" : secao === "comandante" ? "Comandante" : posicaoEl.value;
+      const telefone = document.getElementById("telefone").value.trim();
+      const emailContato = document.getElementById("emailContato").value.trim();
+      const senha = document.getElementById("senha").value;
+      const confirmarSenha = document.getElementById("confirmarSenha").value;
+      const btn = document.getElementById("btnEnviar");
+
+      if (cpf.length !== 11) return mostrarStatus("Informe um CPF com 11 dígitos.", "erro");
+      if (senha.length < 6) return mostrarStatus("A senha precisa ter no mínimo 6 caracteres.", "erro");
+      if (senha !== confirmarSenha) return mostrarStatus("As senhas não são iguais.", "erro");
+      if (!nome || !guerra || !patente || !secao || !posicao) return mostrarStatus("Preencha todos os campos obrigatórios.", "erro");
+
+      btn.disabled = true;
+      btn.textContent = "Criando conta...";
+      mostrarStatus("Criando usuário no Supabase Auth...", "info");
+
+      try {
+        // Evita que uma sessão anterior interfira no cadastro.
+        await supabaseClient.auth.signOut();
+
+        const emailTecnico = emailTecnicoDoCpf(cpf);
+        const { data, error } = await supabaseClient.auth.signUp({
+          email: emailTecnico,
+          password: senha,
+          options: {
+            data: {
+              cadastro_26pel: true,
+              nome_completo: nome,
+              nome_guerra: guerra,
+              cpf,
+              patente,
+              secao,
+              posicao,
+              telefone,
+              email_contato: emailContato
             }
-
-            cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
-            cpf = cpf.replace(/(\d{3})(\d)/, "$1.$2");
-            cpf = cpf.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
-
-            this.value = cpf;
+          }
         });
 
-        // Envio direto para a tabela pública 'usuarios'
-        document.getElementById("formCadastro").addEventListener("submit", async function(event) {
-            event.preventDefault();
+        if (error) throw error;
+        if (!data?.user?.id) throw new Error("O Supabase não retornou o ID do usuário criado.");
 
-            const nome = document.getElementById("nome").value;
-            const guerra = document.getElementById("guerra").value;
-            const cpfLimpo = document.getElementById("cpf").value.replace(/\D/g, "");
-            const patente = document.getElementById("patente").value;
-            const secao = document.getElementById("secao").value;
-            const posicao = document.getElementById("posicao").value;
-            const senha = document.getElementById("senha").value;
-            const confirmarSenha = document.getElementById("confirmarSenha").value;
-            const btnEnviar = document.getElementById("btnEnviar");
+        // O trigger SQL cria public.usuarios usando os metadados acima.
+        // Espera brevemente e confirma se o perfil foi criado quando houver sessão.
+        let perfilOk = false;
+        if (data.session) {
+          for (let tentativa = 0; tentativa < 4; tentativa++) {
+            const { data: perfil } = await supabaseClient
+              .from("usuarios")
+              .select("id,auth_user_id,nome_guerra,secao")
+              .eq("auth_user_id", data.user.id)
+              .maybeSingle();
+            if (perfil) { perfilOk = true; break; }
+            await new Promise(resolve => setTimeout(resolve, 350));
+          }
+        }
 
-            if (senha !== confirmarSenha) {
-                alert("As senhas não são iguais.");
-                return;
-            }
+        await supabaseClient.auth.signOut();
+        this.reset();
+        posicaoEl.disabled = false;
 
-            btnEnviar.disabled = true;
-            btnEnviar.innerText = "Salvando no Banco...";
-
-            try {
-                // Realiza a inserção direta na tabela 'usuarios'
-                const { data, error } = await supabaseClient
-                    .from('usuarios')
-                    .insert([
-                        {
-                            nome_completo: nome,
-                            nome_guerra: guerra,
-                            cpf: cpfLimpo,
-                            patente: patente,
-                            secao: secao,
-                            posicao: posicao,
-                            senha: senha
-                        }
-                    ]);
-
-                if (error) throw error;
-
-                alert("Cadastro realizado! Os dados militares foram salvos com sucesso.");
-                document.getElementById("formCadastro").reset();
-
-            } catch (error) {
-                alert("Erro ao salvar no banco de dados: " + error.message);
-            } finally {
-                btnEnviar.disabled = false;
-                btnEnviar.innerText = "Criar conta";
-            }
-        });
-    </script>
-
+        if (!data.session) {
+          mostrarStatus(
+            "Conta criada no Auth, mas o projeto está exigindo confirmação de e-mail. Como o login usa e-mail técnico, desative 'Confirm email' em Authentication > Providers > Email para permitir login imediato.",
+            "erro"
+          );
+        } else if (perfilOk) {
+          mostrarStatus(`Conta criada com sucesso: ${patente} ${guerra} (${secao}). Já pode entrar pelo CPF e senha.`, "ok");
+        } else {
+          mostrarStatus(
+            "A conta Auth foi criada. Confira se o SQL PREPARAR_CADASTRO_AUTH.sql foi executado, pois ele é responsável por criar o perfil em public.usuarios.",
+            "erro"
+          );
+        }
+      } catch (error) {
+        const msg = String(error?.message || error || "Erro desconhecido");
+        let amigavel = msg;
+        if (/already registered|already been registered|user already exists/i.test(msg)) {
+          amigavel = "Já existe uma conta Auth para esse CPF. Se o perfil foi apagado manualmente, exclua também a conta correspondente em Authentication > Users antes de cadastrar novamente.";
+        }
+        mostrarStatus("Erro ao criar conta: " + amigavel, "erro");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Criar conta no Supabase Auth";
+      }
+    });
+  </script>
 </body>
 </html>
