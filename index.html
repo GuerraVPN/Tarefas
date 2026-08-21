@@ -67,7 +67,7 @@
     }
     .criar-conta a:hover { text-decoration: underline; }
   </style>
-    <link rel="stylesheet" href="v4_tema.css?v=4.1">
+    <link rel="stylesheet" href="v4_tema.css?v=6.0">
 </head>
 
 <body>
@@ -144,7 +144,7 @@
 
     // Se já está autenticado e a sessão não expirou, nem exibe o login.
     if (sessaoAindaValida()) {
-      window.location.replace("menu.html");
+      window.location.replace("dashboard.html");
     }
 
 
@@ -200,7 +200,7 @@
           localStorage.setItem(SESSAO26_CHAVE, String(Date.now()));
 
           alert(`Bem-vindo, ${data.patente} ${data.nome_guerra}!`);
-          window.location.href = "menu.html";
+          window.location.href = "dashboard.html";
         } else {
           alert("Senha incorreta.");
         }

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Histórico / Auditoria - 26º Pel PE Mec</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="perfis.js?v=4.1"></script>
+<script src="perfis.js?v=6.0"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
@@ -51,7 +51,7 @@ button,input,select{font:inherit}
 @media(max-width:1200px){.filters{grid-template-columns:repeat(3,1fr)}.summary{grid-template-columns:repeat(3,1fr)}.workspace{grid-template-columns:1fr}}
 @media(max-width:760px){body{display:block}.sidebar{width:100%;min-height:auto}.nav{display:grid;grid-template-columns:repeat(2,1fr)}.content{padding:16px}.filters{grid-template-columns:1fr}.summary{grid-template-columns:1fr 1fr}.topbar{padding:0 14px}}
 </style>
-    <link rel="stylesheet" href="v4_tema.css?v=4.1">
+    <link rel="stylesheet" href="v4_tema.css?v=6.0">
 </head>
 <body>
 <aside class="sidebar">
@@ -233,7 +233,7 @@ function renderDetalhes(e){
       ${e.reversivel&&!e.revertido?'<button class="btn green" id="undoBtn">↩ Desfazer esta ação</button>':''}
       ${e.revertido?'<button class="btn" disabled>Ação já desfeita</button>':''}
       ${!e.reversivel?'<button class="btn" disabled>Somente histórico</button>':''}
-      <div class="warning">Toda reversão gera um novo evento de auditoria. Senhas, anexos e exclusões sensíveis não são revertidos nesta versão.</div>
+      <div class="warning">Toda reversão gera um novo evento de auditoria. Senhas, anexos e exclusões sensíveis continuam protegidos. Na V6, criação de notas e perfis comuns também pode ser desfeita.</div>
     </div>`;
   const btn=$('undoBtn');if(btn)btn.onclick=abrirUndo;
 }
@@ -243,7 +243,7 @@ function abrirUndo(){if(!selecionado)return;$('undoText').textContent=`Desfazer 
 async function desfazer(){
   if(!selecionado)return;
   $('confirmUndo').disabled=true;
-  const {data,error}=await supabaseClient.rpc('desfazer_evento_auditoria_26pel',{p_evento_id:Number(selecionado.id),p_admin_usuario_id:Number(usuario.id),p_admin_perfil_id:Number(perfil.id)});
+  const {data,error}=await supabaseClient.rpc('desfazer_evento_auditoria_v6',{p_evento_id:Number(selecionado.id),p_admin_usuario_id:Number(usuario.id),p_admin_perfil_id:Number(perfil.id)});
   $('confirmUndo').disabled=false;
   if(error)return toast('Não foi possível desfazer: '+error.message,true);
   $('undoModal').classList.remove('show');toast(data||'Ação desfeita.');
@@ -276,9 +276,9 @@ $('busca').addEventListener('keydown',e=>{if(e.key==='Enter')carregarEventos(tru
 
 (async()=>{if(await confirmarAdmin()){try{await Promise.all([carregarResumo(),carregarEventos(true)])}catch(e){toast(e.message,true)}}})();
 </script>
-    <script src="notificacoes.js?v=3.4"></script>
-    <script src="v4_ui.js?v=5.0"></script>
-    <script src="v4_tema.js?v=4.1"></script>
-    <script src="recorrencias_v4.js?v=4.0"></script>
+    <script src="notificacoes.js?v=6.0"></script>
+    <script src="v4_ui.js?v=6.0"></script>
+    <script src="v4_tema.js?v=6.0"></script>
+    <script src="recorrencias_v4.js?v=6.0"></script>
 </body>
 </html>

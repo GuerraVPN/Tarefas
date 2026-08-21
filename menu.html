@@ -7,8 +7,8 @@
 
     <!-- CDN DO SDK DO SUPABASE -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="perfis.js?v=4.1"></script>
-    <script src="responsaveis_perfis.js?v=3.5"></script>
+    <script src="perfis.js?v=6.0"></script>
+    <script src="responsaveis_perfis.js?v=6.0"></script>
 
     <style>
         * {
@@ -872,8 +872,8 @@
         }
 
     </style>
-    <link rel="stylesheet" href="notificacoes.css">
-    <link rel="stylesheet" href="v4_tema.css?v=4.1">
+    <link rel="stylesheet" href="notificacoes.css?v=6.0">
+    <link rel="stylesheet" href="v4_tema.css?v=6.0">
 </head>
 <body>
 
@@ -1200,6 +1200,7 @@
         let privilegioGlobal = false;
         let todasAsTarefas = [];
         let tarefaSelecionadaId = null;
+        let tarefaUrlAbertaV6 = false;
         let listaArquivosLocal = [];
         let listaHistoricoLocal = [];
         let tarefaArrastadaId = null;
@@ -1995,6 +1996,11 @@
                 todasAsTarefas = data || [];
                 await hidratarResponsaveisFase2(todasAsTarefas);
                 renderizarQuadroKanban();
+                const tarefaDireta = new URLSearchParams(location.search).get('tarefa');
+                if (tarefaDireta && !tarefaUrlAbertaV6 && encontrarTarefa(tarefaDireta)) {
+                    tarefaUrlAbertaV6 = true;
+                    setTimeout(() => abrirModalDetalhes(tarefaDireta), 0);
+                }
             } catch (err) {
                 console.error('Erro ao puxar tarefas:', err.message);
                 alert('Não foi possível carregar as tarefas do banco: ' + err.message);
@@ -2855,12 +2861,12 @@
 
         inicializarQuadro();
     </script>
-        <script src="sistema_comum.js?v=5.0"></script>
-    <script src="auditoria.js?v=5.0"></script>
-    <script src="bloco_notas.js?v=4.1"></script>
-    <script src="notificacoes.js?v=3.6"></script>
-    <script src="v4_ui.js?v=5.0"></script>
-    <script src="v4_tema.js?v=4.1"></script>
-    <script src="recorrencias_v4.js?v=4.0"></script>
+        <script src="sistema_comum.js?v=6.0"></script>
+    <script src="auditoria.js?v=6.0"></script>
+    <script src="bloco_notas.js?v=6.0"></script>
+    <script src="notificacoes.js?v=6.0"></script>
+    <script src="v4_ui.js?v=6.0"></script>
+    <script src="v4_tema.js?v=6.0"></script>
+    <script src="recorrencias_v4.js?v=6.0"></script>
 </body>
 </html>

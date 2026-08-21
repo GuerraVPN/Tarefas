@@ -203,3 +203,95 @@ html[data-theme="military"] .bn-note{
   border-color:#a79d63!important;
   color:#25291c!important;
 }
+
+
+/* ============================================================
+   V6 — CORREÇÃO VISUAL DO MODAL DE TAREFA
+   Quadro + Minhas Tarefas
+   ============================================================ */
+
+#modalDetalhesTarefa{
+  padding:12px!important;
+  overflow:hidden!important;
+}
+
+#modalDetalhesTarefa .modal-content{
+  width:min(760px,calc(100vw - 24px))!important;
+  max-width:760px!important;
+  max-height:calc(100dvh - 24px)!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  overscroll-behavior:contain;
+  background:var(--v4-surface)!important;
+  color:var(--v4-text)!important;
+  border:1px solid var(--v4-border)!important;
+}
+
+#modalDetalhesTarefa #detalhePrioridade,
+#modalDetalhesTarefa #detalhePrazo,
+#modalDetalhesTarefa #detalheDescricao{
+  background:var(--v4-surface-2)!important;
+  color:var(--v4-text)!important;
+  border:1px solid var(--v4-border)!important;
+}
+
+#modalDetalhesTarefa #detalhePrioridade,
+#modalDetalhesTarefa #detalhePrazo{
+  min-height:38px;
+  display:flex;
+  align-items:center;
+}
+
+#modalDetalhesTarefa .file-upload-box{
+  background:var(--v4-surface-2)!important;
+  color:var(--v4-muted)!important;
+  border-color:var(--v4-border-strong)!important;
+}
+
+#modalDetalhesTarefa .file-upload-box:hover{
+  background:var(--v4-surface-3)!important;
+}
+
+#modalDetalhesTarefa .file-item,
+#modalDetalhesTarefa .history-list,
+#modalDetalhesTarefa #detalheListaHistorico{
+  background:var(--v4-surface-2)!important;
+  color:var(--v4-text)!important;
+  border-color:var(--v4-border)!important;
+}
+
+#modalDetalhesTarefa input,
+#modalDetalhesTarefa textarea,
+#modalDetalhesTarefa select{
+  background:var(--v4-surface)!important;
+  color:var(--v4-text)!important;
+  border-color:var(--v4-border-strong)!important;
+}
+
+#modalDetalhesTarefa input::placeholder,
+#modalDetalhesTarefa textarea::placeholder{
+  color:var(--v4-muted)!important;
+}
+
+#modalDetalhesTarefa .modal-buttons{
+  flex-wrap:wrap!important;
+}
+
+@media(max-width:700px){
+  #modalDetalhesTarefa{
+    padding:7px!important;
+    align-items:flex-start!important;
+  }
+
+  #modalDetalhesTarefa .modal-content{
+    width:calc(100vw - 14px)!important;
+    max-width:none!important;
+    max-height:calc(100dvh - 14px)!important;
+    margin-top:7px!important;
+    padding:18px 14px!important;
+  }
+
+  #modalDetalhesTarefa .modal-buttons button{
+    flex:1 1 145px;
+  }
+}

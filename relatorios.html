@@ -6,8 +6,8 @@
     <title>Relatórios - 26º Pel PE Mec</title>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="perfis.js?v=4.1"></script>
-    <script src="responsaveis_perfis.js?v=5.0"></script>
+    <script src="perfis.js?v=6.0"></script>
+    <script src="responsaveis_perfis.js?v=6.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 
     <style>
@@ -154,7 +154,14 @@
 
         @media print {
             body { display: block; background: var(--v4-surface); }
-            .sidebar, .topbar, .toolbar, .sync-line, .btn-sair-sidebar { display: none !important; }
+            .sidebar, .topbar, .toolbar, .sync-line, .btn-sair-sidebar,
+            .bn-fab, .bn-panel,
+            .v3-profile-menu, .v3-password-modal, .v3-password-overlay,
+            .v3-notif-popover, .v3-message-popover,
+            [data-print-hide] { display: none !important; }
+            /* V6: somente o relatório deve sair na impressão/PDF. */
+            body > .bn-fab,
+            body > .bn-panel { display: none !important; }
             .main-content { width: 100%; }
             .page { padding: 0; }
             .heading-row { margin-bottom: 12px; }
@@ -171,8 +178,8 @@
             @page { size: landscape; margin: 10mm; }
         }
     </style>
-    <link rel="stylesheet" href="notificacoes.css">
-    <link rel="stylesheet" href="v4_tema.css?v=4.1">
+    <link rel="stylesheet" href="notificacoes.css?v=6.0">
+    <link rel="stylesheet" href="v4_tema.css?v=6.0">
 </head>
 <body>
     <script>
@@ -757,12 +764,12 @@
 
         iniciar();
     </script>
-        <script src="sistema_comum.js?v=5.0"></script>
-    <script src="auditoria.js?v=5.0"></script>
-    <script src="bloco_notas.js?v=4.1"></script>
-    <script src="notificacoes.js?v=3.4"></script>
-    <script src="v4_ui.js?v=5.0"></script>
-    <script src="v4_tema.js?v=4.1"></script>
-    <script src="recorrencias_v4.js?v=4.0"></script>
+        <script src="sistema_comum.js?v=6.0"></script>
+    <script src="auditoria.js?v=6.0"></script>
+    <script src="bloco_notas.js?v=6.0"></script>
+    <script src="notificacoes.js?v=6.0"></script>
+    <script src="v4_ui.js?v=6.0"></script>
+    <script src="v4_tema.js?v=6.0"></script>
+    <script src="recorrencias_v4.js?v=6.0"></script>
 </body>
 </html>

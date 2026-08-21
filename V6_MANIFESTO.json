@@ -1,0 +1,25 @@
+{
+  "produto": "TAREFAS — 26º Pel PE Mec",
+  "versao": "6.0",
+  "base": "V5.5 consolidada",
+  "pagina_inicial": "dashboard.html",
+  "banco": "V6_ATUALIZAR_BANCO.sql (incremental sobre V5.5)",
+  "modulos_novos": [
+    "Dashboard",
+    "Passagem de Carga"
+  ],
+  "melhorias": [
+    "Dashboard com indicadores e atalhos",
+    "Usuários ativos",
+    "Notificações e mensagens em popover",
+    "Notificações com navegação direta",
+    "Sidebar padronizada com SVG",
+    "Detentor atual no Material Carga",
+    "Depósitos Paiol e Mun Uso",
+    "Correção de tema no modal de tarefas",
+    "Correção da impressão de relatórios",
+    "Hover do menu Orçamentários",
+    "Reversão segura de criação de nota e perfil comum"
+  ],
+  "autenticacao": "clássica; Supabase Auth/RLS final ainda não aplicado"
+}

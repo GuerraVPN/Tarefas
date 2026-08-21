@@ -11,6 +11,7 @@
   function getUser(){try{return JSON.parse(localStorage.getItem('usuarioLogado')||'null')}catch(_){return null}}
   function currentModule(){
     const f=(location.pathname.split('/').pop()||'menu.html').toLowerCase();
+    if(f.includes('dashboard'))return 'Dashboard';
     if(f.includes('usuario'))return 'Usuários';
     if(f.includes('config'))return 'Configurações';
     if(f.includes('calend'))return 'Calendário';
@@ -65,6 +66,11 @@
     }
     if(op==='update'&&table==='usuario_perfis')return true;
     if(op==='delete'&&table==='usuario_perfis')return true;
+    if(op==='insert'&&table==='usuario_perfis'){
+      const sec=norm(Array.isArray(payload)?payload[0]?.secao:payload?.secao);
+      return !['admin','comandante'].includes(sec);
+    }
+    if(op==='insert'&&table==='bloco_notas_usuario')return true;
     if(op==='update'&&table==='bloco_notas_usuario')return true;
     if(op==='delete'&&table==='bloco_notas_usuario')return true;
     return false;

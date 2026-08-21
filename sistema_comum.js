@@ -2,12 +2,14 @@
   'use strict';
 
   const FILE_BY_KEY={
+    dashboard:'dashboard.html',
     quadro:'menu.html',
     minhas:'minhas_tarefas.html',
     calendario:'calendario.html',
     relatorios:'relatorios.html',
     usuarios:'usuarios.html',
-    central:'central.html'
+    central:'central.html',
+    orcamentarios:'orcamentarios.html'
   };
   let usuario=null;
 
