@@ -108,13 +108,13 @@
     style.id = 'perfis26Style';
     style.textContent = `
       .perfis26-box{border-bottom:1px solid #e5e7eb;padding:8px 8px 10px;margin-bottom:6px}
-      .perfis26-title{font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#6b7280;padding:3px 6px 7px}
-      .perfis26-option{width:100%;display:flex!important;align-items:center;justify-content:space-between;gap:9px;padding:9px 10px!important;border:0!important;border-radius:7px!important;background:transparent!important;color:#374151!important;text-align:left!important;cursor:pointer}
-      .perfis26-option:hover{background:#f3f4f6!important}
-      .perfis26-option.ativo{background:#ecfdf5!important;color:#065f46!important;font-weight:700}
+      .perfis26-title{font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--v4-muted);padding:3px 6px 7px}
+      .perfis26-option{width:100%;display:flex!important;align-items:center;justify-content:space-between;gap:9px;padding:9px 10px!important;border:0!important;border-radius:7px!important;background:transparent!important;color:var(--v4-text-2)!important;text-align:left!important;cursor:pointer}
+      .perfis26-option:hover{background:var(--v4-surface-3)!important}
+      .perfis26-option.ativo{background:var(--v4-accent-soft)!important;color:var(--v4-accent)!important;font-weight:700}
       .perfis26-check{font-size:12px;color:#047857}
-      .perfis26-sub{font-size:10px;color:#9ca3af;margin-top:2px}
-      .perfis26-one{font-size:11px;color:#6b7280;padding:4px 7px 2px}
+      .perfis26-sub{font-size:10px;color:var(--v4-muted);margin-top:2px}
+      .perfis26-one{font-size:11px;color:var(--v4-muted);padding:4px 7px 2px}
     `;
     document.head.appendChild(style);
   }

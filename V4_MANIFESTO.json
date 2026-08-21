@@ -1,5 +1,5 @@
 {
-  "versao": "V4.0 Parte 1",
+  "versao": "4.1",
   "js_validado": {
     "perfis.js": "OK",
     "responsaveis_perfis.js": "OK",
@@ -57,5 +57,13 @@
     "v4_tema.css",
     "v4_tema.js",
     "v4_ui.js"
+  ],
+  "correcao_principal": "Temas no desktop: remoção de cores fixas injetadas por JavaScript",
+  "sql_novo": false,
+  "arquivos_tema_corrigidos": [
+    "v4_ui.js",
+    "v4_tema.css",
+    "bloco_notas.js",
+    "perfis.js"
   ]
 }
