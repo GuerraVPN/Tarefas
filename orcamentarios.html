@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="notificacoes.css?v=3.6">
 <link rel="stylesheet" href="v4_tema.css?v=4.1">
 <link rel="stylesheet" href="orcamentarios.css?v=5.1">
-<link rel="stylesheet" href="pedidos_v5_3.css?v=5.3">
+<link rel="stylesheet" href="pedidos_v5_4_1.css?v=5.4.1">
 <style>
 *{margin:0;padding:0;font-family:Arial,sans-serif}
 body{display:flex;min-height:100vh}
@@ -49,6 +49,7 @@ body{display:flex;min-height:100vh}
       <button class="orc-module-btn active" data-orc-module="guias">📑 Guias</button>
       <button class="orc-module-btn" data-orc-module="baixas">📦 Desrelacionamento / Baixa</button>
       <button class="orc-module-btn" data-orc-module="distribuicao">🚚 Distribuição</button>
+      <button class="orc-module-btn" data-orc-module="movimentacao">🔄 Movimentação de Material</button>
     </div>
 
     <div id="guiasModule">
@@ -82,9 +83,11 @@ body{display:flex;min-height:100vh}
         <div id="detailWrap" class="orc-detail" hidden>
           <div class="orc-detail-head">
             <div><h3 id="dNumero">Guia</h3><p id="dTipo"></p></div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
+            <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;align-items:center">
               <span class="orc-badge" id="dStatus"></span>
               <span class="orc-badge" id="dFiscal"></span>
+              <button type="button" class="orc-btn" id="btnEditGuide" hidden>✏️ Editar</button>
+              <button type="button" class="orc-btn danger" id="btnDeleteGuide" hidden>🗑 Excluir</button>
             </div>
           </div>
 
@@ -218,7 +221,11 @@ body{display:flex;min-height:100vh}
           <div class="pedido-detail" id="pedidoDetail" hidden>
             <div class="pedido-head">
               <div><h3 id="pdTitle">Pedido</h3><p id="pdSubtitle"></p></div>
-              <span class="pedido-status" id="pdStatus"></span>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+                <span class="pedido-status" id="pdStatus"></span>
+                <button type="button" class="orc-btn" id="btnEditPedido" hidden>✏️ Editar</button>
+                <button type="button" class="orc-btn danger" id="btnDeletePedido" hidden>🗑 Excluir</button>
+              </div>
             </div>
 
             <div class="pedido-meta">
@@ -238,9 +245,9 @@ body{display:flex;min-height:100vh}
               <div class="pedido-subhead"><span>📦 Materiais do pedido</span><span id="pdItemsCount">0 item(ns)</span></div>
               <div class="pedido-table-wrap">
                 <table class="pedido-table">
-                  <thead><tr><th>Material</th><th>Nº da ficha</th><th>Quantidade</th><th>Valor unitário</th><th>Total</th></tr></thead>
+                  <thead><tr><th>Material</th><th>Nº da ficha</th><th class="pedido-patrimonio-col">Nº Patrimônio</th><th>Quantidade</th><th>Valor unitário</th><th>Total</th></tr></thead>
                   <tbody id="pdItemsBody"></tbody>
-                  <tfoot><tr><td colspan="4">Total do pedido</td><td class="num" id="pdItemsTotal">R$ 0,00</td></tr></tfoot>
+                  <tfoot><tr><td colspan="5">Total do pedido</td><td class="num" id="pdItemsTotal">R$ 0,00</td></tr></tfoot>
                 </table>
               </div>
             </div>
@@ -274,6 +281,85 @@ body{display:flex;min-height:100vh}
         </section>
       </div>
     </div><!-- /pedidosModule -->
+
+    <div id="movimentacaoModule" hidden>
+      <div class="pedido-toolbar">
+        <div style="flex:1">
+          <strong style="font-size:12px">Movimentação entre dependências</strong>
+          <div style="font-size:9px;color:var(--v4-muted);margin-top:3px">Dependência de origem → Dependência de destino, materiais, anexos e atualizações.</div>
+        </div>
+        <button class="orc-btn primary" id="btnNovaMovimentacao">＋ Nova movimentação</button>
+      </div>
+
+      <div class="pedido-filters">
+        <input id="movSearch" type="search" placeholder="Buscar nº, material, ficha, origem ou destino...">
+        <select id="movDependenciaFilter"><option value="">Todas as dependências</option></select>
+        <input id="movDateFilter" type="date">
+      </div>
+
+      <div class="pedido-grid">
+        <section class="orc-panel">
+          <div class="orc-panel-head"><h3>Movimentações por data</h3><span id="movListInfo">0 movimentação(ões)</span></div>
+          <div class="orc-list" id="movList"><div class="orc-empty">Carregando movimentações...</div></div>
+        </section>
+
+        <section class="orc-panel">
+          <div class="orc-empty" id="movDetailEmpty">Selecione uma movimentação para ver materiais, anexos e atualizações.</div>
+          <div class="pedido-detail" id="movDetail" hidden>
+            <div class="pedido-head">
+              <div><h3 id="mdTitle">Movimentação</h3><p id="mdSubtitle"></p></div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap">
+                <button type="button" class="orc-btn" id="btnEditMov" hidden>✏️ Editar</button>
+                <button type="button" class="orc-btn danger" id="btnDeleteMov" hidden>🗑 Excluir</button>
+              </div>
+            </div>
+
+            <div class="pedido-meta">
+              <div><small>Data</small><b id="mdData">-</b></div>
+              <div><small>Dependência de origem</small><b id="mdOrigem">-</b></div>
+              <div><small>Dependência de destino</small><b id="mdDestino">-</b></div>
+              <div><small>Total</small><b class="pedido-total" id="mdTotal">R$ 0,00</b></div>
+              <div style="grid-column:1/-1"><small>Finalidade</small><b id="mdFinalidade">-</b></div>
+              <div style="grid-column:1/-1"><small>Observações</small><b id="mdObservacoes">-</b></div>
+            </div>
+
+            <div class="pedido-sub">
+              <div class="pedido-subhead"><span>📦 Materiais</span><span id="mdItemsCount">0 item(ns)</span></div>
+              <div class="pedido-table-wrap">
+                <table class="pedido-table">
+                  <thead><tr><th>Material</th><th>Nº da ficha</th><th>Nº Patrimônio</th><th>Quantidade</th><th>Valor unitário</th><th>Total</th></tr></thead>
+                  <tbody id="mdItemsBody"></tbody>
+                  <tfoot><tr><td colspan="5">Total</td><td class="num" id="mdItemsTotal">R$ 0,00</td></tr></tfoot>
+                </table>
+              </div>
+            </div>
+
+            <div class="pedido-sub">
+              <div class="pedido-subhead"><span>📎 Arquivos anexados</span><span id="mdAttachCount">0 arquivo(s)</span></div>
+              <div class="pedido-actions">
+                <div id="mdAttachList"></div>
+                <input type="file" id="movAddFiles" multiple accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx,.xls,.xlsx,.odt,.ods,.txt">
+                <textarea id="movAttachNote" placeholder="Observação opcional sobre os novos arquivos..."></textarea>
+                <div><button type="button" class="orc-btn" id="btnMovAddFiles">📎 Anexar novos arquivos</button></div>
+              </div>
+            </div>
+
+            <div class="pedido-sub">
+              <div class="pedido-subhead"><span>📝 Adicionar atualização</span><span>Registrada no histórico</span></div>
+              <div class="pedido-actions">
+                <textarea id="movUpdateText" placeholder="Digite uma atualização sobre a movimentação..."></textarea>
+                <div><button type="button" class="orc-btn" id="btnMovUpdate">Registrar atualização</button></div>
+              </div>
+            </div>
+
+            <div class="pedido-sub">
+              <div class="pedido-subhead"><span>🕘 Histórico / Atualizações</span><span id="mdHistoryCount">0 evento(s)</span></div>
+              <div class="pedido-history" id="mdHistory"></div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div><!-- /movimentacaoModule -->
   </section>
 </main>
 
@@ -298,6 +384,24 @@ body{display:flex;min-height:100vh}
       </div>
       <div class="orc-field full"><div class="orc-destino"><b>Destino do despacho: Fiscalização</b><br>Não há seleção de Almoxarifado, Auxiliar, Chefe ou Comandante. O sistema envia a guia para a fila exclusiva da Fiscalização.</div></div>
       <div class="orc-modal-actions"><button type="button" class="orc-btn" id="cancelGuide">Cancelar</button><button type="submit" class="orc-btn primary" id="saveGuide">Cadastrar e despachar</button></div>
+    </form>
+  </div>
+</div>
+
+
+<div class="orc-modal-bg" id="editGuideBg">
+  <div class="orc-modal">
+    <div class="orc-modal-head"><h3>Editar Guia</h3><button class="orc-close" id="closeEditGuide">×</button></div>
+    <form class="orc-form" id="editGuideForm">
+      <div class="orc-field"><label>Número da guia *</label><input id="egNumero" required></div>
+      <div class="orc-field"><label>Data da guia *</label><input id="egData" type="date" required></div>
+      <div class="orc-field"><label>OM de origem *</label><input id="egOrigem" required></div>
+      <div class="orc-field"><label>OM de destino *</label><input id="egDestino" required></div>
+      <div class="orc-field full"><label>Do que se trata *</label><textarea id="egAssunto" required></textarea></div>
+      <div class="orc-field full"><label>Tipo</label><input id="egTipo" disabled></div>
+      <div class="orc-field full" id="egDepositoWrap" hidden><label>Depósito de destino *</label><select id="egDeposito"></select></div>
+      <div class="orc-field full"><div class="orc-note">O tipo da guia e o fluxo atual não são alterados pela edição.</div></div>
+      <div class="orc-modal-actions"><button type="button" class="orc-btn" id="cancelEditGuide">Cancelar</button><button type="submit" class="orc-btn primary">Salvar alterações</button></div>
     </form>
   </div>
 </div>
@@ -359,6 +463,38 @@ body{display:flex;min-height:100vh}
   </div>
 </div>
 
+
+<div class="orc-modal-bg" id="newMovBg">
+  <div class="orc-modal" style="width:min(980px,97vw)">
+    <div class="orc-modal-head"><h3 id="newMovTitle">Nova Movimentação de Material</h3><button class="orc-close" id="closeMov">×</button></div>
+    <form class="pedido-form" id="newMovForm">
+      <div class="pedido-field"><label>Número / identificação *</label><input id="mNumero" required placeholder="Ex.: MOV-015/2026"></div>
+      <div class="pedido-field"><label>Data *</label><input id="mData" type="date" required></div>
+      <div class="pedido-field"><label>Dependência de origem *</label><select id="mOrigem" required></select></div>
+      <div class="pedido-field"><label>Dependência de destino *</label><select id="mDestino" required></select></div>
+      <div class="pedido-field full"><label>Finalidade *</label><textarea id="mFinalidade" required placeholder="Informe a finalidade da movimentação..."></textarea></div>
+      <div class="pedido-field full"><label>Observações</label><textarea id="mObservacoes"></textarea></div>
+
+      <div class="pedido-items-editor">
+        <div class="pedido-items-head"><span>Materiais da movimentação</span><button type="button" class="orc-btn" id="btnAddMovItem">＋ Adicionar material</button></div>
+        <div id="movItemsEditor"></div>
+        <div class="pedido-editor-total">Total: <span id="movEditorTotal">R$ 0,00</span></div>
+      </div>
+
+      <div class="pedido-field full">
+        <label>Arquivos</label>
+        <input id="mFiles" type="file" multiple accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx,.xls,.xlsx,.odt,.ods,.txt">
+        <div style="font-size:8px;color:var(--v4-muted);margin-top:5px">Arquivos opcionais · até 25 MB por arquivo.</div>
+      </div>
+
+      <div class="pedido-form-actions">
+        <button type="button" class="orc-btn" id="cancelMov">Cancelar</button>
+        <button type="submit" class="orc-btn primary" id="saveMov">Salvar movimentação</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <div class="orc-toast" id="orcToast"></div>
 
 <script>
@@ -371,7 +507,8 @@ const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 <script src="v4_ui.js?v=5.0"></script>
 <script src="bloco_notas.js?v=4.1"></script>
 <script src="v4_tema.js?v=4.1"></script>
-<script src="orcamentarios.js?v=5.3"></script>
-<script src="pedidos_v5_3.js?v=5.3"></script>
+<script src="orcamentarios.js?v=5.4"></script>
+<script src="pedidos_v5_4_1.js?v=5.4.1"></script>
+<script src="movimentacoes_v5_4_1.js?v=5.4.1"></script>
 </body>
 </html>

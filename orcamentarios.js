@@ -6,7 +6,7 @@ const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim
 const fmtDate=v=>v?new Date(v+'T12:00:00').toLocaleDateString('pt-BR'):'-';
 const fmtTime=v=>v?new Date(v).toLocaleString('pt-BR'):'-';
 
-let baseUser=null,user=null,profileState=null,isFiscal=false,isCommander=false;
+let baseUser=null,user=null,profileState=null,isFiscal=false,isCommander=false,isAdmin=false;
 let guides=[],selected=null,attachments=[],history=[],usersMap=new Map();
 let category='sem_assinatura',fiscalQueue=false,currentAttachment=null;
 let orcDepositos=['Almox','AlmoxVirtual','Depósito do Canil','Suprimento de Viaturas'];
@@ -86,6 +86,7 @@ function userName(id){
  return x?[x.patente,x.nome_guerra].filter(Boolean).join(' '):`Usuário ${id||'-'}`;
 }
 function canCreator(g){return g&&String(g.criado_por)===String(user?.id)}
+function canManageGuide(g){return !!(g&&(canCreator(g)||isAdmin))}
 function canUpdate(g){return canCreator(g)||isFiscal}
 
 async function initUser(){
@@ -97,6 +98,7 @@ async function initUser(){
  }else user=baseUser;
  isFiscal=(norm(user.secao)==='fiscalizacao'&&['chefe','auxiliar'].includes(norm(user.posicao)));
  isCommander=(norm(user.secao)==='comandante');
+ isAdmin=(norm(user.secao)==='admin');
  $('btnFiscalQueue').classList.toggle('show',isFiscal);
  $('fiscalBanner').classList.toggle('show',isFiscal);
  return true;
@@ -195,7 +197,8 @@ function eventLabel(e){
    status_alterado:'Andamento atualizado',
    atualizacao:'Atualização registrada',
    arquivo_adicionado:'Nova versão do documento',
-   arquivo_assinado_cmt:'Guia assinada pelo Comandante'
+   arquivo_assinado_cmt:'Guia assinada pelo Comandante',
+   guia_editada:'Guia editada'
  }[e]||e);
 }
 function renderFlow(){
@@ -320,6 +323,9 @@ function renderDetail(){
  $('resendBox').hidden=!(selected.situacao_fiscalizacao==='devolvida_fiscalizacao'&&canCreator(selected));
  $('flowBox').hidden=!(isFiscal&&selected.situacao_fiscalizacao==='aprovada_fiscalizacao');
  $('btnAddUpdate').disabled=!canUpdate(selected);
+ const canManage=canManageGuide(selected);
+ $('btnEditGuide').hidden=!canManage;
+ $('btnDeleteGuide').hidden=!canManage;
  renderPreview();renderHistory();renderFiscalActions();renderCommanderSignature();renderFlow();
 }
 function safeName(v){return String(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9._-]+/g,'_')}
@@ -438,8 +444,75 @@ async function addUpdate(){
  if(r.error)return alert(r.error.message);
  $('generalUpdate').value='';toast('Atualização registrada.');await loadHistory(selected.id);renderHistory();
 }
+
+function fillEditGuideDepositos(){
+ const sel=$('egDeposito');
+ if(!sel)return;
+ sel.innerHTML='<option value="">Selecione o depósito...</option>'+orcDepositos.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
+}
+function openEditGuide(){
+ if(!selected||!canManageGuide(selected))return;
+ fillEditGuideDepositos();
+ $('egNumero').value=selected.numero||'';
+ $('egData').value=selected.data_guia||'';
+ $('egOrigem').value=selected.om_origem||'';
+ $('egDestino').value=selected.om_destino||'';
+ $('egAssunto').value=selected.assunto||'';
+ $('egTipo').value=typeLabel(selected.tipo);
+ const needs=selected.tipo==='transferencia'||selected.tipo==='remessa';
+ $('egDepositoWrap').hidden=!needs;
+ $('egDeposito').required=needs;
+ $('egDeposito').value=selected.deposito_destino||'';
+ $('editGuideBg').classList.add('open');
+}
+async function saveEditGuide(e){
+ e.preventDefault();
+ if(!selected||!canManageGuide(selected))return;
+ const needs=selected.tipo==='transferencia'||selected.tipo==='remessa';
+ if(needs&&!$('egDeposito').value)return alert('Selecione o depósito de destino.');
+ const r=await supabaseClient.rpc('v5_4_editar_guia',{
+   p_guia_id:selected.id,
+   p_usuario_id:String(user.id),
+   p_perfil_id:user.perfil_id?Number(user.perfil_id):null,
+   p_numero:$('egNumero').value.trim(),
+   p_data_guia:$('egData').value,
+   p_om_origem:$('egOrigem').value.trim(),
+   p_om_destino:$('egDestino').value.trim(),
+   p_assunto:$('egAssunto').value.trim(),
+   p_deposito_destino:needs?$('egDeposito').value:null
+ });
+ if(r.error)return alert('Erro ao editar a guia: '+r.error.message);
+ const id=selected.id;
+ $('editGuideBg').classList.remove('open');
+ toast('Guia atualizada.');
+ await loadGuides();await selectGuide(id);
+}
+async function deleteGuide(){
+ if(!selected||!canManageGuide(selected))return;
+ if(!confirm(`Excluir a Guia ${selected.numero}? Esta ação remove o registro da lista, mas guarda um snapshot na auditoria de exclusões.`))return;
+ const r=await supabaseClient.rpc('v5_4_excluir_guia',{
+   p_guia_id:selected.id,
+   p_usuario_id:String(user.id),
+   p_perfil_id:user.perfil_id?Number(user.perfil_id):null
+ });
+ if(r.error)return alert('Erro ao excluir a guia: '+r.error.message);
+ const paths=Array.isArray(r.data)?r.data:[];
+ if(paths.length){
+   try{await supabaseClient.storage.from('guias-orcamentarias').remove(paths)}catch(_){}
+ }
+ selected=null;attachments=[];history=[];currentAttachment=null;
+ $('detailWrap').hidden=true;$('detailEmpty').hidden=false;
+ toast('Guia excluída.');
+ await loadGuides();
+}
+
 function bind(){
  $('btnNovaGuia').onclick=()=>{$('newGuideBg').classList.add('open');$('gData').value=new Date().toISOString().slice(0,10)};
+ $('btnEditGuide').onclick=openEditGuide;
+ $('btnDeleteGuide').onclick=deleteGuide;
+ $('closeEditGuide').onclick=$('cancelEditGuide').onclick=()=>$('editGuideBg').classList.remove('open');
+ $('editGuideBg').onclick=e=>{if(e.target===$('editGuideBg'))$('editGuideBg').classList.remove('open')};
+ $('editGuideForm').onsubmit=saveEditGuide;
  $('closeGuide').onclick=$('cancelGuide').onclick=()=>$('newGuideBg').classList.remove('open');
  $('newGuideBg').onclick=e=>{if(e.target===$('newGuideBg'))$('newGuideBg').classList.remove('open')};
  $('newGuideForm').onsubmit=createGuide;
