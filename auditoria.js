@@ -71,6 +71,7 @@
   }
   function ignored(table,op,payload){
     if(!TABELAS_AUDITADAS.has(table))return true;
+    if(table==='tarefas'&&op==='insert'&&payload?.recorrencia_modelo===true)return true;
     if(table==='tarefas'&&op==='update'){
       const f=fields(payload);
       if(f.length&&f.every(x=>['historico','responsavel'].includes(x)))return true;

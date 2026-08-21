@@ -1,0 +1,61 @@
+{
+  "versao": "V4.0 Parte 1",
+  "js_validado": {
+    "perfis.js": "OK",
+    "responsaveis_perfis.js": "OK",
+    "auditoria.js": "OK",
+    "sistema_comum.js": "OK",
+    "notificacoes.js": "OK",
+    "central.js": "OK",
+    "bloco_notas.js": "OK",
+    "v4_ui.js": "OK",
+    "v4_tema.js": "OK",
+    "recorrencias_v4.js": "OK",
+    "index.html": "OK",
+    "menu.html": "OK",
+    "minhas_tarefas.html": "OK",
+    "calendario.html": "OK",
+    "relatorios.html": "OK",
+    "usuarios.html": "OK",
+    "configuracoes.html": "OK",
+    "historico_auditoria.html": "OK",
+    "central.html": "OK"
+  },
+  "recorrencia": [
+    "diaria",
+    "semanal",
+    "mensal",
+    "anual"
+  ],
+  "temas": [
+    "light",
+    "dark",
+    "night",
+    "military"
+  ],
+  "arquivos": [
+    "LEIA-ME_V4.txt",
+    "V4_ATUALIZAR_BANCO.sql",
+    "auditoria.js",
+    "bloco_notas.js",
+    "calendario.html",
+    "central.html",
+    "central.js",
+    "configuracoes.html",
+    "historico_auditoria.html",
+    "index.html",
+    "menu.html",
+    "minhas_tarefas.html",
+    "notificacoes.css",
+    "notificacoes.js",
+    "perfis.js",
+    "recorrencias_v4.js",
+    "relatorios.html",
+    "responsaveis_perfis.js",
+    "sistema_comum.js",
+    "usuarios.html",
+    "v4_tema.css",
+    "v4_tema.js",
+    "v4_ui.js"
+  ]
+}

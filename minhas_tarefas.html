@@ -19,7 +19,7 @@
         }
 
         body {
-            background: #f3f4f6;
+            background: var(--v4-surface-3);
             display: flex;
             min-height: 100vh;
         }
@@ -28,7 +28,7 @@
         .sidebar {
             width: 260px;
             background: #111827;
-            color: #9ca3af;
+            color: var(--v4-muted);
             padding: 20px;
             display: flex;
             flex-direction: column;
@@ -46,7 +46,7 @@
 
         .star-icon {
             background: #eab308;
-            color: #111827;
+            color: var(--v4-text);
             width: 32px;
             height: 32px;
             border-radius: 6px;
@@ -151,23 +151,23 @@
         }
 
         .header {
-            background: white;
+            background: var(--v4-surface);
             padding: 15px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #e5e7eb;
+            border-bottom: 1px solid var(--v4-border);
             position: relative;
         }
 
         .header-title h2 {
             font-size: 20px;
-            color: #111827;
+            color: var(--v4-text);
         }
 
         .header-title p {
             font-size: 13px;
-            color: #6b7280;
+            color: var(--v4-muted);
             margin-top: 2px;
         }
 
@@ -179,9 +179,9 @@
 
         .select-secao {
             padding: 10px 15px;
-            border: 1px solid #d1d5db;
+            border: 1px solid var(--v4-border-strong);
             border-radius: 8px;
-            background: white;
+            background: var(--v4-surface);
             font-size: 14px;
             cursor: pointer;
         }
@@ -208,8 +208,8 @@
             position: absolute;
             top: 65px;
             right: 30px;
-            background: white;
-            border: 1px solid #e5e7eb;
+            background: var(--v4-surface);
+            border: 1px solid var(--v4-border);
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             width: 160px;
@@ -228,7 +228,7 @@
         }
 
         .dropdown-menu button:hover {
-            background: #f3f4f6;
+            background: var(--v4-surface-3);
         }
 
         /* Container Kanban */
@@ -242,10 +242,10 @@
         }
 
         .kanban-column {
-            background: white;
+            background: var(--v4-surface);
             border-radius: 12px;
             padding: 20px;
-            border: 1px solid #e5e7eb;
+            border: 1px solid var(--v4-border);
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
@@ -267,12 +267,12 @@
         .column-title {
             font-size: 16px;
             font-weight: bold;
-            color: #111827;
+            color: var(--v4-text);
         }
 
         .column-badge {
-            background: #f3f4f6;
-            color: #374151;
+            background: var(--v4-surface-3);
+            color: var(--v4-text-2);
             padding: 2px 8px;
             border-radius: 20px;
             font-size: 12px;
@@ -285,17 +285,17 @@
         }
 
         .mass-actions button {
-            background: #f3f4f6;
-            border: 1px solid #d1d5db;
+            background: var(--v4-surface-3);
+            border: 1px solid var(--v4-border-strong);
             padding: 4px 8px;
             border-radius: 6px;
             font-size: 11px;
             cursor: pointer;
-            color: #4b5563;
+            color: var(--v4-text-2);
         }
 
         .mass-actions button:hover {
-            background: #e5e7eb;
+            background: var(--v4-surface-3);
         }
 
         /* Cores das colunas baseadas na imagem */
@@ -312,8 +312,8 @@
 
         /* Card Kanban */
         .task-card {
-            background: white;
-            border: 1px solid #e5e7eb;
+            background: var(--v4-surface);
+            border: 1px solid var(--v4-border);
             border-radius: 10px;
             padding: 15px;
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
@@ -347,7 +347,7 @@
 
         .task-code {
             font-size: 12px;
-            color: #9ca3af;
+            color: var(--v4-muted);
             font-weight: bold;
         }
 
@@ -365,7 +365,7 @@
         .task-title {
             font-size: 14px;
             font-weight: bold;
-            color: #1f2937;
+            color: var(--v4-text);
             margin-bottom: 12px;
             line-height: 1.4;
             cursor: pointer;
@@ -376,7 +376,7 @@
             flex-direction: column;
             gap: 6px;
             font-size: 12px;
-            color: #6b7280;
+            color: var(--v4-muted);
             border-top: 1px dashed #f3f4f6;
             padding-top: 10px;
         }
@@ -388,7 +388,7 @@
         }
 
         .progress-mini-bar {
-            background: #e5e7eb;
+            background: var(--v4-surface-3);
             border-radius: 4px;
             height: 6px;
             width: 100%;
@@ -405,18 +405,18 @@
         .btn-add-card-footer {
             width: 100%;
             padding: 10px;
-            background: #f9fafb;
-            border: 1px dashed #d1d5db;
+            background: var(--v4-surface-2);
+            border: 1px dashed var(--v4-border-strong);
             border-radius: 8px;
             text-align: center;
             font-size: 13px;
-            color: #4b5563;
+            color: var(--v4-text-2);
             cursor: pointer;
             margin-top: 15px;
         }
 
         .btn-add-card-footer:hover {
-            background: #f3f4f6;
+            background: var(--v4-surface-3);
         }
 
         /* Modais */
@@ -435,7 +435,7 @@
         }
 
         .modal-content {
-            background: white;
+            background: var(--v4-surface);
             padding: 25px;
             border-radius: 12px;
             width: 100%;
@@ -452,12 +452,12 @@
             right: 20px;
             font-size: 24px;
             cursor: pointer;
-            color: #9ca3af;
+            color: var(--v4-muted);
         }
 
         .modal-content h3 {
             margin-bottom: 20px;
-            color: #111827;
+            color: var(--v4-text);
         }
 
         .modal-content label {
@@ -465,7 +465,7 @@
             margin-bottom: 6px;
             font-weight: bold;
             font-size: 14px;
-            color: #4b5563;
+            color: var(--v4-text-2);
             margin-top: 10px;
         }
 
@@ -493,7 +493,7 @@
             font-weight: bold;
         }
 
-        .btn-cancelar { background: #e5e7eb; color: #374151; }
+        .btn-cancelar { background: var(--v4-surface-3); color: var(--v4-text-2); }
         .btn-salvar { background: #047857; color: white; }
         .btn-excluir-task { background: #dc2626; color: white; margin-right: auto; }
 
@@ -525,8 +525,8 @@
         }
 
         .history-list {
-            background: #f9fafb;
-            border: 1px solid #e5e7eb;
+            background: var(--v4-surface-2);
+            border: 1px solid var(--v4-border);
             border-radius: 6px;
             padding: 10px;
             max-height: 120px;
@@ -538,7 +538,7 @@
         .history-item {
             margin-bottom: 6px;
             padding-bottom: 6px;
-            border-bottom: 1px dashed #e5e7eb;
+            border-bottom: 1px dashed var(--v4-border);
         }
 
         .history-item:last-child {
@@ -549,24 +549,24 @@
 
         .history-date {
             font-size: 11px;
-            color: #9ca3af;
+            color: var(--v4-muted);
             display: block;
         }
 
         .file-upload-box {
-            border: 2px dashed #d1d5db;
+            border: 2px dashed var(--v4-border-strong);
             padding: 15px;
             text-align: center;
             border-radius: 6px;
-            background: #f9fafb;
+            background: var(--v4-surface-2);
             cursor: pointer;
             font-size: 13px;
-            color: #6b7280;
+            color: var(--v4-muted);
             margin-bottom: 10px;
         }
 
         .file-upload-box:hover {
-            background: #f3f4f6;
+            background: var(--v4-surface-3);
         }
 
         .files-list {
@@ -580,7 +580,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #f3f4f6;
+            background: var(--v4-surface-3);
             padding: 6px 10px;
             border-radius: 4px;
         }
@@ -601,8 +601,8 @@
         }
 
         .personal-stat {
-            background: white;
-            border: 1px solid #e5e7eb;
+            background: var(--v4-surface);
+            border: 1px solid var(--v4-border);
             border-radius: 10px;
             padding: 14px 16px;
             box-shadow: 0 1px 2px rgba(0,0,0,0.04);
@@ -610,13 +610,13 @@
 
         .personal-stat span {
             display: block;
-            color: #6b7280;
+            color: var(--v4-muted);
             font-size: 12px;
             margin-bottom: 5px;
         }
 
         .personal-stat strong {
-            color: #111827;
+            color: var(--v4-text);
             font-size: 22px;
         }
 
@@ -636,7 +636,7 @@
 
         .personal-info {
             margin: 12px 30px 0;
-            color: #6b7280;
+            color: var(--v4-muted);
             font-size: 12px;
         }
 
@@ -649,9 +649,9 @@
         .search-tarefa {
             width: 240px;
             padding: 10px 12px;
-            border: 1px solid #d1d5db;
+            border: 1px solid var(--v4-border-strong);
             border-radius: 8px;
-            background: white;
+            background: var(--v4-surface);
             font-size: 14px;
             outline: none;
         }
@@ -678,7 +678,7 @@
         }
 
         .file-name-link {
-            color: #1f2937;
+            color: var(--v4-text);
             text-decoration: none;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -700,7 +700,7 @@
 
         .drag-hint {
             font-size: 11px;
-            color: #9ca3af;
+            color: var(--v4-muted);
             margin-top: 5px;
         }
 
@@ -709,9 +709,9 @@
         /* ===== Despacho / múltiplos responsáveis ===== */
         .btn-responsaveis {
             width: 100%;
-            border: 1px solid #d1d5db;
-            background: #ffffff;
-            color: #1f2937;
+            border: 1px solid var(--v4-border-strong);
+            background: var(--v4-surface);
+            color: var(--v4-text);
             padding: 9px 12px;
             border-radius: 7px;
             cursor: pointer;
@@ -765,7 +765,7 @@
 
         .responsaveis-vazio {
             font-size: 11px;
-            color: #9ca3af;
+            color: var(--v4-muted);
             font-style: italic;
             padding: 4px 0;
         }
@@ -774,8 +774,8 @@
             display: none;
             margin: 10px 0 16px;
             padding: 14px;
-            background: #f9fafb;
-            border: 1px solid #d1d5db;
+            background: var(--v4-surface-2);
+            border: 1px solid var(--v4-border-strong);
             border-radius: 10px;
         }
 
@@ -791,13 +791,13 @@
 
         .responsaveis-painel-header strong {
             font-size: 14px;
-            color: #111827;
+            color: var(--v4-text);
         }
 
         .responsaveis-busca {
             width: 100%;
             padding: 9px 10px;
-            border: 1px solid #d1d5db;
+            border: 1px solid var(--v4-border-strong);
             border-radius: 7px;
             outline: none;
             margin-bottom: 10px;
@@ -819,8 +819,8 @@
             align-items: flex-start;
             gap: 10px;
             padding: 9px 10px;
-            border: 1px solid #e5e7eb;
-            background: white;
+            border: 1px solid var(--v4-border);
+            background: var(--v4-surface);
             border-radius: 7px;
             cursor: pointer;
             margin: 0 !important;
@@ -850,13 +850,13 @@
         .usuario-responsavel-info strong {
             display: block;
             font-size: 13px;
-            color: #1f2937;
+            color: var(--v4-text);
         }
 
         .usuario-responsavel-info span {
             display: block;
             font-size: 11px;
-            color: #6b7280;
+            color: var(--v4-muted);
             margin-top: 2px;
         }
 
@@ -866,7 +866,7 @@
             gap: 8px;
             margin-top: 12px;
             padding-top: 10px;
-            border-top: 1px solid #e5e7eb;
+            border-top: 1px solid var(--v4-border);
         }
 
         .btn-despachar {
@@ -902,9 +902,9 @@
             .kanban-board { padding: 15px; }
         }
     
-        .detalhe-secao-select{width:100%;padding:9px 10px;border:1px solid #d1d5db;border-radius:7px;background:#fff;color:#1f2937;font-weight:700;outline:none}
+        .detalhe-secao-select{width:100%;padding:9px 10px;border:1px solid var(--v4-border-strong);border-radius:7px;background:var(--v4-surface);color:var(--v4-text);font-weight:700;outline:none}
         .detalhe-secao-select:focus{border-color:#047857;box-shadow:0 0 0 2px rgba(4,120,87,.08)}
-        .detalhe-secao-select:disabled{background:#f3f4f6;color:#6b7280}
+        .detalhe-secao-select:disabled{background:var(--v4-surface-3);color:var(--v4-muted)}
         .btn-salvar-secao-tarefa{display:none;margin-top:7px;padding:8px 10px;width:100%;border:0;border-radius:7px;background:#047857;color:#fff;font-weight:700;cursor:pointer}
         .btn-salvar-secao-tarefa:hover{background:#065f46}.btn-salvar-secao-tarefa:disabled{opacity:.6;cursor:wait}
         .aviso-permissao-secao{font-size:10px;line-height:1.35;margin-top:6px}
@@ -913,10 +913,10 @@
         .task-last-activity {
             margin-top: 7px;
             padding-top: 6px;
-            border-top: 1px dashed #e5e7eb;
+            border-top: 1px dashed var(--v4-border);
             font-size: 9px;
             line-height: 1.35;
-            color: #6b7280;
+            color: var(--v4-muted);
             overflow-wrap: anywhere;
             display: -webkit-box;
             -webkit-line-clamp: 2;
@@ -925,7 +925,7 @@
         }
 
     </style>
-    <link rel="stylesheet" href="temas.css?v=3.7">
+    <link rel="stylesheet" href="v4_tema.css?v=4.0">
 </head>
 <body>
 
@@ -1059,11 +1059,12 @@
 
     <!-- MODAL: NOVA TAREFA -->
     <div class="modal" id="modalNovaTarefa">
-        <div class="modal-content">
+        <div class="modal-content v4-create-modal">
             <span class="modal-close" id="fecharModalTarefa">×</span>
             <h3>Criar Nova Tarefa</h3>
             <form id="formNovaTarefa">
                 <input type="hidden" id="taskStatusAlvo" value="Pendente">
+                <div class="v4-create-grid"><div class="v4-create-main">
 
                 <label for="taskTitulo">Título *</label>
                 <input type="text" id="taskTitulo" placeholder="Ex: Conferência de armamento" required>
@@ -1109,6 +1110,21 @@
 
                 <label for="taskPrazo">Prazo de Conclusão</label>
                 <input type="date" id="taskPrazo">
+
+                                </div>
+                <aside class="v4-rec-card" id="v4RecCard">
+  <div class="v4-rec-title"><div><strong>↻ Recorrência da tarefa</strong><div style="font-size:9px;color:var(--v4-muted);margin-top:2px">Repita automaticamente esta tarefa.</div></div><label class="v4-switch"><input type="checkbox" id="v4RecEnabled"><span></span></label></div>
+  <div class="v4-rec-body">
+    <div class="v4-rec-field"><label>Frequência</label><div class="v4-rec-tabs"><button type="button" data-v4-freq="diaria">Diária</button><button type="button" data-v4-freq="semanal">Semanal</button><button type="button" data-v4-freq="mensal">Mensal</button><button type="button" data-v4-freq="anual">Anual</button></div></div>
+    <div class="v4-rec-row"><div class="v4-rec-field"><label>Repetir a cada</label><input type="number" id="v4RecInterval" min="1" max="365" value="1"></div><div class="v4-rec-field"><label>Início</label><input type="date" id="v4RecStart"></div></div>
+    <div class="v4-rec-field" id="v4Weekly"><label>Dias da semana</label><div class="v4-weekdays"><button type="button" class="v4-day" data-v4-day="1">Seg</button><button type="button" class="v4-day" data-v4-day="2">Ter</button><button type="button" class="v4-day" data-v4-day="3">Qua</button><button type="button" class="v4-day" data-v4-day="4">Qui</button><button type="button" class="v4-day" data-v4-day="5">Sex</button><button type="button" class="v4-day" data-v4-day="6">Sáb</button><button type="button" class="v4-day" data-v4-day="7">Dom</button></div></div>
+    <div class="v4-rec-field v4-rec-hidden" id="v4Monthly"><label>Dia do mês</label><input type="number" id="v4RecMonthDay" min="1" max="31" value="1"></div>
+    <div class="v4-rec-field v4-rec-hidden" id="v4Annual"><label>Recorrência anual</label><div style="font-size:10px;color:var(--v4-muted)">Será usada a mesma data (dia/mês) informada em Início.</div></div>
+    <div class="v4-rec-field"><label>Fim</label><div class="v4-rec-end"><label><input type="radio" name="v4RecEndMode" id="v4RecEndModeNone" value="none" checked> Sem data final</label><label><input type="radio" name="v4RecEndMode" id="v4RecEndModeDate" value="date"> Em uma data</label></div><input type="date" id="v4RecEnd" disabled style="margin-top:7px"></div>
+    <div class="v4-rec-summary" id="v4RecSummary"></div>
+  </div>
+</aside>
+                </div>
 
                 <div class="modal-buttons">
                     <button type="button" class="btn-cancelar" id="btnCancelaTarefa">Cancelar</button>
@@ -2033,7 +2049,7 @@
                 const adicionar = lista => (lista || []).forEach(t => tarefasPorId.set(String(t.id), t));
 
                 // Tarefas criadas pelo PERFIL ativo.
-                let consultaCriadas = supabaseClient.from('tarefas').select('*').order('id', { ascending: true });
+                let consultaCriadas = supabaseClient.from('tarefas').select('*').eq('recorrencia_modelo', false).order('id', { ascending: true });
                 consultaCriadas = usuarioPerfilAtual?.perfil_id
                     ? consultaCriadas.eq('criado_por_perfil_id', usuarioPerfilAtual.perfil_id)
                     : consultaCriadas.eq('criado_por', usuarioLogado.id);
@@ -2049,6 +2065,7 @@
                         const recebidasF2 = await supabaseClient
                             .from('tarefas')
                             .select('*')
+                            .eq('recorrencia_modelo', false)
                             .in('id', idsAtribuidas)
                             .order('id', { ascending: true });
                         if (recebidasF2.error) throw recebidasF2.error;
@@ -2059,10 +2076,12 @@
                     const variantes = variantesResponsavelUsuario();
                     const consultasRecebidas = [
                         supabaseClient.from('tarefas').select('*')
+                            .eq('recorrencia_modelo', false)
                             .ilike('responsavel', `%"id":"${String(usuarioLogado.id)}"%`)
                             .order('id', { ascending: true }),
                         ...variantes.map(responsavel =>
                             supabaseClient.from('tarefas').select('*')
+                                .eq('recorrencia_modelo', false)
                                 .ilike('responsavel', `%${responsavel}%`)
                                 .order('id', { ascending: true })
                         )
@@ -2129,6 +2148,7 @@
                         <div class="card-top-left">
                             <input type="checkbox" class="task-checkbox" data-id="${tarefa.id}" onclick="event.stopPropagation()">
                             <span class="task-code">${escaparHtml(tarefa.codigo || ('#' + String(tarefa.id).padStart(4, '0')))}</span>
+                            ${tarefa.recorrencia_id ? '<span class="v4-rec-badge">↻ Recorrente</span>' : ''}
                         </div>
                         <span class="priority-badge ${classePrio}">${escaparHtml(tarefa.prioridade || 'Baixa')}</span>
                     </div>
@@ -2598,6 +2618,7 @@
         const modalTarefa = document.getElementById('modalNovaTarefa');
         function abrirModalNovaTarefa(statusColumn) {
             if (typeof v3LimparResponsaveisCriacao === 'function') v3LimparResponsaveisCriacao();
+            if (window.RecorrenciasV4) RecorrenciasV4.resetForm();
             document.getElementById('taskStatusAlvo').value = statusColumn;
             modalTarefa.style.display = 'flex';
             setTimeout(() => document.getElementById('taskTitulo').focus(), 0);
@@ -2764,6 +2785,9 @@
             const tPrio = document.getElementById('taskPrioridade').value;
             const tPrazo = document.getElementById('taskPrazo').value || null;
             const tStatus = document.getElementById('taskStatusAlvo').value;
+            let cfgRecorrencia = null;
+            try { cfgRecorrencia = window.RecorrenciasV4 ? RecorrenciasV4.getConfig() : null; } catch (e) { return alert(e.message); }
+
             const codGerado = '#' + Math.floor(1000 + Math.random() * 9000);
             const andamentoInicial = tStatus === 'Concluída' ? 100 : tStatus === 'Em andamento' ? 1 : 0;
 
@@ -2791,11 +2815,14 @@
                         arquivos: [],
                         historico: [
                             criarEntradaHistorico(
-                                v3NovaTarefaResponsaveis.length
-                                    ? `Tarefa criada e despachada para ${v3NovaTarefaResponsaveis.map(v3LabelResponsavelCriacao).join(', ')}.`
-                                    : 'Tarefa criada.'
+                                cfgRecorrencia
+                                    ? 'Modelo de tarefa recorrente criado.'
+                                    : (v3NovaTarefaResponsaveis.length
+                                        ? `Tarefa criada e despachada para ${v3NovaTarefaResponsaveis.map(v3LabelResponsavelCriacao).join(', ')}.`
+                                        : 'Tarefa criada.')
                             )
-                        ]
+                        ],
+                        recorrencia_modelo: Boolean(cfgRecorrencia)
                     }])
                     .select('*')
                     .single();
@@ -2804,13 +2831,18 @@
 
                 try {
                     if (v3NovaTarefaResponsaveis.length) {
-                        await ResponsaveisPerfis26.save(
-                            supabaseClient,
-                            novaTarefa.id,
-                            v3NovaTarefaResponsaveis,
-                            usuarioLogado.id,
-                            usuarioPerfilAtual?.perfil_id
-                        );
+                        window.__v4CriandoModeloRecorrente = Boolean(cfgRecorrencia);
+                        try {
+                            await ResponsaveisPerfis26.save(
+                                supabaseClient,
+                                novaTarefa.id,
+                                v3NovaTarefaResponsaveis,
+                                usuarioLogado.id,
+                                usuarioPerfilAtual?.perfil_id
+                            );
+                        } finally {
+                            window.__v4CriandoModeloRecorrente = false;
+                        }
                     }
                 } catch (erroResponsaveis) {
                     // Evita deixar tarefa criada sem os responsáveis escolhidos.
@@ -2823,6 +2855,19 @@
                         'Não foi possível vincular os responsáveis selecionados. '
                         + erroResponsaveis.message
                     );
+                }
+
+                if (cfgRecorrencia) {
+                    try {
+                        await RecorrenciasV4.criarRegra(
+                            supabaseClient,novaTarefa.id,cfgRecorrencia,
+                            usuarioLogado.id,usuarioPerfilAtual?.perfil_id
+                        );
+                        await RecorrenciasV4.processar(true);
+                    } catch (erroRecorrencia) {
+                        await supabaseClient.from('tarefas').delete().eq('id',novaTarefa.id);
+                        throw new Error('Não foi possível criar a recorrência: '+erroRecorrencia.message);
+                    }
                 }
 
                 fecharModalNovaTarefa();
@@ -2901,8 +2946,9 @@
     <script src="sistema_comum.js?v=5.0"></script>
     <script src="auditoria.js?v=5.0"></script>
     <script src="bloco_notas.js?v=5.0"></script>
-    <script src="temas.js?v=3.7"></script>
     <script src="notificacoes.js?v=3.6"></script>
-    <script src="v3_ui.js?v=3.4"></script>
+    <script src="v4_ui.js?v=4.0"></script>
+    <script src="v4_tema.js?v=4.0"></script>
+    <script src="recorrencias_v4.js?v=4.0"></script>
 </body>
 </html>

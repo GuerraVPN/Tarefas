@@ -184,7 +184,7 @@
       ok=true;
     }
 
-    if(ok&&window.Auditoria26){
+    if(ok&&window.Auditoria26&&!window.__v4CriandoModeloRecorrente){
       try{
         const depoisResp=await client.from('tarefa_responsaveis').select('*').eq('tarefa_id',Number(taskId));
         const depois=depoisResp.error?[]:(depoisResp.data||[]);

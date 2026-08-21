@@ -16,7 +16,7 @@
             --gold:#eab308;
             --bg:#f3f4f6;
             --card:#ffffff;
-            --line:#e5e7eb;
+            --line:var(--v4-border);
             --text:#111827;
             --muted:#6b7280;
             --green:#169447;
@@ -41,7 +41,7 @@
             width: 260px;
             min-height: 100vh;
             background: var(--sidebar);
-            color: #9ca3af;
+            color: var(--v4-muted);
             padding: 20px;
             display: flex;
             flex-direction: column;
@@ -52,7 +52,7 @@
         }
         .brand { display:flex; align-items:center; gap:12px; margin-bottom:30px; padding:0 10px; }
         .star-icon {
-            background: var(--gold); color:#111827; width:38px; height:38px; border-radius:8px;
+            background: var(--gold); color:var(--v4-text); width:38px; height:38px; border-radius:8px;
             display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:bold;
         }
         .brand h1 { color:#fff; font-size:20px; }
@@ -82,11 +82,11 @@
         /* CONTEÚDO */
         .main-content { flex:1; min-width:0; display:flex; flex-direction:column; }
         .topbar {
-            height:58px; background:#fff; border-bottom:1px solid var(--line); display:flex;
+            height:58px; background:var(--v4-surface); border-bottom:1px solid var(--line); display:flex;
             align-items:center; justify-content:space-between; padding:0 28px; position:sticky; top:0; z-index:30;
         }
-        .topbar-left { color:#4b5563; }
-        .topbar-right { display:flex; align-items:center; gap:20px; color:#374151; }
+        .topbar-left { color:var(--v4-text-2); }
+        .topbar-right { display:flex; align-items:center; gap:20px; color:var(--v4-text-2); }
         .mini-avatar {
             width:32px; height:32px; border-radius:50%; border:2px solid #eab308; background:#17202e;
             color:#eab308; display:flex; align-items:center; justify-content:center; font-weight:bold; overflow:hidden;
@@ -97,26 +97,26 @@
             display:flex; justify-content:space-between; gap:20px; align-items:flex-start; margin-bottom:18px;
         }
         .page-title h2 { font-size:24px; margin-bottom:5px; }
-        .breadcrumb { color:#6b7280; font-size:13px; }
+        .breadcrumb { color:var(--v4-muted); font-size:13px; }
         .toolbar { display:flex; align-items:center; gap:12px; flex-wrap:wrap; justify-content:flex-end; }
         .arrow-btn {
-            width:36px; height:36px; border:none; background:transparent; border-radius:8px; cursor:pointer; color:#374151;
+            width:36px; height:36px; border:none; background:transparent; border-radius:8px; cursor:pointer; color:var(--v4-text-2);
         }
-        .arrow-btn:hover { background:#e5e7eb; }
+        .arrow-btn:hover { background:var(--v4-surface-3); }
         .month-picker, .search-box {
-            height:42px; background:#fff; border:1px solid #d1d5db; border-radius:8px; padding:0 12px; outline:none;
+            height:42px; background:var(--v4-surface); border:1px solid var(--v4-border-strong); border-radius:8px; padding:0 12px; outline:none;
         }
         .month-picker:focus, .search-box:focus { border-color:#169447; box-shadow:0 0 0 2px rgba(22,148,71,.08); }
         .search-wrap { position:relative; }
         .search-box { width:280px; padding-right:38px; }
-        .search-wrap i { position:absolute; right:13px; top:50%; transform:translateY(-50%); color:#6b7280; }
+        .search-wrap i { position:absolute; right:13px; top:50%; transform:translateY(-50%); color:var(--v4-muted); }
         .mine-pill {
-            height:42px; border:1px solid #22a153; color:#15803d; background:#fff; border-radius:8px;
+            height:42px; border:1px solid #22a153; color:#15803d; background:var(--v4-surface); border-radius:8px;
             padding:0 16px; display:flex; align-items:center; gap:8px; font-size:14px; font-weight:600;
         }
 
         .calendar-layout { display:grid; grid-template-columns:minmax(620px, 1fr) 430px; gap:20px; align-items:start; }
-        .calendar-card, .day-panel { background:#fff; border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+        .calendar-card, .day-panel { background:var(--v4-surface); border:1px solid var(--line); border-radius:12px; overflow:hidden; }
         .week-header { display:grid; grid-template-columns:repeat(7, 1fr); border-bottom:1px solid var(--line); }
         .weekday { padding:16px 8px; text-align:center; font-weight:700; font-size:14px; }
         .calendar-grid { display:grid; grid-template-columns:repeat(7, 1fr); grid-template-rows:repeat(6, minmax(104px, 1fr)); }
@@ -142,11 +142,11 @@
         .dot-andamento { background:var(--yellow); }
         .dot-concluida { background:var(--green); }
         .day-task-title { overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
-        .more-tasks { font-size:11px; color:#6b7280; font-weight:700; margin-top:4px; }
+        .more-tasks { font-size:11px; color:var(--v4-muted); font-weight:700; margin-top:4px; }
 
         .legend {
-            background:#fff; border:1px solid var(--line); border-radius:10px; margin-top:14px; min-height:58px;
-            display:flex; align-items:center; gap:28px; padding:12px 18px; flex-wrap:wrap; font-size:13px; color:#4b5563;
+            background:var(--v4-surface); border:1px solid var(--line); border-radius:10px; margin-top:14px; min-height:58px;
+            display:flex; align-items:center; gap:28px; padding:12px 18px; flex-wrap:wrap; font-size:13px; color:var(--v4-text-2);
         }
         .legend-item { display:flex; align-items:center; gap:8px; }
         .legend .dot { width:12px; height:12px; flex-basis:12px; margin-top:0; }
@@ -174,9 +174,9 @@
         .prio-alta { background:#fee2e2; color:#dc2626; }
         .prio-media { background:#ffedd5; color:#ea580c; }
         .prio-baixa { background:#dcfce7; color:#15803d; }
-        .task-meta { display:flex; justify-content:space-between; gap:10px; margin-top:12px; font-size:12px; color:#6b7280; }
-        .task-code { color:#6b7280; font-size:11px; margin-top:8px; }
-        .empty-state { padding:34px 10px; text-align:center; color:#9ca3af; font-size:14px; border:1px dashed #d1d5db; border-radius:8px; }
+        .task-meta { display:flex; justify-content:space-between; gap:10px; margin-top:12px; font-size:12px; color:var(--v4-muted); }
+        .task-code { color:var(--v4-muted); font-size:11px; margin-top:8px; }
+        .empty-state { padding:34px 10px; text-align:center; color:var(--v4-muted); font-size:14px; border:1px dashed var(--v4-border-strong); border-radius:8px; }
 
         .summary-box { border:1px solid var(--line); border-radius:9px; padding:14px; margin-top:18px; }
         .summary-box h4 { font-size:14px; margin-bottom:12px; }
@@ -184,31 +184,31 @@
         .summary-item { border:1px solid var(--line); border-radius:8px; padding:12px 6px; text-align:center; min-width:0; }
         .summary-item span { display:block; font-size:11px; line-height:1.2; min-height:27px; }
         .summary-item strong { display:block; font-size:26px; margin:5px 0 2px; }
-        .summary-item small { color:#6b7280; font-size:10px; }
+        .summary-item small { color:var(--v4-muted); font-size:10px; }
         #sumCreated { color:#169447; }
         #sumForwarded { color:#e59a00; }
 
         .no-deadline {
-            margin-top:18px; border-top:1px solid var(--line); padding-top:14px; color:#6b7280; font-size:12px;
+            margin-top:18px; border-top:1px solid var(--line); padding-top:14px; color:var(--v4-muted); font-size:12px;
         }
-        .no-deadline strong { color:#374151; }
-        .sync-status { font-size:11px; color:#6b7280; display:flex; align-items:center; gap:6px; margin-top:12px; }
+        .no-deadline strong { color:var(--v4-text-2); }
+        .sync-status { font-size:11px; color:var(--v4-muted); display:flex; align-items:center; gap:6px; margin-top:12px; }
         .sync-status.ok i { color:#169447; }
         .sync-status.error i { color:#ef4444; }
 
         /* MODAL DE LEITURA */
         .modal-bg { position:fixed; inset:0; background:rgba(0,0,0,.52); display:none; align-items:center; justify-content:center; z-index:1000; padding:18px; }
         .modal-bg.show { display:flex; }
-        .modal-card { background:#fff; width:min(560px,100%); max-height:88vh; overflow:auto; border-radius:12px; padding:22px; }
+        .modal-card { background:var(--v4-surface); width:min(560px,100%); max-height:88vh; overflow:auto; border-radius:12px; padding:22px; }
         .modal-head { display:flex; justify-content:space-between; gap:15px; align-items:flex-start; }
-        .modal-close { border:none; background:transparent; font-size:24px; cursor:pointer; color:#6b7280; }
+        .modal-close { border:none; background:transparent; font-size:24px; cursor:pointer; color:var(--v4-muted); }
         .modal-code { font-size:12px; color:#169447; font-weight:700; }
         .modal-card h3 { font-size:20px; margin-top:4px; }
         .modal-info { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:18px; }
-        .info-box { background:#f8fafc; border:1px solid var(--line); border-radius:8px; padding:11px; }
-        .info-box small { display:block; color:#6b7280; font-size:11px; margin-bottom:4px; }
+        .info-box { background:var(--v4-surface-2); border:1px solid var(--line); border-radius:8px; padding:11px; }
+        .info-box small { display:block; color:var(--v4-muted); font-size:11px; margin-bottom:4px; }
         .info-box strong { font-size:13px; }
-        .modal-description { margin-top:16px; background:#f8fafc; border:1px solid var(--line); padding:12px; border-radius:8px; color:#4b5563; font-size:13px; line-height:1.5; white-space:pre-wrap; }
+        .modal-description { margin-top:16px; background:var(--v4-surface-2); border:1px solid var(--line); padding:12px; border-radius:8px; color:var(--v4-text-2); font-size:13px; line-height:1.5; white-space:pre-wrap; }
         .modal-actions { display:flex; justify-content:flex-end; margin-top:18px; }
         .btn-open-my { border:none; background:#047857; color:#fff; padding:10px 16px; border-radius:7px; cursor:pointer; font-weight:700; }
 
@@ -248,7 +248,7 @@
             .modal-info { grid-template-columns:1fr; }
         }
     </style>
-    <link rel="stylesheet" href="temas.css?v=3.3">
+    <link rel="stylesheet" href="v4_tema.css?v=4.0">
 </head>
 <body>
     <script>
@@ -636,7 +636,7 @@
                 const mapa = new Map();
                 const adicionar = lista => (lista || []).forEach(t => mapa.set(String(t.id), t));
 
-                let consultaCriadas = supabaseClient.from('tarefas').select('*').order('id', { ascending:true });
+                let consultaCriadas = supabaseClient.from('tarefas').select('*').eq('recorrencia_modelo', false).order('id', { ascending:true });
                 consultaCriadas = usuarioPerfilAtual?.perfil_id
                     ? consultaCriadas.eq('criado_por_perfil_id', usuarioPerfilAtual.perfil_id)
                     : consultaCriadas.eq('criado_por', usuarioLogado.id);
@@ -649,6 +649,7 @@
                 if (idsAtribuidas !== null) {
                     if (idsAtribuidas.length) {
                         const recebidas = await supabaseClient.from('tarefas').select('*')
+                            .eq('recorrencia_modelo', false)
                             .in('id', idsAtribuidas)
                             .order('id', { ascending:true });
                         if (recebidas.error) throw recebidas.error;
@@ -659,9 +660,11 @@
                     const variantes = variantesResponsavelUsuario();
                     const consultas = [
                         supabaseClient.from('tarefas').select('*')
+                            .eq('recorrencia_modelo', false)
                             .ilike('responsavel', `%"id":"${String(usuarioLogado.id)}"%`)
                             .order('id', { ascending:true }),
                         ...variantes.map(v => supabaseClient.from('tarefas').select('*')
+                            .eq('recorrencia_modelo', false)
                             .ilike('responsavel', `%${v}%`).order('id', { ascending:true }))
                     ];
                     const recebidas = await Promise.all(consultas);
@@ -853,8 +856,9 @@
     <script src="sistema_comum.js?v=5.0"></script>
     <script src="auditoria.js?v=5.0"></script>
     <script src="bloco_notas.js?v=5.0"></script>
-    <script src="temas.js?v=3.3"></script>
     <script src="notificacoes.js?v=3.4"></script>
-    <script src="v3_ui.js?v=3.4"></script>
+    <script src="v4_ui.js?v=4.0"></script>
+    <script src="v4_tema.js?v=4.0"></script>
+    <script src="recorrencias_v4.js?v=4.0"></script>
 </body>
 </html>
