@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="notificacoes.css?v=3.6">
 <link rel="stylesheet" href="v4_tema.css?v=4.1">
 <link rel="stylesheet" href="orcamentarios.css?v=5.1">
+<link rel="stylesheet" href="baixas_v5_2.css?v=5.2">
 <style>
 *{margin:0;padding:0;font-family:Arial,sans-serif}
 body{display:flex;min-height:100vh}
@@ -39,11 +40,17 @@ body{display:flex;min-height:100vh}
 
 <main class="orc-main">
   <header class="orc-topbar topbar">
-    <div class="orc-title"><h2>Orçamentários · Guias</h2><p>Cadastro, Fiscalização, devolução, reenvio e andamento das guias.</p></div>
+    <div class="orc-title"><h2 id="orcPageTitle">Orçamentários · Guias</h2><p id="orcPageSubtitle">Cadastro, Fiscalização, devolução, reenvio e andamento das guias.</p></div>
     <div></div>
   </header>
 
   <section class="orc-page">
+    <div class="orc-module-nav" id="orcModuleNav">
+      <button class="orc-module-btn active" data-orc-module="guias">📑 Guias</button>
+      <button class="orc-module-btn" data-orc-module="baixas">📦 Desrelacionamento / Baixa</button>
+    </div>
+
+    <div id="guiasModule">
     <div id="fiscalBanner" class="orc-fiscal-banner">🛡️ Perfil autorizado na fila de Fiscalização — Chefe/Auxiliar da Fiscalização.</div>
 
     <div class="orc-toolbar">
@@ -148,6 +155,93 @@ body{display:flex;min-height:100vh}
         </div>
       </section>
     </div>
+    </div><!-- /guiasModule -->
+
+    <div id="baixasModule" hidden>
+      <div class="baixa-toolbar">
+        <div class="baixa-tabs" id="baixaTabs">
+          <button class="baixa-tab active" data-baixa-cat="permanente">Permanente <span class="count" id="bCountPermanente">0</span></button>
+          <button class="baixa-tab" data-baixa-cat="uso_duradouro">Uso Duradouro <span class="count" id="bCountDuradouro">0</span></button>
+          <button class="baixa-tab" data-baixa-cat="consumo">Consumo <span class="count" id="bCountConsumo">0</span></button>
+        </div>
+        <button class="orc-btn primary" id="btnNovaBaixa">＋ Novo pedido</button>
+      </div>
+
+      <div class="baixa-filters">
+        <input id="baixaSearch" type="search" placeholder="Buscar material, identificação, motivo ou seção...">
+        <select id="baixaStatusFilter">
+          <option value="">Todos os status</option>
+          <option value="pedido">Pedido</option>
+          <option value="aguardando_aprovacao">Aguardando aprovação</option>
+          <option value="retornado">Retornado</option>
+          <option value="aprovado">Aprovado</option>
+          <option value="encaminhado_base">Encaminhado à Base Administrativa</option>
+          <option value="retornado_base">Retornado pela Base</option>
+          <option value="aprovado_base">Aprovado pela Base</option>
+          <option value="pronto">Pronto</option>
+        </select>
+        <input id="baixaDateFilter" type="date">
+      </div>
+
+      <div class="baixa-grid">
+        <section class="orc-panel">
+          <div class="orc-panel-head"><h3>Pedidos por data</h3><span id="baixaListInfo">0 pedido(s)</span></div>
+          <div class="orc-list" id="baixaList"><div class="orc-empty">Carregando pedidos...</div></div>
+        </section>
+
+        <section class="orc-panel">
+          <div class="orc-empty" id="baixaDetailEmpty">Selecione um pedido para visualizar o andamento e as atualizações.</div>
+          <div class="baixa-detail" id="baixaDetail" hidden>
+            <div class="baixa-head">
+              <div>
+                <h3 id="bdTitle">Pedido de baixa</h3>
+                <p id="bdSubtitle"></p>
+              </div>
+              <span class="baixa-status" id="bdStatus"></span>
+            </div>
+
+            <div class="baixa-meta">
+              <div><small>Data do pedido</small><b id="bdData">-</b></div>
+              <div><small>Categoria</small><b id="bdCategoria">-</b></div>
+              <div><small>Quantidade</small><b id="bdQuantidade">-</b></div>
+              <div><small>Material</small><b id="bdMaterial">-</b></div>
+              <div><small>Identificação / patrimônio</small><b id="bdIdentificacao">-</b></div>
+              <div><small>Seção de origem</small><b id="bdSecao">-</b></div>
+              <div style="grid-column:1/-1"><small>Motivo</small><b id="bdMotivo">-</b></div>
+              <div style="grid-column:1/-1"><small>Observações</small><b id="bdObservacoes">-</b></div>
+            </div>
+
+            <div class="baixa-return" id="baixaReturnNotice" hidden></div>
+
+            <div class="baixa-flow">
+              <div class="baixa-flow-head">Fluxo do pedido</div>
+              <div class="baixa-flow-body"><div class="baixa-steps" id="baixaSteps"></div></div>
+            </div>
+
+            <div class="baixa-actions-box">
+              <div class="baixa-actions-head"><span>Ações do andamento</span><span id="baixaActionHint"></span></div>
+              <div class="baixa-actions-body">
+                <textarea id="baixaActionNote" placeholder="Use este campo quando precisar informar o motivo de um retorno ou registrar observação da decisão..."></textarea>
+                <div class="baixa-actions-row" id="baixaActionButtons"></div>
+              </div>
+            </div>
+
+            <div class="baixa-actions-box">
+              <div class="baixa-actions-head"><span>Adicionar atualização</span><span>Fica registrada no histórico</span></div>
+              <div class="baixa-actions-body">
+                <textarea id="baixaUpdateText" placeholder="Ex.: material conferido, documentação enviada, aguardando resposta da Base..."></textarea>
+                <div><button class="orc-btn" id="btnBaixaUpdate">Registrar atualização</button></div>
+              </div>
+            </div>
+
+            <div class="baixa-actions-box">
+              <div class="baixa-actions-head"><span>Histórico / Atualizações</span><span id="baixaHistoryCount">0 evento(s)</span></div>
+              <div class="baixa-history" id="baixaHistory"></div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div><!-- /baixasModule -->
   </section>
 </main>
 
@@ -172,6 +266,33 @@ body{display:flex;min-height:100vh}
   </div>
 </div>
 
+<div class="orc-modal-bg" id="newBaixaBg">
+  <div class="orc-modal">
+    <div class="orc-modal-head"><h3>Novo pedido de Desrelacionamento / Baixa</h3><button class="orc-close" id="closeBaixa">×</button></div>
+    <form class="baixa-form" id="newBaixaForm">
+      <div class="baixa-field">
+        <label>Categoria *</label>
+        <select id="bCategoria" required>
+          <option value="permanente">Permanente</option>
+          <option value="uso_duradouro">Uso Duradouro</option>
+          <option value="consumo">Consumo</option>
+        </select>
+      </div>
+      <div class="baixa-field"><label>Data do pedido *</label><input id="bData" type="date" required></div>
+      <div class="baixa-field full"><label>Material *</label><input id="bMaterial" required placeholder="Descrição do material"></div>
+      <div class="baixa-field"><label>Identificação / patrimônio</label><input id="bIdentificacao" placeholder="Opcional"></div>
+      <div class="baixa-field"><label>Quantidade *</label><input id="bQuantidade" type="number" min="0.001" step="0.001" value="1" required></div>
+      <div class="baixa-field"><label>Unidade *</label><input id="bUnidade" value="UN" required placeholder="UN, KG, LT..."></div>
+      <div class="baixa-field full"><label>Motivo do desrelacionamento / baixa *</label><textarea id="bMotivo" required placeholder="Informe o motivo do pedido..."></textarea></div>
+      <div class="baixa-field full"><label>Observações</label><textarea id="bObservacoes" placeholder="Informações complementares, se houver..."></textarea></div>
+      <div class="baixa-form-actions">
+        <button type="button" class="orc-btn" id="cancelBaixa">Cancelar</button>
+        <button type="submit" class="orc-btn primary" id="saveBaixa">Cadastrar pedido</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <div class="orc-toast" id="orcToast"></div>
 
 <script>
@@ -185,5 +306,6 @@ const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 <script src="bloco_notas.js?v=4.1"></script>
 <script src="v4_tema.js?v=4.1"></script>
 <script src="orcamentarios.js?v=5.0"></script>
+<script src="baixas_v5_2.js?v=5.2"></script>
 </body>
 </html>
