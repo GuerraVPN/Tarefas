@@ -110,6 +110,28 @@ body{display:flex;min-height:100vh}
             <div class="orc-versions" id="versionInfo"></div>
           </div>
 
+          <div class="orc-subpanel" id="cmtSignatureBox" hidden>
+            <div class="orc-subhead">
+              <span>✍️ Assinatura do Comandante</span>
+              <span id="cmtSignatureHint">Aguardando assinatura do Cmt</span>
+            </div>
+            <div class="orc-status-box">
+              <div class="orc-note">
+                Baixe a guia atual, realize a assinatura e depois envie abaixo a versão assinada.
+                A versão anterior continuará preservada no histórico do sistema.
+              </div>
+              <div style="display:flex;gap:7px;flex-wrap:wrap">
+                <button type="button" class="orc-btn" id="btnCmtDownload">⬇ Baixar guia atual</button>
+                <button type="button" class="orc-btn" id="btnCmtOpen">↗ Abrir guia atual</button>
+              </div>
+              <input type="file" id="cmtSignedFile" accept=".pdf,image/jpeg,image/png,image/webp">
+              <textarea id="cmtSignedNote" placeholder="Observação opcional sobre a assinatura/substituição do documento..."></textarea>
+              <div>
+                <button type="button" class="orc-btn primary" id="btnCmtReplace">✓ Substituir pela guia assinada</button>
+              </div>
+            </div>
+          </div>
+
           <div class="orc-subpanel" id="fiscalActions" hidden>
             <div class="orc-subhead"><span>🛡️ Fiscalização</span><span id="fiscalActionHint"></span></div>
             <div class="orc-actions" id="fiscalButtons"></div>
@@ -305,7 +327,7 @@ const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 <script src="v4_ui.js?v=5.0"></script>
 <script src="bloco_notas.js?v=4.1"></script>
 <script src="v4_tema.js?v=4.1"></script>
-<script src="orcamentarios.js?v=5.0"></script>
+<script src="orcamentarios.js?v=5.2.1"></script>
 <script src="baixas_v5_2.js?v=5.2"></script>
 </body>
 </html>

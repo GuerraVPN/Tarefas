@@ -6,7 +6,7 @@ const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim
 const fmtDate=v=>v?new Date(v+'T12:00:00').toLocaleDateString('pt-BR'):'-';
 const fmtTime=v=>v?new Date(v).toLocaleString('pt-BR'):'-';
 
-let baseUser=null,user=null,profileState=null,isFiscal=false;
+let baseUser=null,user=null,profileState=null,isFiscal=false,isCommander=false;
 let guides=[],selected=null,attachments=[],history=[],usersMap=new Map();
 let category='sem_assinatura',fiscalQueue=false,currentAttachment=null;
 
@@ -15,7 +15,7 @@ const STATUS_LABEL={
  aguardando_inclusao_siscofis:'Aguardando inclusão no Siscofis',
  incluindo_guia:'Incluindo guia',
  aguardando_encaminhar_cmt:'Aguardando encaminhar ao Cmt',
- aguardando_assinatura:'Aguardando assinatura',
+ aguardando_assinatura:'Aguardando assinatura do Cmt',
  assinada:'Assinada',
  aguardando_inclusao_carga:'Aguardando inclusão em carga',
  aguardando_assinatura_almoxarifado:'Aguardando assinatura do almoxarifado',
@@ -76,6 +76,7 @@ async function initUser(){
    user=profileState.usuario;
  }else user=baseUser;
  isFiscal=(norm(user.secao)==='fiscalizacao'&&['chefe','auxiliar'].includes(norm(user.posicao)));
+ isCommander=(norm(user.secao)==='comandante');
  $('btnFiscalQueue').classList.toggle('show',isFiscal);
  $('fiscalBanner').classList.toggle('show',isFiscal);
  return true;
@@ -173,7 +174,8 @@ function eventLabel(e){
    reenviada_fiscalizacao:'Guia corrigida e reenviada',
    status_alterado:'Andamento atualizado',
    atualizacao:'Atualização registrada',
-   arquivo_adicionado:'Nova versão do documento'
+   arquivo_adicionado:'Nova versão do documento',
+   arquivo_assinado_cmt:'Guia assinada pelo Comandante'
  }[e]||e);
 }
 function renderFlow(){
@@ -200,6 +202,88 @@ function renderFiscalActions(){
    buttons.innerHTML='<span class="orc-note">Fiscalização concluída. O fluxo administrativo pode seguir.</span>';
  }
 }
+function commanderCanSign(g){
+ return !!(g&&isCommander&&(
+   (g.tipo==='recolhimento'&&g.status==='aguardando_assinatura_cmt')||
+   (g.tipo!=='recolhimento'&&g.status==='aguardando_assinatura')
+ ));
+}
+function renderCommanderSignature(){
+ const box=$('cmtSignatureBox');
+ if(!box)return;
+ const can=commanderCanSign(selected);
+ box.hidden=!can;
+ if(!can)return;
+ $('cmtSignatureHint').textContent=selected.tipo==='recolhimento'
+   ?'Recolhimento · assinatura do Cmt'
+   :'Transferência/Remessa · assinatura do Cmt';
+}
+async function commanderReplaceSignedFile(){
+ if(!selected||!commanderCanSign(selected))return;
+ const file=$('cmtSignedFile').files[0];
+ if(!file)return alert('Selecione a guia já assinada pelo Cmt.');
+ if(!currentAttachment)return alert('A guia atual não possui arquivo para ser substituído.');
+
+ const btn=$('btnCmtReplace');
+ btn.disabled=true;
+ btn.textContent='Enviando versão assinada...';
+
+ let inserted=null,uploadedPath=null;
+ try{
+   const version=(attachments[0]?.versao||0)+1;
+   const f=await uploadFile(file,selected.id,version);
+   uploadedPath=f.path;
+
+   const ai=await supabaseClient.from('guia_anexos').insert([{
+     guia_id:selected.id,
+     versao:version,
+     arquivo_nome:file.name,
+     arquivo_path:f.path,
+     arquivo_url:f.url,
+     arquivo_mime:file.type,
+     arquivo_tamanho:file.size,
+     enviado_por:String(user.id),
+     enviado_por_perfil_id:user.perfil_id?Number(user.perfil_id):null,
+     observacao:$('cmtSignedNote').value.trim()||'Versão assinada pelo Comandante.'
+   }]).select('*').single();
+
+   if(ai.error)throw ai.error;
+   inserted=ai.data;
+
+   const rpc=await supabaseClient.rpc('v5_2_1_assinar_guia_cmt',{
+     p_guia_id:selected.id,
+     p_anexo_id:inserted.id,
+     p_usuario_id:String(user.id),
+     p_perfil_id:user.perfil_id?Number(user.perfil_id):null,
+     p_mensagem:$('cmtSignedNote').value.trim()||null
+   });
+   if(rpc.error)throw rpc.error;
+
+   $('cmtSignedFile').value='';
+   $('cmtSignedNote').value='';
+   toast('Guia assinada substituída com sucesso.');
+   const id=selected.id;
+   await loadGuides();
+   await selectGuide(id);
+
+ }catch(err){
+   console.error(err);
+
+   // Se a RPC rejeitar a assinatura, evita deixar a versão inválida como oficial.
+   if(inserted?.id){
+     await supabaseClient.from('guia_anexos').delete().eq('id',inserted.id);
+   }
+   if(uploadedPath){
+     await supabaseClient.storage.from('guias-orcamentarias').remove([uploadedPath]);
+   }
+
+   alert('Erro ao substituir pela guia assinada: '+err.message);
+ }finally{
+   btn.disabled=false;
+   btn.textContent='✓ Substituir pela guia assinada';
+ }
+}
+
 function renderDetail(){
  $('detailEmpty').hidden=true;$('detailWrap').hidden=false;
  $('dNumero').textContent=`Guia ${selected.numero}`;
@@ -213,7 +297,7 @@ function renderDetail(){
  $('resendBox').hidden=!(selected.situacao_fiscalizacao==='devolvida_fiscalizacao'&&canCreator(selected));
  $('flowBox').hidden=!(isFiscal&&selected.situacao_fiscalizacao==='aprovada_fiscalizacao');
  $('btnAddUpdate').disabled=!canUpdate(selected);
- renderPreview();renderHistory();renderFiscalActions();renderFlow();
+ renderPreview();renderHistory();renderFiscalActions();renderCommanderSignature();renderFlow();
 }
 function safeName(v){return String(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9._-]+/g,'_')}
 async function uploadFile(file,guideId,version){
@@ -342,6 +426,18 @@ function bind(){
  $('previewZoom').onchange=renderPreview;
  $('btnOpenFile').onclick=()=>{if(currentAttachment)window.open(currentAttachment.arquivo_url,'_blank','noopener')};
  $('btnDownloadFile').onclick=()=>{if(!currentAttachment)return;const a=document.createElement('a');a.href=currentAttachment.arquivo_url;a.download=currentAttachment.arquivo_nome||'guia';a.target='_blank';a.click()};
+ $('btnCmtDownload').onclick=()=>{
+   if(!currentAttachment)return alert('A guia não possui arquivo.');
+   const a=document.createElement('a');
+   a.href=currentAttachment.arquivo_url;
+   a.download=currentAttachment.arquivo_nome||'guia';
+   a.target='_blank';
+   a.click();
+ };
+ $('btnCmtOpen').onclick=()=>{
+   if(currentAttachment)window.open(currentAttachment.arquivo_url,'_blank','noopener');
+ };
+ $('btnCmtReplace').onclick=commanderReplaceSignedFile;
  $('btnReturnFiscal').onclick=()=>fiscalAction('devolver');
  $('btnApproveFiscal').onclick=()=>fiscalAction('aprovar');
  $('btnResend').onclick=resend;
