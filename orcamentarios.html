@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="notificacoes.css?v=3.6">
 <link rel="stylesheet" href="v4_tema.css?v=4.1">
 <link rel="stylesheet" href="orcamentarios.css?v=5.1">
-<link rel="stylesheet" href="pedidos_v5_4_1.css?v=5.4.1">
+<link rel="stylesheet" href="pedidos_v5_4_2.css?v=5.4.2">
 <style>
 *{margin:0;padding:0;font-family:Arial,sans-serif}
 body{display:flex;min-height:100vh}
@@ -24,7 +24,7 @@ body{display:flex;min-height:100vh}
 </head>
 <body>
 <aside class="sidebar">
-  <div class="brand"><div class="star">★</div><div><h1>TAREFAS</h1><p>26º Pel PE Mec · V5</p></div></div>
+  <div class="brand"><div class="star">★</div><div><h1>TAREFAS</h1><p>26º Pel PE Mec</p></div></div>
   <ul class="nav">
     <li onclick="location.href='menu.html'">■ Quadro</li>
     <li onclick="location.href='minhas_tarefas.html'">👤 Minhas tarefas</li>
@@ -40,19 +40,61 @@ body{display:flex;min-height:100vh}
 
 <main class="orc-main">
   <header class="orc-topbar topbar">
-    <div class="orc-title"><h2 id="orcPageTitle">Orçamentários · Guias</h2><p id="orcPageSubtitle">Cadastro, Fiscalização, devolução, reenvio e andamento das guias.</p></div>
+    <div class="orc-title"><h2 id="orcPageTitle">Orçamentários · Relatório</h2><p id="orcPageSubtitle">Visão geral das guias, baixas, distribuições e movimentações.</p></div>
     <div></div>
   </header>
 
   <section class="orc-page">
-    <div class="orc-module-nav" id="orcModuleNav">
+    <div class="orc-module-nav" id="orcModuleNav" hidden aria-hidden="true" style="display:none!important">
       <button class="orc-module-btn active" data-orc-module="guias">📑 Guias</button>
       <button class="orc-module-btn" data-orc-module="baixas">📦 Desrelacionamento / Baixa</button>
       <button class="orc-module-btn" data-orc-module="distribuicao">🚚 Distribuição</button>
       <button class="orc-module-btn" data-orc-module="movimentacao">🔄 Movimentação de Material</button>
     </div>
 
-    <div id="guiasModule">
+
+    <div id="reportModule">
+      <div class="orc-report-hero">
+        <div>
+          <h3>Relatório Orçamentário</h3>
+          <p>Resumo dos quatro módulos. Use a seta de <b>Orçamentários</b> na lateral para abrir somente a área desejada.</p>
+        </div>
+        <span id="reportUpdated">Atualizando...</span>
+      </div>
+
+      <div class="orc-report-grid">
+        <article class="orc-report-card">
+          <div class="orc-report-icon">📑</div>
+          <div><small>Guias</small><strong id="rGuiasTotal">0</strong><span><b id="rGuiasFiscal">0</b> na Fiscalização · <b id="rGuiasPronto">0</b> prontas</span></div>
+        </article>
+        <article class="orc-report-card">
+          <div class="orc-report-icon">📦</div>
+          <div><small>Desrelacionamento / Baixa</small><strong id="rBaixasTotal">0</strong><span><b id="rBaixasAndamento">0</b> em andamento · <b id="rBaixasPronto">0</b> prontas</span></div>
+        </article>
+        <article class="orc-report-card">
+          <div class="orc-report-icon">🚚</div>
+          <div><small>Distribuição</small><strong id="rDistribTotal">0</strong><span><b id="rDistribFiscal">0</b> na Fiscalização · <b id="rDistribPronto">0</b> prontas</span></div>
+        </article>
+        <article class="orc-report-card">
+          <div class="orc-report-icon">🔄</div>
+          <div><small>Movimentação</small><strong id="rMovTotal">0</strong><span><b id="rMovFiscal">0</b> na Fiscalização · <b id="rMovPronto">0</b> prontas</span></div>
+        </article>
+      </div>
+
+      <div class="orc-report-grid orc-report-values">
+        <article class="orc-report-value"><small>Valor em Baixa / Desrelacionamento</small><strong id="rBaixasValor">R$ 0,00</strong></article>
+        <article class="orc-report-value"><small>Valor em Distribuição</small><strong id="rDistribValor">R$ 0,00</strong></article>
+        <article class="orc-report-value"><small>Valor em Movimentação</small><strong id="rMovValor">R$ 0,00</strong></article>
+        <article class="orc-report-value"><small>Pendências na Fiscalização</small><strong id="rFiscalTotal">0</strong></article>
+      </div>
+
+      <div class="orc-panel orc-report-recent">
+        <div class="orc-panel-head"><h3>Atividade recente</h3><span>Últimos registros atualizados</span></div>
+        <div id="rRecentList"><div class="orc-empty">Carregando relatório...</div></div>
+      </div>
+    </div>
+
+    <div id="guiasModule" hidden>
     <div id="fiscalBanner" class="orc-fiscal-banner">🛡️ Perfil autorizado na fila de Fiscalização — Chefe/Auxiliar da Fiscalização.</div>
 
     <div class="orc-toolbar">
@@ -206,6 +248,9 @@ body{display:flex;min-height:100vh}
           <option value="retornado_base">Retornado pela Base</option>
           <option value="aprovado_base">Aprovado pela Base</option>
           <option value="pronto">Pronto</option>
+          <option value="encaminhado_fiscal">Encaminhado ao Fiscal</option>
+          <option value="retornado_fiscal">Retornado pela Fiscalização</option>
+          <option value="aguardando_diex">Aguardando DIEx do material</option>
         </select>
         <input id="pedidoDateFilter" type="date">
       </div>
@@ -308,7 +353,8 @@ body{display:flex;min-height:100vh}
           <div class="pedido-detail" id="movDetail" hidden>
             <div class="pedido-head">
               <div><h3 id="mdTitle">Movimentação</h3><p id="mdSubtitle"></p></div>
-              <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+                <span class="pedido-status" id="mdStatus">Encaminhado ao Fiscal</span>
                 <button type="button" class="orc-btn" id="btnEditMov" hidden>✏️ Editar</button>
                 <button type="button" class="orc-btn danger" id="btnDeleteMov" hidden>🗑 Excluir</button>
               </div>
@@ -331,6 +377,22 @@ body{display:flex;min-height:100vh}
                   <tbody id="mdItemsBody"></tbody>
                   <tfoot><tr><td colspan="5">Total</td><td class="num" id="mdItemsTotal">R$ 0,00</td></tr></tfoot>
                 </table>
+              </div>
+            </div>
+
+
+            <div class="pedido-return" id="movReturnNotice" hidden></div>
+
+            <div class="pedido-sub">
+              <div class="pedido-subhead"><span>Fluxo da movimentação</span><span id="movFlowHint"></span></div>
+              <div class="pedido-steps" id="movSteps"></div>
+            </div>
+
+            <div class="pedido-sub">
+              <div class="pedido-subhead"><span>Ações do andamento</span><span id="movActionHint"></span></div>
+              <div class="pedido-actions">
+                <textarea id="movActionNote" placeholder="Informe uma observação ou, no retorno da Fiscalização, o motivo obrigatório..."></textarea>
+                <div class="pedido-action-row" id="movActionButtons"></div>
               </div>
             </div>
 
@@ -504,11 +566,11 @@ const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 </script>
 <script src="sistema_comum.js?v=5.0"></script>
 <script src="notificacoes.js?v=3.6"></script>
-<script src="v4_ui.js?v=5.0"></script>
+<script src="v4_ui.js?v=5.4.2"></script>
 <script src="bloco_notas.js?v=4.1"></script>
 <script src="v4_tema.js?v=4.1"></script>
 <script src="orcamentarios.js?v=5.4"></script>
-<script src="pedidos_v5_4_1.js?v=5.4.1"></script>
-<script src="movimentacoes_v5_4_1.js?v=5.4.1"></script>
+<script src="pedidos_v5_4_2.js?v=5.4.2"></script>
+<script src="movimentacoes_v5_4_2.js?v=5.4.2"></script>
 </body>
 </html>
