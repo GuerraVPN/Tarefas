@@ -9,6 +9,26 @@ const fmtTime=v=>v?new Date(v).toLocaleString('pt-BR'):'-';
 let baseUser=null,user=null,profileState=null,isFiscal=false,isCommander=false;
 let guides=[],selected=null,attachments=[],history=[],usersMap=new Map();
 let category='sem_assinatura',fiscalQueue=false,currentAttachment=null;
+let orcDepositos=['Almox','AlmoxVirtual','Depósito do Canil','Suprimento de Viaturas'];
+
+async function loadGuideDepositos(){
+ try{
+   const r=await supabaseClient.from('orc_depositos').select('nome').eq('ativo',true).order('ordem');
+   if(!r.error&&r.data?.length)orcDepositos=r.data.map(x=>x.nome);
+ }catch(_){}
+ const sel=$('gDepositoDestino');
+ if(sel)sel.innerHTML='<option value="">Selecione o depósito...</option>'+orcDepositos.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
+}
+function syncGuideDepositField(){
+ const tipo=$('gTipo')?.value;
+ const show=tipo==='transferencia'||tipo==='remessa';
+ const wrap=$('gDepositoDestinoWrap'),sel=$('gDepositoDestino');
+ if(wrap)wrap.hidden=!show;
+ if(sel){
+   sel.required=show;
+   if(!show)sel.value='';
+ }
+}
 
 const STATUS_LABEL={
  aguardando_recebimento_guia:'Aguardando recebimento da guia',
@@ -289,6 +309,9 @@ function renderDetail(){
  $('dNumero').textContent=`Guia ${selected.numero}`;
  $('dTipo').textContent=`${typeLabel(selected.tipo)} · criada por ${userName(selected.criado_por)}`;
  $('dData').textContent=fmtDate(selected.data_guia);$('dOrigem').textContent=selected.om_origem;$('dDestino').textContent=selected.om_destino;$('dAssunto').textContent=selected.assunto;
+ const depWrap=$('dDepositoDestinoWrap');
+ if(depWrap)depWrap.hidden=!(selected.tipo==='transferencia'||selected.tipo==='remessa');
+ if($('dDepositoDestino'))$('dDepositoDestino').textContent=selected.deposito_destino||'-';
  $('dStatus').textContent=STATUS_LABEL[selected.status]||selected.status;
  $('dFiscal').textContent=FISCAL_LABEL[selected.situacao_fiscalizacao]||selected.situacao_fiscalizacao;
  $('dFiscal').className=`orc-badge ${fiscalClass(selected.situacao_fiscalizacao)}`;
@@ -315,6 +338,7 @@ async function createGuide(e){
  e.preventDefault();
  const btn=$('saveGuide'),file=$('gFile').files[0],tipo=$('gTipo').value;
  if(!file)return alert('Anexe a guia em PDF ou imagem.');
+ if((tipo==='transferencia'||tipo==='remessa')&&!$('gDepositoDestino').value)return alert('Selecione o depósito de destino.');
  btn.disabled=true;btn.textContent='Cadastrando...';
  let guide=null;
  try{
@@ -325,6 +349,7 @@ async function createGuide(e){
      om_destino:$('gDestino').value.trim(),
      assunto:$('gAssunto').value.trim(),
      tipo,
+     deposito_destino:(tipo==='transferencia'||tipo==='remessa')?$('gDepositoDestino').value:null,
      status:initialStatus(tipo),
      situacao_fiscalizacao:'aguardando_fiscalizacao',
      criado_por:String(user.id),
@@ -419,6 +444,7 @@ function bind(){
  $('newGuideBg').onclick=e=>{if(e.target===$('newGuideBg'))$('newGuideBg').classList.remove('open')};
  $('newGuideForm').onsubmit=createGuide;
  $('gFile').onchange=()=>{const f=$('gFile').files[0];$('fileName').textContent=f?f.name:'';$('uploadArea').classList.toggle('selected',!!f)};
+ $('gTipo').onchange=syncGuideDepositField;
  $('categoryTabs').onclick=e=>{const b=e.target.closest('[data-cat]');if(!b)return;category=b.dataset.cat;fiscalQueue=false;$('btnFiscalQueue').classList.remove('active');document.querySelectorAll('.orc-tab').forEach(x=>x.classList.toggle('active',x===b));renderList()};
  $('btnFiscalQueue').onclick=()=>{if(!isFiscal)return;fiscalQueue=!fiscalQueue;$('btnFiscalQueue').classList.toggle('active',fiscalQueue);if(fiscalQueue)document.querySelectorAll('.orc-tab').forEach(x=>x.classList.remove('active'));else document.querySelector(`[data-cat="${category}"]`)?.classList.add('active');renderList()};
  ['searchGuia','tipoFilter','dateFilter'].forEach(id=>$(id).addEventListener(id==='searchGuia'?'input':'change',renderList));
@@ -447,7 +473,7 @@ function bind(){
 async function start(){
  try{
    if(!await initUser())return;
-   bind();await loadUsers();await loadGuides();
+   bind();await loadGuideDepositos();syncGuideDepositField();await loadUsers();await loadGuides();
  }catch(err){console.error(err);$('guiaList').innerHTML=`<div class="orc-empty">Erro ao abrir Orçamentários:<br>${esc(err.message)}</div>`}
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();

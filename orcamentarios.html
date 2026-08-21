@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="notificacoes.css?v=3.6">
 <link rel="stylesheet" href="v4_tema.css?v=4.1">
 <link rel="stylesheet" href="orcamentarios.css?v=5.1">
-<link rel="stylesheet" href="baixas_v5_2.css?v=5.2">
+<link rel="stylesheet" href="pedidos_v5_3.css?v=5.3">
 <style>
 *{margin:0;padding:0;font-family:Arial,sans-serif}
 body{display:flex;min-height:100vh}
@@ -48,6 +48,7 @@ body{display:flex;min-height:100vh}
     <div class="orc-module-nav" id="orcModuleNav">
       <button class="orc-module-btn active" data-orc-module="guias">📑 Guias</button>
       <button class="orc-module-btn" data-orc-module="baixas">📦 Desrelacionamento / Baixa</button>
+      <button class="orc-module-btn" data-orc-module="distribuicao">🚚 Distribuição</button>
     </div>
 
     <div id="guiasModule">
@@ -91,6 +92,7 @@ body{display:flex;min-height:100vh}
             <div><small>Data da guia</small><b id="dData">-</b></div>
             <div><small>OM de origem</small><b id="dOrigem">-</b></div>
             <div><small>OM de destino</small><b id="dDestino">-</b></div>
+            <div id="dDepositoDestinoWrap" hidden><small>Depósito de destino</small><b id="dDepositoDestino">-</b></div>
             <div style="grid-column:1/-1"><small>Do que se trata</small><b id="dAssunto">-</b></div>
           </div>
 
@@ -179,19 +181,19 @@ body{display:flex;min-height:100vh}
     </div>
     </div><!-- /guiasModule -->
 
-    <div id="baixasModule" hidden>
-      <div class="baixa-toolbar">
-        <div class="baixa-tabs" id="baixaTabs">
-          <button class="baixa-tab active" data-baixa-cat="permanente">Permanente <span class="count" id="bCountPermanente">0</span></button>
-          <button class="baixa-tab" data-baixa-cat="uso_duradouro">Uso Duradouro <span class="count" id="bCountDuradouro">0</span></button>
-          <button class="baixa-tab" data-baixa-cat="consumo">Consumo <span class="count" id="bCountConsumo">0</span></button>
+    <div id="pedidosModule" hidden>
+      <div class="pedido-toolbar">
+        <div class="pedido-tabs" id="pedidoTabs">
+          <button class="pedido-tab active" data-pedido-cat="permanente">Permanente <span class="count" id="pCountPermanente">0</span></button>
+          <button class="pedido-tab" data-pedido-cat="uso_duradouro">Uso Duradouro <span class="count" id="pCountDuradouro">0</span></button>
+          <button class="pedido-tab" data-pedido-cat="consumo">Consumo <span class="count" id="pCountConsumo">0</span></button>
         </div>
-        <button class="orc-btn primary" id="btnNovaBaixa">＋ Novo pedido</button>
+        <button class="orc-btn primary" id="btnNovoPedido">＋ Novo pedido</button>
       </div>
 
-      <div class="baixa-filters">
-        <input id="baixaSearch" type="search" placeholder="Buscar material, identificação, motivo ou seção...">
-        <select id="baixaStatusFilter">
+      <div class="pedido-filters">
+        <input id="pedidoSearch" type="search" placeholder="Buscar nº do pedido, material, ficha, origem ou destino...">
+        <select id="pedidoStatusFilter">
           <option value="">Todos os status</option>
           <option value="pedido">Pedido</option>
           <option value="aguardando_aprovacao">Aguardando aprovação</option>
@@ -202,68 +204,76 @@ body{display:flex;min-height:100vh}
           <option value="aprovado_base">Aprovado pela Base</option>
           <option value="pronto">Pronto</option>
         </select>
-        <input id="baixaDateFilter" type="date">
+        <input id="pedidoDateFilter" type="date">
       </div>
 
-      <div class="baixa-grid">
+      <div class="pedido-grid">
         <section class="orc-panel">
-          <div class="orc-panel-head"><h3>Pedidos por data</h3><span id="baixaListInfo">0 pedido(s)</span></div>
-          <div class="orc-list" id="baixaList"><div class="orc-empty">Carregando pedidos...</div></div>
+          <div class="orc-panel-head"><h3 id="pedidoListTitle">Pedidos por data</h3><span id="pedidoListInfo">0 pedido(s)</span></div>
+          <div class="orc-list" id="pedidoList"><div class="orc-empty">Carregando pedidos...</div></div>
         </section>
 
         <section class="orc-panel">
-          <div class="orc-empty" id="baixaDetailEmpty">Selecione um pedido para visualizar o andamento e as atualizações.</div>
-          <div class="baixa-detail" id="baixaDetail" hidden>
-            <div class="baixa-head">
-              <div>
-                <h3 id="bdTitle">Pedido de baixa</h3>
-                <p id="bdSubtitle"></p>
-              </div>
-              <span class="baixa-status" id="bdStatus"></span>
+          <div class="orc-empty" id="pedidoDetailEmpty">Selecione um pedido para visualizar os materiais, total, andamento e atualizações.</div>
+          <div class="pedido-detail" id="pedidoDetail" hidden>
+            <div class="pedido-head">
+              <div><h3 id="pdTitle">Pedido</h3><p id="pdSubtitle"></p></div>
+              <span class="pedido-status" id="pdStatus"></span>
             </div>
 
-            <div class="baixa-meta">
-              <div><small>Data do pedido</small><b id="bdData">-</b></div>
-              <div><small>Categoria</small><b id="bdCategoria">-</b></div>
-              <div><small>Quantidade</small><b id="bdQuantidade">-</b></div>
-              <div><small>Material</small><b id="bdMaterial">-</b></div>
-              <div><small>Identificação / patrimônio</small><b id="bdIdentificacao">-</b></div>
-              <div><small>Seção de origem</small><b id="bdSecao">-</b></div>
-              <div style="grid-column:1/-1"><small>Motivo</small><b id="bdMotivo">-</b></div>
-              <div style="grid-column:1/-1"><small>Observações</small><b id="bdObservacoes">-</b></div>
+            <div class="pedido-meta">
+              <div><small>Data do pedido</small><b id="pdData">-</b></div>
+              <div id="pdCategoriaWrap"><small>Categoria</small><b id="pdCategoria">-</b></div>
+              <div><small>Total do pedido</small><b class="pedido-total" id="pdTotal">R$ 0,00</b></div>
+              <div id="pdDependenciaOrigemWrap"><small>Dependência de origem</small><b id="pdDependenciaOrigem">-</b></div>
+              <div id="pdDepositoOrigemWrap"><small>Depósito de origem</small><b id="pdDepositoOrigem">-</b></div>
+              <div id="pdDependenciaDestinoWrap"><small>Dependência de destino</small><b id="pdDependenciaDestino">-</b></div>
+              <div style="grid-column:1/-1"><small>Motivo / finalidade</small><b id="pdMotivo">-</b></div>
+              <div style="grid-column:1/-1"><small>Observações</small><b id="pdObservacoes">-</b></div>
             </div>
 
-            <div class="baixa-return" id="baixaReturnNotice" hidden></div>
+            <div class="pedido-return" id="pedidoReturnNotice" hidden></div>
 
-            <div class="baixa-flow">
-              <div class="baixa-flow-head">Fluxo do pedido</div>
-              <div class="baixa-flow-body"><div class="baixa-steps" id="baixaSteps"></div></div>
-            </div>
-
-            <div class="baixa-actions-box">
-              <div class="baixa-actions-head"><span>Ações do andamento</span><span id="baixaActionHint"></span></div>
-              <div class="baixa-actions-body">
-                <textarea id="baixaActionNote" placeholder="Use este campo quando precisar informar o motivo de um retorno ou registrar observação da decisão..."></textarea>
-                <div class="baixa-actions-row" id="baixaActionButtons"></div>
+            <div class="pedido-sub">
+              <div class="pedido-subhead"><span>📦 Materiais do pedido</span><span id="pdItemsCount">0 item(ns)</span></div>
+              <div class="pedido-table-wrap">
+                <table class="pedido-table">
+                  <thead><tr><th>Material</th><th>Nº da ficha</th><th>Quantidade</th><th>Valor unitário</th><th>Total</th></tr></thead>
+                  <tbody id="pdItemsBody"></tbody>
+                  <tfoot><tr><td colspan="4">Total do pedido</td><td class="num" id="pdItemsTotal">R$ 0,00</td></tr></tfoot>
+                </table>
               </div>
             </div>
 
-            <div class="baixa-actions-box">
-              <div class="baixa-actions-head"><span>Adicionar atualização</span><span>Fica registrada no histórico</span></div>
-              <div class="baixa-actions-body">
-                <textarea id="baixaUpdateText" placeholder="Ex.: material conferido, documentação enviada, aguardando resposta da Base..."></textarea>
-                <div><button class="orc-btn" id="btnBaixaUpdate">Registrar atualização</button></div>
+            <div class="pedido-sub" id="pedidoFlowBox">
+              <div class="pedido-subhead"><span>Fluxo do pedido</span><span id="pedidoFlowHint"></span></div>
+              <div class="pedido-steps" id="pedidoSteps"></div>
+            </div>
+
+            <div class="pedido-sub" id="pedidoActionsBox">
+              <div class="pedido-subhead"><span>Ações do andamento</span><span id="pedidoActionHint"></span></div>
+              <div class="pedido-actions">
+                <textarea id="pedidoActionNote" placeholder="Informe observação da decisão ou o motivo quando retornar o pedido..."></textarea>
+                <div class="pedido-action-row" id="pedidoActionButtons"></div>
               </div>
             </div>
 
-            <div class="baixa-actions-box">
-              <div class="baixa-actions-head"><span>Histórico / Atualizações</span><span id="baixaHistoryCount">0 evento(s)</span></div>
-              <div class="baixa-history" id="baixaHistory"></div>
+            <div class="pedido-sub">
+              <div class="pedido-subhead"><span>📝 Adicionar atualização</span><span>Registrada no histórico</span></div>
+              <div class="pedido-actions">
+                <textarea id="pedidoUpdateText" placeholder="Ex.: conferência realizada, documentação encaminhada, aguardando providência..."></textarea>
+                <div><button class="orc-btn" id="btnPedidoUpdate">Registrar atualização</button></div>
+              </div>
+            </div>
+
+            <div class="pedido-sub">
+              <div class="pedido-subhead"><span>🕘 Histórico / Atualizações</span><span id="pedidoHistoryCount">0 evento(s)</span></div>
+              <div class="pedido-history" id="pedidoHistory"></div>
             </div>
           </div>
         </section>
       </div>
-    </div><!-- /baixasModule -->
+    </div><!-- /pedidosModule -->
   </section>
 </main>
 
@@ -277,6 +287,10 @@ body{display:flex;min-height:100vh}
       <div class="orc-field"><label>OM de destino *</label><input id="gDestino" required placeholder="OM de destino"></div>
       <div class="orc-field full"><label>Do que se trata *</label><textarea id="gAssunto" required maxlength="500" placeholder="Descreva o objeto da guia..."></textarea></div>
       <div class="orc-field full"><label>Tipo da guia *</label><select id="gTipo" required><option value="">Selecione...</option><option value="transferencia">Transferência</option><option value="remessa">Remessa</option><option value="recolhimento">Recolhimento</option></select></div>
+      <div class="orc-field full" id="gDepositoDestinoWrap" hidden>
+        <label>Depósito de destino *</label>
+        <select id="gDepositoDestino"><option value="">Selecione o depósito...</option></select>
+      </div>
       <div class="orc-field full">
         <label>Guia em PDF ou imagem *</label>
         <label class="orc-upload" id="uploadArea" for="gFile"><strong>📎 Anexar guia</strong><p>PDF, JPG, PNG ou WEBP · máximo 15 MB</p><p id="fileName"></p></label>
@@ -288,28 +302,58 @@ body{display:flex;min-height:100vh}
   </div>
 </div>
 
-<div class="orc-modal-bg" id="newBaixaBg">
-  <div class="orc-modal">
-    <div class="orc-modal-head"><h3>Novo pedido de Desrelacionamento / Baixa</h3><button class="orc-close" id="closeBaixa">×</button></div>
-    <form class="baixa-form" id="newBaixaForm">
-      <div class="baixa-field">
+<div class="orc-modal-bg" id="newPedidoBg">
+  <div class="orc-modal" style="width:min(980px,97vw)">
+    <div class="orc-modal-head"><h3 id="newPedidoTitle">Novo pedido</h3><button class="orc-close" id="closePedido">×</button></div>
+    <form class="pedido-form" id="newPedidoForm">
+      <div class="pedido-field"><label>Número do pedido *</label><input id="pNumero" required placeholder="Ex.: 15-Almox"></div>
+      <div class="pedido-field"><label>Data do pedido *</label><input id="pData" type="date" required></div>
+
+      <div class="pedido-field" id="pCategoriaWrap">
         <label>Categoria *</label>
-        <select id="bCategoria" required>
+        <select id="pCategoria">
           <option value="permanente">Permanente</option>
           <option value="uso_duradouro">Uso Duradouro</option>
           <option value="consumo">Consumo</option>
         </select>
       </div>
-      <div class="baixa-field"><label>Data do pedido *</label><input id="bData" type="date" required></div>
-      <div class="baixa-field full"><label>Material *</label><input id="bMaterial" required placeholder="Descrição do material"></div>
-      <div class="baixa-field"><label>Identificação / patrimônio</label><input id="bIdentificacao" placeholder="Opcional"></div>
-      <div class="baixa-field"><label>Quantidade *</label><input id="bQuantidade" type="number" min="0.001" step="0.001" value="1" required></div>
-      <div class="baixa-field"><label>Unidade *</label><input id="bUnidade" value="UN" required placeholder="UN, KG, LT..."></div>
-      <div class="baixa-field full"><label>Motivo do desrelacionamento / baixa *</label><textarea id="bMotivo" required placeholder="Informe o motivo do pedido..."></textarea></div>
-      <div class="baixa-field full"><label>Observações</label><textarea id="bObservacoes" placeholder="Informações complementares, se houver..."></textarea></div>
-      <div class="baixa-form-actions">
-        <button type="button" class="orc-btn" id="cancelBaixa">Cancelar</button>
-        <button type="submit" class="orc-btn primary" id="saveBaixa">Cadastrar pedido</button>
+
+      <div class="pedido-field" id="pDependenciaOrigemWrap" hidden>
+        <label>Dependência de origem *</label>
+        <select id="pDependenciaOrigem"><option value="">Selecione...</option></select>
+      </div>
+
+      <div class="pedido-field" id="pDepositoOrigemWrap" hidden>
+        <label>Depósito de origem *</label>
+        <select id="pDepositoOrigem"><option value="">Selecione...</option></select>
+      </div>
+
+      <div class="pedido-field" id="pDependenciaDestinoWrap" hidden>
+        <label>Dependência de destino *</label>
+        <select id="pDependenciaDestino"><option value="">Selecione...</option></select>
+      </div>
+
+      <div class="pedido-location-note" id="pedidoLocationRule"></div>
+
+      <div class="pedido-field full">
+        <label id="pMotivoLabel">Motivo / finalidade *</label>
+        <textarea id="pMotivo" required placeholder="Informe o motivo ou finalidade do pedido..."></textarea>
+      </div>
+
+      <div class="pedido-field full">
+        <label>Observações</label>
+        <textarea id="pObservacoes" placeholder="Informações complementares, se houver..."></textarea>
+      </div>
+
+      <div class="pedido-items-editor">
+        <div class="pedido-items-head"><span>Materiais do pedido</span><button type="button" class="orc-btn" id="btnAddPedidoItem">＋ Adicionar material</button></div>
+        <div id="pedidoItemsEditor"></div>
+        <div class="pedido-editor-total">Total do pedido: <span id="pedidoEditorTotal">R$ 0,00</span></div>
+      </div>
+
+      <div class="pedido-form-actions">
+        <button type="button" class="orc-btn" id="cancelPedido">Cancelar</button>
+        <button type="submit" class="orc-btn primary" id="savePedido">Cadastrar pedido</button>
       </div>
     </form>
   </div>
@@ -327,7 +371,7 @@ const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 <script src="v4_ui.js?v=5.0"></script>
 <script src="bloco_notas.js?v=4.1"></script>
 <script src="v4_tema.js?v=4.1"></script>
-<script src="orcamentarios.js?v=5.2.1"></script>
-<script src="baixas_v5_2.js?v=5.2"></script>
+<script src="orcamentarios.js?v=5.3"></script>
+<script src="pedidos_v5_3.js?v=5.3"></script>
 </body>
 </html>
