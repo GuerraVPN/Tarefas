@@ -1,0 +1,59 @@
+/* V5 — Orçamentários / Guias */
+*{box-sizing:border-box}
+.orc-main{flex:1;min-width:0;background:var(--v4-bg);color:var(--v4-text)}
+.orc-topbar{min-height:68px;background:var(--v4-surface);border-bottom:1px solid var(--v4-border);display:flex;align-items:center;justify-content:space-between;padding:10px 22px;position:sticky;top:0;z-index:40}
+.orc-title h2{font-size:22px;margin:0}.orc-title p{font-size:11px;color:var(--v4-muted);margin-top:4px}
+.orc-page{padding:16px 18px 30px}
+.orc-toolbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.orc-tabs{display:flex;gap:7px;flex:1;flex-wrap:wrap}
+.orc-tab{border:1px solid var(--v4-border);background:var(--v4-surface);color:var(--v4-text-2);padding:9px 12px;border-radius:9px;font-size:11px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:7px}
+.orc-tab.active{border-color:var(--v4-accent);color:var(--v4-accent);background:var(--v4-accent-soft)}
+.orc-tab .count{min-width:20px;height:20px;border-radius:999px;background:var(--v4-surface-3);display:inline-grid;place-items:center;font-size:9px}
+.orc-tab.active .count{background:var(--v4-accent);color:#fff}
+.orc-fiscal-toggle{display:none;border:1px solid var(--v4-info);background:var(--v4-surface);color:var(--v4-info);border-radius:9px;padding:9px 11px;font-size:10px;font-weight:800;cursor:pointer}
+.orc-fiscal-toggle.show{display:inline-flex}.orc-fiscal-toggle.active{background:var(--v4-info);color:#fff}
+.orc-btn{border:1px solid var(--v4-border-strong);background:var(--v4-surface);color:var(--v4-text);border-radius:9px;padding:9px 12px;font-weight:800;font-size:11px;cursor:pointer}
+.orc-btn.primary{background:var(--v4-accent);border-color:var(--v4-accent);color:#fff}.orc-btn.primary:hover{background:var(--v4-accent-hover)}
+.orc-btn.info{background:var(--v4-info);border-color:var(--v4-info);color:#fff}.orc-btn.danger{background:var(--v4-danger);border-color:var(--v4-danger);color:#fff}
+.orc-btn:disabled{opacity:.55;cursor:not-allowed}
+.orc-filters{display:grid;grid-template-columns:minmax(220px,1fr) 190px 190px;gap:8px;margin-bottom:12px}
+.orc-filters input,.orc-filters select{width:100%;padding:9px 10px;border:1px solid var(--v4-border-strong);border-radius:8px;background:var(--v4-surface);color:var(--v4-text)}
+.orc-grid{display:grid;grid-template-columns:minmax(300px,.72fr) minmax(550px,1.28fr);gap:12px;min-height:650px}
+.orc-panel{background:var(--v4-surface);border:1px solid var(--v4-border);border-radius:12px;min-width:0;overflow:hidden}
+.orc-panel-head{padding:12px 14px;border-bottom:1px solid var(--v4-border);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.orc-panel-head h3{font-size:14px;margin:0}.orc-panel-head span{font-size:9px;color:var(--v4-muted)}
+.orc-list{max-height:calc(100vh - 250px);overflow:auto;padding:8px}
+.orc-date{font-size:10px;font-weight:800;color:var(--v4-muted);padding:8px 6px 5px}
+.orc-card{border:1px solid var(--v4-border);background:var(--v4-surface);padding:10px;border-radius:9px;margin-bottom:7px;cursor:pointer}
+.orc-card:hover{background:var(--v4-surface-2)}.orc-card.active{border-color:var(--v4-accent);box-shadow:0 0 0 2px var(--v4-accent-soft)}
+.orc-card-top{display:flex;justify-content:space-between;gap:8px}.orc-card strong{font-size:11px}.orc-card p{font-size:9px;color:var(--v4-muted);margin-top:5px;line-height:1.35}
+.orc-badge{display:inline-flex;padding:3px 7px;border:1px solid var(--v4-border);border-radius:999px;font-size:8px;font-weight:800;white-space:nowrap}
+.orc-badge.fiscal-wait{color:var(--v4-warning);border-color:var(--v4-warning)}.orc-badge.fiscal-analysis{color:var(--v4-info);border-color:var(--v4-info)}.orc-badge.fiscal-return{color:var(--v4-danger);border-color:var(--v4-danger)}.orc-badge.fiscal-ok{color:var(--v4-accent);border-color:var(--v4-accent)}
+.orc-empty{padding:36px 18px;text-align:center;color:var(--v4-muted);font-size:11px}
+.orc-detail{padding:14px;display:grid;gap:12px}
+.orc-detail-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.orc-detail-head h3{font-size:17px;margin:0}.orc-detail-head p{font-size:10px;color:var(--v4-muted);margin-top:4px}
+.orc-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.orc-meta div{border:1px solid var(--v4-border);border-radius:8px;padding:9px;background:var(--v4-surface-2)}.orc-meta small{display:block;color:var(--v4-muted);font-size:8px;margin-bottom:3px}.orc-meta b{font-size:10px}
+.orc-subpanel{border:1px solid var(--v4-border);border-radius:10px;overflow:hidden}.orc-subhead{padding:9px 11px;border-bottom:1px solid var(--v4-border);display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:10px;font-weight:800}
+.orc-preview-tools{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.orc-preview-tools select{padding:5px;border:1px solid var(--v4-border);background:var(--v4-surface);color:var(--v4-text);border-radius:6px;font-size:9px}
+.orc-preview{height:420px;background:var(--v4-surface-2);display:grid;place-items:center;overflow:auto}.orc-preview iframe{width:100%;height:100%;border:0;background:var(--v4-surface)}.orc-preview img{max-width:100%;height:auto;transform-origin:top center}
+.orc-versions{padding:8px 10px;border-top:1px solid var(--v4-border);font-size:9px;color:var(--v4-muted)}
+.orc-actions{display:flex;gap:7px;flex-wrap:wrap;padding:10px;background:var(--v4-surface-2)}
+.orc-note{padding:9px 10px;border:1px solid var(--v4-border);border-radius:8px;background:var(--v4-surface-2);font-size:10px;line-height:1.45}
+.orc-note.returned{border-color:var(--v4-danger);background:color-mix(in srgb,var(--v4-danger) 8%,var(--v4-surface))}
+.orc-form-row{display:grid;grid-template-columns:1fr auto;gap:7px}.orc-form-row textarea{min-height:68px;resize:vertical}
+.orc-form-row input,.orc-form-row textarea,.orc-status-box select,.orc-status-box textarea{width:100%;padding:8px 9px;border:1px solid var(--v4-border-strong);border-radius:7px;background:var(--v4-surface);color:var(--v4-text)}
+.orc-status-box{padding:10px;display:grid;gap:7px;background:var(--v4-surface-2)}
+.orc-history{max-height:300px;overflow:auto;padding:9px}.orc-hitem{position:relative;padding:8px 8px 8px 19px;border-left:2px solid var(--v4-border);margin-left:5px}.orc-hitem:before{content:"";position:absolute;left:-5px;top:12px;width:8px;height:8px;border-radius:50%;background:var(--v4-accent)}.orc-hitem strong{font-size:9px}.orc-hitem p{font-size:9px;line-height:1.45;margin-top:3px}.orc-hitem small{font-size:8px;color:var(--v4-muted);display:block;margin-top:3px}
+.orc-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:100000;display:none;align-items:center;justify-content:center;padding:16px}.orc-modal-bg.open{display:flex}
+.orc-modal{width:min(740px,96vw);max-height:92vh;overflow:auto;background:var(--v4-surface);border:1px solid var(--v4-border);border-radius:13px;box-shadow:0 24px 70px rgba(0,0,0,.25)}
+.orc-modal-head{padding:14px 16px;border-bottom:1px solid var(--v4-border);display:flex;justify-content:space-between;align-items:center}.orc-modal-head h3{font-size:16px}.orc-close{border:0;background:transparent;color:var(--v4-muted);font-size:22px;cursor:pointer}
+.orc-form{padding:15px;display:grid;grid-template-columns:1fr 1fr;gap:10px}.orc-field.full{grid-column:1/-1}.orc-field label{display:block;font-size:9px;font-weight:800;color:var(--v4-muted);margin-bottom:5px}.orc-field input,.orc-field textarea,.orc-field select{width:100%;padding:9px 10px;border:1px solid var(--v4-border-strong);border-radius:8px;background:var(--v4-surface);color:var(--v4-text)}.orc-field textarea{min-height:85px;resize:vertical}
+.orc-upload{border:2px dashed var(--v4-border-strong);background:var(--v4-surface-2);border-radius:10px;padding:20px;text-align:center;cursor:pointer}.orc-upload strong{font-size:11px}.orc-upload p{font-size:9px;color:var(--v4-muted);margin-top:4px}.orc-upload.selected{border-color:var(--v4-accent);background:var(--v4-accent-soft)}
+.orc-destino{border:1px solid var(--v4-info);border-radius:9px;padding:10px;background:color-mix(in srgb,var(--v4-info) 8%,var(--v4-surface));font-size:10px;line-height:1.45}.orc-destino b{color:var(--v4-info)}
+.orc-modal-actions{grid-column:1/-1;display:flex;justify-content:flex-end;gap:7px;border-top:1px solid var(--v4-border);padding-top:11px;margin-top:3px}
+.orc-fiscal-banner{display:none;padding:9px 11px;border:1px solid var(--v4-info);border-radius:9px;color:var(--v4-info);background:color-mix(in srgb,var(--v4-info) 8%,var(--v4-surface));font-size:10px;font-weight:800;margin-bottom:10px}.orc-fiscal-banner.show{display:block}
+.orc-toast{position:fixed;right:18px;bottom:18px;z-index:110000;background:var(--v4-sidebar);color:#fff;padding:10px 13px;border-radius:9px;font-size:10px;box-shadow:0 10px 30px rgba(0,0,0,.25);display:none}.orc-toast.show{display:block}
+@media(max-width:1050px){.orc-grid{grid-template-columns:1fr}.orc-list{max-height:460px}.orc-preview{height:500px}}
+@media(max-width:760px){.orc-page{padding:10px}.orc-topbar{padding:9px 12px}.orc-title h2{font-size:18px}.orc-filters{grid-template-columns:1fr}.orc-meta{grid-template-columns:1fr 1fr}.orc-form{grid-template-columns:1fr}.orc-field.full,.orc-modal-actions{grid-column:1}.orc-preview{height:62vh}.orc-toolbar{align-items:stretch}.orc-tabs{width:100%}.orc-tab{flex:1;justify-content:center;min-width:130px}}

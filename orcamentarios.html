@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Orçamentários - 26º Pel PE Mec</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="perfis.js?v=5.0"></script>
+<link rel="stylesheet" href="notificacoes.css?v=3.6">
+<link rel="stylesheet" href="v4_tema.css?v=4.1">
+<link rel="stylesheet" href="orcamentarios.css?v=5.0">
+<style>
+*{margin:0;padding:0;font-family:Arial,sans-serif}
+body{display:flex;min-height:100vh}
+.sidebar{width:260px;padding:20px;display:flex;flex-direction:column;min-height:100vh;flex-shrink:0}
+.brand{display:flex;gap:12px;align-items:center;margin-bottom:28px}
+.star{width:36px;height:36px;background:var(--v4-gold);color:#111;border-radius:7px;display:grid;place-items:center;font-size:22px;font-weight:800}
+.brand h1{color:#fff;font-size:20px}.brand p{font-size:12px;color:var(--v4-gold)}
+.nav{list-style:none;flex:1}.nav li{padding:12px 14px;border-radius:8px;margin-bottom:6px;cursor:pointer;display:flex;gap:10px;align-items:center;color:var(--v4-sidebar-text)}.nav li:hover,.nav li.active{background:var(--v4-sidebar-hover)}.nav li.active{color:var(--v4-gold);border:1px solid var(--v4-gold)}
+.credit{font-size:10px;text-align:center;line-height:1.5;border-top:1px solid rgba(255,255,255,.12);padding-top:12px;color:var(--v4-sidebar-text)}.credit b{color:var(--v4-gold)}
+@media(max-width:900px){.sidebar{display:none!important}.orc-main{margin-left:0!important;width:100%!important}}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="brand"><div class="star">★</div><div><h1>TAREFAS</h1><p>26º Pel PE Mec · V5</p></div></div>
+  <ul class="nav">
+    <li onclick="location.href='menu.html'">■ Quadro</li>
+    <li onclick="location.href='minhas_tarefas.html'">👤 Minhas tarefas</li>
+    <li onclick="location.href='calendario.html'">📅 Calendário</li>
+    <li onclick="location.href='relatorios.html'">📊 Relatórios</li>
+    <li onclick="location.href='usuarios.html'">👥 Usuários</li>
+    <li onclick="location.href='central.html'" data-v3-central="1">🔔 Central</li>
+    <li class="active" data-v5-orcamentarios="1">📑 Orçamentários</li>
+    <li onclick="location.href='configuracoes.html'">⚙️ Configurações</li>
+  </ul>
+  <div class="credit">Criado por <b>Sd Guerra</b><br>26º Pel PE Mec 💪🏼</div>
+</aside>
+
+<main class="orc-main">
+  <header class="orc-topbar topbar">
+    <div class="orc-title"><h2>Orçamentários · Guias</h2><p>Cadastro, Fiscalização, devolução, reenvio e andamento das guias.</p></div>
+    <div></div>
+  </header>
+
+  <section class="orc-page">
+    <div id="fiscalBanner" class="orc-fiscal-banner">🛡️ Perfil autorizado na fila de Fiscalização — Chefe/Auxiliar da Fiscalização.</div>
+
+    <div class="orc-toolbar">
+      <div class="orc-tabs" id="categoryTabs">
+        <button class="orc-tab active" data-cat="sem_assinatura">Sem Assinatura <span class="count" id="cSem">0</span></button>
+        <button class="orc-tab" data-cat="assinada">Assinada <span class="count" id="cAss">0</span></button>
+        <button class="orc-tab" data-cat="aguardando_carga">Aguardando inclusão em carga <span class="count" id="cCarga">0</span></button>
+        <button class="orc-tab" data-cat="pronto">Pronto <span class="count" id="cPronto">0</span></button>
+      </div>
+      <button id="btnFiscalQueue" class="orc-fiscal-toggle">🛡️ Fila da Fiscalização <span id="fiscalCount">0</span></button>
+      <button id="btnNovaGuia" class="orc-btn primary">＋ Nova Guia</button>
+    </div>
+
+    <div class="orc-filters">
+      <input id="searchGuia" type="search" placeholder="Buscar número, OM ou assunto...">
+      <select id="tipoFilter"><option value="">Todos os tipos</option><option value="transferencia">Transferência</option><option value="remessa">Remessa</option><option value="recolhimento">Recolhimento</option></select>
+      <input id="dateFilter" type="date">
+    </div>
+
+    <div class="orc-grid">
+      <section class="orc-panel">
+        <div class="orc-panel-head"><h3>Guias por data</h3><span id="listInfo">0 guia(s)</span></div>
+        <div class="orc-list" id="guiaList"><div class="orc-empty">Carregando guias...</div></div>
+      </section>
+
+      <section class="orc-panel">
+        <div id="detailEmpty" class="orc-empty">Selecione uma guia para abrir os detalhes, documento e histórico.</div>
+        <div id="detailWrap" class="orc-detail" hidden>
+          <div class="orc-detail-head">
+            <div><h3 id="dNumero">Guia</h3><p id="dTipo"></p></div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
+              <span class="orc-badge" id="dStatus"></span>
+              <span class="orc-badge" id="dFiscal"></span>
+            </div>
+          </div>
+
+          <div class="orc-meta">
+            <div><small>Data da guia</small><b id="dData">-</b></div>
+            <div><small>OM de origem</small><b id="dOrigem">-</b></div>
+            <div><small>OM de destino</small><b id="dDestino">-</b></div>
+            <div style="grid-column:1/-1"><small>Do que se trata</small><b id="dAssunto">-</b></div>
+          </div>
+
+          <div id="returnNotice" class="orc-note returned" hidden></div>
+
+          <div class="orc-subpanel">
+            <div class="orc-subhead">
+              <span>📎 Guia anexada</span>
+              <div class="orc-preview-tools">
+                <label>Zoom</label>
+                <select id="previewZoom"><option>75%</option><option selected>100%</option><option>125%</option><option>150%</option><option>200%</option></select>
+                <button class="orc-btn" id="btnOpenFile">Abrir</button>
+                <button class="orc-btn" id="btnDownloadFile">Baixar</button>
+              </div>
+            </div>
+            <div class="orc-preview" id="previewBox"><div class="orc-empty">Sem anexo.</div></div>
+            <div class="orc-versions" id="versionInfo"></div>
+          </div>
+
+          <div class="orc-subpanel" id="fiscalActions" hidden>
+            <div class="orc-subhead"><span>🛡️ Fiscalização</span><span id="fiscalActionHint"></span></div>
+            <div class="orc-actions" id="fiscalButtons"></div>
+            <div id="fiscalDecisionBox" class="orc-status-box" hidden>
+              <textarea id="fiscalDecisionText" placeholder="Descreva o motivo da devolução ou uma observação da aprovação..."></textarea>
+              <div style="display:flex;gap:7px;flex-wrap:wrap">
+                <button class="orc-btn danger" id="btnReturnFiscal">↩ Devolver ao remetente</button>
+                <button class="orc-btn primary" id="btnApproveFiscal">✓ Aprovar e seguir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="orc-subpanel" id="resendBox" hidden>
+            <div class="orc-subhead"><span>🔁 Corrigir e reenviar à Fiscalização</span><span>Nova versão obrigatória</span></div>
+            <div class="orc-status-box">
+              <input type="file" id="resendFile" accept=".pdf,image/jpeg,image/png,image/webp">
+              <textarea id="resendNote" placeholder="Informe o que foi corrigido / atualização para a Fiscalização..."></textarea>
+              <div><button class="orc-btn primary" id="btnResend">Reenviar para Fiscalização</button></div>
+            </div>
+          </div>
+
+          <div class="orc-subpanel" id="flowBox" hidden>
+            <div class="orc-subhead"><span>➡️ Andamento da guia</span><span>Após aprovação da Fiscalização</span></div>
+            <div class="orc-status-box">
+              <select id="flowStatus"></select>
+              <textarea id="flowNote" placeholder="Atualização opcional sobre esta mudança de status..."></textarea>
+              <div><button class="orc-btn primary" id="btnSaveFlow">Salvar andamento</button></div>
+            </div>
+          </div>
+
+          <div class="orc-subpanel">
+            <div class="orc-subhead"><span>📝 Adicionar atualização</span><span>Remetente ou Fiscalização</span></div>
+            <div class="orc-status-box">
+              <textarea id="generalUpdate" placeholder="Ex.: documento conferido, aguardando providência, contato realizado..."></textarea>
+              <div><button class="orc-btn" id="btnAddUpdate">Registrar atualização</button></div>
+            </div>
+          </div>
+
+          <div class="orc-subpanel">
+            <div class="orc-subhead"><span>🕘 Histórico / Atualizações</span><span id="historyCount">0 evento(s)</span></div>
+            <div class="orc-history" id="historyList"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </section>
+</main>
+
+<div class="orc-modal-bg" id="newGuideBg">
+  <div class="orc-modal">
+    <div class="orc-modal-head"><h3>Cadastrar Guia</h3><button class="orc-close" id="closeGuide">×</button></div>
+    <form class="orc-form" id="newGuideForm">
+      <div class="orc-field"><label>Número da guia *</label><input id="gNumero" required placeholder="Ex.: 027/2026"></div>
+      <div class="orc-field"><label>Data da guia *</label><input id="gData" type="date" required></div>
+      <div class="orc-field"><label>OM de origem *</label><input id="gOrigem" required placeholder="OM de origem"></div>
+      <div class="orc-field"><label>OM de destino *</label><input id="gDestino" required placeholder="OM de destino"></div>
+      <div class="orc-field full"><label>Do que se trata *</label><textarea id="gAssunto" required maxlength="500" placeholder="Descreva o objeto da guia..."></textarea></div>
+      <div class="orc-field full"><label>Tipo da guia *</label><select id="gTipo" required><option value="">Selecione...</option><option value="transferencia">Transferência</option><option value="remessa">Remessa</option><option value="recolhimento">Recolhimento</option></select></div>
+      <div class="orc-field full">
+        <label>Guia em PDF ou imagem *</label>
+        <label class="orc-upload" id="uploadArea" for="gFile"><strong>📎 Anexar guia</strong><p>PDF, JPG, PNG ou WEBP · máximo 15 MB</p><p id="fileName"></p></label>
+        <input id="gFile" type="file" accept=".pdf,image/jpeg,image/png,image/webp" required hidden>
+      </div>
+      <div class="orc-field full"><div class="orc-destino"><b>Destino do despacho: Fiscalização</b><br>Não há seleção de Almoxarifado, Auxiliar, Chefe ou Comandante. O sistema envia a guia para a fila exclusiva da Fiscalização.</div></div>
+      <div class="orc-modal-actions"><button type="button" class="orc-btn" id="cancelGuide">Cancelar</button><button type="submit" class="orc-btn primary" id="saveGuide">Cadastrar e despachar</button></div>
+    </form>
+  </div>
+</div>
+
+<div class="orc-toast" id="orcToast"></div>
+
+<script>
+const SUPABASE_URL="https://bpvijatnsluwsgnzklrd.supabase.co";
+const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwdmlqYXRuc2x1d3NnbnprbHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MzkxNDMsImV4cCI6MjEwMjQxNTE0M30.uvyfm9mgl6MON0v75CwfGzNz6FBqw58uzR4ZcRAOLNQ";
+const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+</script>
+<script src="sistema_comum.js?v=5.0"></script>
+<script src="notificacoes.js?v=3.6"></script>
+<script src="v4_ui.js?v=5.0"></script>
+<script src="bloco_notas.js?v=4.1"></script>
+<script src="v4_tema.js?v=4.1"></script>
+<script src="orcamentarios.js?v=5.0"></script>
+</body>
+</html>
