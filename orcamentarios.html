@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="notificacoes.css?v=3.6">
 <link rel="stylesheet" href="v4_tema.css?v=4.1">
 <link rel="stylesheet" href="orcamentarios.css?v=5.1">
-<link rel="stylesheet" href="pedidos_v5_4_2.css?v=5.4.2">
+<link rel="stylesheet" href="pedidos_v5_5.css?v=5.5">
 <style>
 *{margin:0;padding:0;font-family:Arial,sans-serif}
 body{display:flex;min-height:100vh}
@@ -50,6 +50,7 @@ body{display:flex;min-height:100vh}
       <button class="orc-module-btn" data-orc-module="baixas">📦 Desrelacionamento / Baixa</button>
       <button class="orc-module-btn" data-orc-module="distribuicao">🚚 Distribuição</button>
       <button class="orc-module-btn" data-orc-module="movimentacao">🔄 Movimentação de Material</button>
+      <button class="orc-module-btn" data-orc-module="material_carga">🗂 Material Carga / Depósito</button>
     </div>
 
 
@@ -57,7 +58,7 @@ body{display:flex;min-height:100vh}
       <div class="orc-report-hero">
         <div>
           <h3>Relatório Orçamentário</h3>
-          <p>Resumo dos quatro módulos. Use a seta de <b>Orçamentários</b> na lateral para abrir somente a área desejada.</p>
+          <p>Resumo das áreas do Orçamentários. Use a seta de <b>Orçamentários</b> na lateral para abrir somente a área desejada.</p>
         </div>
         <span id="reportUpdated">Atualizando...</span>
       </div>
@@ -79,6 +80,11 @@ body{display:flex;min-height:100vh}
           <div class="orc-report-icon">🔄</div>
           <div><small>Movimentação</small><strong id="rMovTotal">0</strong><span><b id="rMovFiscal">0</b> na Fiscalização · <b id="rMovPronto">0</b> prontas</span></div>
         </article>
+
+        <article class="orc-report-card">
+          <div class="orc-report-icon">🗂</div>
+          <div><small>Material Carga / Depósito</small><strong id="rCargaDocs">0</strong><span><b id="rCargaPendentes">0</b> sem documento atualizado</span></div>
+        </article>
       </div>
 
       <div class="orc-report-grid orc-report-values">
@@ -99,8 +105,7 @@ body{display:flex;min-height:100vh}
 
     <div class="orc-toolbar">
       <div class="orc-tabs" id="categoryTabs">
-        <button class="orc-tab active" data-cat="sem_assinatura">Sem Assinatura <span class="count" id="cSem">0</span></button>
-        <button class="orc-tab" data-cat="assinada">Assinada <span class="count" id="cAss">0</span></button>
+        <button class="orc-tab active" data-cat="fiscalizacao">Na Fiscalização <span class="count" id="cFiscal">0</span></button>
         <button class="orc-tab" data-cat="aguardando_carga">Aguardando inclusão em carga <span class="count" id="cCarga">0</span></button>
         <button class="orc-tab" data-cat="pronto">Pronto <span class="count" id="cPronto">0</span></button>
       </div>
@@ -142,6 +147,11 @@ body{display:flex;min-height:100vh}
           </div>
 
           <div id="returnNotice" class="orc-note returned" hidden></div>
+
+          <div class="orc-subpanel">
+            <div class="orc-subhead"><span>Fluxo superior da guia</span><span id="guideStageText"></span></div>
+            <div class="pedido-steps" id="guideSimpleSteps"></div>
+          </div>
 
           <div class="orc-subpanel">
             <div class="orc-subhead">
@@ -187,6 +197,43 @@ body{display:flex;min-height:100vh}
               <div style="display:flex;gap:7px;flex-wrap:wrap">
                 <button class="orc-btn danger" id="btnReturnFiscal">↩ Devolver ao remetente</button>
                 <button class="orc-btn primary" id="btnApproveFiscal">✓ Aprovar e seguir</button>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="orc-subpanel" id="fiscalDocsBox" hidden>
+            <div class="orc-subhead"><span>📄 Documentos da Fiscalização</span><span>Após aprovação</span></div>
+            <div class="orc-status-box">
+              <div class="orc-doc-grid">
+                <div class="orc-doc-card">
+                  <strong>Espelho</strong>
+                  <div id="espelhoInfo" class="orc-note">Nenhum Espelho anexado.</div>
+                  <div style="display:flex;gap:6px;flex-wrap:wrap">
+                    <button type="button" class="orc-btn" id="btnOpenEspelho" disabled>Abrir</button>
+                    <button type="button" class="orc-btn" id="btnDownloadEspelho" disabled>Baixar</button>
+                  </div>
+                  <div id="espelhoFiscalUpload" hidden>
+                    <input type="file" id="espelhoFile" accept=".pdf,image/jpeg,image/png,image/webp">
+                    <button type="button" class="orc-btn primary" id="btnUploadEspelho">Anexar / Atualizar Espelho</button>
+                  </div>
+                </div>
+                <div class="orc-doc-card">
+                  <strong>TREM</strong>
+                  <div id="tremInfo" class="orc-note">Nenhum TREM anexado.</div>
+                  <div style="display:flex;gap:6px;flex-wrap:wrap">
+                    <button type="button" class="orc-btn" id="btnOpenTrem" disabled>Abrir</button>
+                    <button type="button" class="orc-btn" id="btnDownloadTrem" disabled>Baixar</button>
+                  </div>
+                  <div id="tremFiscalUpload" hidden>
+                    <input type="file" id="tremFile" accept=".pdf,image/jpeg,image/png,image/webp">
+                    <button type="button" class="orc-btn primary" id="btnUploadTrem">Anexar / Atualizar TREM</button>
+                  </div>
+                </div>
+              </div>
+              <div id="guideCompleteBox" hidden>
+                <textarea id="guideCompleteNote" placeholder="Observação opcional ao concluir a inclusão em carga..."></textarea>
+                <button type="button" class="orc-btn primary" id="btnGuideComplete">✓ Marcar como Pronto</button>
               </div>
             </div>
           </div>
@@ -294,6 +341,17 @@ body{display:flex;min-height:100vh}
                   <tbody id="pdItemsBody"></tbody>
                   <tfoot><tr><td colspan="5">Total do pedido</td><td class="num" id="pdItemsTotal">R$ 0,00</td></tr></tfoot>
                 </table>
+              </div>
+            </div>
+
+
+            <div class="pedido-sub" id="pedidoAttachmentsBox">
+              <div class="pedido-subhead"><span>📎 Arquivos anexados</span><span id="pedidoAttachCount">0 arquivo(s)</span></div>
+              <div class="pedido-actions">
+                <div id="pedidoAttachList"></div>
+                <input type="file" id="pedidoAddFiles" multiple accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx,.xls,.xlsx,.odt,.ods,.txt">
+                <textarea id="pedidoAttachNote" placeholder="Observação opcional sobre os arquivos..."></textarea>
+                <div><button type="button" class="orc-btn" id="btnPedidoAddFiles">📎 Anexar arquivos</button></div>
               </div>
             </div>
 
@@ -422,6 +480,57 @@ body{display:flex;min-height:100vh}
         </section>
       </div>
     </div><!-- /movimentacaoModule -->
+
+    <div id="materialCargaModule" hidden>
+      <div class="pedido-toolbar">
+        <div class="pedido-tabs" id="cargaTabs">
+          <button class="pedido-tab active" data-carga-tipo="dependencia">Material Carga</button>
+          <button class="pedido-tab" data-carga-tipo="deposito">Depósitos</button>
+        </div>
+      </div>
+
+      <div class="pedido-grid">
+        <section class="orc-panel">
+          <div class="orc-panel-head"><h3 id="cargaListTitle">Dependências</h3><span id="cargaListInfo">0 registro(s)</span></div>
+          <div class="orc-list" id="cargaRefList"><div class="orc-empty">Carregando...</div></div>
+        </section>
+
+        <section class="orc-panel">
+          <div class="orc-empty" id="cargaDetailEmpty">Selecione uma dependência ou depósito para abrir o documento.</div>
+          <div class="pedido-detail" id="cargaDetail" hidden>
+            <div class="pedido-head">
+              <div><h3 id="cargaTitle">Material Carga</h3><p id="cargaSubtitle"></p></div>
+              <span class="pedido-status info" id="cargaVersionBadge">Sem documento</span>
+            </div>
+
+            <div class="pedido-sub">
+              <div class="pedido-subhead"><span>📎 Documento atual</span><span id="cargaFileDate"></span></div>
+              <div class="carga-doc-view">
+                <div id="cargaFileInfo" class="orc-note">Nenhum documento cadastrado.</div>
+                <div style="display:flex;gap:7px;flex-wrap:wrap">
+                  <button type="button" class="orc-btn" id="btnCargaOpen" disabled>↗ Abrir</button>
+                  <button type="button" class="orc-btn" id="btnCargaDownload" disabled>⬇ Baixar</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="pedido-sub" id="cargaFiscalUpdate" hidden>
+              <div class="pedido-subhead"><span>🛡️ Atualização pela Fiscalização</span><span>Substitui a versão exibida</span></div>
+              <div class="pedido-actions">
+                <input type="file" id="cargaNewFile" accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx,.xls,.xlsx,.odt,.ods,.txt">
+                <textarea id="cargaNote" placeholder="Observação opcional sobre a atualização..."></textarea>
+                <div><button type="button" class="orc-btn primary" id="btnCargaUpdate">Atualizar documento</button></div>
+              </div>
+            </div>
+
+            <div class="pedido-sub">
+              <div class="pedido-subhead"><span>Histórico de versões</span><span id="cargaHistoryCount">0 versão(ões)</span></div>
+              <div id="cargaHistoryList" class="pedido-history"></div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div><!-- /materialCargaModule -->
   </section>
 </main>
 
@@ -517,6 +626,13 @@ body{display:flex;min-height:100vh}
         <div class="pedido-editor-total">Total do pedido: <span id="pedidoEditorTotal">R$ 0,00</span></div>
       </div>
 
+
+      <div class="pedido-field full">
+        <label>Arquivos anexos</label>
+        <input id="pFiles" type="file" multiple accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx,.xls,.xlsx,.odt,.ods,.txt">
+        <div style="font-size:8px;color:var(--v4-muted);margin-top:5px">Opcional · até 25 MB por arquivo.</div>
+      </div>
+
       <div class="pedido-form-actions">
         <button type="button" class="orc-btn" id="cancelPedido">Cancelar</button>
         <button type="submit" class="orc-btn primary" id="savePedido">Cadastrar pedido</button>
@@ -566,11 +682,12 @@ const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 </script>
 <script src="sistema_comum.js?v=5.0"></script>
 <script src="notificacoes.js?v=3.6"></script>
-<script src="v4_ui.js?v=5.4.2"></script>
+<script src="v4_ui.js?v=5.5"></script>
 <script src="bloco_notas.js?v=4.1"></script>
 <script src="v4_tema.js?v=4.1"></script>
-<script src="orcamentarios.js?v=5.4"></script>
-<script src="pedidos_v5_4_2.js?v=5.4.2"></script>
+<script src="orcamentarios.js?v=5.5"></script>
+<script src="pedidos_v5_5.js?v=5.5"></script>
 <script src="movimentacoes_v5_4_2.js?v=5.4.2"></script>
+<script src="material_carga_v5_5.js?v=5.5"></script>
 </body>
 </html>

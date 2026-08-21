@@ -143,6 +143,7 @@ function addNav(){
    <button data-v5-orc-link="baixas">📦 Desrelacionamento / Baixa</button>
    <button data-v5-orc-link="distribuicao">🚚 Distribuição</button>
    <button data-v5-orc-link="movimentacao">🔄 Movimentação de Material</button>
+   <button data-v5-orc-link="material_carga">🗂 Material Carga / Depósito</button>
  </div>`;
 
  li.querySelector('[data-v5-orc-main]').onclick=e=>{

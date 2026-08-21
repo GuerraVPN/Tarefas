@@ -8,7 +8,8 @@ const fmtTime=v=>v?new Date(v).toLocaleString('pt-BR'):'-';
 
 let baseUser=null,user=null,profileState=null,isFiscal=false,isCommander=false,isAdmin=false;
 let guides=[],selected=null,attachments=[],history=[],usersMap=new Map();
-let category='sem_assinatura',fiscalQueue=false,currentAttachment=null;
+let category='fiscalizacao',fiscalQueue=false,currentAttachment=null;
+let espelhoAttachment=null,tremAttachment=null;
 let orcDepositos=['Almox','AlmoxVirtual','Depósito do Canil','Suprimento de Viaturas'];
 
 async function loadGuideDepositos(){
@@ -45,9 +46,9 @@ const STATUS_LABEL={
  pronto:'Pronto'
 };
 const FISCAL_LABEL={
- aguardando_fiscalizacao:'Aguardando Fiscalização',
- em_analise_fiscalizacao:'Em análise na Fiscalização',
- devolvida_fiscalizacao:'Devolvida para correção',
+ aguardando_fiscalizacao:'Despachada para Fiscalização',
+ em_analise_fiscalizacao:'Despachada para Fiscalização',
+ devolvida_fiscalizacao:'Retornada pela Fiscalização',
  aprovada_fiscalizacao:'Aprovada pela Fiscalização'
 };
 const REGULAR_FLOW=[
@@ -66,14 +67,13 @@ function toast(msg){
 }
 function initialStatus(tipo){return tipo==='recolhimento'?'aguardando_assinatura_almoxarifado':'aguardando_recebimento_guia'}
 function catOf(g){
- if(g.status==='pronto')return'pronto';
- if(g.tipo==='recolhimento'){
-   if(g.status==='aguardando_material_sair_carga')return'assinada';
-   return'sem_assinatura';
- }
- if(g.status==='assinada')return'assinada';
- if(g.status==='aguardando_inclusao_carga')return'aguardando_carga';
- return'sem_assinatura';
+ const e=g.etapa_orcamentaria||(
+   g.situacao_fiscalizacao==='aprovada_fiscalizacao'?'aguardando_inclusao_carga':
+   g.situacao_fiscalizacao==='devolvida_fiscalizacao'?'fiscalizacao':'fiscalizacao'
+ );
+ if(e==='pronto')return'pronto';
+ if(e==='aguardando_inclusao_carga')return'aguardando_carga';
+ return'fiscalizacao';
 }
 function fiscalClass(v){
  return v==='aguardando_fiscalizacao'?'fiscal-wait':
@@ -120,8 +120,7 @@ async function loadGuides(){
 }
 function updateCounts(){
  const count=c=>guides.filter(g=>catOf(g)===c).length;
- $('cSem').textContent=count('sem_assinatura');
- $('cAss').textContent=count('assinada');
+ if($('cFiscal'))$('cFiscal').textContent=count('fiscalizacao');
  $('cCarga').textContent=count('aguardando_carga');
  $('cPronto').textContent=count('pronto');
  $('fiscalCount').textContent=guides.filter(g=>['aguardando_fiscalizacao','em_analise_fiscalizacao'].includes(g.situacao_fiscalizacao)).length;
@@ -153,7 +152,12 @@ function renderList(){
 }
 async function loadAttachments(id){
  const r=await supabaseClient.from('guia_anexos').select('*').eq('guia_id',id).order('versao',{ascending:false});
- if(r.error)throw r.error;attachments=r.data||[];currentAttachment=attachments[0]||null;
+ if(r.error)throw r.error;
+ attachments=r.data||[];
+ const main=attachments.filter(a=>(a.tipo_documento||'guia')==='guia');
+ currentAttachment=main[0]||null;
+ espelhoAttachment=attachments.find(a=>a.tipo_documento==='espelho')||null;
+ tremAttachment=attachments.find(a=>a.tipo_documento==='trem')||null;
 }
 async function loadHistory(id){
  const r=await supabaseClient.from('guia_tramitacoes').select('*').eq('guia_id',id).order('criado_em',{ascending:false}).order('id',{ascending:false});
@@ -198,9 +202,87 @@ function eventLabel(e){
    atualizacao:'Atualização registrada',
    arquivo_adicionado:'Nova versão do documento',
    arquivo_assinado_cmt:'Guia assinada pelo Comandante',
-   guia_editada:'Guia editada'
+   guia_editada:'Guia editada',
+   espelho_anexado:'Espelho anexado/atualizado',
+   trem_anexado:'TREM anexado/atualizado',
+   guia_etapa_pronto:'Guia concluída na etapa orçamentária'
  }[e]||e);
 }
+function guideStage(g){
+ return g?.etapa_orcamentaria||(
+   g?.situacao_fiscalizacao==='aprovada_fiscalizacao'?'aguardando_inclusao_carga':
+   g?.situacao_fiscalizacao==='devolvida_fiscalizacao'?'retornado_fiscalizacao':'despachado_fiscalizacao'
+ );
+}
+function renderGuideSimpleFlow(){
+ const stage=guideStage(selected);
+ const rank={despachado_fiscalizacao:1,retornado_fiscalizacao:1,aguardando_inclusao_carga:2,pronto:3}[stage]??0;
+ const labels=['Despachado para Fiscalização','Aprovado / Retorno','Aguardando inclusão em carga','Pronto'];
+ $('guideStageText').textContent=({
+   despachado_fiscalizacao:'Despachado para Fiscalização',
+   retornado_fiscalizacao:'Retornado pela Fiscalização',
+   aguardando_inclusao_carga:'Aguardando inclusão em carga',
+   pronto:'Pronto'
+ }[stage]||stage);
+ $('guideSimpleSteps').innerHTML=labels.map((t,i)=>`<div class="pedido-step ${i<rank||stage==='pronto'?'done':''} ${i===rank?'current':''}">${esc(t)}</div>`).join('');
+}
+function renderFiscalDocs(){
+ const box=$('fiscalDocsBox');
+ const approved=selected?.situacao_fiscalizacao==='aprovada_fiscalizacao';
+ box.hidden=!approved;
+ if(!approved)return;
+
+ const setDoc=(kind,a)=>{
+   const suffix=kind==='espelho'?'Espelho':'Trem';
+   const label=kind==='espelho'?'Espelho':'TREM';
+   const info=$(kind+'Info'),open=$('btnOpen'+suffix),down=$('btnDownload'+suffix);
+   info.textContent=a?`${a.arquivo_nome} · versão ${a.versao} · ${fmtTime(a.criado_em)}`:`Nenhum ${label} anexado.`;
+   open.disabled=!a;down.disabled=!a;
+ };
+ setDoc('espelho',espelhoAttachment);
+ setDoc('trem',tremAttachment);
+ $('espelhoFiscalUpload').hidden=!isFiscal;
+ $('tremFiscalUpload').hidden=!isFiscal;
+ $('guideCompleteBox').hidden=!(isFiscal&&guideStage(selected)==='aguardando_inclusao_carga');
+}
+async function uploadFiscalGuideDoc(kind){
+ if(!selected||!isFiscal||selected.situacao_fiscalizacao!=='aprovada_fiscalizacao')return;
+ const input=$(kind+'File'),file=input.files[0];
+ if(!file)return alert(`Selecione o arquivo do ${kind==='espelho'?'Espelho':'TREM'}.`);
+ let uploadedPath=null;
+ try{
+   const version=(attachments[0]?.versao||0)+1;
+   const f=await uploadFile(file,selected.id,version);
+   uploadedPath=f.path;
+   const rpc=await supabaseClient.rpc('v5_5_registrar_documento_guia',{
+     p_guia_id:selected.id,p_tipo_documento:kind,
+     p_arquivo_nome:file.name,p_arquivo_path:f.path,p_arquivo_url:f.url,
+     p_arquivo_mime:file.type,p_arquivo_tamanho:file.size,
+     p_usuario_id:String(user.id),p_perfil_id:user.perfil_id?Number(user.perfil_id):null,
+     p_observacao:null
+   });
+   if(rpc.error)throw rpc.error;
+   input.value='';
+   toast(`${kind==='espelho'?'Espelho':'TREM'} anexado/atualizado.`);
+   await loadAttachments(selected.id);await loadHistory(selected.id);
+   renderPreview();renderFiscalDocs();renderHistory();
+ }catch(err){
+   if(uploadedPath)try{await supabaseClient.storage.from('guias-orcamentarias').remove([uploadedPath])}catch(_){}
+   alert('Erro ao anexar documento: '+err.message);
+ }
+}
+async function completeGuideStage(){
+ if(!selected||!isFiscal)return;
+ const r=await supabaseClient.rpc('v5_5_concluir_guia',{
+   p_guia_id:selected.id,p_usuario_id:String(user.id),
+   p_perfil_id:user.perfil_id?Number(user.perfil_id):null,
+   p_mensagem:$('guideCompleteNote').value.trim()||null
+ });
+ if(r.error)return alert(r.error.message);
+ $('guideCompleteNote').value='';toast('Guia marcada como Pronto.');
+ const id=selected.id;await loadGuides();await selectGuide(id);
+}
+
 function renderFlow(){
  const flow=selected.tipo==='recolhimento'?RECOLHIMENTO_FLOW:REGULAR_FLOW;
  $('flowStatus').innerHTML=flow.map(s=>`<option value="${s}" ${s===selected.status?'selected':''}>${esc(STATUS_LABEL[s])}</option>`).join('');
@@ -210,19 +292,16 @@ function renderFiscalActions(){
  panel.hidden=!isFiscal;decision.hidden=true;buttons.innerHTML='';
  if(!isFiscal)return;
  const s=selected.situacao_fiscalizacao;
- if(s==='aguardando_fiscalizacao'){
-   $('fiscalActionHint').textContent='Aguardando ciência';
-   buttons.innerHTML='<button class="orc-btn info" id="takeScience">✓ Tomar ciência da guia</button>';
-   $('takeScience').onclick=()=>fiscalAction('ciencia');
- }else if(s==='em_analise_fiscalizacao'){
-   $('fiscalActionHint').textContent='Em análise';
+
+ if(['aguardando_fiscalizacao','em_analise_fiscalizacao'].includes(s)){
+   $('fiscalActionHint').textContent='Aguardando decisão';
    decision.hidden=false;
  }else if(s==='devolvida_fiscalizacao'){
    $('fiscalActionHint').textContent='Aguardando correção do remetente';
-   buttons.innerHTML='<span class="orc-note returned">A guia foi devolvida. Aguarde o remetente reenviar uma nova versão.</span>';
+   buttons.innerHTML='<span class="orc-note returned">A guia foi retornada. Aguarde o remetente reenviar uma nova versão.</span>';
  }else{
    $('fiscalActionHint').textContent='Aprovada';
-   buttons.innerHTML='<span class="orc-note">Fiscalização concluída. O fluxo administrativo pode seguir.</span>';
+   buttons.innerHTML='<span class="orc-note">Guia aprovada. Espelho e TREM podem ser anexados pela Fiscalização.</span>';
  }
 }
 function commanderCanSign(g){
@@ -326,7 +405,7 @@ function renderDetail(){
  const canManage=canManageGuide(selected);
  $('btnEditGuide').hidden=!canManage;
  $('btnDeleteGuide').hidden=!canManage;
- renderPreview();renderHistory();renderFiscalActions();renderCommanderSignature();renderFlow();
+ renderPreview();renderHistory();renderGuideSimpleFlow();renderFiscalActions();renderFiscalDocs();renderCommanderSignature();renderFlow();
 }
 function safeName(v){return String(v).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9._-]+/g,'_')}
 async function uploadFile(file,guideId,version){
@@ -365,7 +444,7 @@ async function createGuide(e){
    if(ins.error)throw ins.error;guide=ins.data;
    const f=await uploadFile(file,guide.id,1);
    const ai=await supabaseClient.from('guia_anexos').insert([{
-     guia_id:guide.id,versao:1,arquivo_nome:file.name,arquivo_path:f.path,arquivo_url:f.url,
+     guia_id:guide.id,versao:1,tipo_documento:'guia',arquivo_nome:file.name,arquivo_path:f.path,arquivo_url:f.url,
      arquivo_mime:file.type,arquivo_tamanho:file.size,enviado_por:String(user.id),
      enviado_por_perfil_id:user.perfil_id?Number(user.perfil_id):null,observacao:'Documento cadastrado com a guia.'
    }]).select('*').single();
@@ -407,7 +486,7 @@ async function resend(){
  try{
    const version=(attachments[0]?.versao||0)+1,f=await uploadFile(file,selected.id,version);
    const ai=await supabaseClient.from('guia_anexos').insert([{
-     guia_id:selected.id,versao:version,arquivo_nome:file.name,arquivo_path:f.path,arquivo_url:f.url,
+     guia_id:selected.id,versao:version,tipo_documento:'guia',arquivo_nome:file.name,arquivo_path:f.path,arquivo_url:f.url,
      arquivo_mime:file.type,arquivo_tamanho:file.size,enviado_por:String(user.id),
      enviado_por_perfil_id:user.perfil_id?Number(user.perfil_id):null,observacao:note
    }]).select('*').single();
@@ -537,6 +616,13 @@ function bind(){
    if(currentAttachment)window.open(currentAttachment.arquivo_url,'_blank','noopener');
  };
  $('btnCmtReplace').onclick=commanderReplaceSignedFile;
+ $('btnOpenEspelho').onclick=()=>{if(espelhoAttachment)window.open(espelhoAttachment.arquivo_url,'_blank','noopener')};
+ $('btnDownloadEspelho').onclick=()=>{if(espelhoAttachment){const a=document.createElement('a');a.href=espelhoAttachment.arquivo_url;a.download=espelhoAttachment.arquivo_nome;a.target='_blank';a.click()}};
+ $('btnOpenTrem').onclick=()=>{if(tremAttachment)window.open(tremAttachment.arquivo_url,'_blank','noopener')};
+ $('btnDownloadTrem').onclick=()=>{if(tremAttachment){const a=document.createElement('a');a.href=tremAttachment.arquivo_url;a.download=tremAttachment.arquivo_nome;a.target='_blank';a.click()}};
+ $('btnUploadEspelho').onclick=()=>uploadFiscalGuideDoc('espelho');
+ $('btnUploadTrem').onclick=()=>uploadFiscalGuideDoc('trem');
+ $('btnGuideComplete').onclick=completeGuideStage;
  $('btnReturnFiscal').onclick=()=>fiscalAction('devolver');
  $('btnApproveFiscal').onclick=()=>fiscalAction('aprovar');
  $('btnResend').onclick=resend;
