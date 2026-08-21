@@ -57,3 +57,185 @@
 .orc-toast{position:fixed;right:18px;bottom:18px;z-index:110000;background:var(--v4-sidebar);color:#fff;padding:10px 13px;border-radius:9px;font-size:10px;box-shadow:0 10px 30px rgba(0,0,0,.25);display:none}.orc-toast.show{display:block}
 @media(max-width:1050px){.orc-grid{grid-template-columns:1fr}.orc-list{max-height:460px}.orc-preview{height:500px}}
 @media(max-width:760px){.orc-page{padding:10px}.orc-topbar{padding:9px 12px}.orc-title h2{font-size:18px}.orc-filters{grid-template-columns:1fr}.orc-meta{grid-template-columns:1fr 1fr}.orc-form{grid-template-columns:1fr}.orc-field.full,.orc-modal-actions{grid-column:1}.orc-preview{height:62vh}.orc-toolbar{align-items:stretch}.orc-tabs{width:100%}.orc-tab{flex:1;justify-content:center;min-width:130px}}
+
+
+/* ============================================================
+   V5.1 — CORREÇÃO DE ENCAIXE / RESPONSIVIDADE
+   A V4.1 fixa a sidebar em 238px. Orçamentários usa .orc-main,
+   então precisa reservar essa largura explicitamente no desktop.
+   ============================================================ */
+
+html,body{
+  width:100%;
+  max-width:100%;
+  overflow-x:hidden;
+}
+
+.orc-main,
+.orc-page,
+.orc-toolbar,
+.orc-tabs,
+.orc-grid,
+.orc-panel,
+.orc-detail,
+.orc-subpanel{
+  min-width:0;
+  max-width:100%;
+}
+
+.orc-main{
+  width:100%;
+  overflow-x:hidden;
+}
+
+.orc-page{
+  width:100%;
+  overflow-x:hidden;
+}
+
+/* A segunda coluna pode encolher sem empurrar a página para fora. */
+.orc-grid{
+  grid-template-columns:minmax(270px,.72fr) minmax(0,1.28fr);
+  width:100%;
+}
+
+/* Textos longos (OM, assunto, nome de arquivo) não alargam a tela. */
+.orc-card,
+.orc-card strong,
+.orc-card p,
+.orc-meta b,
+.orc-note,
+.orc-versions,
+.orc-hitem,
+.orc-hitem p{
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+
+.orc-detail-head,
+.orc-subhead,
+.orc-preview-tools,
+.orc-actions{
+  min-width:0;
+  flex-wrap:wrap;
+}
+
+.orc-preview{
+  width:100%;
+  max-width:100%;
+}
+
+.orc-preview iframe,
+.orc-preview img{
+  max-width:100%;
+}
+
+/* Integração correta com a sidebar fixa criada pelo v4_ui.js. */
+@media (min-width:901px){
+  body.v3-shell{
+    display:block!important;
+    width:100vw!important;
+    max-width:100vw!important;
+    overflow:hidden!important;
+  }
+
+  body.v3-shell .orc-main{
+    margin-left:238px!important;
+    width:calc(100vw - 238px)!important;
+    max-width:calc(100vw - 238px)!important;
+    height:100vh!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    flex:none!important;
+  }
+
+  body.v3-shell .orc-topbar{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+  }
+
+  body.v3-shell .orc-title{
+    min-width:0;
+    flex:1 1 auto;
+  }
+
+  body.v3-shell .orc-title h2,
+  body.v3-shell .orc-title p{
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+
+  body.v3-shell .orc-topbar .v3-user-zone{
+    flex:0 0 auto;
+    max-width:55%;
+  }
+}
+
+/* Notebook / PC menor: empilha lista e detalhes antes de começar a cortar. */
+@media (min-width:901px) and (max-width:1280px){
+  .orc-grid{
+    grid-template-columns:1fr;
+  }
+
+  .orc-list{
+    max-height:350px;
+  }
+
+  .orc-preview{
+    height:480px;
+  }
+
+  .orc-filters{
+    grid-template-columns:minmax(0,1fr) 160px 160px;
+  }
+}
+
+/* Tablet/celular: ocupa 100% e não herda margem do desktop. */
+@media (max-width:900px){
+  body.v3-shell{
+    display:block!important;
+    overflow-x:hidden!important;
+  }
+
+  body.v3-shell .orc-main,
+  .orc-main{
+    margin-left:0!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-height:100vh;
+  }
+
+  .orc-grid{
+    grid-template-columns:1fr;
+  }
+}
+
+/* Celular estreito. */
+@media (max-width:620px){
+  .orc-meta{
+    grid-template-columns:1fr!important;
+  }
+
+  .orc-filters{
+    grid-template-columns:1fr!important;
+  }
+
+  .orc-tab{
+    min-width:0!important;
+    flex:1 1 calc(50% - 5px);
+  }
+
+  .orc-topbar{
+    gap:8px;
+  }
+
+  .orc-title p{
+    display:none;
+  }
+
+  .orc-preview-tools{
+    width:100%;
+  }
+}
