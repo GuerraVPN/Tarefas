@@ -295,3 +295,241 @@ html[data-theme="military"] .bn-note{
     flex:1 1 145px;
   }
 }
+
+
+/* ============================================================
+   V6.2 — ANDROID: MENU LATERAL EM GAVETA
+   IMPORTANTE: todas as alterações de layout abaixo de 900px.
+   Desktop >= 901px permanece com o layout original da V6.
+   ============================================================ */
+
+/* Correção do calendário válida em todos os tamanhos/temas. */
+.day-cell:hover{
+  background:var(--v4-surface-2)!important;
+  color:var(--v4-text)!important;
+}
+.day-cell.other-month{
+  background:var(--v4-surface-2)!important;
+  color:var(--v4-muted)!important;
+}
+.day-cell.other-month:hover{
+  background:var(--v4-surface-3)!important;
+  color:var(--v4-text-2)!important;
+}
+.day-cell.selected,.day-cell.selected:hover{
+  background:var(--v4-accent-soft)!important;
+  color:var(--v4-text)!important;
+  box-shadow:inset 0 0 0 1px var(--v4-accent)!important;
+}
+
+.v62-mobile-bar,.v62-mobile-backdrop{display:none;}
+
+@media(max-width:900px){
+  html,body{width:100%!important;max-width:100%!important;overflow-x:hidden!important;}
+  body{min-height:100dvh!important;}
+
+  /* Barra superior exclusiva do Android. */
+  .v62-mobile-bar{
+    display:flex!important;
+    align-items:center!important;
+    gap:10px!important;
+    position:sticky!important;
+    top:0!important;
+    z-index:6100!important;
+    height:52px!important;
+    min-height:52px!important;
+    padding:6px 10px!important;
+    background:var(--v4-surface)!important;
+    color:var(--v4-text)!important;
+    border-bottom:1px solid var(--v4-border)!important;
+    box-shadow:0 2px 10px rgba(0,0,0,.08)!important;
+  }
+  .v62-menu-toggle{
+    width:40px!important;height:40px!important;min-width:40px!important;
+    border:1px solid var(--v4-border)!important;
+    border-radius:10px!important;
+    background:var(--v4-surface-2)!important;
+    color:var(--v4-text)!important;
+    display:grid!important;place-items:center!important;
+    cursor:pointer!important;padding:0!important;
+    touch-action:manipulation!important;
+  }
+  .v62-dots{display:flex!important;flex-direction:column!important;gap:3px!important;align-items:center!important;}
+  .v62-dots i{display:block!important;width:4px!important;height:4px!important;border-radius:50%!important;background:currentColor!important;}
+  .v62-mobile-brand{min-width:0!important;line-height:1.08!important;}
+  .v62-mobile-brand strong{display:block!important;font-size:14px!important;letter-spacing:.3px!important;white-space:nowrap!important;}
+  .v62-mobile-brand small{display:block!important;font-size:9px!important;color:var(--v4-muted)!important;margin-top:3px!important;white-space:nowrap!important;}
+
+  /* Fundo escurecido quando a gaveta estiver aberta. */
+  .v62-mobile-backdrop{
+    display:block!important;
+    position:fixed!important;inset:0!important;
+    background:rgba(0,0,0,.48)!important;
+    opacity:0!important;visibility:hidden!important;
+    z-index:6190!important;
+    transition:opacity .18s ease,visibility .18s ease!important;
+  }
+  body.v62-menu-open{overflow:hidden!important;}
+  body.v62-menu-open .v62-mobile-backdrop{opacity:1!important;visibility:visible!important;}
+
+  /* Sidebar vira gaveta lateral. Não vira barra horizontal. */
+  body.v3-shell .sidebar,.sidebar{
+    display:flex!important;
+    flex-direction:column!important;
+    position:fixed!important;
+    top:0!important;left:0!important;bottom:0!important;
+    width:min(82vw,300px)!important;
+    max-width:300px!important;
+    min-width:250px!important;
+    min-height:100dvh!important;height:100dvh!important;
+    padding:14px!important;
+    margin:0!important;
+    border-right:1px solid rgba(255,255,255,.10)!important;
+    border-bottom:0!important;
+    overflow-y:auto!important;overflow-x:hidden!important;
+    z-index:6200!important;
+    transform:translateX(-105%)!important;
+    transition:transform .20s ease!important;
+    box-shadow:12px 0 34px rgba(0,0,0,.28)!important;
+  }
+  body.v62-menu-open .sidebar{transform:translateX(0)!important;}
+
+  .sidebar .brand{flex:0 0 auto!important;margin-bottom:12px!important;}
+  .sidebar :where(.menu-items,.nav),
+  .sidebar ul{
+    display:block!important;
+    width:100%!important;
+    overflow:visible!important;
+    padding:0!important;margin:0!important;
+  }
+  .sidebar :where(.menu-items,.nav)>li,
+  .sidebar ul>li{
+    display:flex!important;
+    width:100%!important;
+    min-width:0!important;
+    margin:0 0 4px!important;
+    white-space:normal!important;
+  }
+  .sidebar .v6-nav-item,.sidebar .v6-orc-main{
+    width:100%!important;min-height:42px!important;
+    padding:10px 11px!important;
+  }
+  .sidebar .v6-orc-parent{display:block!important;width:100%!important;overflow:visible!important;}
+  .sidebar .v6-orc-sub{position:static!important;width:100%!important;max-width:none!important;}
+  .sidebar .v6-orc-parent.v62-subopen .v6-orc-sub{display:grid!important;gap:2px!important;}
+  .sidebar .v6-orc-parent.v62-subopen .v6-orc-arrow{transform:rotate(180deg)!important;}
+  .sidebar :where(.sidebar-footer,.side-user,.sb-user-profile,.btn-sair-sidebar){display:none!important;}
+  .sidebar :where(.credit,.creditos-26pel){margin-top:auto!important;padding-top:12px!important;}
+
+  /* Conteúdo passa a ocupar a tela inteira; desktop continua intocado. */
+  body.v3-shell :where(.main,.main-content,.orc-main),
+  :where(.main,.main-content,.orc-main,.v6-dashboard-main){
+    margin-left:0!important;width:100%!important;max-width:100%!important;
+    min-width:0!important;height:auto!important;min-height:0!important;
+    overflow-x:hidden!important;overflow-y:visible!important;
+  }
+  body.v3-shell{display:block!important;height:auto!important;overflow-y:auto!important;}
+
+  /* Cabeçalhos originais continuam funcionais, abaixo da barra dos 3 pontos. */
+  body.v3-shell :where(.header,.topbar),
+  :where(.header,.topbar,.v6-dashboard-top){
+    position:relative!important;top:auto!important;
+    z-index:3000!important;width:100%!important;
+    min-height:54px!important;height:auto!important;
+    padding:8px 10px!important;gap:8px!important;
+  }
+  :where(.header-title,.topbar-left,.orc-title,.v6-dashboard-top>div){min-width:0!important;}
+  :where(.header-title h2,.page-title h2,.heading h2,.orc-title h2,.v6-dashboard-top h2){font-size:18px!important;line-height:1.2!important;}
+  :where(.header-title p,.breadcrumb,.orc-title p,.v6-dashboard-top p){font-size:10px!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;}
+  .v3-user-text{display:none!important;}
+  .v3-user-zone{margin-left:auto!important;gap:4px!important;}
+  .v3-top-icon,.v3-avatar{width:36px!important;height:36px!important;}
+  .v3-profile-menu{position:fixed!important;top:58px!important;right:8px!important;width:min(320px,calc(100vw - 16px))!important;max-height:calc(100dvh - 68px)!important;overflow:auto!important;}
+
+  /* Espaçamento geral. */
+  body.v3-shell :where(.content,.page),
+  :where(.content,.page,.page-wrap,.orc-page,.v6-dashboard-content){
+    width:100%!important;max-width:100%!important;padding:12px!important;margin:0!important;
+  }
+  :where(.page-head,.page-header,.heading-row,.heading,.orc-report-hero,.v6-welcome){
+    flex-direction:column!important;align-items:stretch!important;gap:10px!important;
+  }
+  :where(.toolbar,.toolbar-left,.toolbar-right,.head-actions,.actions,.orc-toolbar,.pedido-toolbar,.orc-filters,.pedido-filters,.modal-actions,.modal-buttons,.orc-modal-actions,.pedido-form-actions){
+    max-width:100%!important;flex-wrap:wrap!important;gap:8px!important;
+  }
+  :where(input,select,textarea){max-width:100%;}
+
+  /* Dashboard — compacto e alinhado no Android. */
+  .v6-kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important;}
+  .v6-kpi{min-width:0!important;padding:12px!important;}
+  .v6-kpi strong{font-size:24px!important;}
+  .v6-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important;}
+  .v6-grid2{grid-template-columns:1fr!important;gap:12px!important;}
+  .v6-budget-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important;}
+  .v6-welcome-badge{align-self:flex-start!important;max-width:100%!important;}
+
+  /* Quadro / Minhas Tarefas — sem rolagem horizontal de colunas. */
+  .kanban-board{display:grid!important;grid-template-columns:1fr!important;width:100%!important;min-width:0!important;gap:12px!important;padding:12px!important;overflow:visible!important;}
+  .kanban-column{width:100%!important;min-width:0!important;max-width:none!important;max-height:none!important;}
+  .cards-container{width:100%!important;max-height:none!important;overflow:visible!important;}
+  :where(.search-tarefa,.select-secao){width:100%!important;max-width:100%!important;min-width:0!important;}
+  .mass-actions{width:100%!important;flex-wrap:wrap!important;}
+  .personal-summary{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+
+  /* Relatórios / Usuários / Central / Auditoria. */
+  :where(.charts-grid,.bottom-grid,.layout,.workspace,.grid,.two-col){grid-template-columns:1fr!important;width:100%!important;min-width:0!important;gap:12px!important;}
+  :where(.kpis,.summary-kpis,.stats){grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;}
+  .messages-wrap{grid-template-columns:1fr!important;min-height:0!important;}
+  .conversations{max-height:250px!important;border-right:0!important;border-bottom:1px solid var(--v4-border)!important;}
+  .chat{min-height:420px!important;}
+  .right-stack{min-width:0!important;}
+
+  /* Tabelas rolam dentro do cartão, sem alargar a página. */
+  :where(.table-wrap,.pedido-table-wrap){width:100%!important;max-width:100%!important;overflow-x:auto!important;-webkit-overflow-scrolling:touch;}
+  :where(.table-wrap table,.pedido-table){min-width:660px;}
+
+  /* Orçamentários. */
+  :where(.orc-grid,.pedido-grid,.orc-report-grid,.orc-report-values,.orc-doc-grid){grid-template-columns:1fr!important;gap:10px!important;}
+  :where(.orc-detail-head,.pedido-head,.orc-subhead){flex-direction:column!important;align-items:stretch!important;gap:8px!important;}
+  :where(.orc-meta,.pedido-meta,.orc-form,.pedido-form){grid-template-columns:1fr!important;}
+  .orc-preview-tools{width:100%!important;display:flex!important;flex-wrap:wrap!important;gap:6px!important;}
+  .pedido-tabs,.orc-tabs{width:100%!important;overflow-x:auto!important;flex-wrap:nowrap!important;padding-bottom:4px!important;}
+  .pedido-tab,.orc-tab{flex:0 0 auto!important;white-space:nowrap!important;}
+
+  /* Modais. */
+  :where(.modal,.modal-bg,.orc-modal-bg,.new-msg-bg,.v3-password-bg){padding:7px!important;}
+  :where(.modal-content,.modal-card,.orc-modal,.new-msg,.v3-password-box,.v4-create-modal){
+    width:calc(100vw - 14px)!important;max-width:calc(100vw - 14px)!important;
+    max-height:calc(100dvh - 14px)!important;margin:0!important;overflow:auto!important;border-radius:14px!important;
+  }
+  :where(.form-grid,.modal-info,.v4-create-grid,.v4-rec-row){grid-template-columns:1fr!important;}
+
+  /* Calendário: 7 dias cabem na tela e o hover não fica preso no touch. */
+  .calendar-layout{display:grid!important;grid-template-columns:1fr!important;gap:12px!important;}
+  .calendar-card{width:100%!important;overflow:hidden!important;}
+  .calendar-inner{width:100%!important;min-width:0!important;}
+  .week-header,.calendar-grid{width:100%!important;grid-template-columns:repeat(7,minmax(0,1fr))!important;}
+  .calendar-grid{grid-template-rows:none!important;grid-auto-rows:minmax(62px,auto)!important;}
+  .weekday{padding:8px 1px!important;font-size:10px!important;}
+  .day-cell{min-width:0!important;min-height:62px!important;padding:4px!important;overflow:hidden!important;}
+  .day-number{width:21px!important;height:21px!important;font-size:10px!important;margin-bottom:4px!important;}
+  .day-task{gap:3px!important;font-size:9px!important;margin-bottom:3px!important;}
+  .day-task-title{white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;}
+  .dot{width:6px!important;height:6px!important;flex:0 0 6px!important;}
+  .day-panel{position:static!important;width:100%!important;margin-top:0!important;}
+  .legend{gap:9px!important;padding:10px!important;flex-wrap:wrap!important;}
+}
+
+@media(max-width:520px){
+  .v6-kpis,.v6-budget-grid,:where(.kpis,.summary-kpis,.stats){grid-template-columns:1fr!important;}
+  .v6-shortcuts{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+  .personal-summary{grid-template-columns:1fr!important;}
+  .day-cell{min-height:56px!important;padding:3px!important;}
+  .calendar-grid{grid-auto-rows:minmax(56px,auto)!important;}
+  .day-task-title{display:none!important;}
+}
+
+@media(hover:none) and (pointer:coarse){
+  .day-cell:not(.selected):hover{background:var(--v4-surface)!important;color:var(--v4-text)!important;}
+  .day-cell.other-month:not(.selected):hover{background:var(--v4-surface-2)!important;color:var(--v4-muted)!important;}
+}
