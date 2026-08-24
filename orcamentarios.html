@@ -174,11 +174,11 @@ body{display:flex;min-height:100vh}
 
           <div class="orc-subpanel" id="cmtSignatureBox" hidden>
             <div class="orc-subhead">
-              <span>✍️ Assinatura do Comandante</span>
+              <span id="guideReplaceTitle">✍️ Assinatura do Comandante</span>
               <span id="cmtSignatureHint">Aguardando assinatura do Cmt</span>
             </div>
             <div class="orc-status-box">
-              <div class="orc-note">
+              <div class="orc-note" id="guideReplaceNote">
                 Baixe a guia atual, realize a assinatura e depois envie abaixo a versão assinada.
                 A versão anterior continuará preservada no histórico do sistema.
               </div>
@@ -759,7 +759,7 @@ const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 <script src="v4_ui.js?v=6.0"></script>
 <script src="bloco_notas.js?v=6.0"></script>
 <script src="v4_tema.js?v=6.0"></script>
-<script src="guias_v6.js?v=6.0"></script>
+<script src="guias_v6.js?v=6.3"></script>
 <script src="pedidos_v6.js?v=6.0"></script>
 <script src="movimentacoes_v6.js?v=6.0"></script>
 <script src="material_carga_v6.js?v=6.0"></script>

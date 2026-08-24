@@ -310,27 +310,49 @@ function commanderCanSign(g){
    (g.tipo!=='recolhimento'&&g.status==='aguardando_assinatura')
  ));
 }
+function fiscalCanReplaceGuide(g){return !!(g&&isFiscal)}
 function renderCommanderSignature(){
  const box=$('cmtSignatureBox');
  if(!box)return;
- const can=commanderCanSign(selected);
+ const asCommander=commanderCanSign(selected);
+ const asFiscal=fiscalCanReplaceGuide(selected);
+ const can=asCommander||asFiscal;
  box.hidden=!can;
  if(!can)return;
- $('cmtSignatureHint').textContent=selected.tipo==='recolhimento'
-   ?'Recolhimento · assinatura do Cmt'
-   :'Transferência/Remessa · assinatura do Cmt';
+
+ const title=$('guideReplaceTitle'),note=$('guideReplaceNote'),hint=$('cmtSignatureHint');
+ if(asCommander){
+   if(title)title.textContent='✍️ Assinatura do Comandante';
+   if(hint)hint.textContent=selected.tipo==='recolhimento'
+     ?'Recolhimento · assinatura do Cmt'
+     :'Transferência/Remessa · assinatura do Cmt';
+   if(note)note.textContent='Baixe a guia atual, realize a assinatura e depois envie abaixo a versão assinada. A versão anterior continuará preservada no histórico do sistema.';
+   $('cmtSignedNote').placeholder='Observação opcional sobre a assinatura/substituição do documento...';
+   $('btnCmtReplace').textContent='✓ Substituir pela guia assinada';
+ }else{
+   if(title)title.textContent='🛡️ Substituir guia';
+   if(hint)hint.textContent='Fiscalização · nova versão do documento';
+   if(note)note.textContent='A Fiscalização pode trocar o arquivo da guia sem alterar o andamento atual. A versão anterior continuará preservada no histórico do sistema.';
+   $('cmtSignedNote').placeholder='Observação opcional sobre a substituição da guia...';
+   $('btnCmtReplace').textContent='↻ Substituir guia';
+ }
 }
-async function commanderReplaceSignedFile(){
- if(!selected||!commanderCanSign(selected))return;
+async function replaceGuideFile(){
+ if(!selected)return;
+ const asCommander=commanderCanSign(selected);
+ const asFiscal=fiscalCanReplaceGuide(selected);
+ if(!asCommander&&!asFiscal)return;
+
  const file=$('cmtSignedFile').files[0];
- if(!file)return alert('Selecione a guia já assinada pelo Cmt.');
+ if(!file)return alert(asCommander?'Selecione a guia já assinada pelo Cmt.':'Selecione a nova versão da guia.');
  if(!currentAttachment)return alert('A guia atual não possui arquivo para ser substituído.');
 
  const btn=$('btnCmtReplace');
+ const noteText=$('cmtSignedNote').value.trim();
  btn.disabled=true;
- btn.textContent='Enviando versão assinada...';
+ btn.textContent=asCommander?'Enviando versão assinada...':'Substituindo guia...';
 
- let inserted=null,uploadedPath=null;
+ let inserted=null,uploadedPath=null,persisted=false;
  try{
    const version=(attachments[0]?.versao||0)+1;
    const f=await uploadFile(file,selected.id,version);
@@ -339,6 +361,7 @@ async function commanderReplaceSignedFile(){
    const ai=await supabaseClient.from('guia_anexos').insert([{
      guia_id:selected.id,
      versao:version,
+     tipo_documento:'guia',
      arquivo_nome:file.name,
      arquivo_path:f.path,
      arquivo_url:f.url,
@@ -346,24 +369,37 @@ async function commanderReplaceSignedFile(){
      arquivo_tamanho:file.size,
      enviado_por:String(user.id),
      enviado_por_perfil_id:user.perfil_id?Number(user.perfil_id):null,
-     observacao:$('cmtSignedNote').value.trim()||'Versão assinada pelo Comandante.'
+     observacao:noteText||(asCommander?'Versão assinada pelo Comandante.':'Guia substituída pela Fiscalização.')
    }]).select('*').single();
 
    if(ai.error)throw ai.error;
    inserted=ai.data;
 
-   const rpc=await supabaseClient.rpc('v5_2_1_assinar_guia_cmt',{
-     p_guia_id:selected.id,
-     p_anexo_id:inserted.id,
-     p_usuario_id:String(user.id),
-     p_perfil_id:user.perfil_id?Number(user.perfil_id):null,
-     p_mensagem:$('cmtSignedNote').value.trim()||null
-   });
-   if(rpc.error)throw rpc.error;
+   if(asCommander){
+     const rpc=await supabaseClient.rpc('v5_2_1_assinar_guia_cmt',{
+       p_guia_id:selected.id,
+       p_anexo_id:inserted.id,
+       p_usuario_id:String(user.id),
+       p_perfil_id:user.perfil_id?Number(user.perfil_id):null,
+       p_mensagem:noteText||null
+     });
+     if(rpc.error)throw rpc.error;
+   }else{
+     const hist=await supabaseClient.from('guia_tramitacoes').insert([{
+       guia_id:selected.id,
+       evento:'arquivo_adicionado',
+       mensagem:`Fiscalização substituiu a guia pela versão ${version}${noteText?`: ${noteText}`:'.'}`,
+       usuario_id:String(user.id),
+       perfil_id:user.perfil_id?Number(user.perfil_id):null,
+       anexo_id:inserted.id
+     }]);
+     if(hist.error)throw hist.error;
+   }
+   persisted=true;
 
    $('cmtSignedFile').value='';
    $('cmtSignedNote').value='';
-   toast('Guia assinada substituída com sucesso.');
+   toast(asCommander?'Guia assinada substituída com sucesso.':'Guia substituída pela Fiscalização.');
    const id=selected.id;
    await loadGuides();
    await selectGuide(id);
@@ -371,18 +407,18 @@ async function commanderReplaceSignedFile(){
  }catch(err){
    console.error(err);
 
-   // Se a RPC rejeitar a assinatura, evita deixar a versão inválida como oficial.
-   if(inserted?.id){
+   // Se a gravação ainda não foi concluída, remove a versão incompleta e o arquivo recém-enviado.
+   if(!persisted&&inserted?.id){
      await supabaseClient.from('guia_anexos').delete().eq('id',inserted.id);
    }
-   if(uploadedPath){
+   if(!persisted&&uploadedPath){
      await supabaseClient.storage.from('guias-orcamentarias').remove([uploadedPath]);
    }
 
-   alert('Erro ao substituir pela guia assinada: '+err.message);
+   alert((persisted?'A guia foi substituída, mas houve erro ao atualizar a tela: ':'Erro ao substituir a guia: ')+err.message);
  }finally{
    btn.disabled=false;
-   btn.textContent='✓ Substituir pela guia assinada';
+   btn.textContent=asCommander?'✓ Substituir pela guia assinada':'↻ Substituir guia';
  }
 }
 
@@ -615,7 +651,7 @@ function bind(){
  $('btnCmtOpen').onclick=()=>{
    if(currentAttachment)window.open(currentAttachment.arquivo_url,'_blank','noopener');
  };
- $('btnCmtReplace').onclick=commanderReplaceSignedFile;
+ $('btnCmtReplace').onclick=replaceGuideFile;
  $('btnOpenEspelho').onclick=()=>{if(espelhoAttachment)window.open(espelhoAttachment.arquivo_url,'_blank','noopener')};
  $('btnDownloadEspelho').onclick=()=>{if(espelhoAttachment){const a=document.createElement('a');a.href=espelhoAttachment.arquivo_url;a.download=espelhoAttachment.arquivo_nome;a.target='_blank';a.click()}};
  $('btnOpenTrem').onclick=()=>{if(tremAttachment)window.open(tremAttachment.arquivo_url,'_blank','noopener')};
