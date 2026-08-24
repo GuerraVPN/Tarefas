@@ -39,7 +39,7 @@ select{padding:10px 12px;border:1px solid var(--v4-border-strong);border-radius:
    <h2>TAREFAS — 26º Pel PE Mec</h2>
    <p>Painel de tarefas, usuários, comunicações e fluxos administrativos.</p>
    <div class="meta">
-    <div><small>Versão atual</small><b>7.0</b></div>
+    <div><small>Versão atual</small><b>7.0.1</b></div>
     <div><small>Criador</small><b>Sd Guerra</b></div>
     <div><small>Organização</small><b>26º Pel PE Mec</b></div>
    </div>
@@ -62,12 +62,13 @@ const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 <script src="notificacoes.js?v=6.0"></script>
 <script src="v4_tema.js?v=6.0"></script>
 <script src="v4_ui.js?v=6.0"></script>
-<script src="v6_2_mobile.js?v=7.0"></script>
+<script src="v6_2_mobile.js?v=7.0.1"></script>
 
 <script>
 (function(){
 const versions=[
- {v:'7.0',title:'Pessoal e Escala de serviço',current:true,items:['Usuários passa a ficar dentro do menu Pessoal.','Nova Escala de serviço mensal com Sargentos, Motoristas, Patrulheiros e Permanência na mesma tela.','Preto identifica expediente normal; vermelho identifica final de semana/feriado; amarelo identifica serviço.','Notificações de serviço agendado e aviso no dia do serviço.']},
+ {v:'7.0.1',title:'Hotfix de estabilidade do Dashboard',current:true,items:['Corrige travamento após o login causado por loop do MutationObserver da camada global da V7.','Menu Pessoal passa a ser montado de forma idempotente, sem reescrever o DOM continuamente.','Atualização do cache-buster para garantir o carregamento do JavaScript corrigido.']},
+ {v:'7.0',title:'Pessoal e Escala de serviço',items:['Usuários passa a ficar dentro do menu Pessoal.','Nova Escala de serviço mensal com Sargentos, Motoristas, Patrulheiros e Permanência na mesma tela.','Preto identifica expediente normal; vermelho identifica final de semana/feriado; amarelo identifica serviço.','Notificações de serviço agendado e aviso no dia do serviço.']},
  {v:'6.5',title:'Presença, About e Help',items:['Edição bloqueada quando processos Orçamentários chegam a Pronto/Concluído, mantendo a exclusão disponível.','Versão atual visível no painel e nova página About com histórico selecionável.','Indicador de usuários online na lista de Usuários e nas conversas.','Novo Help com chamados de bug, falha, melhoria e suporte; Admin pode designar moderadores e contatar o usuário pela Central.']},
  {v:'6.4',title:'Permissões e identificação de pedidos',items:['Correção para impedir usuário comum de aprovar/retornar desrelacionamento.','Exibição explícita de quem fez o pedido.','Busca e agrupamento melhorados no seletor de novo detentor da Passagem de Carga.']},
  {v:'6.3',title:'Guias e seção Canil',items:['Fiscalização passou a poder substituir a versão do arquivo da guia sem simular assinatura do Comandante.','Seção Canil adicionada aos seletores e perfis de usuários.']},
@@ -91,7 +92,7 @@ const versions=[
 ];
 const s=document.getElementById('versionSelect'),card=document.getElementById('versionCard');
 s.innerHTML=versions.map(x=>`<option value="${x.v}">${x.v} — ${x.title}</option>`).join('');
-s.value='7.0';
+s.value='7.0.1';
 function render(){
  const x=versions.find(v=>v.v===s.value)||versions[0];
  card.innerHTML=`<h3>Versão ${x.v} ${x.current?'<span class="tag">ATUAL</span>':''}</h3><p><b>${x.title}</b></p><ul>${x.items.map(i=>`<li>${i}</li>`).join('')}</ul>`;

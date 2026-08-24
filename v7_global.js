@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const VERSION='7.0';
+const VERSION='7.0.1';
 const $=id=>document.getElementById(id);
 let busy=false,timer=null;
 
@@ -38,33 +38,52 @@ function pessoalNav(){
   const p=page();
   const active=p==='pessoal.html'||p==='usuarios.html';
   parent.classList.toggle('active',active);
-  parent.innerHTML=`<button class="v6-orc-main" data-v7-main>
-    <span class="v6-nav-icon">${people()}</span>
-    <span class="v6-nav-label">Pessoal</span>
-    <span class="v6-orc-arrow">${arrow()}</span>
-  </button>
-  <div class="v7-pessoal-sub">
-    <button data-v7-link="escala" class="${p==='pessoal.html'?'active':''}">Escala de serviço</button>
-    <button data-v7-link="usuarios" class="${p==='usuarios.html'?'active':''}">Usuários</button>
-  </div>`;
 
-  parent.querySelector('[data-v7-main]').onclick=function(e){
-    e.preventDefault();
-    if(window.matchMedia('(max-width: 900px)').matches){
-      parent.classList.toggle('v62-subopen');
-    }else{
-      location.href='pessoal.html';
-    }
-  };
-  parent.querySelector('[data-v7-link="escala"]').onclick=e=>{e.stopPropagation();location.href='pessoal.html'};
-  parent.querySelector('[data-v7-link="usuarios"]').onclick=e=>{e.stopPropagation();location.href='usuarios.html'};
+  // V7.0.1: só monta o conteúdo uma vez.
+  // Na V7.0, reescrever innerHTML em todo refresh alimentava o MutationObserver.
+  if(!parent.querySelector('[data-v7-main]')){
+    parent.innerHTML=`<button class="v6-orc-main" data-v7-main>
+      <span class="v6-nav-icon">${people()}</span>
+      <span class="v6-nav-label">Pessoal</span>
+      <span class="v6-orc-arrow">${arrow()}</span>
+    </button>
+    <div class="v7-pessoal-sub">
+      <button data-v7-link="escala">Escala de serviço</button>
+      <button data-v7-link="usuarios">Usuários</button>
+    </div>`;
+  }
+
+  const escala=parent.querySelector('[data-v7-link="escala"]');
+  const usuarios=parent.querySelector('[data-v7-link="usuarios"]');
+  escala?.classList.toggle('active',p==='pessoal.html');
+  usuarios?.classList.toggle('active',p==='usuarios.html');
+
+  if(parent.dataset.v701Wired!=='1'){
+    const main=parent.querySelector('[data-v7-main]');
+    if(main)main.onclick=function(e){
+      e.preventDefault();
+      if(window.matchMedia('(max-width: 900px)').matches){
+        parent.classList.toggle('v62-subopen');
+      }else{
+        location.href='pessoal.html';
+      }
+    };
+    if(escala)escala.onclick=e=>{e.stopPropagation();location.href='pessoal.html'};
+    if(usuarios)usuarios.onclick=e=>{e.stopPropagation();location.href='usuarios.html'};
+    parent.dataset.v701Wired='1';
+  }
 }
 
 function version(){
   document.querySelectorAll('.v65-version-badge').forEach(b=>{
-    b.innerHTML='● TAREFAS v'+VERSION;b.title='Sobre a versão 7.0';
+    const txt='● TAREFAS v'+VERSION;
+    if(b.textContent!==txt)b.textContent=txt;
+    if(b.title!=='Sobre a versão '+VERSION)b.title='Sobre a versão '+VERSION;
   });
-  document.querySelectorAll('.v65-mobile-version').forEach(v=>v.textContent='v'+VERSION);
+  document.querySelectorAll('.v65-mobile-version').forEach(v=>{
+    const txt='v'+VERSION;
+    if(v.textContent!==txt)v.textContent=txt;
+  });
 }
 
 function usersTitle(){
@@ -85,17 +104,31 @@ async function serviceNotices(){
     }
   }catch(_){}
 }
+let observer=null;
 function refresh(){
-  if(busy)return;busy=true;
-  try{pessoalNav();version();usersTitle()}finally{busy=false}
+  if(busy)return;
+  busy=true;
+  if(observer)observer.disconnect();
+  try{
+    pessoalNav();
+    version();
+    usersTitle();
+  }finally{
+    busy=false;
+    if(observer)observer.observe(document.documentElement,{childList:true,subtree:true});
+  }
 }
 function init(){
-  injectCss();refresh();serviceNotices();
+  injectCss();
+  observer=new MutationObserver(()=>refresh());
+  refresh();
+  serviceNotices();
   timer=setInterval(serviceNotices,10*60*1000);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)serviceNotices()});
   window.addEventListener('focus',serviceNotices);
-  new MutationObserver(refresh).observe(document.documentElement,{childList:true,subtree:true});
-  setTimeout(refresh,700);setTimeout(refresh,1500);
+  observer.observe(document.documentElement,{childList:true,subtree:true});
+  setTimeout(refresh,700);
+  setTimeout(refresh,1500);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
