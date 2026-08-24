@@ -71,6 +71,6 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     document.head.appendChild(s);
   }
   add('v6_5_patch.js?v=6.5','data-v65-loader',function(){
-    add('v7_global.js?v=7.1','data-v7-loader');
+    add('v7_global.js?v=7.2','data-v7-loader');
   });
 })();

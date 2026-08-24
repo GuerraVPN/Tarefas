@@ -39,7 +39,7 @@ select{padding:10px 12px;border:1px solid var(--v4-border-strong);border-radius:
    <h2>TAREFAS — 26º Pel PE Mec</h2>
    <p>Painel de tarefas, usuários, comunicações e fluxos administrativos.</p>
    <div class="meta">
-    <div><small>Versão atual</small><b>7.1</b></div>
+    <div><small>Versão atual</small><b>7.2</b></div>
     <div><small>Criador</small><b>Sd Guerra</b></div>
     <div><small>Organização</small><b>26º Pel PE Mec</b></div>
    </div>
@@ -62,12 +62,13 @@ const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 <script src="notificacoes.js?v=6.0"></script>
 <script src="v4_tema.js?v=6.0"></script>
 <script src="v4_ui.js?v=6.0"></script>
-<script src="v6_2_mobile.js?v=7.1"></script>
+<script src="v6_2_mobile.js?v=7.2"></script>
 
 <script>
 (function(){
 const versions=[
- {v:'7.1',title:'Admin, online e ajustes da Escala',current:true,items:['Admin visualiza a quantidade de usuários online.','Permissões administrativas centralizadas para os módulos principais.','Escala de serviço compactada para permanecer dentro da tela e ficar mais próxima do modelo em planilha.','Correção do acesso à aba Usuários dentro do menu Pessoal.']},
+ {v:'7.2',title:'1ª Seção, Missões, folgas e feriados',current:true,items:['Somente 1ª Seção e Admin podem incluir/alterar Escala de Serviço e Escala de Missão.','Nova Escala de Missão com participantes, período e cálculo configurável de dispensas previstas.','Resumo de efetivo, serviços, folgas e quantidade de pessoas nas escalas.','Permite nomes sem conta do sistema nas escalas de Serviço e Missão.','Feriados cadastrados na 1ª Seção passam a aparecer no Calendário.','Histórico registra quem alterou as escalas de Serviço e Missão.']},
+ {v:'7.1',title:'Admin, online e ajustes da Escala',items:['Admin visualiza a quantidade de usuários online.','Permissões administrativas centralizadas para os módulos principais.','Escala de serviço compactada para permanecer dentro da tela e ficar mais próxima do modelo em planilha.','Correção do acesso à aba Usuários dentro do menu Pessoal.']},
  {v:'7.0.1',title:'Hotfix de estabilidade do Dashboard',items:['Corrige travamento após o login causado por loop do MutationObserver da camada global da V7.','Menu Pessoal passa a ser montado de forma idempotente, sem reescrever o DOM continuamente.','Atualização do cache-buster para garantir o carregamento do JavaScript corrigido.']},
  {v:'7.0',title:'Pessoal e Escala de serviço',items:['Usuários passa a ficar dentro do menu Pessoal.','Nova Escala de serviço mensal com Sargentos, Motoristas, Patrulheiros e Permanência na mesma tela.','Preto identifica expediente normal; vermelho identifica final de semana/feriado; amarelo identifica serviço.','Notificações de serviço agendado e aviso no dia do serviço.']},
  {v:'6.5',title:'Presença, About e Help',items:['Edição bloqueada quando processos Orçamentários chegam a Pronto/Concluído, mantendo a exclusão disponível.','Versão atual visível no painel e nova página About com histórico selecionável.','Indicador de usuários online na lista de Usuários e nas conversas.','Novo Help com chamados de bug, falha, melhoria e suporte; Admin pode designar moderadores e contatar o usuário pela Central.']},
@@ -93,7 +94,7 @@ const versions=[
 ];
 const s=document.getElementById('versionSelect'),card=document.getElementById('versionCard');
 s.innerHTML=versions.map(x=>`<option value="${x.v}">${x.v} — ${x.title}</option>`).join('');
-s.value='7.1';
+s.value='7.2';
 function render(){
  const x=versions.find(v=>v.v===s.value)||versions[0];
  card.innerHTML=`<h3>Versão ${x.v} ${x.current?'<span class="tag">ATUAL</span>':''}</h3><p><b>${x.title}</b></p><ul>${x.items.map(i=>`<li>${i}</li>`).join('')}</ul>`;

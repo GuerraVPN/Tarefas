@@ -6,7 +6,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="perfis.js?v=6.0"></script>
 <link rel="stylesheet" href="v4_tema.css?v=6.2">
-<link rel="stylesheet" href="pessoal_v7.css?v=7.1">
+<link rel="stylesheet" href="pessoal_v7.css?v=7.2">
 </head>
 <body class="v7-body">
 <script>
@@ -33,20 +33,32 @@ if(!usuarioLogado?.id)location.replace('index.html');
  </div>
  <div class="v7-legend"><span><i class="dia"></i> Expediente normal</span><span><i class="fds"></i> Final de semana / feriado</span><span><i class="sv"></i> Serviço</span></div>
  <div class="v7-note" id="scaleInfo">Preto = dia útil/expediente normal. Vermelho = final de semana ou feriado. Amarelo = militar escalado de serviço.</div>
+ <div class="v72-summary" id="serviceSummary">
+  <div><small>Efetivo nas escalas</small><strong id="sumScalePeople">0</strong><span>pessoas cadastradas</span></div>
+  <div><small>Serviços no mês</small><strong id="sumServices">0</strong><span>lançamentos</span></div>
+  <div><small>Pessoas escaladas</small><strong id="sumPeopleOnService">0</strong><span>no mês exibido</span></div>
+  <div><small>Folgas previstas</small><strong id="sumFolgas">0</strong><span>conforme lançado</span></div>
+ </div>
  <div class="v7-board" id="scaleBoard"><div class="v7-empty">Carregando escalas...</div></div>
+ <section class="v7-panel v72-changes">
+  <div class="v7-panel-head"><h3>Últimas alterações da escala de serviço</h3><span id="changesCount">0 registro(s)</span></div>
+  <div id="serviceChanges" class="v72-change-list"><div class="v7-empty">Carregando alterações...</div></div>
+ </section>
 </section>
 </main>
 
 <div class="v7-modal-bg" id="serviceModal"><div class="v7-modal">
  <div class="v7-modal-head"><h3>Lançar serviço</h3><button class="v7-close" data-close="serviceModal">×</button></div>
  <form id="serviceForm">
-  <input type="hidden" id="serviceUserId"><input type="hidden" id="serviceGroup"><input type="hidden" id="serviceDate">
+  <input type="hidden" id="serviceUserId"><input type="hidden" id="serviceExternalId"><input type="hidden" id="serviceGroup"><input type="hidden" id="serviceDate">
   <div class="v7-form">
    <div class="v7-field full"><label>Militar</label><input id="serviceUser" disabled></div>
    <div class="v7-field"><label>Data</label><input id="serviceDateLabel" disabled></div>
    <div class="v7-field"><label>Escala</label><input id="serviceGroupLabel" disabled></div>
-   <div class="v7-field full"><label>Marcação</label><input id="serviceMark" maxlength="8" value="SV" placeholder="Ex.: SV, 1, 2"></div>
+   <div class="v7-field"><label>Marcação</label><input id="serviceMark" maxlength="8" value="SV" placeholder="Ex.: SV, 1, 2"></div>
+   <div class="v7-field"><label>Folgas geradas</label><input id="serviceFolgas" type="number" min="0" step="0.5" value="0"></div>
    <div class="v7-field full"><label>Observação</label><textarea id="serviceNote" rows="3" maxlength="500"></textarea></div>
+   <div class="v7-field full"><div class="v72-last-change" id="serviceChangedBy">Sem alteração registrada.</div></div>
   </div>
   <div class="v7-modal-actions"><button type="button" class="v7-btn danger" id="removeService" hidden>Remover serviço</button><button type="button" class="v7-btn" data-close="serviceModal">Cancelar</button><button type="submit" class="v7-btn primary">Salvar</button></div>
  </form>
@@ -56,7 +68,10 @@ if(!usuarioLogado?.id)location.replace('index.html');
  <div class="v7-modal-head"><h3>Militares das escalas</h3><button class="v7-close" data-close="membersModal">×</button></div>
  <div class="v7-form">
   <div class="v7-field"><label>Escala</label><select id="memberGroup"><option value="sargento">Sargentos</option><option value="motorista">Motoristas</option><option value="patrulheiro">Patrulheiros</option><option value="permanencia">Permanência</option></select></div>
-  <div class="v7-field"><label>Militar</label><select id="memberUser"></select></div>
+  <div class="v7-field"><label>Origem do nome</label><select id="memberMode"><option value="sistema">Usuário do sistema</option><option value="externo">Nome sem usuário no sistema</option></select></div>
+  <div class="v7-field full" id="memberSystemField"><label>Militar</label><select id="memberUser"></select></div>
+  <div class="v7-field" id="memberExternalNameField" hidden><label>Nome *</label><input id="memberExternalName" maxlength="120" placeholder="Nome / nome de guerra"></div>
+  <div class="v7-field" id="memberExternalRankField" hidden><label>Posto / Grad.</label><input id="memberExternalRank" maxlength="40" placeholder="Ex.: Sd, Cb, 3º Sgt"></div>
   <div class="v7-field"><label>Ordem</label><input id="memberOrder" type="number" min="1" max="9999" value="100"></div>
   <div class="v7-field" style="display:flex;align-items:end"><button type="button" class="v7-btn primary" id="addMember" style="width:100%">Adicionar</button></div>
  </div>
@@ -82,6 +97,6 @@ const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 <script src="notificacoes.js?v=6.0"></script>
 <script src="v4_tema.js?v=6.0"></script>
 <script src="v4_ui.js?v=6.0"></script>
-<script src="pessoal_v7.js?v=7.1"></script>
-<script src="v6_2_mobile.js?v=7.1"></script>
+<script src="pessoal_v7.js?v=7.2"></script>
+<script src="v6_2_mobile.js?v=7.2"></script>
 </body></html>

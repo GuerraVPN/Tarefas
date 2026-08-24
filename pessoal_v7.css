@@ -66,3 +66,24 @@ html,body{max-width:100%;overflow-x:hidden}
   .v7-table{min-width:930px}
   .v7-table th:first-child,.v7-table td:first-child{width:125px;min-width:125px;max-width:125px}
 }
+
+
+/* =========================================================
+   V7.2 — RESUMOS, NOMES EXTERNOS E AUDITORIA DA ESCALA
+   ========================================================= */
+.v72-summary{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:7px;margin-bottom:8px}
+.v72-summary>div{background:var(--v4-surface);border:1px solid var(--v4-border);border-radius:8px;padding:9px 10px;min-width:0}
+.v72-summary small{display:block;font-size:8px;color:var(--v4-muted);font-weight:800;text-transform:uppercase;letter-spacing:.4px}
+.v72-summary strong{display:block;font-size:20px;line-height:1.1;margin:4px 0 2px}
+.v72-summary span{display:block;font-size:8px;color:var(--v4-muted)}
+.v72-changes{margin-top:8px}
+.v72-change-list{max-height:230px;overflow:auto;padding:6px}
+.v72-change-row{display:flex;justify-content:space-between;gap:10px;padding:7px 8px;border-bottom:1px solid var(--v4-border);font-size:9px}
+.v72-change-row:last-child{border-bottom:0}
+.v72-change-row b{font-size:9px}
+.v72-change-row small{display:block;color:var(--v4-muted);margin-top:2px}
+.v72-last-change{border:1px solid var(--v4-border);background:var(--v4-surface-2);border-radius:8px;padding:8px 9px;font-size:9px;color:var(--v4-muted)}
+.v72-external-tag{display:inline-flex;margin-left:5px;padding:1px 5px;border-radius:999px;background:rgba(234,179,8,.18);color:#facc15;font-size:6.5px;font-weight:900;vertical-align:middle}
+.v72-mission-link{display:inline-flex;align-items:center;gap:5px}
+@media(max-width:900px){.v72-summary{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.v72-summary{grid-template-columns:1fr 1fr}.v72-summary strong{font-size:17px}}
