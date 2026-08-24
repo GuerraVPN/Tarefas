@@ -1,8 +1,8 @@
 (function(){
 'use strict';
-const VERSION='7.0.1';
+const VERSION='7.1';
 const $=id=>document.getElementById(id);
-let busy=false,timer=null;
+let busy=false,timer=null,onlineTimer=null,adminActive=false;
 
 function client(){try{return typeof supabaseClient!=='undefined'?supabaseClient:null}catch(_){return null}}
 function logged(){try{return JSON.parse(localStorage.getItem('usuarioLogado')||'null')}catch(_){return null}}
@@ -14,8 +14,11 @@ function injectCss(){
   .v7-pessoal-sub{display:none;padding:2px 5px 7px 28px}
   .v7-pessoal-parent:hover .v7-pessoal-sub,.v7-pessoal-parent:focus-within .v7-pessoal-sub,.v7-pessoal-parent.v62-subopen .v7-pessoal-sub{display:grid;gap:2px}
   .v7-pessoal-parent:hover .v6-orc-arrow,.v7-pessoal-parent:focus-within .v6-orc-arrow,.v7-pessoal-parent.v62-subopen .v6-orc-arrow{transform:rotate(180deg)}
-  .v7-pessoal-sub button{border:0;background:transparent;color:var(--v4-sidebar-text);border-radius:7px;padding:7px 8px;text-align:left;font-size:9px;cursor:pointer}
-  .v7-pessoal-sub button:hover,.v7-pessoal-sub button.active{background:var(--v4-sidebar-hover);color:var(--v4-gold)}
+  .v7-pessoal-sub a{display:block;text-decoration:none;border:0;background:transparent;color:var(--v4-sidebar-text);border-radius:7px;padding:7px 8px;text-align:left;font-size:9px;cursor:pointer}
+  .v7-pessoal-sub a:hover,.v7-pessoal-sub a.active{background:var(--v4-sidebar-hover);color:var(--v4-gold)}
+  .v71-admin-online{height:34px;display:inline-flex;align-items:center;gap:7px;border:1px solid var(--v4-border);background:var(--v4-surface);color:var(--v4-text-2);border-radius:9px;padding:0 10px;font-size:9px;font-weight:800;cursor:pointer;white-space:nowrap}
+  .v71-admin-online:hover{background:var(--v4-surface-2)}
+  .v71-admin-online i{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 2px color-mix(in srgb,#22c55e 18%,transparent)}
   @media(max-width:900px){.v7-pessoal-parent:hover .v7-pessoal-sub{display:none}.v7-pessoal-parent.v62-subopen .v7-pessoal-sub{display:grid}}
   `;document.head.appendChild(s);
 }
@@ -39,17 +42,15 @@ function pessoalNav(){
   const active=p==='pessoal.html'||p==='usuarios.html';
   parent.classList.toggle('active',active);
 
-  // V7.0.1: só monta o conteúdo uma vez.
-  // Na V7.0, reescrever innerHTML em todo refresh alimentava o MutationObserver.
   if(!parent.querySelector('[data-v7-main]')){
-    parent.innerHTML=`<button class="v6-orc-main" data-v7-main>
+    parent.innerHTML=`<a class="v6-orc-main" data-v7-main href="pessoal.html">
       <span class="v6-nav-icon">${people()}</span>
       <span class="v6-nav-label">Pessoal</span>
       <span class="v6-orc-arrow">${arrow()}</span>
-    </button>
+    </a>
     <div class="v7-pessoal-sub">
-      <button data-v7-link="escala">Escala de serviço</button>
-      <button data-v7-link="usuarios">Usuários</button>
+      <a data-v7-link="escala" href="pessoal.html">Escala de serviço</a>
+      <a data-v7-link="usuarios" href="usuarios.html">Usuários</a>
     </div>`;
   }
 
@@ -58,19 +59,17 @@ function pessoalNav(){
   escala?.classList.toggle('active',p==='pessoal.html');
   usuarios?.classList.toggle('active',p==='usuarios.html');
 
-  if(parent.dataset.v701Wired!=='1'){
+  // Links reais corrigem a aba Usuários e continuam funcionando mesmo
+  // se outra camada do sistema interceptar cliques no menu.
+  if(parent.dataset.v71Wired!=='1'){
     const main=parent.querySelector('[data-v7-main]');
-    if(main)main.onclick=function(e){
-      e.preventDefault();
-      if(window.matchMedia('(max-width: 900px)').matches){
+    if(main)main.addEventListener('click',function(e){
+      if(window.matchMedia('(max-width: 900px)').matches && e.target.closest('.v6-orc-arrow')){
+        e.preventDefault();
         parent.classList.toggle('v62-subopen');
-      }else{
-        location.href='pessoal.html';
       }
-    };
-    if(escala)escala.onclick=e=>{e.stopPropagation();location.href='pessoal.html'};
-    if(usuarios)usuarios.onclick=e=>{e.stopPropagation();location.href='usuarios.html'};
-    parent.dataset.v701Wired='1';
+    });
+    parent.dataset.v71Wired='1';
   }
 }
 
@@ -92,6 +91,49 @@ function usersTitle(){
   if(h && !h.textContent.includes('Pessoal'))h.textContent='Pessoal · Usuários';
   const bc=document.querySelector('.breadcrumb');
   if(bc)bc.textContent='Pessoal › Usuários';
+}
+
+async function detectAdmin(){
+  const c=client(),u=logged();
+  if(!c||!u?.id){adminActive=false;return false}
+  const local=norm(u.secao)==='admin';
+  if(local){adminActive=true;return true}
+  try{
+    if(!u.perfil_id){adminActive=false;return false}
+    const r=await c.from('usuario_perfis').select('secao').eq('id',Number(u.perfil_id)).eq('usuario_id',Number(u.id)).eq('ativo',true).maybeSingle();
+    adminActive=!r.error&&norm(r.data?.secao)==='admin';
+    return adminActive;
+  }catch(_){adminActive=false;return false}
+}
+function onlineHost(){
+  return document.getElementById('v3UserZone')||document.querySelector('.header-actions,.topbar-right,.v7-top>div:last-child');
+}
+async function renderAdminOnline(){
+  const c=client();
+  if(!c)return;
+  if(!adminActive)await detectAdmin();
+  let badge=document.getElementById('v71AdminOnline');
+  if(!adminActive){badge?.remove();return}
+
+  const since=new Date(Date.now()-120000).toISOString();
+  try{
+    const r=await c.from('usuarios_presenca').select('usuario_id').gte('ultima_atividade',since);
+    if(r.error)return;
+    const count=new Set((r.data||[]).map(x=>String(x.usuario_id))).size;
+    const host=onlineHost();if(!host)return;
+    if(!badge){
+      badge=document.createElement('button');
+      badge.type='button';badge.id='v71AdminOnline';badge.className='v71-admin-online';
+      badge.title='Ver usuários online';
+      badge.onclick=()=>location.href='usuarios.html';
+      host.insertBefore(badge,host.firstChild);
+    }
+    const txt=`${count} online${count===1?'':'s'}`;
+    if(badge.dataset.count!==String(count)){
+      badge.innerHTML=`<i></i><span>${txt}</span>`;
+      badge.dataset.count=String(count);
+    }
+  }catch(_){}
 }
 
 async function serviceNotices(){
@@ -122,10 +164,13 @@ function init(){
   injectCss();
   observer=new MutationObserver(()=>refresh());
   refresh();
+  detectAdmin().then(renderAdminOnline);
   serviceNotices();
   timer=setInterval(serviceNotices,10*60*1000);
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden)serviceNotices()});
-  window.addEventListener('focus',serviceNotices);
+  onlineTimer=setInterval(renderAdminOnline,30000);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden){serviceNotices();renderAdminOnline()}});
+  window.addEventListener('focus',()=>{serviceNotices();renderAdminOnline()});
+  window.addEventListener('v65:presenca',renderAdminOnline);
   observer.observe(document.documentElement,{childList:true,subtree:true});
   setTimeout(refresh,700);
   setTimeout(refresh,1500);

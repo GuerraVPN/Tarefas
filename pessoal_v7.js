@@ -23,8 +23,9 @@ async function initUser(){
  const base=JSON.parse(localStorage.getItem('usuarioLogado')||'null');if(!base?.id)return false;
  user=base;
  if(window.Perfis26){try{const p=await Perfis26.carregar(supabaseClient,base);if(p?.usuario)user=p.usuario}catch(_){}}
+ const adminAtivo=norm(user?.secao)==='admin';
  const r=await supabaseClient.rpc('v7_pode_gerenciar_escala',{p_usuario_id:Number(user.id),p_perfil_id:profileId()});
- canManage=!r.error&&r.data===true;
+ canManage=adminAtivo||(!r.error&&r.data===true);
  $('manageMembers').hidden=!canManage;$('manageHolidays').hidden=!canManage;
  if(!canManage)$('scaleInfo').textContent+=' Seu perfil possui acesso somente para consulta.';
  return true;
@@ -64,7 +65,7 @@ function render(){
   html+='<div class="v7-wrap"><table class="v7-table"><thead><tr><th>Militar</th>';
   for(let d=1;d<=rg.dias;d++){
    const date=iso(new Date(view.getFullYear(),view.getMonth(),d)),dt=new Date(date+'T12:00:00'),holiday=hol(date);
-   html+=`<th class="v7-day ${dayClass(date)}" title="${esc(holiday?.nome||'')}">${String(d).padStart(2,'0')}<small>${WEEK[dt.getDay()]}</small></th>`;
+   html+=`<th class="v7-day ${dayClass(date)}" title="${esc(holiday?.nome||'')}"><small>${WEEK[dt.getDay()]}</small><b>${String(d).padStart(2,'0')}</b></th>`;
   }
   html+='</tr></thead><tbody>';
   for(const row of rows){
