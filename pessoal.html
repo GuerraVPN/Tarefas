@@ -6,7 +6,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="perfis.js?v=6.0"></script>
 <link rel="stylesheet" href="v4_tema.css?v=6.2">
-<link rel="stylesheet" href="pessoal_v7.css?v=7.2">
+<link rel="stylesheet" href="pessoal_v7.css?v=7.2.1">
 </head>
 <body class="v7-body">
 <script>
@@ -31,13 +31,13 @@ if(!usuarioLogado?.id)location.replace('index.html');
    <button class="v7-btn" id="manageHolidays" hidden>Feriados</button>
   </div>
  </div>
- <div class="v7-legend"><span><i class="dia"></i> Expediente normal</span><span><i class="fds"></i> Final de semana / feriado</span><span><i class="sv"></i> Serviço</span></div>
- <div class="v7-note" id="scaleInfo">Preto = dia útil/expediente normal. Vermelho = final de semana ou feriado. Amarelo = militar escalado de serviço.</div>
+ <div class="v7-legend"><span><i class="dia"></i> Expediente normal</span><span><i class="fds"></i> Final de semana / feriado</span><span><i class="sv"></i> Serviço confirmado</span><span><i class="prev"></i> Próximo serviço previsto</span><span><i class="ferias"></i> Férias</span><span><i class="adapt"></i> Adaptação</span></div>
+ <div class="v7-note" id="scaleInfo">Após um serviço confirmado, a escala calcula automaticamente as folgas (1, 2, 3...) e projeta o próximo serviço pelo rodízio. Férias retiram o militar do rodízio; o dia seguinte ao fim das férias é adaptação e ele só pode servir a partir do outro dia. <b>Dispensas não interferem nesta escala.</b></div>
  <div class="v72-summary" id="serviceSummary">
   <div><small>Efetivo nas escalas</small><strong id="sumScalePeople">0</strong><span>pessoas cadastradas</span></div>
   <div><small>Serviços no mês</small><strong id="sumServices">0</strong><span>lançamentos</span></div>
   <div><small>Pessoas escaladas</small><strong id="sumPeopleOnService">0</strong><span>no mês exibido</span></div>
-  <div><small>Folgas previstas</small><strong id="sumFolgas">0</strong><span>conforme lançado</span></div>
+  <div><small>Folgas projetadas</small><strong id="sumFolgas">0</strong><span>até os próximos serviços</span></div>
  </div>
  <div class="v7-board" id="scaleBoard"><div class="v7-empty">Carregando escalas...</div></div>
  <section class="v7-panel v72-changes">
@@ -55,12 +55,11 @@ if(!usuarioLogado?.id)location.replace('index.html');
    <div class="v7-field full"><label>Militar</label><input id="serviceUser" disabled></div>
    <div class="v7-field"><label>Data</label><input id="serviceDateLabel" disabled></div>
    <div class="v7-field"><label>Escala</label><input id="serviceGroupLabel" disabled></div>
-   <div class="v7-field"><label>Marcação</label><input id="serviceMark" maxlength="8" value="SV" placeholder="Ex.: SV, 1, 2"></div>
-   <div class="v7-field"><label>Folgas geradas</label><input id="serviceFolgas" type="number" min="0" step="0.5" value="0"></div>
+   <div class="v7-field full"><label>Marcação do serviço</label><input id="serviceMark" maxlength="8" value="SV" placeholder="Ex.: SV"></div>
    <div class="v7-field full"><label>Observação</label><textarea id="serviceNote" rows="3" maxlength="500"></textarea></div>
    <div class="v7-field full"><div class="v72-last-change" id="serviceChangedBy">Sem alteração registrada.</div></div>
   </div>
-  <div class="v7-modal-actions"><button type="button" class="v7-btn danger" id="removeService" hidden>Remover serviço</button><button type="button" class="v7-btn" data-close="serviceModal">Cancelar</button><button type="submit" class="v7-btn primary">Salvar</button></div>
+  <div class="v7-modal-actions"><button type="button" class="v7-btn" id="markVacation">Marcar férias</button><button type="button" class="v7-btn" id="swapService" hidden>Trocar serviço</button><button type="button" class="v7-btn danger" id="removeService" hidden>Tirar serviço</button><button type="button" class="v7-btn" data-close="serviceModal">Cancelar</button><button type="submit" class="v7-btn primary">Confirmar serviço</button></div>
  </form>
 </div></div>
 
@@ -88,6 +87,38 @@ if(!usuarioLogado?.id)location.replace('index.html');
  <div id="holidaysList" class="v7-list"></div>
 </div></div>
 
+<div class="v7-modal-bg" id="vacationModal"><div class="v7-modal">
+ <div class="v7-modal-head"><h3>Férias</h3><button class="v7-close" data-close="vacationModal">×</button></div>
+ <form id="vacationForm">
+  <input type="hidden" id="vacationId"><input type="hidden" id="vacationUserId"><input type="hidden" id="vacationExternalId">
+  <div class="v7-form">
+   <div class="v7-field full"><label>Militar / Nome</label><input id="vacationPerson" disabled></div>
+   <div class="v7-field"><label>Início *</label><input id="vacationStart" type="date" required></div>
+   <div class="v7-field"><label>Fim *</label><input id="vacationEnd" type="date" required></div>
+   <div class="v7-field full"><div class="v72-last-change" id="vacationBalanceInfo">Saldo de férias: carregando...</div></div>
+   <div class="v7-field full"><label>Observação</label><textarea id="vacationNote" rows="3" maxlength="500"></textarea></div>
+  </div>
+  <div class="v7-note">O dia seguinte ao término fica automaticamente como <b>ADP — adaptação</b>. O militar só volta a ficar elegível para serviço no dia posterior.</div>
+  <div class="v7-modal-actions"><button type="button" class="v7-btn danger" id="removeVacation" hidden>Excluir férias</button><button type="button" class="v7-btn" data-close="vacationModal">Cancelar</button><button type="submit" class="v7-btn primary">Salvar férias</button></div>
+ </form>
+</div></div>
+
+<div class="v7-modal-bg" id="swapModal"><div class="v7-modal">
+ <div class="v7-modal-head"><h3>Trocar serviço</h3><button class="v7-close" data-close="swapModal">×</button></div>
+ <form id="swapForm">
+  <input type="hidden" id="swapSourceUserId"><input type="hidden" id="swapSourceExternalId"><input type="hidden" id="swapGroup"><input type="hidden" id="swapDate">
+  <div class="v7-form">
+   <div class="v7-field full"><label>Serviço atual</label><input id="swapSource" disabled></div>
+   <div class="v7-field"><label>Data</label><input id="swapDateLabel" disabled></div>
+   <div class="v7-field"><label>Escala</label><input id="swapGroupLabel" disabled></div>
+   <div class="v7-field full"><label>Quem assumirá o serviço *</label><select id="swapTarget" required></select></div>
+   <div class="v7-field full"><label>Motivo / observação</label><textarea id="swapNote" rows="3" maxlength="500" placeholder="Opcional"></textarea></div>
+  </div>
+  <div class="v7-note">A troca mantém a mesma data. O novo militar precisa estar cadastrado na mesma escala e não pode estar de férias nem no dia de adaptação.</div>
+  <div class="v7-modal-actions"><button type="button" class="v7-btn" data-close="swapModal">Cancelar</button><button type="submit" class="v7-btn primary">Confirmar troca</button></div>
+ </form>
+</div></div>
+
 <script>
 const SUPABASE_URL='https://bpvijatnsluwsgnzklrd.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwdmlqYXRuc2x1d3NnbnprbHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MzkxNDMsImV4cCI6MjEwMjQxNTE0M30.uvyfm9mgl6MON0v75CwfGzNz6FBqw58uzR4ZcRAOLNQ';
@@ -97,6 +128,6 @@ const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 <script src="notificacoes.js?v=6.0"></script>
 <script src="v4_tema.js?v=6.0"></script>
 <script src="v4_ui.js?v=6.0"></script>
-<script src="pessoal_v7.js?v=7.2"></script>
-<script src="v6_2_mobile.js?v=7.2"></script>
+<script src="pessoal_v7.js?v=7.2.1"></script>
+<script src="v6_2_mobile.js?v=7.2.1"></script>
 </body></html>

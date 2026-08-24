@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const VERSION='7.2';
+const VERSION='7.2.1';
 const $=id=>document.getElementById(id);
 const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
 let busy=false,timer=null,onlineTimer=null,adminActive=false;
@@ -40,7 +40,7 @@ function pessoalNav(){
   if(!parent)return;
 
   const p=page();
-  const active=p==='pessoal.html'||p==='missao.html'||p==='usuarios.html';
+  const active=p==='pessoal.html'||p==='missao.html'||p==='ferias_dispensas.html'||p==='usuarios.html';
   parent.classList.toggle('active',active);
 
   if(!parent.querySelector('[data-v7-main]')){
@@ -52,15 +52,18 @@ function pessoalNav(){
     <div class="v7-pessoal-sub">
       <a data-v7-link="escala" href="pessoal.html">Escala de serviço</a>
       <a data-v7-link="missao" href="missao.html">Escala de missão</a>
+      <a data-v7-link="afastamentos" href="ferias_dispensas.html">Férias / Dispensas</a>
       <a data-v7-link="usuarios" href="usuarios.html">Usuários</a>
     </div>`;
   }
 
   const escala=parent.querySelector('[data-v7-link="escala"]');
   const missao=parent.querySelector('[data-v7-link="missao"]');
+  const afastamentos=parent.querySelector('[data-v7-link="afastamentos"]');
   const usuarios=parent.querySelector('[data-v7-link="usuarios"]');
   escala?.classList.toggle('active',p==='pessoal.html');
   missao?.classList.toggle('active',p==='missao.html');
+  afastamentos?.classList.toggle('active',p==='ferias_dispensas.html');
   usuarios?.classList.toggle('active',p==='usuarios.html');
 
   // Links reais corrigem a aba Usuários e continuam funcionando mesmo
