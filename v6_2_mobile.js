@@ -60,12 +60,17 @@ function init(){
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 
-/* V6.5 loader — mantém a V6.2 mobile e carrega a camada comum da versão atual. */
+/* V7 loader — mantém a V6.5 e carrega a camada global da V7. */
 (function(){
-  if(document.querySelector('script[data-v65-loader],script[src*="v6_5_patch.js"]'))return;
-  const s=document.createElement('script');
-  s.src='v6_5_patch.js?v=6.5';
-  s.defer=true;
-  s.dataset.v65Loader='1';
-  document.head.appendChild(s);
+  function add(src, attr, done){
+    const old=document.querySelector('script['+attr+'],script[src*="'+src.split('?')[0]+'"]');
+    if(old){if(done)done();return;}
+    const s=document.createElement('script');
+    s.src=src;s.defer=true;s.setAttribute(attr,'1');
+    if(done)s.onload=done;
+    document.head.appendChild(s);
+  }
+  add('v6_5_patch.js?v=6.5','data-v65-loader',function(){
+    add('v7_global.js?v=7.0','data-v7-loader');
+  });
 })();
