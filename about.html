@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>About — TAREFAS</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="perfis.js?v=6.0"></script>
+<link rel="stylesheet" href="v4_tema.css?v=6.2">
+
+<style>
+*{box-sizing:border-box}body{margin:0;display:flex;min-height:100vh;background:var(--v4-bg);color:var(--v4-text);font-family:Arial,sans-serif}
+.sidebar{width:238px;min-height:100vh;background:var(--v4-sidebar);padding:16px;color:var(--v4-sidebar-text);display:flex;flex-direction:column;flex-shrink:0}
+.brand{display:flex;gap:12px;align-items:center;margin-bottom:24px}.star{width:36px;height:36px;background:var(--v4-gold);color:#111;border-radius:8px;display:grid;place-items:center;font-size:22px;font-weight:900}
+.brand h1{font-size:20px;color:#fff;margin:0}.brand p{font-size:12px;color:var(--v4-gold);margin:2px 0 0}.sidebar ul{list-style:none;padding:0;margin:0;flex:1}
+.credit{font-size:10px;text-align:center;line-height:1.5;border-top:1px solid rgba(255,255,255,.12);padding-top:12px}.credit b{color:var(--v4-gold)}
+.main{flex:1;min-width:0}.topbar{min-height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;border-bottom:1px solid var(--v4-border);background:var(--v4-surface)}
+.page{padding:22px;max-width:1120px;margin:0 auto}.hero{background:var(--v4-surface);border:1px solid var(--v4-border);border-radius:16px;padding:22px;margin-bottom:16px}
+.hero h2{margin:0 0 5px;font-size:26px}.hero p{margin:0;color:var(--v4-muted);line-height:1.5}.meta{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:17px}
+.meta div{padding:12px;border:1px solid var(--v4-border);border-radius:11px;background:var(--v4-surface-2)}.meta small{display:block;color:var(--v4-muted);font-size:10px;margin-bottom:4px}.meta b{font-size:13px}
+.panel{background:var(--v4-surface);border:1px solid var(--v4-border);border-radius:16px;padding:18px}.picker{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-bottom:15px;flex-wrap:wrap}
+select{padding:10px 12px;border:1px solid var(--v4-border-strong);border-radius:9px;background:var(--v4-surface);color:var(--v4-text);min-width:220px}
+.version-card{border:1px solid var(--v4-border);border-radius:13px;padding:16px;background:var(--v4-surface-2)}.version-card h3{margin:0 0 7px;font-size:20px}.version-card .tag{display:inline-flex;padding:4px 8px;border-radius:999px;background:var(--v4-accent-soft);color:var(--v4-accent);font-size:10px;font-weight:800;margin-left:6px}
+.version-card p{color:var(--v4-muted);line-height:1.5}.version-card ul{margin:12px 0 0;padding-left:20px;line-height:1.65}.source-note{font-size:10px;color:var(--v4-muted);margin-top:14px}
+@media(max-width:900px){body{display:block}.sidebar{display:none}.page{padding:14px}.meta{grid-template-columns:1fr}.topbar{padding:0 14px}}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+ <div class="brand"><div class="star">★</div><div><h1>TAREFAS</h1><p>26º Pel PE Mec</p></div></div>
+ <ul></ul>
+ <div class="credit">Criado por <b>Sd Guerra</b><br>26º Pel PE Mec 💪🏼</div>
+</aside>
+<main class="main">
+ <header class="topbar"><div><b>About</b><div style="font-size:10px;color:var(--v4-muted)">Informações do sistema e histórico</div></div><div></div></header>
+ <section class="page">
+  <div class="hero">
+   <h2>TAREFAS — 26º Pel PE Mec</h2>
+   <p>Painel de tarefas, usuários, comunicações e fluxos administrativos.</p>
+   <div class="meta">
+    <div><small>Versão atual</small><b>6.5</b></div>
+    <div><small>Criador</small><b>Sd Guerra</b></div>
+    <div><small>Organização</small><b>26º Pel PE Mec</b></div>
+   </div>
+  </div>
+  <div class="panel">
+   <div class="picker"><div><b>Histórico de versões</b><div style="font-size:10px;color:var(--v4-muted);margin-top:3px">A versão atual fica selecionada primeiro.</div></div>
+    <select id="versionSelect"></select>
+   </div>
+   <div id="versionCard" class="version-card"></div>
+   <div class="source-note">V4, V5 e V6 possuem registros técnicos/manifestos preservados. V1 e V2 aparecem como registro histórico sem detalhes técnicos preservados, para não atribuir mudanças que não estejam documentadas.</div>
+  </div>
+ </section>
+</main>
+
+<script>
+const SUPABASE_URL='https://bpvijatnsluwsgnzklrd.supabase.co';
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwdmlqYXRuc2x1d3NnbnprbHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MzkxNDMsImV4cCI6MjEwMjQxNTE0M30.uvyfm9mgl6MON0v75CwfGzNz6FBqw58uzR4ZcRAOLNQ';
+const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+</script>
+<script src="notificacoes.js?v=6.0"></script>
+<script src="v4_tema.js?v=6.0"></script>
+<script src="v4_ui.js?v=6.0"></script>
+<script src="v6_2_mobile.js?v=6.5"></script>
+
+<script>
+(function(){
+const versions=[
+ {v:'6.5',title:'Presença, About e Help',current:true,items:['Edição bloqueada quando processos Orçamentários chegam a Pronto/Concluído, mantendo a exclusão disponível.','Versão atual visível no painel e nova página About com histórico selecionável.','Indicador de usuários online na lista de Usuários e nas conversas.','Novo Help com chamados de bug, falha, melhoria e suporte; Admin pode designar moderadores e contatar o usuário pela Central.']},
+ {v:'6.4',title:'Permissões e identificação de pedidos',items:['Correção para impedir usuário comum de aprovar/retornar desrelacionamento.','Exibição explícita de quem fez o pedido.','Busca e agrupamento melhorados no seletor de novo detentor da Passagem de Carga.']},
+ {v:'6.3',title:'Guias e seção Canil',items:['Fiscalização passou a poder substituir a versão do arquivo da guia sem simular assinatura do Comandante.','Seção Canil adicionada aos seletores e perfis de usuários.']},
+ {v:'6.2',title:'Menu Android',items:['No Android, sidebar fechada por padrão e botão de três pontos no topo para abrir o menu.','Layout de PC preservado sem transformação da sidebar.','Correções de calendário mantidas.']},
+ {v:'6.1',title:'Responsividade Android',items:['Camada responsiva global para telas móveis.','Calendário adaptado ao Android.','Correção de hover/fundo branco no calendário para temas escuros.']},
+ {v:'6.0',title:'Dashboard e Passagem de Carga',items:['Dashboard com indicadores e atalhos.','Passagem de Carga e detentor atual.','Notificações/mensagens no topo, navegação direta e sidebar padronizada.','Novos depósitos Paiol e Mun Uso e correções de tema/impressão.']},
+ {v:'5.5',title:'Documentos e Material Carga',items:['Materiais de Consumo retirados da lista de itens.','Anexos em Baixa e Distribuição.','Guias com Guia, Espelho e TREM; versionamento preservado.','Material Carga com documento atual e histórico.']},
+ {v:'5.4.2',title:'Fluxos Orçamentários',items:['Relatório principal do Orçamentários e submenu lateral.','Fluxos detalhados de Movimentação e Distribuição.']},
+ {v:'5.4.1',title:'Patrimônio',items:['Nº Patrimônio obrigatório para Permanente e Movimentação quando aplicável.']},
+ {v:'5.4',title:'Edição, exclusão e movimentação',items:['Edição/exclusão de registros com rastreabilidade.','Módulo de Movimentação de Material.']},
+ {v:'5.3',title:'Pedidos Orçamentários',items:['Pedido único com vários materiais.','Regras de dependência/depósito conforme tipo de operação.']},
+ {v:'5.2.1',title:'Assinatura do Comandante',items:['Comandante baixa a guia, assina externamente e substitui pela versão assinada, preservando a anterior.']},
+ {v:'5.2',title:'Desrelacionamento / Baixa',items:['Fluxos para Permanente, Uso Duradouro e Consumo.']},
+ {v:'5.1',title:'Layout PC do Orçamentários',items:['Correções de largura, sidebar, grids e responsividade do módulo Orçamentários.']},
+ {v:'5.0',title:'Orçamentários / Guias',items:['Novo módulo de Guias.','Fila de Fiscalização para Chefe/Auxiliar, devolução, aprovação e anexos versionados.']},
+ {v:'4.1',title:'Correção de temas no desktop',items:['Remoção de cores fixas que quebravam os temas no PC.']},
+ {v:'4.0',title:'Temas e recorrências',items:['Temas Claro, Escuro, Noturno e Militar.','Tarefas recorrentes diária, semanal, mensal e anual integradas ao sistema.']},
+ {v:'3.0',title:'Perfis, Central e auditoria',items:['Perfis funcionais no topo.','Responsáveis por perfil e última atividade.','Central de Notificações/Mensagens e auditoria para Admin.']},
+ {v:'2.0',title:'Histórico inicial',items:['O repositório atual não preserva um manifesto técnico detalhado desta versão.']},
+ {v:'1.0',title:'Primeira versão',items:['O repositório atual não preserva um manifesto técnico detalhado desta versão.']}
+];
+const s=document.getElementById('versionSelect'),card=document.getElementById('versionCard');
+s.innerHTML=versions.map(x=>`<option value="${x.v}">${x.v} — ${x.title}</option>`).join('');
+s.value='6.5';
+function render(){
+ const x=versions.find(v=>v.v===s.value)||versions[0];
+ card.innerHTML=`<h3>Versão ${x.v} ${x.current?'<span class="tag">ATUAL</span>':''}</h3><p><b>${x.title}</b></p><ul>${x.items.map(i=>`<li>${i}</li>`).join('')}</ul>`;
+}
+s.onchange=render;render();
+})();
+</script>
+</body>
+</html>

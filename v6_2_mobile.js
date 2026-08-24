@@ -59,3 +59,13 @@ function init(){
 
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
+
+/* V6.5 loader — mantém a V6.2 mobile e carrega a camada comum da versão atual. */
+(function(){
+  if(document.querySelector('script[data-v65-loader],script[src*="v6_5_patch.js"]'))return;
+  const s=document.createElement('script');
+  s.src='v6_5_patch.js?v=6.5';
+  s.defer=true;
+  s.dataset.v65Loader='1';
+  document.head.appendChild(s);
+})();
