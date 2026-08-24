@@ -20,7 +20,7 @@ function br(v){return v?parseDate(v).toLocaleDateString('pt-BR'):'-'}
 function dt(v){return v?new Date(v).toLocaleString('pt-BR'):'-'}
 function range(){
  const y=view.getFullYear(),m=view.getMonth(),ini=iso(new Date(y,m,1)),fim=iso(new Date(y,m+1,0));
- return{ini,fim,dias:new Date(y,m+1,0).getDate(),extIni:addDays(ini,-90),extFim:addDays(fim,90)}
+ return{ini,fim,dias:new Date(y,m+1,0).getDate(),extIni:addDays(ini,-365),extFim:addDays(fim,365)}
 }
 function hol(date){return holidays.find(x=>x.data===date)}
 function dayClass(date){const d=parseDate(date);return d.getDay()===0||d.getDay()===6||hol(date)?'weekend':'normal'}
@@ -105,10 +105,7 @@ function buildProjection(g){
  const keys=rows.map(personKey),queue=[...keys],rg=range(),today=todayIso();
  const confirmed=rotationServices.filter(x=>x.grupo===g&&keys.includes(personKey(x))).sort((a,b)=>a.data_servico.localeCompare(b.data_servico)||Number(a.id)-Number(b.id));
  if(!confirmed.length)return;
- const anchorLimit=rg.fim<today?rg.fim:today;
- let anchor=[...confirmed].reverse().find(x=>x.data_servico<=anchorLimit);
- if(!anchor)anchor=confirmed[0];
- moveToBack(queue,personKey(anchor));
+ const anchorDate=confirmed[0].data_servico;
  const localDuty=new Map();
  function addDuty(key,date,type,item=null){
    if(!localDuty.has(key))localDuty.set(key,[]);
@@ -116,8 +113,8 @@ function buildProjection(g){
    const k=g+'|'+date;if(!projections.has(k))projections.set(k,[]);
    projections.get(k).push({key,type,item});
  }
- addDuty(personKey(anchor),anchor.data_servico,'actual',anchor);
- let date=addDays(anchor.data_servico,1);
+ confirmed.filter(x=>x.data_servico===anchorDate).forEach(a=>{const key=personKey(a);addDuty(key,anchorDate,'actual',a);moveToBack(queue,key)});
+ let date=addDays(anchorDate,1);
  while(date<=rg.extFim){
    const actuals=rotationActuals(g,date).filter(x=>keys.includes(personKey(x)));
    if(actuals.length){
@@ -179,7 +176,7 @@ function render(){
     const date=iso(new Date(view.getFullYear(),view.getMonth(),d)),actual=currentActual(row,g,date),vac=vacationFor(row,date),adapt=adaptationFor(row,date),duty=dutyAt(row,g,date);
     let cls=['v7-day',dayClass(date),canManage?'manage':''],text='-',title=hol(date)?.nome||'';
     if(actual){cls.push('service');text=esc(actual.marcacao||'SV');title=`Serviço confirmado · ${personName(row)} · ${br(date)}`}
-    else if(vac){cls.push('vacation');text='FÉR';title=`Férias · ${br(vac.data_inicio)} a ${br(vac.data_fim)}`}
+    else if(vac){cls.push('vacation');text='FÉRIAS';title=`Férias · ${br(vac.data_inicio)} a ${br(vac.data_fim)}`}
     else if(adapt){cls.push('adaptation');text='ADP';title=`Dia de adaptação · serviço permitido a partir de ${br(addDays(date,1))}`}
     else if(duty?.type==='predicted'){cls.push('predicted');text='SV';title=`Próximo serviço previsto automaticamente · ${personName(row)} · ${br(date)}`}
     else{const f=folgaNumber(row,g,date);if(f!==null&&f>0){cls.push('folga-count');text=String(f);title=`${f}º dia de folga desde o último serviço`}}
@@ -199,48 +196,76 @@ function openCell(td){
  if(adp){alert('Este é o dia de adaptação após as férias. O militar só pode entrar de serviço a partir de '+br(addDays(date,1))+'.');return}
  openService(td);
 }
+function serviceContext(row,g,date){
+ const list=dutyDates.get(g+'|'+personKey(row))||[];
+ const prev=[...list].reverse().find(x=>x.date<date)||null;
+ const next=list.find(x=>x.date>date)||null;
+ return{prev,next,folgas:prev?Math.max(0,diffDays(prev.date,date)-1):null,diasAte:next?Math.max(0,diffDays(date,next.date)):null};
+}
+function fillServiceContext(row,g,date,item){
+ const ctx=serviceContext(row,g,date);
+ $('serviceFolgas').value=ctx.prev?`${ctx.folgas} dia(s) · último SV ${br(ctx.prev.date)}`:'Sem serviço anterior calculado';
+ $('serviceNext').value=ctx.next?`${ctx.next.type==='predicted'?'Previsto':'Confirmado'} · ${br(ctx.next.date)}`:'Sem próximo serviço calculado';
+ $('serviceNextDays').value=ctx.next?`${ctx.diasAte} dia(s)`:'Sem previsão';
+ $('serviceModalTitle').textContent=item?'Editar serviço':'Lançar serviço';
+}
 function openService(td){
  const row=rowFromCell(td),date=td.dataset.date,g=td.dataset.group,item=currentActual(row,g,date);
  $('serviceUserId').value=row.usuario_id||'';$('serviceExternalId').value=row.pessoa_externa_id||'';$('serviceGroup').value=g;$('serviceDate').value=date;
  $('serviceUser').value=personName(row);$('serviceDateLabel').value=br(date);$('serviceGroupLabel').value=GROUPS[g];$('serviceMark').value=item?.marcacao||'SV';
- $('serviceNote').value=item?.observacao||'';$('serviceChangedBy').textContent=changedBy(item);$('removeService').hidden=!item;$('swapService').hidden=!item;modal('serviceModal');
+ $('serviceNote').value=item?.observacao||'';fillServiceContext(row,g,date,item);$('serviceChangedBy').textContent=changedBy(item);$('removeService').hidden=!item;$('swapService').hidden=!item;modal('serviceModal');
 }
 async function saveService(e){
  e.preventDefault();
- const r=await supabaseClient.rpc('v7_2_1_definir_servico',{
+ const r=await supabaseClient.rpc('v7_2_2_definir_servico',{
   p_grupo:$('serviceGroup').value,p_usuario_alvo_id:Number($('serviceUserId').value)||null,p_pessoa_externa_id:Number($('serviceExternalId').value)||null,
   p_data_servico:$('serviceDate').value,p_marcacao:$('serviceMark').value.trim()||'SV',p_observacao:$('serviceNote').value.trim()||null,
   p_usuario_id:Number(user.id),p_perfil_id:profileId()
  });
  if(r.error)return alert(r.error.message);modal('serviceModal',false);await loadScale();
 }
-async function removeService(){
- if(!confirm('Tirar este serviço confirmado? A projeção será recalculada.'))return;
- const r=await supabaseClient.rpc('v7_2_1_remover_servico',{
-  p_grupo:$('serviceGroup').value,p_usuario_alvo_id:Number($('serviceUserId').value)||null,p_pessoa_externa_id:Number($('serviceExternalId').value)||null,
-  p_data_servico:$('serviceDate').value,p_usuario_id:Number(user.id),p_perfil_id:profileId()
- });
- if(r.error)return alert(r.error.message);modal('serviceModal',false);await loadScale();
-}
 function servicePerson(){return{usuario_id:Number($('serviceUserId').value)||null,pessoa_externa_id:Number($('serviceExternalId').value)||null}}
+function targetOptions(src,g,date){
+ return members.filter(x=>x.grupo===g&&personKey(x)!==personKey(src)).map(r=>{
+  const vac=vacationFor(r,date),adp=adaptationFor(r,date),blocked=vac||adp;
+  return `<option value="${personKey(r)}" ${blocked?'disabled':''}>${esc(personName(r))}${vac?' — FÉRIAS':adp?' — ADP':''}</option>`;
+ }).join('');
+}
 function openSwap(){
  const src=servicePerson(),g=$('serviceGroup').value,date=$('serviceDate').value;
- const rows=members.filter(x=>x.grupo===g&&personKey(x)!==personKey(src));
  $('swapSourceUserId').value=src.usuario_id||'';$('swapSourceExternalId').value=src.pessoa_externa_id||'';$('swapGroup').value=g;$('swapDate').value=date;
  $('swapSource').value=personName(src);$('swapDateLabel').value=br(date);$('swapGroupLabel').value=GROUPS[g];$('swapNote').value='';
- $('swapTarget').innerHTML='<option value="">Selecione...</option>'+rows.map(r=>{const blocked=vacationFor(r,date)||adaptationFor(r,date);return `<option value="${personKey(r)}" ${blocked?'disabled':''}>${esc(personName(r))}${vacationFor(r,date)?' — FÉRIAS':adaptationFor(r,date)?' — ADAPTAÇÃO':''}</option>`}).join('');
+ $('swapTarget').innerHTML='<option value="">Selecione...</option>'+targetOptions(src,g,date);
  modal('serviceModal',false);modal('swapModal');
 }
 async function saveSwap(e){
  e.preventDefault();const value=$('swapTarget').value;if(!value)return;
  const [kind,id]=value.split(':');
- const r=await supabaseClient.rpc('v7_2_1_trocar_servico',{
+ const r=await supabaseClient.rpc('v7_2_2_trocar_servico',{
   p_grupo:$('swapGroup').value,p_data_servico:$('swapDate').value,
   p_origem_usuario_id:Number($('swapSourceUserId').value)||null,p_origem_pessoa_externa_id:Number($('swapSourceExternalId').value)||null,
   p_destino_usuario_id:kind==='u'?Number(id):null,p_destino_pessoa_externa_id:kind==='e'?Number(id):null,
   p_observacao:$('swapNote').value.trim()||null,p_usuario_id:Number(user.id),p_perfil_id:profileId()
  });
  if(r.error)return alert(r.error.message);modal('swapModal',false);await loadScale();
+}
+function openReplacement(){
+ const src=servicePerson(),g=$('serviceGroup').value,date=$('serviceDate').value;
+ $('replaceSourceUserId').value=src.usuario_id||'';$('replaceSourceExternalId').value=src.pessoa_externa_id||'';$('replaceGroup').value=g;$('replaceDate').value=date;
+ $('replaceSource').value=personName(src);$('replaceDateLabel').value=br(date);$('replaceGroupLabel').value=GROUPS[g];$('replaceNote').value='';
+ $('replaceTarget').innerHTML='<option value="">Selecione...</option>'+targetOptions(src,g,date);
+ modal('serviceModal',false);modal('replaceModal');
+}
+async function saveReplacement(e){
+ e.preventDefault();const value=$('replaceTarget').value;if(!value)return;
+ const [kind,id]=value.split(':');
+ const r=await supabaseClient.rpc('v7_2_2_substituir_servico',{
+  p_grupo:$('replaceGroup').value,p_data_servico:$('replaceDate').value,
+  p_origem_usuario_id:Number($('replaceSourceUserId').value)||null,p_origem_pessoa_externa_id:Number($('replaceSourceExternalId').value)||null,
+  p_destino_usuario_id:kind==='u'?Number(id):null,p_destino_pessoa_externa_id:kind==='e'?Number(id):null,
+  p_observacao:$('replaceNote').value.trim()||null,p_usuario_id:Number(user.id),p_perfil_id:profileId()
+ });
+ if(r.error)return alert(r.error.message);modal('replaceModal',false);await loadScale();
 }
 function openVacation(row,vac=null){
  $('vacationId').value=vac?.id||'';$('vacationUserId').value=row.usuario_id||'';$('vacationExternalId').value=row.pessoa_externa_id||'';
@@ -287,8 +312,8 @@ function month(delta){view=new Date(view.getFullYear(),view.getMonth()+delta,1);
 function bind(){
  $('prevMonth').onclick=()=>month(-1);$('nextMonth').onclick=()=>month(1);$('todayMonth').onclick=()=>{view=new Date();loadScale().catch(e=>alert(e.message))};
  $('manageMembers').onclick=()=>{renderMembers();modal('membersModal')};$('manageHolidays').onclick=()=>{renderHolidays();modal('holidayModal')};
- $('serviceForm').onsubmit=saveService;$('removeService').onclick=removeService;$('swapService').onclick=openSwap;$('markVacation').onclick=()=>openVacation(servicePerson());
- $('swapForm').onsubmit=saveSwap;$('vacationForm').onsubmit=saveVacation;$('removeVacation').onclick=removeVacation;
+ $('serviceForm').onsubmit=saveService;$('removeService').onclick=openReplacement;$('swapService').onclick=openSwap;$('markVacation').onclick=()=>openVacation(servicePerson());
+ $('swapForm').onsubmit=saveSwap;$('replaceForm').onsubmit=saveReplacement;$('vacationForm').onsubmit=saveVacation;$('removeVacation').onclick=removeVacation;
  $('memberGroup').onchange=renderMembers;$('memberMode').onchange=toggleMemberMode;$('addMember').onclick=addMember;$('addHoliday').onclick=addHoliday;
  $('membersList').onclick=e=>{const b=e.target.closest('[data-rm-member]');if(b)removeMember(b.dataset.rmMember)};
  $('holidaysList').onclick=e=>{const b=e.target.closest('[data-rm-holiday]');if(b)removeHoliday(b.dataset.rmHoliday)};
@@ -297,7 +322,7 @@ function bind(){
 }
 function realtime(){
  try{
-  supabaseClient.channel('v721-escalas')
+  supabaseClient.channel('v722-escalas')
    .on('postgres_changes',{event:'*',schema:'public',table:'escala_integrantes'},()=>loadScale())
    .on('postgres_changes',{event:'*',schema:'public',table:'escala_servicos'},()=>loadScale())
    .on('postgres_changes',{event:'*',schema:'public',table:'escala_feriados'},()=>loadScale())

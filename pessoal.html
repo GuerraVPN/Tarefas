@@ -6,7 +6,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="perfis.js?v=6.0"></script>
 <link rel="stylesheet" href="v4_tema.css?v=6.2">
-<link rel="stylesheet" href="pessoal_v7.css?v=7.2.1">
+<link rel="stylesheet" href="pessoal_v7.css?v=7.2.2">
 </head>
 <body class="v7-body">
 <script>
@@ -48,7 +48,7 @@ if(!usuarioLogado?.id)location.replace('index.html');
 </main>
 
 <div class="v7-modal-bg" id="serviceModal"><div class="v7-modal">
- <div class="v7-modal-head"><h3>Lançar serviço</h3><button class="v7-close" data-close="serviceModal">×</button></div>
+ <div class="v7-modal-head"><h3 id="serviceModalTitle">Lançar serviço</h3><button class="v7-close" data-close="serviceModal">×</button></div>
  <form id="serviceForm">
   <input type="hidden" id="serviceUserId"><input type="hidden" id="serviceExternalId"><input type="hidden" id="serviceGroup"><input type="hidden" id="serviceDate">
   <div class="v7-form">
@@ -57,6 +57,9 @@ if(!usuarioLogado?.id)location.replace('index.html');
    <div class="v7-field"><label>Escala</label><input id="serviceGroupLabel" disabled></div>
    <div class="v7-field full"><label>Marcação do serviço</label><input id="serviceMark" maxlength="8" value="SV" placeholder="Ex.: SV"></div>
    <div class="v7-field full"><label>Observação</label><textarea id="serviceNote" rows="3" maxlength="500"></textarea></div>
+   <div class="v7-field"><label>Folgas desde o último serviço</label><input id="serviceFolgas" disabled value="-"></div>
+   <div class="v7-field"><label>Próximo serviço confirmado ou previsto</label><input id="serviceNext" disabled value="-"></div>
+   <div class="v7-field full"><label>Estimativa até o próximo serviço</label><input id="serviceNextDays" disabled value="-"></div>
    <div class="v7-field full"><div class="v72-last-change" id="serviceChangedBy">Sem alteração registrada.</div></div>
   </div>
   <div class="v7-modal-actions"><button type="button" class="v7-btn" id="markVacation">Marcar férias</button><button type="button" class="v7-btn" id="swapService" hidden>Trocar serviço</button><button type="button" class="v7-btn danger" id="removeService" hidden>Tirar serviço</button><button type="button" class="v7-btn" data-close="serviceModal">Cancelar</button><button type="submit" class="v7-btn primary">Confirmar serviço</button></div>
@@ -119,6 +122,22 @@ if(!usuarioLogado?.id)location.replace('index.html');
  </form>
 </div></div>
 
+<div class="v7-modal-bg" id="replaceModal"><div class="v7-modal">
+ <div class="v7-modal-head"><h3>Tirar serviço / substituir militar</h3><button class="v7-close" data-close="replaceModal">×</button></div>
+ <form id="replaceForm">
+  <input type="hidden" id="replaceSourceUserId"><input type="hidden" id="replaceSourceExternalId"><input type="hidden" id="replaceGroup"><input type="hidden" id="replaceDate">
+  <div class="v7-form">
+   <div class="v7-field full"><label>Militar que sairá do serviço</label><input id="replaceSource" disabled></div>
+   <div class="v7-field"><label>Data</label><input id="replaceDateLabel" disabled></div>
+   <div class="v7-field"><label>Escala</label><input id="replaceGroupLabel" disabled></div>
+   <div class="v7-field full"><label>Militar que assumirá o serviço *</label><select id="replaceTarget" required></select></div>
+   <div class="v7-field full"><label>Motivo / observação</label><textarea id="replaceNote" rows="3" maxlength="500" placeholder="Opcional"></textarea></div>
+  </div>
+  <div class="v7-note"><b>Este comando não apaga o serviço.</b> O lançamento permanece no mesmo dia e escala, trocando apenas o militar responsável. O histórico registra quem saiu, quem entrou e quem realizou a alteração.</div>
+  <div class="v7-modal-actions"><button type="button" class="v7-btn" data-close="replaceModal">Cancelar</button><button type="submit" class="v7-btn primary">Confirmar substituição</button></div>
+ </form>
+</div></div>
+
 <script>
 const SUPABASE_URL='https://bpvijatnsluwsgnzklrd.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwdmlqYXRuc2x1d3NnbnprbHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MzkxNDMsImV4cCI6MjEwMjQxNTE0M30.uvyfm9mgl6MON0v75CwfGzNz6FBqw58uzR4ZcRAOLNQ';
@@ -128,6 +147,6 @@ const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 <script src="notificacoes.js?v=6.0"></script>
 <script src="v4_tema.js?v=6.0"></script>
 <script src="v4_ui.js?v=6.0"></script>
-<script src="pessoal_v7.js?v=7.2.1"></script>
-<script src="v6_2_mobile.js?v=7.2.1"></script>
+<script src="pessoal_v7.js?v=7.2.2"></script>
+<script src="v6_2_mobile.js?v=7.2.2"></script>
 </body></html>

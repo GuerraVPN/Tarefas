@@ -88,12 +88,12 @@ html,body{max-width:100%;overflow-x:hidden}
 @media(max-width:900px){.v72-summary{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:520px){.v72-summary{grid-template-columns:1fr 1fr}.v72-summary strong{font-size:17px}}
 
-/* V7.2.1 — RODÍZIO AUTOMÁTICO, FÉRIAS E ADAPTAÇÃO */
+/* V7.2.2 — RODÍZIO, FOLGAS, FÉRIAS/ADP E SUBSTITUIÇÃO DE SERVIÇO */
 .v7-legend .prev{background:repeating-linear-gradient(135deg,#eab308 0 5px,#fff4a3 5px 9px)}
 .v7-legend .ferias{background:#2563eb}.v7-legend .adapt{background:#64748b}
 .v7-day.predicted{background:repeating-linear-gradient(135deg,#eab308 0 6px,#fff1a8 6px 10px)!important;color:#111!important;font-weight:900}
 .v7-day.predicted small,.v7-day.predicted b{color:#111!important}
-.v7-day.vacation{background:#1d4ed8!important;color:#fff!important;font-weight:900}
+.v7-day.vacation{background:#1d4ed8!important;color:#fff!important;font-weight:900;font-size:6.2px;letter-spacing:-.15px}
 .v7-day.adaptation{background:#64748b!important;color:#fff!important;font-weight:900}
 .v7-day.folga-count{font-weight:800;color:#cbd5e1}.v7-day.weekend.folga-count{color:#fff}
 .v721-person-meta{display:block;font-size:6.5px;line-height:1.1;color:#94a3b8;margin-top:2px;overflow:hidden;text-overflow:ellipsis}
