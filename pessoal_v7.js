@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const ESCALA_UI_VERSION='7.3.2';
+const ESCALA_UI_VERSION='7.4';
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
@@ -9,7 +9,8 @@ const ORDER=['sargento','motorista','patrulheiro','permanencia'];
 const WEEK=['DOM','SEG','TER','QUA','QUI','SEX','SÁB'];
 
 let user=null,canManage=false,view=new Date(),users=new Map(),externals=new Map();
-let members=[],services=[],rotationServices=[],holidays=[],online=new Set(),changes=[],vacations=[],balances=[];
+let members=[],services=[],rotationServices=[],holidays=[],online=new Set(),changes=[],vacations=[],balances=[],qualifications=[];
+let selectedQualification=null;
 let projections=new Map(),dutyDates=new Map(),nextDuty=new Map();
 
 function profileId(){return user?.perfil_id?Number(user.perfil_id):null}
@@ -38,6 +39,8 @@ function actorName(id){const u=users.get(String(id));return u?[u.patente,u.nome_
 function extName(id){const p=externals.get(String(id));return p?[p.patente,p.nome].filter(Boolean).join(' '):`Nome externo ${id}`}
 function personName(obj){return obj?.usuario_id?actorName(obj.usuario_id):extName(obj?.pessoa_externa_id)}
 function personKey(obj){return obj?.usuario_id?`u:${obj.usuario_id}`:`e:${obj?.pessoa_externa_id}`}
+function qualificationFor(obj){return qualifications.find(q=>(obj?.usuario_id&&String(q.usuario_id)===String(obj.usuario_id))||(obj?.pessoa_externa_id&&String(q.pessoa_externa_id)===String(obj.pessoa_externa_id)))||null}
+function qualificationSummary(obj){const q=qualificationFor(obj),parts=[];if(q?.cnh_categoria)parts.push(`CNH ${q.cnh_categoria}`);if(q?.cursos?.length)parts.push(q.cursos.join(', '));return parts.join(' · ')||'Sem habilitação/cursos'}
 function rowByKey(key,g=null){return members.find(x=>personKey(x)===key&&(!g||x.grupo===g))}
 function samePerson(a,b){return personKey(a)===personKey(b)}
 function currentActual(row,g,date){return services.find(x=>x.grupo===g&&x.data_servico===date&&samePerson(x,row))}
@@ -70,13 +73,14 @@ async function initUser(){
  return true;
 }
 async function loadPeople(){
- const [u,e]=await Promise.all([
+ const [u,e,q]=await Promise.all([
   supabaseClient.from('usuarios').select('id,patente,nome_guerra,secao,posicao,ativo').order('nome_guerra'),
-  supabaseClient.from('pessoal_nomes_externos').select('id,nome,patente,ativo').eq('ativo',true).order('nome')
+  supabaseClient.from('pessoal_nomes_externos').select('id,nome,patente,ativo').eq('ativo',true).order('nome'),
+  supabaseClient.from('pessoal_qualificacoes').select('*').order('id')
  ]);
- if(u.error)throw u.error;if(e.error)throw e.error;
+ if(u.error)throw u.error;if(e.error)throw e.error;if(q.error)throw q.error;
  users=new Map((u.data||[]).filter(x=>x.ativo!==false).map(x=>[String(x.id),x]));
- externals=new Map((e.data||[]).map(x=>[String(x.id),x]));
+ externals=new Map((e.data||[]).map(x=>[String(x.id),x]));qualifications=q.data||[];
  $('memberUser').innerHTML='<option value="">Selecione...</option>'+[...users.values()].map(x=>`<option value="${x.id}">${esc(actorName(x.id))} — ${esc(x.secao||'-')} / ${esc(x.posicao||'-')}</option>`).join('');
 }
 async function loadPresence(){
@@ -304,6 +308,24 @@ async function removeVacation(){
  const r=await supabaseClient.rpc('v7_2_1_excluir_ferias',{p_ferias_id:id,p_usuario_id:Number(user.id),p_perfil_id:profileId()});
  if(r.error)return alert(r.error.message);modal('vacationModal',false);await Promise.all([loadBalances(),loadScale()]);
 }
+function qualificationPeopleRows(){
+ const term=norm($('qualificationSearch')?.value||'');
+ const rows=[...users.values()].map(u=>({usuario_id:u.id,pessoa_externa_id:null})).concat([...externals.values()].map(e=>({usuario_id:null,pessoa_externa_id:e.id})));
+ return rows.filter(r=>!term||norm(personName(r)+' '+qualificationSummary(r)).includes(term)).sort((a,b)=>personName(a).localeCompare(personName(b),'pt-BR'));
+}
+function renderQualificationPeople(){
+ const rows=qualificationPeopleRows();$('qualificationCount').textContent=`${rows.length} pessoa(s)`;
+ $('qualificationPeople').innerHTML=rows.length?rows.map(r=>{const q=qualificationFor(r),key=personKey(r),active=selectedQualification&&personKey(selectedQualification)===key;return `<div class="v74-qual-person ${active?'active':''}" data-qual-person="${key}"><b>${esc(personName(r))}${q?.cnh_categoria?`<span class="v74-cnh-chip">CNH ${esc(q.cnh_categoria)}</span>`:''}</b><small>${esc(qualificationSummary(r))}</small></div>`}).join(''):'<div class="v7-empty">Nenhuma pessoa encontrada.</div>';
+}
+function openQualification(row){
+ selectedQualification=row;const q=qualificationFor(row);$('qualificationEmpty').hidden=true;$('qualificationForm').hidden=false;$('qualificationUserId').value=row.usuario_id||'';$('qualificationExternalId').value=row.pessoa_externa_id||'';$('qualificationPerson').value=personName(row);$('qualificationCnh').value=q?.cnh_categoria||'';$('qualificationCnhValidity').value=q?.cnh_validade||'';$('qualificationCourses').value=(q?.cursos||[]).join(', ');$('qualificationNote').value=q?.observacao||'';$('qualificationSave').hidden=!canManage;$('qualificationCnh').disabled=!canManage;$('qualificationCnhValidity').disabled=!canManage;$('qualificationCourses').disabled=!canManage;$('qualificationNote').disabled=!canManage;renderQualificationPeople();
+}
+function openQualifications(){selectedQualification=null;$('qualificationForm').hidden=true;$('qualificationEmpty').hidden=false;$('qualificationSearch').value='';renderQualificationPeople();modal('qualificationsModal')}
+async function saveQualification(e){
+ e.preventDefault();if(!canManage)return;const cursos=$('qualificationCourses').value.split(',').map(x=>x.trim()).filter(Boolean);
+ const r=await supabaseClient.rpc('v7_4_salvar_qualificacao',{p_usuario_alvo_id:Number($('qualificationUserId').value)||null,p_pessoa_externa_id:Number($('qualificationExternalId').value)||null,p_cnh_categoria:$('qualificationCnh').value.trim()||null,p_cnh_validade:$('qualificationCnhValidity').value||null,p_cursos:cursos,p_observacao:$('qualificationNote').value.trim()||null,p_usuario_id:Number(user.id),p_perfil_id:profileId()});
+ if(r.error)return alert(r.error.message);await loadPeople();if(selectedQualification){selectedQualification=selectedQualification.usuario_id?{usuario_id:selectedQualification.usuario_id,pessoa_externa_id:null}:{usuario_id:null,pessoa_externa_id:selectedQualification.pessoa_externa_id};openQualification(selectedQualification)}
+}
 function toggleMemberMode(){const ext=$('memberMode').value==='externo';$('memberSystemField').hidden=ext;$('memberExternalNameField').hidden=!ext;$('memberExternalRankField').hidden=!ext}
 function renderMembers(){
  const g=$('memberGroup').value||'sargento',rows=members.filter(x=>x.grupo===g).sort((a,b)=>(a.ordem||100)-(b.ordem||100));
@@ -327,10 +349,10 @@ function renderChanges(){$('changesCount').textContent=`${changes.length} regist
 function month(delta){view=new Date(view.getFullYear(),view.getMonth()+delta,1);loadScale().catch(e=>alert(e.message))}
 function bind(){
  $('prevMonth').onclick=()=>month(-1);$('nextMonth').onclick=()=>month(1);$('todayMonth').onclick=()=>{view=new Date();loadScale().catch(e=>alert(e.message))};
- $('manageMembers').onclick=()=>{renderMembers();modal('membersModal')};$('manageHolidays').onclick=()=>{renderHolidays();modal('holidayModal')};
+ $('manageMembers').onclick=()=>{renderMembers();modal('membersModal')};$('manageHolidays').onclick=()=>{renderHolidays();modal('holidayModal')};$('manageQualifications').onclick=openQualifications;
  $('serviceForm').onsubmit=saveService;$('removeService').onclick=openReplacement;$('swapService').onclick=openSwap;$('markVacation').onclick=()=>openVacation(servicePerson());
  $('swapForm').onsubmit=saveSwap;$('replaceForm').onsubmit=saveReplacement;$('vacationForm').onsubmit=saveVacation;$('removeVacation').onclick=removeVacation;
- $('memberGroup').onchange=renderMembers;$('memberMode').onchange=toggleMemberMode;$('addMember').onclick=addMember;$('addHoliday').onclick=addHoliday;
+ $('memberGroup').onchange=renderMembers;$('memberMode').onchange=toggleMemberMode;$('addMember').onclick=addMember;$('addHoliday').onclick=addHoliday;$('qualificationSearch').oninput=renderQualificationPeople;$('qualificationForm').onsubmit=saveQualification;$('qualificationPeople').onclick=e=>{const el=e.target.closest('[data-qual-person]');if(!el)return;const [kind,id]=el.dataset.qualPerson.split(':');openQualification(kind==='u'?{usuario_id:Number(id),pessoa_externa_id:null}:{usuario_id:null,pessoa_externa_id:Number(id)})};
  $('membersList').onclick=e=>{const b=e.target.closest('[data-rm-member]');if(b)removeMember(b.dataset.rmMember)};
  $('holidaysList').onclick=e=>{const b=e.target.closest('[data-rm-holiday]');if(b)removeHoliday(b.dataset.rmHoliday)};
  document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>modal(b.dataset.close,false));
@@ -343,6 +365,7 @@ function realtime(){
    .on('postgres_changes',{event:'*',schema:'public',table:'escala_servicos'},()=>loadScale())
    .on('postgres_changes',{event:'*',schema:'public',table:'escala_feriados'},()=>loadScale())
    .on('postgres_changes',{event:'*',schema:'public',table:'pessoal_ferias'},async()=>{await loadBalances();await loadScale()})
+   .on('postgres_changes',{event:'*',schema:'public',table:'pessoal_qualificacoes'},async()=>{await loadPeople();renderQualificationPeople()})
    .on('postgres_changes',{event:'*',schema:'public',table:'escala_alteracoes'},()=>loadScale()).subscribe();
  }catch(_){}
 }

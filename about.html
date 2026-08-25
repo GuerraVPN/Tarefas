@@ -39,7 +39,7 @@ select{padding:10px 12px;border:1px solid var(--v4-border-strong);border-radius:
    <h2>TAREFAS — 26º Pel PE Mec</h2>
    <p>Painel de tarefas, usuários, comunicações e fluxos administrativos.</p>
    <div class="meta">
-    <div><small>Versão atual</small><b>7.3.3</b></div>
+    <div><small>Versão atual</small><b>7.4</b></div>
     <div><small>Criador</small><b>Sd Guerra</b></div>
     <div><small>Organização</small><b>26º Pel PE Mec</b></div>
    </div>
@@ -62,12 +62,13 @@ const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 <script src="notificacoes.js?v=6.0"></script>
 <script src="v4_tema.js?v=6.0"></script>
 <script src="v4_ui.js?v=6.0"></script>
-<script src="v6_2_mobile.js?v=7.3.3"></script>
+<script src="v6_2_mobile.js?v=7.4"></script>
 
 <script>
 (function(){
 const versions=[
- {v:'7.3.3',title:'Ordem correta de Serviço e Sobreaviso',current:true,items:['Ao gerar vários dias, o PDF apresenta primeiro todos os blocos de Serviço, em ordem cronológica.','Somente depois de listar todos os serviços, o PDF apresenta os blocos de Sobreaviso marcados pelo usuário.','A seleção de Sobreaviso continua independente para cada dia.','Mantém vários dias no mesmo PDF, missões automáticas e Permanência/Canil em branco.']},
+ {v:'7.4',title:'Escala de Missão e qualificações do pessoal',current:true,items:['Escala de Missão passa a ter rodízios independentes Preta e Vermelha, no mesmo padrão da Escala de Serviço.','Nova divisão da Escala de Missão em Sargentos, Cabos e Soldados, com ordem própria e quantidade de folgas.','Cada missão consome uma posição do rodízio pela data de início, sem multiplicar a contagem em missões de vários dias.','Cada missão informa quantos Sargentos, Cabos e Soldados precisa e o sistema projeta os próximos militares elegíveis.','Cadastro de Pessoal ganha categoria atual da CNH, validade e lista livre de cursos/habilitações.','CNH e cursos aparecem na seleção da Escala de Missão para auxiliar na composição do efetivo.','Férias e ADP impedem a seleção para missão; feriados definem automaticamente a Escala Vermelha.']},
+ {v:'7.3.3',title:'Ordem correta de Serviço e Sobreaviso',items:['Ao gerar vários dias, o PDF apresenta primeiro todos os blocos de Serviço, em ordem cronológica.','Somente depois de listar todos os serviços, o PDF apresenta os blocos de Sobreaviso marcados pelo usuário.','A seleção de Sobreaviso continua independente para cada dia.','Mantém vários dias no mesmo PDF, missões automáticas e Permanência/Canil em branco.']},
  {v:'7.3.2',title:'Correção de carregamento da Escala de Serviço',items:['Corrige o versionamento dos arquivos da Escala de Serviço que ainda eram carregados com cache-buster antigo.','pessoal_v7.js e pessoal_v7.css passam a ser carregados explicitamente como V7.3.2.','A camada do aditamento passa a usar o novo arquivo aditamento_v732.js, evitando reaproveitamento do JavaScript antigo pelo navegador.','Mantém integralmente as funções da V7.3.1: vários dias no mesmo PDF e seleção independente de Sobreaviso por dia.']},
  {v:'7.3.1',title:'Aditamento com vários dias e Sobreaviso',items:['O gerador de aditamento passa a aceitar vários dias no mesmo PDF.','Cada dia possui uma caixa independente “Incluir sobreaviso deste dia”, permitindo misturar datas com e sem Sobreaviso no mesmo documento.','O Sobreaviso é calculado pelo próximo militar elegível do mesmo grupo e do mesmo rodízio da data: Escala Preta ou Escala Vermelha.','Férias e ADP são respeitados no cálculo do Sobreaviso e Permanência/Canil continua vazio até existir a escala própria do Canil.','Serviços continuam usando apenas lançamentos confirmados e as missões selecionadas continuam sendo consolidadas automaticamente na 3ª Parte.']},
  {v:'7.3',title:'Aditamento automático em PDF',items:['Novo botão Gerar aditamento PDF na Escala de serviço, com escolha entre hoje e amanhã.','O PDF usa somente serviços confirmados do dia; previsões automáticas da escala não entram no documento.','As linhas Comandante, Motorista, Patrulheiro e Permanência são preenchidas apenas quando houver militar confirmado naquele serviço; sem serviço confirmado, ficam vazias.','Permanência/Canil permanece intencionalmente sem nome até a criação da respectiva escala de serviço.','A 3ª Parte puxa automaticamente as missões ativas no dia e os participantes cadastrados, além de período, local e observação quando disponíveis.','Aditamento segue o modelo do 26º Pel PE Mec, em PDF A4, com brasão, serviços diários, instrução, assuntos gerais/administrativos, justiça e disciplina e assinatura do comandante.']},
@@ -102,7 +103,7 @@ const versions=[
 ];
 const s=document.getElementById('versionSelect'),card=document.getElementById('versionCard');
 s.innerHTML=versions.map(x=>`<option value="${x.v}">${x.v} — ${x.title}</option>`).join('');
-s.value='7.3.3';
+s.value='7.4';
 function render(){
  const x=versions.find(v=>v.v===s.value)||versions[0];
  card.innerHTML=`<h3>Versão ${x.v} ${x.current?'<span class="tag">ATUAL</span>':''}</h3><p><b>${x.title}</b></p><ul>${x.items.map(i=>`<li>${i}</li>`).join('')}</ul>`;

@@ -7,7 +7,7 @@
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
 <script src="perfis.js?v=6.0"></script>
 <link rel="stylesheet" href="v4_tema.css?v=6.2">
-<link rel="stylesheet" href="pessoal_v7.css?v=7.3.3">
+<link rel="stylesheet" href="pessoal_v7.css?v=7.4">
 <style>
 .v731-adit-days{display:grid;gap:7px;margin-top:6px}
 .v731-adit-day{display:grid;grid-template-columns:minmax(180px,1fr) minmax(220px,1.15fr) auto;gap:8px;align-items:end;padding:9px;border:1px solid var(--v4-border);border-radius:9px;background:var(--v4-surface-2)}
@@ -38,6 +38,7 @@ if(!usuarioLogado?.id)location.replace('index.html');
    <div class="v7-month"><button class="v7-btn" id="prevMonth">‹</button><div class="v7-month-label" id="monthLabel">-</div><button class="v7-btn" id="nextMonth">›</button><button class="v7-btn" id="todayMonth">Hoje</button></div>
    <button class="v7-btn" id="manageMembers" hidden>Militares das escalas</button>
    <button class="v7-btn" id="manageHolidays" hidden>Feriados</button>
+   <button class="v7-btn" id="manageQualifications">Habilitação / Cursos</button>
    <button class="v7-btn primary" id="generateAddendum">Gerar aditamento PDF</button>
   </div>
  </div>
@@ -148,8 +149,26 @@ if(!usuarioLogado?.id)location.replace('index.html');
  </form>
 </div></div>
 
+<div class="v7-modal-bg" id="qualificationsModal"><div class="v7-modal" style="width:min(900px,100%)">
+ <div class="v7-modal-head"><h3>Habilitação e Cursos do Pessoal</h3><button class="v7-close" data-close="qualificationsModal">×</button></div>
+ <div class="v74-qual-grid">
+  <section class="v7-panel"><div class="v7-panel-head"><h3>Pessoal</h3><span id="qualificationCount">0 pessoa(s)</span></div><div style="padding:8px"><input id="qualificationSearch" class="v7-btn" type="search" placeholder="Buscar militar..." style="width:100%"></div><div id="qualificationPeople" class="v74-qual-people"><div class="v7-empty">Carregando...</div></div></section>
+  <section class="v7-panel"><div id="qualificationEmpty" class="v7-empty">Selecione um militar para visualizar a habilitação e os cursos.</div><form id="qualificationForm" class="v74-qual-form" hidden><input id="qualificationUserId" type="hidden"><input id="qualificationExternalId" type="hidden">
+   <div class="v7-form">
+    <div class="v7-field full"><label>Militar</label><input id="qualificationPerson" disabled></div>
+    <div class="v7-field"><label>Categoria atual da CNH</label><input id="qualificationCnh" list="cnhCategories" maxlength="10" placeholder="Ex.: B, AB, D"><datalist id="cnhCategories"><option value="ACC"><option value="A"><option value="B"><option value="AB"><option value="C"><option value="D"><option value="E"><option value="AC"><option value="AD"><option value="AE"></datalist></div>
+    <div class="v7-field"><label>Validade da CNH</label><input id="qualificationCnhValidity" type="date"></div>
+    <div class="v7-field full"><label>Cursos / habilitações complementares</label><textarea id="qualificationCourses" rows="4" placeholder="Separe por vírgula. Ex.: Condutor de Viatura, MOPP, Motociclista"></textarea></div>
+    <div class="v7-field full"><label>Observação</label><textarea id="qualificationNote" rows="3" maxlength="1000"></textarea></div>
+   </div>
+   <div class="v7-note">A CNH e os cursos serão exibidos na Escala de Missão para ajudar na escolha do efetivo. Os cursos são livres e podem ser atualizados conforme a necessidade.</div>
+   <div class="v7-modal-actions"><button type="button" class="v7-btn" data-close="qualificationsModal">Fechar</button><button type="submit" class="v7-btn primary" id="qualificationSave">Salvar habilitação</button></div>
+  </form></section>
+ </div>
+</div></div>
+
 <div class="v7-modal-bg" id="aditamentoModal"><div class="v7-modal" style="width:min(680px,100%)">
- <div class="v7-modal-head"><h3>Gerar aditamento em PDF <small style="font-size:9px;color:var(--v4-muted)">V7.3.3</small></h3><button class="v7-close" id="aditamentoClose" type="button">×</button></div>
+ <div class="v7-modal-head"><h3>Gerar aditamento em PDF <small style="font-size:9px;color:var(--v4-muted)">V7.4</small></h3><button class="v7-close" id="aditamentoClose" type="button">×</button></div>
  <div class="v7-form">
   <div class="v7-field full">
    <label>Dias que entrarão no aditamento</label>
@@ -171,7 +190,7 @@ const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 <script src="notificacoes.js?v=6.0"></script>
 <script src="v4_tema.js?v=6.0"></script>
 <script src="v4_ui.js?v=6.0"></script>
-<script src="pessoal_v7.js?v=7.3.3"></script>
-<script src="aditamento_v733.js?v=7.3.3"></script>
-<script src="v6_2_mobile.js?v=7.3.3"></script>
+<script src="pessoal_v7.js?v=7.4"></script>
+<script src="aditamento_v74.js?v=7.4"></script>
+<script src="v6_2_mobile.js?v=7.4"></script>
 </body></html>
