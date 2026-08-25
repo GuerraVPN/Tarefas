@@ -7,7 +7,7 @@
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
 <script src="perfis.js?v=6.0"></script>
 <link rel="stylesheet" href="v4_tema.css?v=6.2">
-<link rel="stylesheet" href="pessoal_v7.css?v=7.4">
+<link rel="stylesheet" href="pessoal_v7.css?v=7.4.2">
 <style>
 .v731-adit-days{display:grid;gap:7px;margin-top:6px}
 .v731-adit-day{display:grid;grid-template-columns:minmax(180px,1fr) minmax(220px,1.15fr) auto;gap:8px;align-items:end;padding:9px;border:1px solid var(--v4-border);border-radius:9px;background:var(--v4-surface-2)}
@@ -30,7 +30,7 @@ if(!usuarioLogado?.id)location.replace('index.html');
 </aside>
 
 <main class="v7-main">
-<header class="v7-top"><div><b>Pessoal · Escala de serviço</b><div style="font-size:9px;color:var(--v4-muted);margin-top:3px">Sargentos, Motoristas, Patrulheiros e Permanência</div></div><div></div></header>
+<header class="v7-top topbar"><div><b>Pessoal · Escala de serviço</b><div style="font-size:9px;color:var(--v4-muted);margin-top:3px">Sargentos, Motoristas, Patrulheiros, Permanência e Permanência/Canil</div></div><div></div></header>
 <section class="v7-page">
  <div class="v7-head">
   <div><h2>Escala de serviço</h2><p>Visualização mensal integrada das quatro escalas.</p></div>
@@ -80,7 +80,7 @@ if(!usuarioLogado?.id)location.replace('index.html');
 <div class="v7-modal-bg" id="membersModal"><div class="v7-modal">
  <div class="v7-modal-head"><h3>Militares das escalas</h3><button class="v7-close" data-close="membersModal">×</button></div>
  <div class="v7-form">
-  <div class="v7-field"><label>Escala</label><select id="memberGroup"><option value="sargento">Sargentos</option><option value="motorista">Motoristas</option><option value="patrulheiro">Patrulheiros</option><option value="permanencia">Permanência</option></select></div>
+  <div class="v7-field"><label>Escala</label><select id="memberGroup"><option value="sargento">Sargentos</option><option value="motorista">Motoristas</option><option value="patrulheiro">Patrulheiros</option><option value="permanencia">Permanência</option><option value="canil">Permanência/Canil</option></select></div>
   <div class="v7-field"><label>Origem do nome</label><select id="memberMode"><option value="sistema">Usuário do sistema</option><option value="externo">Nome sem usuário no sistema</option></select></div>
   <div class="v7-field full" id="memberSystemField"><label>Militar</label><select id="memberUser"></select></div>
   <div class="v7-field" id="memberExternalNameField" hidden><label>Nome *</label><input id="memberExternalName" maxlength="120" placeholder="Nome / nome de guerra"></div>
@@ -168,14 +168,14 @@ if(!usuarioLogado?.id)location.replace('index.html');
 </div></div>
 
 <div class="v7-modal-bg" id="aditamentoModal"><div class="v7-modal" style="width:min(680px,100%)">
- <div class="v7-modal-head"><h3>Gerar aditamento em PDF <small style="font-size:9px;color:var(--v4-muted)">V7.4</small></h3><button class="v7-close" id="aditamentoClose" type="button">×</button></div>
+ <div class="v7-modal-head"><h3>Gerar aditamento em PDF <small style="font-size:9px;color:var(--v4-muted)">V7.4.2</small></h3><button class="v7-close" id="aditamentoClose" type="button">×</button></div>
  <div class="v7-form">
   <div class="v7-field full">
    <label>Dias que entrarão no aditamento</label>
    <div id="aditamentoDias" class="v731-adit-days"></div>
    <button type="button" class="v7-btn" id="aditamentoAddDia" style="margin-top:7px">＋ Adicionar outro dia</button>
   </div>
-  <div class="v7-field full"><div class="v7-note">Você pode incluir <b>vários dias no mesmo PDF</b>. Em cada data, marque ou desmarque a caixa <b>“Incluir sobreaviso deste dia”</b>. O serviço usa somente militares confirmados; o sobreaviso é calculado pelo próximo militar elegível no mesmo rodízio (Preta ou Vermelha). Permanência/Canil continua vazio até existir a escala do Canil.</div></div>
+  <div class="v7-field full"><div class="v7-note">Você pode incluir <b>vários dias no mesmo PDF</b>. Em cada data, marque ou desmarque a caixa <b>“Incluir sobreaviso deste dia”</b>. O serviço usa somente militares confirmados; o sobreaviso é calculado pelo próximo militar elegível no mesmo rodízio (Preta ou Vermelha). Permanência/Canil agora possui escala própria e independente, com rodízios Preta/Vermelha e Sobreaviso próprios.</div></div>
   <div class="v7-field full"><div class="v72-last-change" id="aditamentoStatus">Pronto para gerar.</div></div>
  </div>
  <div class="v7-modal-actions"><button type="button" class="v7-btn" id="aditamentoCancelar">Cancelar</button><button type="button" class="v7-btn primary" id="aditamentoGerar">Gerar PDF</button></div>
@@ -188,9 +188,10 @@ const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 </script>
 <script src="sistema_comum.js?v=6.0"></script>
 <script src="notificacoes.js?v=6.0"></script>
+<script src="bloco_notas.js?v=6.0"></script>
 <script src="v4_tema.js?v=6.0"></script>
 <script src="v4_ui.js?v=6.0"></script>
-<script src="pessoal_v7.js?v=7.4"></script>
-<script src="aditamento_v74.js?v=7.4"></script>
-<script src="v6_2_mobile.js?v=7.4"></script>
+<script src="pessoal_v7.js?v=7.4.2"></script>
+<script src="aditamento_v74.js?v=7.4.2"></script>
+<script src="v6_2_mobile.js?v=7.4.2"></script>
 </body></html>

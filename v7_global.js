@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const VERSION='7.4.1';
+const VERSION='7.4.2';
 const $=id=>document.getElementById(id);
 const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
 let busy=false,timer=null,onlineTimer=null,adminActive=false;
@@ -49,8 +49,6 @@ function pessoalNav(){
   const p=page();
   const active=p==='pessoal.html'||p==='missao.html'||p==='ferias_dispensas.html'||p==='usuarios.html';
   parent.classList.toggle('active',active);
-  // No celular, ao abrir a sidebar dentro de uma página de Pessoal,
-  // mantém o grupo expandido para acesso imediato às opções internas.
   if(window.matchMedia('(max-width: 900px)').matches && active){
     parent.classList.add('v62-subopen');
   }
@@ -78,9 +76,6 @@ function pessoalNav(){
   afastamentos?.classList.toggle('active',p==='ferias_dispensas.html');
   usuarios?.classList.toggle('active',p==='usuarios.html');
 
-  // Desktop: Pessoal continua sendo um link normal.
-  // Android/mobile: tocar em QUALQUER ponto da linha Pessoal apenas
-  // abre/fecha o submenu. A navegação acontece somente nas opções internas.
   if(parent.dataset.v724Wired!=='1'){
     const main=parent.querySelector('[data-v7-main]');
     if(main){
@@ -93,8 +88,6 @@ function pessoalNav(){
       main.addEventListener('click',function(e){
         if(!window.matchMedia('(max-width: 900px)').matches)return;
         e.preventDefault();
-        // Impede que a rotina genérica do menu mobile interprete este toque
-        // como navegação e feche a sidebar imediatamente.
         e.stopPropagation();
         parent.classList.toggle('v62-subopen');
         syncExpanded();

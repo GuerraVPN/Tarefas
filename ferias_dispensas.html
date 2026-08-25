@@ -6,7 +6,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="perfis.js?v=6.0"></script>
 <link rel="stylesheet" href="v4_tema.css?v=6.2">
-<link rel="stylesheet" href="pessoal_v7.css?v=7.4">
+<link rel="stylesheet" href="pessoal_v7.css?v=7.4.2">
 <style>
 .v721-fd-grid{display:grid;grid-template-columns:minmax(300px,.75fr) minmax(500px,1.25fr);gap:9px}
 .v721-person-list{max-height:calc(100vh - 300px);overflow:auto;padding:6px}
@@ -31,7 +31,7 @@ if(!usuarioLogado?.id)location.replace('index.html');
 </script>
 <aside class="sidebar"><div class="brand"><div class="star">★</div><div><h1>TAREFAS</h1><p>26º Pel PE Mec</p></div></div><ul></ul><div class="credit">Criado por <b>Sd Guerra</b><br>26º Pel PE Mec 💪🏼</div></aside>
 <main class="v7-main">
-<header class="v7-top"><div><b>Pessoal · Férias / Dispensas</b><div style="font-size:9px;color:var(--v4-muted);margin-top:3px">Saldos, períodos e utilização</div></div><div></div></header>
+<header class="v7-top topbar"><div><b>Pessoal · Férias / Dispensas</b><div style="font-size:9px;color:var(--v4-muted);margin-top:3px">Saldos, períodos e utilização</div></div><div></div></header>
 <section class="v7-page">
  <div class="v7-head"><div><h2>Férias / Dispensas</h2><p>Férias interferem no rodízio da Escala de Serviço. <b>Dispensas não interferem na escala.</b></p></div>
   <div class="v7-actions"><input id="peopleSearch" class="v7-btn" type="search" placeholder="Buscar militar..." style="min-width:220px"></div>
@@ -98,8 +98,9 @@ const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 </script>
 <script src="sistema_comum.js?v=6.0"></script>
 <script src="notificacoes.js?v=6.0"></script>
+<script src="bloco_notas.js?v=6.0"></script>
 <script src="v4_tema.js?v=6.0"></script>
 <script src="v4_ui.js?v=6.0"></script>
 <script src="ferias_dispensas_v721.js?v=7.2.1"></script>
-<script src="v6_2_mobile.js?v=7.4"></script>
+<script src="v6_2_mobile.js?v=7.4.2"></script>
 </body></html>

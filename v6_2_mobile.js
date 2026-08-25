@@ -34,9 +34,6 @@ function wireSidebar(){
   sidebar.addEventListener('click',function(e){
     if(!MQ.matches)return;
 
-    // V7.2.4: o grupo Pessoal segue o mesmo padrão confortável do
-    // Orçamentários no Android. A linha principal inteira expande/recolhe;
-    // apenas as opções internas navegam e fecham a sidebar.
     const pessoalMain=e.target.closest('[data-v7-main]');
     if(pessoalMain){
       e.preventDefault();e.stopPropagation();
@@ -77,7 +74,7 @@ function init(){
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 
-/* V7 loader — mantém a V6.5 e carrega a camada global da V7. */
+/* V7 loader — V7.4.2 */
 (function(){
   function add(src, attr, done){
     const old=document.querySelector('script['+attr+'],script[src*="'+src.split('?')[0]+'"]');
@@ -88,11 +85,15 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     document.head.appendChild(s);
   }
   add('v6_5_patch.js?v=6.5','data-v65-loader',function(){
-    add('v7_global.js?v=7.4.1','data-v7-loader',function(){
-      add('v7_4_1_period.js?v=7.4.1','data-v741-period',function(){
-        add('v7_4_1_pdf.js?v=7.4.1','data-v741-pdf',function(){
-          add('v7_4_1_order.js?v=7.4.1','data-v741-order',function(){
-            add('v7_4_1_about.js?v=7.4.1','data-v741-about');
+    add('v7_global.js?v=7.4.2','data-v7-loader',function(){
+      add('v7_4_2_period.js?v=7.4.2','data-v742-period',function(){
+        add('v7_4_2_pdf.js?v=7.4.2','data-v742-pdf',function(){
+          add('v7_4_2_search_order.js?v=7.4.2','data-v742-search-order',function(){
+            add('v7_4_2_transfer.js?v=7.4.2','data-v742-transfer',function(){
+              add('v7_4_2_replace.js?v=7.4.2','data-v742-replace',function(){
+                add('v7_4_2_about.js?v=7.4.2','data-v742-about');
+              });
+            });
           });
         });
       });

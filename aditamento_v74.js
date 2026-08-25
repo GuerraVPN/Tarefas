@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const ADITAMENTO_VERSION='7.4';
+const ADITAMENTO_VERSION='7.4.2';
 
 const $=id=>document.getElementById(id);
 const MONTHS=['JANEIRO','FEVEREIRO','MARÇO','ABRIL','MAIO','JUNHO','JULHO','AGOSTO','SETEMBRO','OUTUBRO','NOVEMBRO','DEZEMBRO'];
@@ -10,7 +10,7 @@ const SERVICE_ROWS=[
   {grupo:'motorista',funcao:'MOTORISTA'},
   {grupo:'patrulheiro',funcao:'PATRULHEIRO'},
   {grupo:'permanencia',funcao:'PERMANÊNCIA'},
-  {grupo:'__canil__',funcao:'PERMANÊNCIA/CANIL'}
+  {grupo:'canil',funcao:'PERMANÊNCIA/CANIL'}
 ];
 
 function modal(on=true){$('aditamentoModal')?.classList.toggle('open',on)}
@@ -31,7 +31,7 @@ function moveToBack(queue,key){const i=queue.indexOf(key);if(i>=0){queue.splice(
 function dataUrlFromBlob(blob){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(blob)})}
 async function loadLogo(){
   try{
-    const r=await fetch('brasao_exercito.png?v=7.4',{cache:'force-cache'});
+    const r=await fetch('brasao_exercito.png?v=7.4.2',{cache:'force-cache'});
     if(!r.ok)throw new Error('brasão indisponível');
     return await dataUrlFromBlob(await r.blob());
   }catch(_){return null}
@@ -98,7 +98,7 @@ async function loadAditamentoContext(dayOptions){
     supabaseClient.from('escala_servicos').select('id,grupo,usuario_id,pessoa_externa_id,data_servico,marcacao,observacao').in('data_servico',dates).order('data_servico').order('grupo').order('id'),
     supabaseClient.from('escala_servicos').select('id,grupo,usuario_id,pessoa_externa_id,data_servico,marcacao,observacao').gte('data_servico',extStart).lte('data_servico',extEnd).order('data_servico').order('grupo').order('id'),
     supabaseClient.from('missoes_escala').select('id,titulo,data_inicio,data_fim,local,descricao').lte('data_inicio',maxDate).gte('data_fim',minDate).order('data_inicio').order('id'),
-    supabaseClient.from('escala_integrantes').select('id,grupo,usuario_id,pessoa_externa_id,ordem,ativo').eq('ativo',true).order('grupo').order('ordem').order('id'),
+    supabaseClient.from('escala_integrantes').select('id,grupo,usuario_id,pessoa_externa_id,ordem,ativo,heranca_preta_data,heranca_vermelha_data').eq('ativo',true).order('grupo').order('ordem').order('id'),
     supabaseClient.from('escala_feriados').select('id,data,nome').gte('data',extStart).lte('data',extEnd).order('data'),
     supabaseClient.from('pessoal_ferias').select('id,usuario_id,pessoa_externa_id,data_inicio,data_fim').lte('data_inicio',extEnd).gte('data_fim',extStart).order('data_inicio')
   ]);
@@ -137,7 +137,6 @@ async function loadAditamentoContext(dayOptions){
 }
 
 function serviceData(context,day,group){
-  if(group==='__canil__')return{grad:'',nome:''};
   const rows=day.services.filter(x=>x.grupo===group);
   if(!rows.length)return{grad:'',nome:''};
   const people=rows.map(context.person);
@@ -148,7 +147,6 @@ function computeStandby(context,targetDate){
   const result=new Map(),lane=laneFor(context,targetDate);
   for(const rowDef of SERVICE_ROWS){
     const g=rowDef.grupo;
-    if(g==='__canil__'){result.set(g,{grad:'',nome:''});continue}
     const targetActuals=context.services.filter(x=>x.data_servico===targetDate&&x.grupo===g);
     if(!targetActuals.length){result.set(g,{grad:'',nome:''});continue}
 
@@ -156,8 +154,14 @@ function computeStandby(context,targetDate){
     const keys=rows.map(personKey).filter(Boolean);
     if(!keys.length){result.set(g,{grad:'',nome:''});continue}
     let queue=[...keys];
-    const confirmed=context.historyServices.filter(x=>x.grupo===g&&keys.includes(personKey(x))&&laneFor(context,x.data_servico)===lane&&x.data_servico<=targetDate)
-      .sort((a,b)=>a.data_servico.localeCompare(b.data_servico)||Number(a.id)-Number(b.id));
+    let confirmed=context.historyServices.filter(x=>x.grupo===g&&keys.includes(personKey(x))&&laneFor(context,x.data_servico)===lane&&x.data_servico<=targetDate);
+    for(const row of rows){
+      const inherited=lane==='vermelha'?row.heranca_vermelha_data:row.heranca_preta_data;
+      if(inherited&&inherited<=targetDate&&!confirmed.some(x=>personKey(x)===personKey(row)&&x.data_servico>=inherited)){
+        confirmed.push({id:-Number(row.id||0),grupo:g,data_servico:inherited,usuario_id:row.usuario_id||null,pessoa_externa_id:row.pessoa_externa_id||null,_inherited:true});
+      }
+    }
+    confirmed.sort((a,b)=>a.data_servico.localeCompare(b.data_servico)||Number(a.id)-Number(b.id));
     if(!confirmed.length){result.set(g,{grad:'',nome:''});continue}
 
     const anchor=confirmed[0].data_servico;
@@ -165,7 +169,7 @@ function computeStandby(context,targetDate){
     while(date<=targetDate){
       if(laneFor(context,date)!==lane){date=addDays(date,1);continue}
       const actuals=confirmed.filter(x=>x.data_servico===date);
-      if(actuals.length){actuals.forEach(a=>moveToBack(queue,personKey(a)))}
+      if(actuals.length){actuals.forEach(a=>moveToBack(queue,personKey(a))}
       else if(date<targetDate){
         let idx=-1;
         for(let i=0;i<queue.length;i++){
@@ -229,7 +233,6 @@ async function buildPdf(context){
   doc.setFont('times','bold');doc.setFontSize(9.6);doc.text(intro.split('\n'),105,y,{align:'center'});y+=15;
   h.center('1ª PARTE - SERVIÇOS DIÁRIOS',y,10.5,true);y+=8;
 
-  // Primeiro apresenta TODOS os serviços selecionados, em ordem de data.
   for(const day of context.days){
     y=h.ensure(y,58);
     h.center(`SERVIÇO PARA O DIA ${fullDate(day.date)} (${weekName(day.date)})`,y,9.6,true);y+=3;
@@ -237,7 +240,6 @@ async function buildPdf(context){
     y+=5;doc.setFont('times','bold');doc.setFontSize(9.5);doc.text('- PASSAGEM DE SERVIÇO ÀS 08:00h.',17,y);y+=12;
   }
 
-  // Somente depois de todos os serviços, apresenta os Sobreavisos marcados.
   const standbyDays=context.days.filter(day=>day.includeStandby);
   for(const day of standbyDays){
     y=h.ensure(y,54);
