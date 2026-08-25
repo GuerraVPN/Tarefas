@@ -6,7 +6,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="perfis.js?v=6.0"></script>
 <link rel="stylesheet" href="v4_tema.css?v=6.2">
-<link rel="stylesheet" href="pessoal_v7.css?v=7.2.2">
+<link rel="stylesheet" href="pessoal_v7.css?v=7.2.3">
 </head>
 <body class="v7-body">
 <script>
@@ -31,8 +31,8 @@ if(!usuarioLogado?.id)location.replace('index.html');
    <button class="v7-btn" id="manageHolidays" hidden>Feriados</button>
   </div>
  </div>
- <div class="v7-legend"><span><i class="dia"></i> Expediente normal</span><span><i class="fds"></i> Final de semana / feriado</span><span><i class="sv"></i> Serviço confirmado</span><span><i class="prev"></i> Próximo serviço previsto</span><span><i class="ferias"></i> Férias</span><span><i class="adapt"></i> Adaptação</span></div>
- <div class="v7-note" id="scaleInfo">Após um serviço confirmado, a escala calcula automaticamente as folgas (1, 2, 3...) e projeta o próximo serviço pelo rodízio. Férias retiram o militar do rodízio; o dia seguinte ao fim das férias é adaptação e ele só pode servir a partir do outro dia. <b>Dispensas não interferem nesta escala.</b></div>
+ <div class="v7-legend"><span><i class="dia"></i> Escala Preta — dias úteis</span><span><i class="fds"></i> Escala Vermelha — sábados, domingos e feriados</span><span><i class="sv"></i> Serviço confirmado</span><span><i class="prev"></i> Próximo serviço previsto</span><span><i class="ferias"></i> Férias</span><span><i class="adapt"></i> Adaptação</span></div>
+ <div class="v7-note" id="scaleInfo">A <b>Escala Preta</b> roda somente em dias úteis. A <b>Escala Vermelha</b> roda somente em sábados, domingos e feriados. As duas possuem rodízios e contagens independentes: um SV na Preta não reinicia a Vermelha e um SV na Vermelha não reinicia a Preta. Férias e ADP bloqueiam serviço; <b>dispensas não interferem em nenhuma das duas escalas.</b></div>
  <div class="v72-summary" id="serviceSummary">
   <div><small>Efetivo nas escalas</small><strong id="sumScalePeople">0</strong><span>pessoas cadastradas</span></div>
   <div><small>Serviços no mês</small><strong id="sumServices">0</strong><span>lançamentos</span></div>
@@ -147,6 +147,6 @@ const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 <script src="notificacoes.js?v=6.0"></script>
 <script src="v4_tema.js?v=6.0"></script>
 <script src="v4_ui.js?v=6.0"></script>
-<script src="pessoal_v7.js?v=7.2.2"></script>
-<script src="v6_2_mobile.js?v=7.2.2"></script>
+<script src="pessoal_v7.js?v=7.2.3"></script>
+<script src="v6_2_mobile.js?v=7.2.3"></script>
 </body></html>

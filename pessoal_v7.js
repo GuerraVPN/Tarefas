@@ -24,6 +24,14 @@ function range(){
 }
 function hol(date){return holidays.find(x=>x.data===date)}
 function dayClass(date){const d=parseDate(date);return d.getDay()===0||d.getDay()===6||hol(date)?'weekend':'normal'}
+function scaleLane(date){return dayClass(date)==='weekend'?'vermelha':'preta'}
+function scaleLaneName(date){return scaleLane(date)==='vermelha'?'Escala Vermelha':'Escala Preta'}
+function isLaneDate(date,lane){return scaleLane(date)===lane}
+function countLaneDays(fromExclusive,toExclusive,lane){
+ let n=0,date=addDays(fromExclusive,1);
+ while(date<toExclusive){if(isLaneDate(date,lane))n++;date=addDays(date,1)}
+ return n;
+}
 function modal(id,on=true){$(id)?.classList.toggle('open',on)}
 function actorName(id){const u=users.get(String(id));return u?[u.patente,u.nome_guerra].filter(Boolean).join(' '):`Usuário ${id||'-'}`}
 function extName(id){const p=externals.get(String(id));return p?[p.patente,p.nome].filter(Boolean).join(' '):`Nome externo ${id}`}
@@ -89,7 +97,7 @@ async function loadScale(){
   supabaseClient.from('escala_integrantes').select('*').eq('ativo',true).order('grupo').order('ordem').order('id'),
   supabaseClient.from('escala_servicos').select('*').gte('data_servico',rg.ini).lte('data_servico',rg.fim).order('data_servico').order('grupo').order('id'),
   supabaseClient.from('escala_servicos').select('*').gte('data_servico',rg.extIni).lte('data_servico',rg.extFim).order('data_servico').order('grupo').order('id'),
-  supabaseClient.from('escala_feriados').select('*').gte('data',rg.ini).lte('data',rg.fim).order('data'),
+  supabaseClient.from('escala_feriados').select('*').gte('data',rg.extIni).lte('data',rg.extFim).order('data'),
   supabaseClient.from('escala_alteracoes').select('*').eq('modulo','servico').order('criado_em',{ascending:false}).limit(30),
   supabaseClient.from('pessoal_ferias').select('*').lte('data_inicio',rg.extFim).gte('data_fim',rg.extIni).order('data_inicio')
  ]);
@@ -98,25 +106,29 @@ async function loadScale(){
  services=s.data||[];rotationServices=sx.data||[];holidays=h.data||[];changes=c.data||[];vacations=v.data||[];
  buildAllProjections();render();renderMembers();renderHolidays();renderChanges();renderSummary();
 }
-function buildAllProjections(){projections=new Map();dutyDates=new Map();nextDuty=new Map();for(const g of ORDER)buildProjection(g)}
-function buildProjection(g){
+function buildAllProjections(){
+ projections=new Map();dutyDates=new Map();nextDuty=new Map();
+ for(const g of ORDER){buildProjection(g,'preta');buildProjection(g,'vermelha')}
+}
+function buildProjection(g,lane){
  const rows=members.filter(x=>x.grupo===g).sort((a,b)=>(a.ordem||100)-(b.ordem||100)||Number(a.id)-Number(b.id));
  if(!rows.length)return;
  const keys=rows.map(personKey),queue=[...keys],rg=range(),today=todayIso();
- const confirmed=rotationServices.filter(x=>x.grupo===g&&keys.includes(personKey(x))).sort((a,b)=>a.data_servico.localeCompare(b.data_servico)||Number(a.id)-Number(b.id));
+ const confirmed=rotationServices.filter(x=>x.grupo===g&&keys.includes(personKey(x))&&scaleLane(x.data_servico)===lane).sort((a,b)=>a.data_servico.localeCompare(b.data_servico)||Number(a.id)-Number(b.id));
  if(!confirmed.length)return;
  const anchorDate=confirmed[0].data_servico;
  const localDuty=new Map();
  function addDuty(key,date,type,item=null){
    if(!localDuty.has(key))localDuty.set(key,[]);
-   localDuty.get(key).push({date,type,item});
-   const k=g+'|'+date;if(!projections.has(k))projections.set(k,[]);
-   projections.get(k).push({key,type,item});
+   localDuty.get(key).push({date,type,item,lane});
+   const k=g+'|'+lane+'|'+date;if(!projections.has(k))projections.set(k,[]);
+   projections.get(k).push({key,type,item,lane});
  }
  confirmed.filter(x=>x.data_servico===anchorDate).forEach(a=>{const key=personKey(a);addDuty(key,anchorDate,'actual',a);moveToBack(queue,key)});
  let date=addDays(anchorDate,1);
  while(date<=rg.extFim){
-   const actuals=rotationActuals(g,date).filter(x=>keys.includes(personKey(x)));
+   if(!isLaneDate(date,lane)){date=addDays(date,1);continue}
+   const actuals=rotationActuals(g,date).filter(x=>keys.includes(personKey(x))&&scaleLane(x.data_servico)===lane);
    if(actuals.length){
      actuals.forEach(a=>{const key=personKey(a);addDuty(key,date,'actual',a);moveToBack(queue,key)});
    }else{
@@ -131,29 +143,32 @@ function buildProjection(g){
    date=addDays(date,1);
  }
  for(const [key,list] of localDuty){
-   list.sort((a,b)=>a.date.localeCompare(b.date));dutyDates.set(g+'|'+key,list);
-   const next=list.find(x=>x.date>=today);if(next)nextDuty.set(g+'|'+key,next);
+   list.sort((a,b)=>a.date.localeCompare(b.date));dutyDates.set(g+'|'+lane+'|'+key,list);
+   const next=list.find(x=>x.date>=today);if(next)nextDuty.set(g+'|'+lane+'|'+key,next);
  }
 }
-function dutyAt(row,g,date){const list=projections.get(g+'|'+date)||[];return list.find(x=>x.key===personKey(row))}
+function dutyAt(row,g,date){const lane=scaleLane(date),list=projections.get(g+'|'+lane+'|'+date)||[];return list.find(x=>x.key===personKey(row))}
 function folgaNumber(row,g,date){
- const list=dutyDates.get(g+'|'+personKey(row))||[];let prev=null,next=null;
- for(const d of list){if(d.date<date)prev=d;if(d.date>date){next=d;break}}
- if(!prev||!next)return null;return diffDays(prev.date,date);
+ const lane=scaleLane(date),list=dutyDates.get(g+'|'+lane+'|'+personKey(row))||[];
+ const prev=[...list].reverse().find(x=>x.date<date)||null;
+ if(!prev)return null;
+ return countLaneDays(prev.date,addDays(date,1),lane);
 }
 function nextMeta(row,g){
  const vac=vacations.find(v=>((row.usuario_id&&String(v.usuario_id)===String(row.usuario_id))||(row.pessoa_externa_id&&String(v.pessoa_externa_id)===String(row.pessoa_externa_id)))&&v.data_fim>=todayIso());
  if(vac&&vac.data_inicio<=todayIso()&&vac.data_fim>=todayIso())return `<span class="v721-person-meta vac">Férias até ${br(vac.data_fim)} · ADP ${br(addDays(vac.data_fim,1))}</span>`;
- const n=nextDuty.get(g+'|'+personKey(row));
- return n?`<span class="v721-person-meta next">Próx. ${n.type==='predicted'?'previsto':'confirmado'}: ${br(n.date)}</span>`:'<span class="v721-person-meta">Sem projeção — confirme um serviço</span>';
+ const key=personKey(row),black=nextDuty.get(g+'|preta|'+key),red=nextDuty.get(g+'|vermelha|'+key),parts=[];
+ if(black)parts.push(`Preta: ${br(black.date)}${black.type==='predicted'?' prev.':''}`);
+ if(red)parts.push(`Vermelha: ${br(red.date)}${red.type==='predicted'?' prev.':''}`);
+ return parts.length?`<span class="v721-person-meta next">${parts.join(' · ')}</span>`:'<span class="v721-person-meta">Sem projeção — confirme um serviço em cada escala</span>';
 }
 function renderSummary(){
  const uniqueMembers=new Set(members.map(personKey)),uniqueOnService=new Set(services.map(personKey));
  $('sumScalePeople').textContent=uniqueMembers.size;$('sumServices').textContent=services.length;$('sumPeopleOnService').textContent=uniqueOnService.size;
  let total=0,now=todayIso();
- for(const g of ORDER)for(const row of members.filter(x=>x.grupo===g)){
-   const list=dutyDates.get(g+'|'+personKey(row))||[],prev=[...list].reverse().find(x=>x.date<=now),next=list.find(x=>x.date>now);
-   if(prev&&next)total+=Math.max(0,diffDays(prev.date,next.date)-1);
+ for(const g of ORDER)for(const row of members.filter(x=>x.grupo===g))for(const lane of ['preta','vermelha']){
+   const list=dutyDates.get(g+'|'+lane+'|'+personKey(row))||[],prev=[...list].reverse().find(x=>x.date<=now),next=list.find(x=>x.date>now);
+   if(prev&&next)total+=countLaneDays(prev.date,next.date,lane);
  }
  $('sumFolgas').textContent=total;
 }
@@ -179,7 +194,7 @@ function render(){
     else if(vac){cls.push('vacation');text='FÉRIAS';title=`Férias · ${br(vac.data_inicio)} a ${br(vac.data_fim)}`}
     else if(adapt){cls.push('adaptation');text='ADP';title=`Dia de adaptação · serviço permitido a partir de ${br(addDays(date,1))}`}
     else if(duty?.type==='predicted'){cls.push('predicted');text='SV';title=`Próximo serviço previsto automaticamente · ${personName(row)} · ${br(date)}`}
-    else{const f=folgaNumber(row,g,date);if(f!==null&&f>0){cls.push('folga-count');text=String(f);title=`${f}º dia de folga desde o último serviço`}}
+    else{const f=folgaNumber(row,g,date);if(f!==null&&f>0){cls.push('folga-count');text=String(f);title=`${f}º dia da ${scaleLaneName(date)} desde o último serviço desta mesma escala`}}
     html+=`<td class="${cls.filter(Boolean).join(' ')}" data-user="${row.usuario_id||''}" data-external="${row.pessoa_externa_id||''}" data-group="${g}" data-date="${date}" title="${esc(title)}">${text}</td>`;
    }
    html+='</tr>';
@@ -197,27 +212,27 @@ function openCell(td){
  openService(td);
 }
 function serviceContext(row,g,date){
- const list=dutyDates.get(g+'|'+personKey(row))||[];
+ const lane=scaleLane(date),list=dutyDates.get(g+'|'+lane+'|'+personKey(row))||[];
  const prev=[...list].reverse().find(x=>x.date<date)||null;
  const next=list.find(x=>x.date>date)||null;
- return{prev,next,folgas:prev?Math.max(0,diffDays(prev.date,date)-1):null,diasAte:next?Math.max(0,diffDays(date,next.date)):null};
+ return{lane,prev,next,folgas:prev?countLaneDays(prev.date,date,lane):null,diasAte:next?countLaneDays(date,next.date,lane):null,diasCorridos:next?Math.max(0,diffDays(date,next.date)):null};
 }
 function fillServiceContext(row,g,date,item){
  const ctx=serviceContext(row,g,date);
- $('serviceFolgas').value=ctx.prev?`${ctx.folgas} dia(s) · último SV ${br(ctx.prev.date)}`:'Sem serviço anterior calculado';
+ $('serviceFolgas').value=ctx.prev?`${ctx.folgas} dia(s) da ${ctx.lane==='vermelha'?'Vermelha':'Preta'} · último SV ${br(ctx.prev.date)}`:'Sem serviço anterior calculado nesta escala';
  $('serviceNext').value=ctx.next?`${ctx.next.type==='predicted'?'Previsto':'Confirmado'} · ${br(ctx.next.date)}`:'Sem próximo serviço calculado';
- $('serviceNextDays').value=ctx.next?`${ctx.diasAte} dia(s)`:'Sem previsão';
+ $('serviceNextDays').value=ctx.next?`${ctx.diasAte} dia(s) desta escala · ${ctx.diasCorridos} dia(s) corridos`:'Sem previsão';
  $('serviceModalTitle').textContent=item?'Editar serviço':'Lançar serviço';
 }
 function openService(td){
  const row=rowFromCell(td),date=td.dataset.date,g=td.dataset.group,item=currentActual(row,g,date);
  $('serviceUserId').value=row.usuario_id||'';$('serviceExternalId').value=row.pessoa_externa_id||'';$('serviceGroup').value=g;$('serviceDate').value=date;
- $('serviceUser').value=personName(row);$('serviceDateLabel').value=br(date);$('serviceGroupLabel').value=GROUPS[g];$('serviceMark').value=item?.marcacao||'SV';
+ $('serviceUser').value=personName(row);$('serviceDateLabel').value=br(date);$('serviceGroupLabel').value=`${GROUPS[g]} · ${scaleLaneName(date)}`;$('serviceMark').value=item?.marcacao||'SV';
  $('serviceNote').value=item?.observacao||'';fillServiceContext(row,g,date,item);$('serviceChangedBy').textContent=changedBy(item);$('removeService').hidden=!item;$('swapService').hidden=!item;modal('serviceModal');
 }
 async function saveService(e){
  e.preventDefault();
- const r=await supabaseClient.rpc('v7_2_2_definir_servico',{
+ const r=await supabaseClient.rpc('v7_2_3_definir_servico',{
   p_grupo:$('serviceGroup').value,p_usuario_alvo_id:Number($('serviceUserId').value)||null,p_pessoa_externa_id:Number($('serviceExternalId').value)||null,
   p_data_servico:$('serviceDate').value,p_marcacao:$('serviceMark').value.trim()||'SV',p_observacao:$('serviceNote').value.trim()||null,
   p_usuario_id:Number(user.id),p_perfil_id:profileId()
@@ -234,14 +249,14 @@ function targetOptions(src,g,date){
 function openSwap(){
  const src=servicePerson(),g=$('serviceGroup').value,date=$('serviceDate').value;
  $('swapSourceUserId').value=src.usuario_id||'';$('swapSourceExternalId').value=src.pessoa_externa_id||'';$('swapGroup').value=g;$('swapDate').value=date;
- $('swapSource').value=personName(src);$('swapDateLabel').value=br(date);$('swapGroupLabel').value=GROUPS[g];$('swapNote').value='';
+ $('swapSource').value=personName(src);$('swapDateLabel').value=br(date);$('swapGroupLabel').value=`${GROUPS[g]} · ${scaleLaneName(date)}`;$('swapNote').value='';
  $('swapTarget').innerHTML='<option value="">Selecione...</option>'+targetOptions(src,g,date);
  modal('serviceModal',false);modal('swapModal');
 }
 async function saveSwap(e){
  e.preventDefault();const value=$('swapTarget').value;if(!value)return;
  const [kind,id]=value.split(':');
- const r=await supabaseClient.rpc('v7_2_2_trocar_servico',{
+ const r=await supabaseClient.rpc('v7_2_3_trocar_servico',{
   p_grupo:$('swapGroup').value,p_data_servico:$('swapDate').value,
   p_origem_usuario_id:Number($('swapSourceUserId').value)||null,p_origem_pessoa_externa_id:Number($('swapSourceExternalId').value)||null,
   p_destino_usuario_id:kind==='u'?Number(id):null,p_destino_pessoa_externa_id:kind==='e'?Number(id):null,
@@ -252,14 +267,14 @@ async function saveSwap(e){
 function openReplacement(){
  const src=servicePerson(),g=$('serviceGroup').value,date=$('serviceDate').value;
  $('replaceSourceUserId').value=src.usuario_id||'';$('replaceSourceExternalId').value=src.pessoa_externa_id||'';$('replaceGroup').value=g;$('replaceDate').value=date;
- $('replaceSource').value=personName(src);$('replaceDateLabel').value=br(date);$('replaceGroupLabel').value=GROUPS[g];$('replaceNote').value='';
+ $('replaceSource').value=personName(src);$('replaceDateLabel').value=br(date);$('replaceGroupLabel').value=`${GROUPS[g]} · ${scaleLaneName(date)}`;$('replaceNote').value='';
  $('replaceTarget').innerHTML='<option value="">Selecione...</option>'+targetOptions(src,g,date);
  modal('serviceModal',false);modal('replaceModal');
 }
 async function saveReplacement(e){
  e.preventDefault();const value=$('replaceTarget').value;if(!value)return;
  const [kind,id]=value.split(':');
- const r=await supabaseClient.rpc('v7_2_2_substituir_servico',{
+ const r=await supabaseClient.rpc('v7_2_3_substituir_servico',{
   p_grupo:$('replaceGroup').value,p_data_servico:$('replaceDate').value,
   p_origem_usuario_id:Number($('replaceSourceUserId').value)||null,p_origem_pessoa_externa_id:Number($('replaceSourceExternalId').value)||null,
   p_destino_usuario_id:kind==='u'?Number(id):null,p_destino_pessoa_externa_id:kind==='e'?Number(id):null,
@@ -304,7 +319,7 @@ async function removeMember(id){
  const r=await supabaseClient.rpc('v7_2_remover_integrante',{p_integrante_id:Number(id),p_usuario_id:Number(user.id),p_perfil_id:profileId()});
  if(r.error)return alert(r.error.message);await loadScale();
 }
-function renderHolidays(){$('holidaysList').innerHTML=holidays.length?holidays.map(h=>`<div class="v7-list-row"><div><b>${br(h.data)}</b><div class="v7-mini">${esc(h.nome)}</div></div><button class="v7-btn danger" data-rm-holiday="${h.id}">Remover</button></div>`).join(''):'<div class="v7-empty">Nenhum feriado cadastrado neste mês.</div>'}
+function renderHolidays(){const rg=range(),list=holidays.filter(h=>h.data>=rg.ini&&h.data<=rg.fim);$('holidaysList').innerHTML=list.length?list.map(h=>`<div class="v7-list-row"><div><b>${br(h.data)}</b><div class="v7-mini">${esc(h.nome)}</div></div><button class="v7-btn danger" data-rm-holiday="${h.id}">Remover</button></div>`).join(''):'<div class="v7-empty">Nenhum feriado cadastrado neste mês.</div>'}
 async function addHoliday(){const date=$('holidayDate').value,nome=$('holidayName').value.trim();if(!date||!nome)return alert('Informe data e descrição.');const r=await supabaseClient.rpc('v7_definir_feriado',{p_data:date,p_nome:nome,p_usuario_id:Number(user.id),p_perfil_id:profileId()});if(r.error)return alert(r.error.message);$('holidayName').value='';await loadScale()}
 async function removeHoliday(id){const r=await supabaseClient.rpc('v7_remover_feriado',{p_feriado_id:Number(id),p_usuario_id:Number(user.id),p_perfil_id:profileId()});if(r.error)return alert(r.error.message);await loadScale()}
 function renderChanges(){$('changesCount').textContent=`${changes.length} registro(s)`;$('serviceChanges').innerHTML=changes.length?changes.map(x=>`<div class="v72-change-row"><div><b>${esc(x.acao||'Alteração')}</b><small>${esc(x.detalhes||'')}</small></div><div style="text-align:right"><b>${esc(actorName(x.usuario_id))}</b><small>${dt(x.criado_em)}</small></div></div>`).join(''):'<div class="v7-empty">Nenhuma alteração registrada.</div>'}
@@ -322,7 +337,7 @@ function bind(){
 }
 function realtime(){
  try{
-  supabaseClient.channel('v722-escalas')
+  supabaseClient.channel('v723-escalas')
    .on('postgres_changes',{event:'*',schema:'public',table:'escala_integrantes'},()=>loadScale())
    .on('postgres_changes',{event:'*',schema:'public',table:'escala_servicos'},()=>loadScale())
    .on('postgres_changes',{event:'*',schema:'public',table:'escala_feriados'},()=>loadScale())
