@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const VERSION='7.3';
+const VERSION='7.3.1';
 const $=id=>document.getElementById(id);
 const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
 let busy=false,timer=null,onlineTimer=null,adminActive=false;
