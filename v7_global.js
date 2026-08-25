@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const VERSION='7.2.3';
+const VERSION='7.2.4';
 const $=id=>document.getElementById(id);
 const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
 let busy=false,timer=null,onlineTimer=null,adminActive=false;
@@ -20,7 +20,14 @@ function injectCss(){
   .v71-admin-online{height:34px;display:inline-flex;align-items:center;gap:7px;border:1px solid var(--v4-border);background:var(--v4-surface);color:var(--v4-text-2);border-radius:9px;padding:0 10px;font-size:9px;font-weight:800;cursor:pointer;white-space:nowrap}
   .v71-admin-online:hover{background:var(--v4-surface-2)}
   .v71-admin-online i{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 2px color-mix(in srgb,#22c55e 18%,transparent)}
-  @media(max-width:900px){.v7-pessoal-parent:hover .v7-pessoal-sub{display:none}.v7-pessoal-parent.v62-subopen .v7-pessoal-sub{display:grid}}
+  @media(max-width:900px){
+    .v7-pessoal-parent:hover .v7-pessoal-sub{display:none}
+    .v7-pessoal-parent.v62-subopen .v7-pessoal-sub{display:grid}
+    .v7-pessoal-parent>.v6-orc-main{min-height:48px;padding:12px 11px!important;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+    .v7-pessoal-parent>.v6-orc-main .v6-orc-arrow{width:24px;height:24px;pointer-events:none}
+    .v7-pessoal-sub{padding:4px 7px 9px 30px!important}
+    .v7-pessoal-sub a{min-height:42px;display:flex!important;align-items:center;padding:10px 11px!important;font-size:11px!important;touch-action:manipulation}
+  }
   `;document.head.appendChild(s);
 }
 function arrow(){return '<svg viewBox="0 0 24 24"><path d="m8 10 4 4 4-4"/></svg>'}
@@ -42,6 +49,11 @@ function pessoalNav(){
   const p=page();
   const active=p==='pessoal.html'||p==='missao.html'||p==='ferias_dispensas.html'||p==='usuarios.html';
   parent.classList.toggle('active',active);
+  // No celular, ao abrir a sidebar dentro de uma página de Pessoal,
+  // mantém o grupo expandido para acesso imediato às opções internas.
+  if(window.matchMedia('(max-width: 900px)').matches && active){
+    parent.classList.add('v62-subopen');
+  }
 
   if(!parent.querySelector('[data-v7-main]')){
     parent.innerHTML=`<a class="v6-orc-main" data-v7-main href="pessoal.html">
@@ -66,17 +78,37 @@ function pessoalNav(){
   afastamentos?.classList.toggle('active',p==='ferias_dispensas.html');
   usuarios?.classList.toggle('active',p==='usuarios.html');
 
-  // Links reais corrigem a aba Usuários e continuam funcionando mesmo
-  // se outra camada do sistema interceptar cliques no menu.
-  if(parent.dataset.v71Wired!=='1'){
+  // Desktop: Pessoal continua sendo um link normal.
+  // Android/mobile: tocar em QUALQUER ponto da linha Pessoal apenas
+  // abre/fecha o submenu. A navegação acontece somente nas opções internas.
+  if(parent.dataset.v724Wired!=='1'){
     const main=parent.querySelector('[data-v7-main]');
-    if(main)main.addEventListener('click',function(e){
-      if(window.matchMedia('(max-width: 900px)').matches && e.target.closest('.v6-orc-arrow')){
+    if(main){
+      main.setAttribute('aria-haspopup','true');
+      main.setAttribute('aria-controls','v7PessoalSubmenu');
+      const sub=parent.querySelector('.v7-pessoal-sub');
+      if(sub)sub.id='v7PessoalSubmenu';
+      const syncExpanded=()=>main.setAttribute('aria-expanded',parent.classList.contains('v62-subopen')?'true':'false');
+      syncExpanded();
+      main.addEventListener('click',function(e){
+        if(!window.matchMedia('(max-width: 900px)').matches)return;
         e.preventDefault();
+        // Impede que a rotina genérica do menu mobile interprete este toque
+        // como navegação e feche a sidebar imediatamente.
+        e.stopPropagation();
         parent.classList.toggle('v62-subopen');
-      }
-    });
-    parent.dataset.v71Wired='1';
+        syncExpanded();
+      });
+      main.addEventListener('keydown',function(e){
+        if(!window.matchMedia('(max-width: 900px)').matches)return;
+        if(e.key!=='Enter'&&e.key!==' ')return;
+        e.preventDefault();
+        e.stopPropagation();
+        parent.classList.toggle('v62-subopen');
+        syncExpanded();
+      });
+    }
+    parent.dataset.v724Wired='1';
   }
 }
 

@@ -39,7 +39,7 @@ select{padding:10px 12px;border:1px solid var(--v4-border-strong);border-radius:
    <h2>TAREFAS — 26º Pel PE Mec</h2>
    <p>Painel de tarefas, usuários, comunicações e fluxos administrativos.</p>
    <div class="meta">
-    <div><small>Versão atual</small><b>7.2.3</b></div>
+    <div><small>Versão atual</small><b>7.2.4</b></div>
     <div><small>Criador</small><b>Sd Guerra</b></div>
     <div><small>Organização</small><b>26º Pel PE Mec</b></div>
    </div>
@@ -62,12 +62,13 @@ const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 <script src="notificacoes.js?v=6.0"></script>
 <script src="v4_tema.js?v=6.0"></script>
 <script src="v4_ui.js?v=6.0"></script>
-<script src="v6_2_mobile.js?v=7.2.3"></script>
+<script src="v6_2_mobile.js?v=7.2.4"></script>
 
 <script>
 (function(){
 const versions=[
- {v:'7.2.3',title:'Escalas Preta e Vermelha independentes',current:true,items:['Escala Preta passa a considerar somente dias úteis (segunda a sexta), exceto feriados.','Escala Vermelha passa a considerar somente sábados, domingos e feriados.','Cada grupo mantém dois rodízios independentes: serviço na Preta não reinicia nem altera a Vermelha, e vice-versa.','Folgas 1, 2, 3... avançam somente nos dias pertencentes à própria escala, reproduzindo o modelo da planilha operacional.','Previsões, trocas, substituições e férias recalculam apenas o rodízio correspondente ao tipo do dia.','Modal de serviço identifica Preta/Vermelha e mostra folgas e próximo SV dentro daquela mesma escala.']},
+ {v:'7.2.4',title:'Navegação Pessoal otimizada no Android',current:true,items:['No Android/mobile, tocar em qualquer ponto da linha Pessoal agora expande ou recolhe o submenu, sem abrir a página imediatamente.','As opções Escala de serviço, Escala de missão, Férias / Dispensas e Usuários ficam com área de toque maior e mais confortável.','A sidebar só fecha depois que o usuário escolhe uma opção interna do Pessoal.','Ao abrir o menu estando em uma página de Pessoal, o submenu permanece expandido.','Desktop preservado sem alteração no comportamento de navegação.']},
+ {v:'7.2.3',title:'Escalas Preta e Vermelha independentes',items:['Escala Preta passa a considerar somente dias úteis (segunda a sexta), exceto feriados.','Escala Vermelha passa a considerar somente sábados, domingos e feriados.','Cada grupo mantém dois rodízios independentes: serviço na Preta não reinicia nem altera a Vermelha, e vice-versa.','Folgas 1, 2, 3... avançam somente nos dias pertencentes à própria escala, reproduzindo o modelo da planilha operacional.','Previsões, trocas, substituições e férias recalculam apenas o rodízio correspondente ao tipo do dia.','Modal de serviço identifica Preta/Vermelha e mostra folgas e próximo SV dentro daquela mesma escala.']},
  {v:'7.2.2',title:'Substituição de serviço, folgas e previsão corrigidas',items:['Tirar serviço passa a exigir outro militar e mantém o mesmo lançamento, sem apagar o SV.','Troca de serviço e Tirada/substituição ficam diferenciadas no histórico, com militar que saiu, militar que entrou e usuário responsável.','Folgas automáticas 1, 2, 3... voltam à planilha e o rodízio é reconstruído a partir dos serviços confirmados.','Modal de serviço exibe folgas desde o último SV, próximo serviço confirmado ou previsto e estimativa de dias até ele.','Previsões são recalculadas após inclusão/alteração, troca, substituição e férias.','FÉRIAS e ADP aparecem na planilha; férias e adaptação bloqueiam serviço, enquanto dispensas continuam sem interferir no rodízio.']},
  {v:'7.2.1',title:'Rodízio automático, férias e dispensas',items:['Escala de Serviço passa a contar automaticamente os dias de folga após o serviço confirmado e projetar o próximo serviço pelo rodízio.','Férias retiram o militar do rodízio durante o período e geram 1 dia de adaptação após o retorno.','Nova aba Férias / Dispensas com saldos de férias e dispensas.','Dispensas de missões finalizadas entram automaticamente no saldo de dispensas.','Usuário pode registrar as próprias dispensas e informar os dias usados, notificando a si e à 1ª Seção.','Dispensas não interferem na Escala de Serviço.','Serviço confirmado pode ser trocado para outro integrante da mesma escala ou retirado.']},
  {v:'7.2',title:'1ª Seção, Missões, folgas e feriados',items:['Somente 1ª Seção e Admin podem incluir/alterar Escala de Serviço e Escala de Missão.','Nova Escala de Missão com participantes, período e cálculo configurável de dispensas previstas.','Resumo de efetivo, serviços, folgas e quantidade de pessoas nas escalas.','Permite nomes sem conta do sistema nas escalas de Serviço e Missão.','Feriados cadastrados na 1ª Seção passam a aparecer no Calendário.','Histórico registra quem alterou as escalas de Serviço e Missão.']},
