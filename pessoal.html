@@ -4,6 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Pessoal · Escala de serviço - 26º Pel PE Mec</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
 <script src="perfis.js?v=6.0"></script>
 <link rel="stylesheet" href="v4_tema.css?v=6.2">
 <link rel="stylesheet" href="pessoal_v7.css?v=7.2.3">
@@ -29,6 +30,7 @@ if(!usuarioLogado?.id)location.replace('index.html');
    <div class="v7-month"><button class="v7-btn" id="prevMonth">‹</button><div class="v7-month-label" id="monthLabel">-</div><button class="v7-btn" id="nextMonth">›</button><button class="v7-btn" id="todayMonth">Hoje</button></div>
    <button class="v7-btn" id="manageMembers" hidden>Militares das escalas</button>
    <button class="v7-btn" id="manageHolidays" hidden>Feriados</button>
+   <button class="v7-btn primary" id="generateAddendum">Gerar aditamento PDF</button>
   </div>
  </div>
  <div class="v7-legend"><span><i class="dia"></i> Escala Preta — dias úteis</span><span><i class="fds"></i> Escala Vermelha — sábados, domingos e feriados</span><span><i class="sv"></i> Serviço confirmado</span><span><i class="prev"></i> Próximo serviço previsto</span><span><i class="ferias"></i> Férias</span><span><i class="adapt"></i> Adaptação</span></div>
@@ -138,6 +140,16 @@ if(!usuarioLogado?.id)location.replace('index.html');
  </form>
 </div></div>
 
+<div class="v7-modal-bg" id="aditamentoModal"><div class="v7-modal" style="width:min(560px,100%)">
+ <div class="v7-modal-head"><h3>Gerar aditamento em PDF</h3><button class="v7-close" id="aditamentoClose" type="button">×</button></div>
+ <div class="v7-form">
+  <div class="v7-field full"><label>Data do serviço / missões</label><select id="aditamentoDia"></select></div>
+  <div class="v7-field full"><div class="v7-note">O aditamento traz somente militares com <b>serviço confirmado</b> no dia escolhido. Permanência/Canil fica sem nome até essa escala ser criada. Se não houver Sgt, Motorista, Patrulheiro ou Permanência confirmado, a respectiva linha permanece vazia. As missões ativas no dia e seus participantes entram automaticamente na 3ª Parte.</div></div>
+  <div class="v7-field full"><div class="v72-last-change" id="aditamentoStatus">Pronto para gerar.</div></div>
+ </div>
+ <div class="v7-modal-actions"><button type="button" class="v7-btn" id="aditamentoCancelar">Cancelar</button><button type="button" class="v7-btn primary" id="aditamentoGerar">Gerar PDF</button></div>
+</div></div>
+
 <script>
 const SUPABASE_URL='https://bpvijatnsluwsgnzklrd.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwdmlqYXRuc2x1d3NnbnprbHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MzkxNDMsImV4cCI6MjEwMjQxNTE0M30.uvyfm9mgl6MON0v75CwfGzNz6FBqw58uzR4ZcRAOLNQ';
@@ -148,5 +160,6 @@ const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 <script src="v4_tema.js?v=6.0"></script>
 <script src="v4_ui.js?v=6.0"></script>
 <script src="pessoal_v7.js?v=7.2.3"></script>
-<script src="v6_2_mobile.js?v=7.2.4"></script>
+<script src="aditamento_v73.js?v=7.3"></script>
+<script src="v6_2_mobile.js?v=7.3"></script>
 </body></html>
