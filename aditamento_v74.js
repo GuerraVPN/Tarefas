@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const ADITAMENTO_VERSION='7.4.2';
+const ADITAMENTO_VERSION='7.4.4';
 
 const $=id=>document.getElementById(id);
 const MONTHS=['JANEIRO','FEVEREIRO','MARÇO','ABRIL','MAIO','JUNHO','JULHO','AGOSTO','SETEMBRO','OUTUBRO','NOVEMBRO','DEZEMBRO'];
@@ -29,12 +29,35 @@ function personKey(x){return x?.usuario_id?`u:${x.usuario_id}`:x?.pessoa_externa
 function moveToBack(queue,key){const i=queue.indexOf(key);if(i>=0){queue.splice(i,1);queue.push(key)}}
 
 function dataUrlFromBlob(blob){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(blob)})}
+async function ensureJsPdf(){
+  if(window.jspdf?.jsPDF)return window.jspdf.jsPDF;
+  await new Promise((resolve,reject)=>{
+    const old=document.querySelector('script[data-aditamento-jspdf],script[src*="jspdf"]');
+    if(old){
+      if(window.jspdf?.jsPDF)return resolve();
+      old.addEventListener('load',resolve,{once:true});
+      old.addEventListener('error',()=>reject(new Error('Falha ao carregar a biblioteca de PDF.')),{once:true});
+      setTimeout(()=>window.jspdf?.jsPDF?resolve():reject(new Error('A biblioteca de PDF demorou para carregar. Atualize a página e tente novamente.')),8000);
+      return;
+    }
+    const sc=document.createElement('script');
+    sc.src='https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js';
+    sc.async=true;sc.dataset.aditamentoJspdf='1';
+    sc.onload=resolve;sc.onerror=()=>reject(new Error('Falha ao carregar a biblioteca de PDF. Verifique a conexão.'));
+    document.head.appendChild(sc);
+  });
+  if(!window.jspdf?.jsPDF)throw new Error('Biblioteca de PDF indisponível.');
+  return window.jspdf.jsPDF;
+}
 async function loadLogo(){
-  try{
-    const r=await fetch('brasao_exercito.png?v=7.4.2',{cache:'force-cache'});
-    if(!r.ok)throw new Error('brasão indisponível');
-    return await dataUrlFromBlob(await r.blob());
-  }catch(_){return null}
+  for(const src of ['brasao_exercito_v742.png?v=7.4.4','brasao_exercito.png?v=7.4.4']){
+    try{
+      const r=await fetch(src,{cache:'force-cache'});
+      if(!r.ok)continue;
+      return await dataUrlFromBlob(await r.blob());
+    }catch(_){}
+  }
+  return null;
 }
 
 async function fetchRows(table,ids,cols){
@@ -72,9 +95,16 @@ function addDateRow(date,includeStandby=true){
   host.appendChild(row);refreshRemoveButtons();
 }
 
+function initialAditamentoDate(){
+  try{
+    const st=window.TAREFAS_PERIOD_V743?.read?.();
+    if(st?.anchor&&/^\d{4}-\d{2}-\d{2}$/.test(st.anchor))return st.anchor;
+  }catch(_){}
+  return today();
+}
 function resetDays(){
   const host=$('aditamentoDias');if(!host)return;
-  host.innerHTML='';addDateRow(today(),true);
+  host.innerHTML='';addDateRow(initialAditamentoDate(),true);
 }
 function addNextDay(){
   const days=selectedDays(),base=days.length?days[days.length-1].date:today();
@@ -104,7 +134,6 @@ async function loadAditamentoContext(dayOptions){
   ]);
   for(const r of [srv,history,mis,members,holidays,vacations])if(r.error)throw r.error;
 
-  const selectedSet=new Set(dates);
   const missions=(mis.data||[]).filter(m=>dates.some(d=>m.data_inicio<=d&&m.data_fim>=d));
   const missionIds=missions.map(x=>x.id);
   let participants=[];
@@ -127,10 +156,7 @@ async function loadAditamentoContext(dayOptions){
     return{grad:'',nome:''};
   };
 
-  const context={
-    dates,selectedSet,services:srv.data||[],historyServices:history.data||[],missions,participants,
-    members:members.data||[],holidaySet:new Set((holidays.data||[]).map(x=>x.data)),vacations:vacations.data||[],person
-  };
+  const context={dates,services:srv.data||[],historyServices:history.data||[],missions,participants,members:members.data||[],holidaySet:new Set((holidays.data||[]).map(x=>x.data)),vacations:vacations.data||[],person};
   context.days=dayOptions.map(opt=>({date:opt.date,includeStandby:opt.includeStandby,services:context.services.filter(x=>x.data_servico===opt.date)}));
   for(const day of context.days)day.standby=computeStandby(context,day.date);
   return context;
@@ -140,16 +166,14 @@ function serviceData(context,day,group){
   const rows=day.services.filter(x=>x.grupo===group);
   if(!rows.length)return{grad:'',nome:''};
   const people=rows.map(context.person);
-  return{grad:[...new Set(people.map(x=>x.grad).filter(Boolean))].join(' / '),nome:people.map(x=>x.nome).filter(Boolean).join(' / ')};
+  return{grad:[...new Set(people.map(x=>x.grad).filter(Boolean))].join(' / '),nome:people.map(x=>x.nome).filter(Boolean).join(', ')};
 }
 
 function computeStandby(context,targetDate){
   const result=new Map(),lane=laneFor(context,targetDate);
-  for(const rowDef of SERVICE_ROWS){
-    const g=rowDef.grupo;
+  for(const {grupo:g} of SERVICE_ROWS){
     const targetActuals=context.services.filter(x=>x.data_servico===targetDate&&x.grupo===g);
     if(!targetActuals.length){result.set(g,{grad:'',nome:''});continue}
-
     const rows=context.members.filter(x=>x.grupo===g).sort((a,b)=>(a.ordem||100)-(b.ordem||100)||Number(a.id)-Number(b.id));
     const keys=rows.map(personKey).filter(Boolean);
     if(!keys.length){result.set(g,{grad:'',nome:''});continue}
@@ -163,13 +187,12 @@ function computeStandby(context,targetDate){
     }
     confirmed.sort((a,b)=>a.data_servico.localeCompare(b.data_servico)||Number(a.id)-Number(b.id));
     if(!confirmed.length){result.set(g,{grad:'',nome:''});continue}
-
     const anchor=confirmed[0].data_servico;
     let date=anchor;
     while(date<=targetDate){
       if(laneFor(context,date)!==lane){date=addDays(date,1);continue}
       const actuals=confirmed.filter(x=>x.data_servico===date);
-      if(actuals.length){actuals.forEach(a=>moveToBack(queue,personKey(a))}
+      if(actuals.length){actuals.forEach(a=>moveToBack(queue,personKey(a)))}
       else if(date<targetDate){
         let idx=-1;
         for(let i=0;i<queue.length;i++){
@@ -180,7 +203,6 @@ function computeStandby(context,targetDate){
       }
       date=addDays(date,1);
     }
-
     let standbyRow=null;
     const actualKeys=new Set(targetActuals.map(personKey));
     for(const key of queue){
@@ -195,7 +217,6 @@ function computeStandby(context,targetDate){
 function missionPeople(context,missionId){
   return context.participants.filter(x=>String(x.missao_id)===String(missionId)).map(context.person).map(x=>[x.grad,x.nome].filter(Boolean).join(' '));
 }
-
 function docHelpers(doc){
   const pageW=210,pageH=297;
   function border(){doc.setDrawColor(15,23,42);doc.setLineWidth(.55);doc.rect(8,7,pageW-16,pageH-14);doc.setLineWidth(.18);doc.rect(10,9,pageW-20,pageH-18)}
@@ -204,7 +225,6 @@ function docHelpers(doc){
   function center(text,y,size=10,bold=false){doc.setFont('times',bold?'bold':'normal');doc.setFontSize(size);doc.text(String(text),pageW/2,y,{align:'center'});return y}
   return{pageW,pageH,border,newPage,ensure,center};
 }
-
 function drawServiceTable(doc,context,day,y,standby=false){
   const x=[17,72,94,193],headH=7,rowH=7;
   doc.setFillColor(225,225,225);doc.rect(x[0],y,x[3]-x[0],headH,'F');doc.setDrawColor(40);doc.setLineWidth(.2);doc.rect(x[0],y,x[3]-x[0],headH);
@@ -221,32 +241,24 @@ function drawServiceTable(doc,context,day,y,standby=false){
 }
 
 async function buildPdf(context){
-  if(!window.jspdf?.jsPDF)throw new Error('Biblioteca de PDF não carregou. Atualize a página e tente novamente.');
-  const {jsPDF}=window.jspdf,doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'}),h=docHelpers(doc);
+  const jsPDF=await ensureJsPdf(),doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'}),h=docHelpers(doc);
   h.border();let y=14;
   const logo=await loadLogo();
   if(logo){try{doc.addImage(logo,'PNG',96,13,18,19)}catch(_){}}
   y=36;h.center('MINISTÉRIO DA DEFESA',y,10,false);y+=4;h.center('EXÉRCITO BRASILEIRO',y,10,false);y+=4;h.center('26º PELOTÃO DE POLÍCIA DO EXÉRCITO MECANIZADO',y,10,true);y+=8;
-
   const firstDate=context.days[0].date,boletimDate=addDays(firstDate,-1);
   const intro=`ADITAMENTO AO BOLETIM INTERNO DA 6ª BRIGADA DE INFANTARIA BLINDADA,\nDO DIA ${fullDate(boletimDate)}, PARA O CONHECIMENTO DO PELOTÃO E A DEVIDA\nEXECUÇÃO, PUBLICO O SEGUINTE:`;
   doc.setFont('times','bold');doc.setFontSize(9.6);doc.text(intro.split('\n'),105,y,{align:'center'});y+=15;
   h.center('1ª PARTE - SERVIÇOS DIÁRIOS',y,10.5,true);y+=8;
-
   for(const day of context.days){
-    y=h.ensure(y,58);
-    h.center(`SERVIÇO PARA O DIA ${fullDate(day.date)} (${weekName(day.date)})`,y,9.6,true);y+=3;
-    y=drawServiceTable(doc,context,day,y,false);
-    y+=5;doc.setFont('times','bold');doc.setFontSize(9.5);doc.text('- PASSAGEM DE SERVIÇO ÀS 08:00h.',17,y);y+=12;
+    y=h.ensure(y,58);h.center(`SERVIÇO PARA O DIA ${fullDate(day.date)} (${weekName(day.date)})`,y,9.6,true);y+=3;
+    y=drawServiceTable(doc,context,day,y,false);y+=5;doc.setFont('times','bold');doc.setFontSize(9.5);doc.text('- PASSAGEM DE SERVIÇO ÀS 08:00h.',17,y);y+=12;
   }
-
   const standbyDays=context.days.filter(day=>day.includeStandby);
   for(const day of standbyDays){
-    y=h.ensure(y,54);
-    h.center(`SOBREAVISO PARA O DIA ${fullDate(day.date)} (${weekName(day.date)})`,y,9.6,true);y+=3;
+    y=h.ensure(y,54);h.center(`SOBREAVISO PARA O DIA ${fullDate(day.date)} (${weekName(day.date)})`,y,9.6,true);y+=3;
     y=drawServiceTable(doc,context,day,y,true);y+=10;
   }
-
   y=h.ensure(y,30);h.center('2ª PARTE - INSTRUÇÃO:',y,10,true);doc.setFont('times','normal');doc.setFontSize(9.5);doc.text('Sem alteração.',105,y+4,{align:'center'});y+=14;
   h.center('3ª PARTE - ASSUNTOS GERAIS E ADMINISTRATIVOS:',y,10,true);y+=8;
   if(!context.missions.length){doc.setFont('times','normal');doc.setFontSize(9.5);doc.text('Sem alteração.',105,y,{align:'center'});y+=8}
@@ -265,7 +277,6 @@ async function buildPdf(context){
       y+=4;
     }
   }
-
   y=h.ensure(y,34);y+=3;h.center('4ª PARTE - JUSTIÇA E DISCIPLINA:',y,10,true);doc.setFont('times','normal');doc.setFontSize(9.5);doc.text('Sem alteração.',105,y+4,{align:'center'});y+=24;
   h.center('GUILLEN GABRIEL DOS SANTOS SILVA - 1º Ten',y,10.5,true);y+=4.5;h.center('Comandante do 26º Pelotão de Polícia do Exército Mecanizado',y,9.5,false);
   return doc;
@@ -280,9 +291,14 @@ async function generate(){
     if(btn){btn.disabled=true;btn.textContent='Gerando PDF...'}
     setStatus(`Buscando ${days.length} dia(s) de serviço, sobreaviso e missões...`);
     const context=await loadAditamentoContext(days),doc=await buildPdf(context);
-    const blob=doc.output('blob'),url=URL.createObjectURL(blob),a=document.createElement('a');
     const first=days[0].date,last=days[days.length-1].date,suffix=first===last?fileDate(first):`${fileDate(first)}_a_${fileDate(last)}`;
-    a.href=url;a.download=`Aditamento_${suffix}.pdf`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);
+    const filename=`Aditamento_${suffix}.pdf`;
+    try{doc.save(filename)}catch(saveError){
+      console.warn('doc.save falhou; usando fallback de Blob.',saveError);
+      const blob=doc.output('blob'),url=URL.createObjectURL(blob),a=document.createElement('a');
+      a.href=url;a.download=filename;a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),60000);
+    }
     const standbyCount=days.filter(x=>x.includeStandby).length;
     setStatus(`PDF gerado com ${days.length} dia(s), ${standbyCount} bloco(s) de sobreaviso e ${context.missions.length} missão(ões).`);
     modal(false);
@@ -290,18 +306,18 @@ async function generate(){
   finally{if(btn){btn.disabled=false;btn.textContent='Gerar PDF'}}
 }
 
-function updateLabels(){
-  resetDays();
-  setStatus('Adicione quantos dias precisar. Marque individualmente quais datas devem sair com Sobreaviso.');
-}
+function updateLabels(){resetDays();setStatus('Adicione quantos dias precisar. Marque individualmente quais datas devem sair com Sobreaviso.');}
 function bind(){
-  const open=$('generateAddendum');if(!open)return;
-  open.onclick=()=>{updateLabels();modal(true)};
-  $('aditamentoAddDia').onclick=addNextDay;
-  $('aditamentoGerar').onclick=generate;
-  $('aditamentoCancelar').onclick=()=>modal(false);
-  $('aditamentoClose').onclick=()=>modal(false);
-  $('aditamentoModal').onclick=e=>{if(e.target===$('aditamentoModal'))modal(false)};
+  const open=$('generateAddendum'),add=$('aditamentoAddDia'),go=$('aditamentoGerar'),cancel=$('aditamentoCancelar'),close=$('aditamentoClose'),bg=$('aditamentoModal');
+  if(!open||!add||!go||!cancel||!close||!bg){console.error('Aditamento V7.4.4: elementos da interface não encontrados.');return}
+  if(open.dataset.aditamentoBound==='1')return;
+  open.dataset.aditamentoBound='1';
+  open.addEventListener('click',e=>{e.preventDefault();updateLabels();modal(true)});
+  add.addEventListener('click',addNextDay);
+  go.addEventListener('click',generate);
+  cancel.addEventListener('click',()=>modal(false));
+  close.addEventListener('click',()=>modal(false));
+  bg.addEventListener('click',e=>{if(e.target===bg)modal(false)});
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
 })();
