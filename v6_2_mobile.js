@@ -33,6 +33,10 @@ function makeBar(){
 function wireSidebar(){
   sidebar.addEventListener('click',function(e){
     if(!MQ.matches)return;
+
+    // V7.2.4: o grupo Pessoal segue o mesmo padrão confortável do
+    // Orçamentários no Android. A linha principal inteira expande/recolhe;
+    // apenas as opções internas navegam e fecham a sidebar.
     const pessoalMain=e.target.closest('[data-v7-main]');
     if(pessoalMain){
       e.preventDefault();e.stopPropagation();
@@ -43,6 +47,7 @@ function wireSidebar(){
       }
       return;
     }
+
     const arrow=e.target.closest('.v6-orc-arrow');
     if(arrow){
       e.preventDefault();e.stopPropagation();
@@ -50,8 +55,11 @@ function wireSidebar(){
       if(parent) parent.classList.toggle('v62-subopen');
       return;
     }
+
     const nav=e.target.closest('a,button,.v6-nav-item,li');
-    if(nav)window.setTimeout(closeMenu,120);
+    if(nav){
+      window.setTimeout(closeMenu,120);
+    }
   });
 }
 
@@ -59,7 +67,8 @@ function init(){
   sidebar=document.querySelector('.sidebar');
   if(!sidebar || document.getElementById('v62MobileBar'))return;
   document.body.classList.add('v62-mobile-ready');
-  makeBar();wireSidebar();
+  makeBar();
+  wireSidebar();
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu();});
   const onChange=()=>{if(!MQ.matches)closeMenu();};
   if(MQ.addEventListener)MQ.addEventListener('change',onChange);else MQ.addListener(onChange);
@@ -68,32 +77,35 @@ function init(){
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 
-/* V7 loader — V7.4.7 hotfix */
+/* V7 loader — V7.4.7 */
 (function(){
-  function add(src,attr,done){
+  function add(src, attr, done){
     const old=document.querySelector('script['+attr+'],script[src*="'+src.split('?')[0]+'"]');
     if(old){if(done)done();return;}
-    const s=document.createElement('script');s.src=src;s.defer=true;s.setAttribute(attr,'1');if(done)s.onload=done;document.head.appendChild(s);
+    const s=document.createElement('script');
+    s.src=src;s.defer=true;s.setAttribute(attr,'1');
+    if(done)s.onload=done;
+    document.head.appendChild(s);
   }
-  add('v7_4_7_site_control.js?v=7.4.7h1','data-v747-site-control',function(){
-    add('v7_4_7_mission_patch.js?v=7.4.7h1','data-v747-mission-patch',function(){
-      add('v7_4_7_aditamento_patch.js?v=7.4.7h1','data-v747-aditamento-patch',function(){
-        add('v6_5_patch.js?v=6.5','data-v65-loader',function(){
-          add('v7_global.js?v=7.4.7h1','data-v7-loader',function(){
-            add('v7_4_3_period.js?v=7.4.7h1','data-v743-period',function(){
-              add('v7_4_3_pdf.js?v=7.4.7h1','data-v743-pdf',function(){
-                add('v7_4_2_search_order.js?v=7.4.7h1','data-v742-search-order',function(){
-                  add('v7_4_2_transfer.js?v=7.4.7h1','data-v742-transfer',function(){
-                    add('v7_4_2_replace.js?v=7.4.7h1','data-v742-replace',function(){
-                      add('v7_4_7_about.js?v=7.4.7h1','data-v747-about');
-                    });
-                  });
-                });
+  add('v7_4_7_site_control.js?v=7.4.7h2','data-v747-site-control',function(){
+   add('v7_4_7_mission_patch.js?v=7.4.7h2','data-v747-mission-patch',function(){
+    add('v7_4_7_aditamento_patch.js?v=7.4.7h2','data-v747-aditamento-patch',function(){
+     add('v6_5_patch.js?v=6.5','data-v65-loader',function(){
+    add('v7_global.js?v=7.4.7h2','data-v7-loader',function(){
+      add('v7_4_3_period.js?v=7.4.7h2','data-v743-period',function(){
+        add('v7_4_3_pdf.js?v=7.4.7h2','data-v743-pdf',function(){
+          add('v7_4_2_search_order.js?v=7.4.7h2','data-v742-search-order',function(){
+            add('v7_4_2_transfer.js?v=7.4.7h2','data-v742-transfer',function(){
+              add('v7_4_2_replace.js?v=7.4.7h2','data-v742-replace',function(){
+                add('v7_4_7_about.js?v=7.4.7h2','data-v747-about');
               });
             });
           });
         });
       });
     });
+     });
+    });
+   });
   });
 })();
