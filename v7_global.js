@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const VERSION='7.4.6';
+const VERSION='7.4.7';
 const $=id=>document.getElementById(id);
 const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
 let busy=false,timer=null,onlineTimer=null,adminActive=false;
@@ -87,18 +87,12 @@ function pessoalNav(){
       syncExpanded();
       main.addEventListener('click',function(e){
         if(!window.matchMedia('(max-width: 900px)').matches)return;
-        e.preventDefault();
-        e.stopPropagation();
-        parent.classList.toggle('v62-subopen');
-        syncExpanded();
+        e.preventDefault();e.stopPropagation();parent.classList.toggle('v62-subopen');syncExpanded();
       });
       main.addEventListener('keydown',function(e){
         if(!window.matchMedia('(max-width: 900px)').matches)return;
         if(e.key!=='Enter'&&e.key!==' ')return;
-        e.preventDefault();
-        e.stopPropagation();
-        parent.classList.toggle('v62-subopen');
-        syncExpanded();
+        e.preventDefault();e.stopPropagation();parent.classList.toggle('v62-subopen');syncExpanded();
       });
     }
     parent.dataset.v724Wired='1';
@@ -146,6 +140,7 @@ async function renderAdminOnline(){
   if(!adminActive)await detectAdmin();
   let badge=document.getElementById('v71AdminOnline');
   if(!adminActive){badge?.remove();return}
+
   const since=new Date(Date.now()-120000).toISOString();
   try{
     const r=await c.from('usuarios_presenca').select('usuario_id').gte('ultima_atividade',since);
@@ -182,14 +177,8 @@ function refresh(){
   if(busy)return;
   busy=true;
   if(observer)observer.disconnect();
-  try{
-    pessoalNav();
-    version();
-    usersTitle();
-  }finally{
-    busy=false;
-    if(observer)observer.observe(document.documentElement,{childList:true,subtree:true});
-  }
+  try{pessoalNav();version();usersTitle();}
+  finally{busy=false;if(observer)observer.observe(document.documentElement,{childList:true,subtree:true});}
 }
 function init(){
   injectCss();
@@ -203,8 +192,7 @@ function init(){
   window.addEventListener('focus',()=>{serviceNotices();renderAdminOnline()});
   window.addEventListener('v65:presenca',renderAdminOnline);
   observer.observe(document.documentElement,{childList:true,subtree:true});
-  setTimeout(refresh,700);
-  setTimeout(refresh,1500);
+  setTimeout(refresh,700);setTimeout(refresh,1500);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
