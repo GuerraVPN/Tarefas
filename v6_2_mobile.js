@@ -33,10 +33,6 @@ function makeBar(){
 function wireSidebar(){
   sidebar.addEventListener('click',function(e){
     if(!MQ.matches)return;
-
-    // V7.2.4: o grupo Pessoal segue o mesmo padrão confortável do
-    // Orçamentários no Android. A linha principal inteira expande/recolhe;
-    // apenas as opções internas navegam e fecham a sidebar.
     const pessoalMain=e.target.closest('[data-v7-main]');
     if(pessoalMain){
       e.preventDefault();e.stopPropagation();
@@ -47,7 +43,6 @@ function wireSidebar(){
       }
       return;
     }
-
     const arrow=e.target.closest('.v6-orc-arrow');
     if(arrow){
       e.preventDefault();e.stopPropagation();
@@ -55,11 +50,8 @@ function wireSidebar(){
       if(parent) parent.classList.toggle('v62-subopen');
       return;
     }
-
     const nav=e.target.closest('a,button,.v6-nav-item,li');
-    if(nav){
-      window.setTimeout(closeMenu,120);
-    }
+    if(nav)window.setTimeout(closeMenu,120);
   });
 }
 
@@ -77,7 +69,7 @@ function init(){
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 
-/* V7 loader — V7.4.3 */
+/* V7 loader — V7.4.4 */
 (function(){
   function add(src, attr, done){
     const old=document.querySelector('script['+attr+'],script[src*="'+src.split('?')[0]+'"]');
@@ -88,11 +80,15 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     document.head.appendChild(s);
   }
   add('v6_5_patch.js?v=6.5','data-v65-loader',function(){
-    add('v7_global.js?v=7.4.3','data-v7-loader',function(){
-      add('v7_4_3_period.js?v=7.4.3','data-v743-period',function(){
-        add('v7_4_3_pdf.js?v=7.4.3','data-v743-pdf',function(){
-          add('v7_4_2_people.js?v=7.4.3','data-v742-people',function(){
-            add('v7_4_3_about.js?v=7.4.3','data-v743-about');
+    add('v7_global.js?v=7.4.4','data-v7-loader',function(){
+      add('v7_4_3_period.js?v=7.4.4','data-v743-period',function(){
+        add('v7_4_3_pdf.js?v=7.4.4','data-v743-pdf',function(){
+          add('v7_4_2_search_order.js?v=7.4.4','data-v742-search-order',function(){
+            add('v7_4_2_transfer.js?v=7.4.4','data-v742-transfer',function(){
+              add('v7_4_2_replace.js?v=7.4.4','data-v742-replace',function(){
+                add('v7_4_4_about.js?v=7.4.4','data-v744-about');
+              });
+            });
           });
         });
       });
