@@ -13,7 +13,8 @@ const release={
   'Ajusta o espaçamento entre Missão, Data/Hora, Local e Militares e os respectivos valores.',
   'Novo Controle do Site exclusivo do Admin: EXIT USERS, Desligar/Iniciar e Reiniciar com aviso global de 30 segundos.',
   'No modo desligado, usuários comuns ficam bloqueados em manutenção; o Admin continua com acesso para reabrir o sistema.',
-  'Reiniciar atualiza caches/recursos e recarrega a aplicação mantendo a sessão.'
+  'Reiniciar atualiza caches/recursos e recarrega a aplicação mantendo a sessão.',
+  'No aditamento, missões sem Local informado omitem completamente a linha Local.'
  ]
 };
 function apply(){
