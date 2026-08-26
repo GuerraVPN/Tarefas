@@ -22,7 +22,6 @@ const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
   <header class="v6-dashboard-top"><div><h2>Dashboard</h2><p>Visão geral do 26º Pel PE Mec</p></div></header>
   <div class="v6-dashboard-content">
     <section class="v6-welcome"><div><h1 id="dashGreeting">Bem-vindo.</h1><p>Resumo operacional, tarefas, usuários e Orçamentários em um único lugar.</p></div><div class="v6-welcome-badge" id="dashProfile">Carregando perfil...</div></section>
-
     <div class="v6-section-head"><h3>Resumo geral</h3><span id="dashUpdated">Atualizando...</span></div>
     <section class="v6-kpis">
       <article class="v6-kpi"><div class="v6-kpi-icon" data-icon="clipboard"></div><div><small>Tarefas abertas</small><strong id="kOpen">0</strong><span id="kOpenSub">0 pendentes</span></div></article>
@@ -31,16 +30,13 @@ const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
       <article class="v6-kpi"><div class="v6-kpi-icon" data-icon="bell"></div><div><small>Notificações</small><strong id="kNotifs">0</strong><span>Não lidas no perfil atual</span></div></article>
       <article class="v6-kpi"><div class="v6-kpi-icon" data-icon="file"></div><div><small>Guias</small><strong id="kGuides">0</strong><span id="kGuidesSub">0 aguardando inclusão</span></div></article>
     </section>
-
     <div class="v6-section-head"><h3>Acesso rápido</h3><span>Abra qualquer área em um clique</span></div>
     <section class="v6-shortcuts" id="shortcutGrid"></section>
-
     <div class="v6-section-head"><h3>Relatórios resumidos</h3><span>Dados sincronizados com o banco</span></div>
     <section class="v6-grid2">
       <article class="v6-panel"><div class="v6-panel-head"><h3>Tarefas por situação</h3><a href="relatorios.html">Abrir Relatórios</a></div><div class="v6-panel-body"><div class="v6-bars" id="taskBars"></div></div></article>
       <article class="v6-panel"><div class="v6-panel-head"><h3>Orçamentários</h3><a href="orcamentarios.html">Abrir relatório</a></div><div class="v6-panel-body"><div class="v6-budget-grid" id="budgetCards"></div></div></article>
     </section>
-
     <div class="v6-section-head"><h3>Atividade recente</h3><span>Últimas tarefas atualizadas</span></div>
     <section class="v6-panel"><div class="v6-panel-body"><div class="v6-recent" id="recentTasks"><div class="v6-empty">Carregando...</div></div></div></section>
   </div>
@@ -51,6 +47,8 @@ const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 <script src="bloco_notas.js?v=6.0"></script>
 <script src="v4_tema.js?v=6.0"></script>
 <script src="dashboard.js?v=6.0"></script>
-  <script src="v6_2_mobile.js?v=6.2"></script>
+<script src="v7_global.js?v=7.4.8"></script>
+<script src="v7_4_8_site_control.js?v=7.4.8"></script>
+<script src="v6_2_mobile.js?v=7.4.8"></script>
 </body>
 </html>
