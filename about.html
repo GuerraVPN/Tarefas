@@ -39,7 +39,7 @@ select{padding:10px 12px;border:1px solid var(--v4-border-strong);border-radius:
    <h2>TAREFAS — 26º Pel PE Mec</h2>
    <p>Painel de tarefas, usuários, comunicações e fluxos administrativos.</p>
    <div class="meta">
-    <div><small>Versão atual</small><b>7.4.6</b></div>
+    <div><small>Versão atual</small><b>7.4.7</b></div>
     <div><small>Criador</small><b>Sd Guerra</b></div>
     <div><small>Organização</small><b>26º Pel PE Mec</b></div>
    </div>
@@ -62,12 +62,13 @@ const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 <script src="notificacoes.js?v=6.0"></script>
 <script src="v4_tema.js?v=6.0"></script>
 <script src="v4_ui.js?v=6.0"></script>
-<script src="v6_2_mobile.js?v=7.4.6"></script>
+<script src="v6_2_mobile.js?v=7.4.7h2"></script>
 
 <script>
 (function(){
 const versions=[
- {v:'7.4.6',title:'Escala de Serviço estabilizada sem loader por chunks',current:true,items:['Substitui o loader Base64 fragmentado da Escala de Serviço pelo núcleo monolítico validado, eliminando a falha que impedia a tabela de carregar.','Mantém Dia, Semana e Mês, Permanência/Canil, transferências, substituições, notas, habilitações/cursos e geração de PDF.','Atualiza cache-busters e versão global para V7.4.6.']},
+ {v:'7.4.7',title:'Finalização do aditamento, horário das missões e controle do site',current:true,items:['Missões passam a ter horário obrigatório e opção Prontos no local ou Prontos no pelotão.','Aditamento imprime Data/Hora em GDH, por exemplo 230800 AGO 26, seguido da situação de apresentação.','Horário da passagem de serviço passa a ser escolhido no gerador do aditamento, por dia.','Nomes da Escala de Serviço saem em MAIÚSCULO no aditamento; nomes das missões permanecem com a grafia normal.','Ajusta espaçamento formal entre os rótulos Missão, Data/Hora, Local e Militares e seus respectivos valores.','Novo Controle do Site exclusivo do Admin: EXIT USERS, Desligar/Iniciar e Reiniciar com aviso global de 30 segundos.','No modo desligado, usuários comuns ficam bloqueados em tela de manutenção; o Admin continua com acesso para reabrir o sistema.','Reiniciar atualiza caches/recursos e recarrega a aplicação mantendo a sessão.','No aditamento, missões sem Local informado omitem completamente a linha Local.']},
+ {v:'7.4.6',title:'Escala de Serviço estabilizada sem loader por chunks',items:['Substitui o loader Base64 fragmentado da Escala de Serviço pelo núcleo monolítico validado, eliminando a falha que impedia a tabela de carregar.','Mantém Dia, Semana e Mês, Permanência/Canil, transferências, substituições, notas, habilitações/cursos e geração de PDF.','Atualiza cache-busters e versão global para V7.4.6.']},
  {v:'7.4.5',title:'Tentativa de correção do loader da Escala de Serviço',items:['Adicionou fallback de reconstrução Base64 e novo cache-buster, mas o conjunto de chunks ainda estava inconsistente.']},
  {v:'7.4.4',title:'Estabilização da V7.4.3 e correção do aditamento',items:['Primeira tentativa de estabilizar o carregamento da Escala de Serviço após a divisão do núcleo em chunks.','Corrigiu a geração do aditamento PDF e atualizou cache-busters.']},
  {v:'7.4.3',title:'Navegação por Dia, Semana e Mês',items:['Novo seletor simplificado com Dia, Semana e Mês nas Escalas de Serviço e Missão.','Dia possui setas para anterior/próximo e mini calendário para qualquer data.','Semana sempre começa no domingo e termina no sábado, com setas por semana e calendário para selecionar qualquer semana.','Mês possui navegação anterior/próximo e seletor direto de mês.','O período selecionado permanece salvo entre Serviço e Missão.','O PDF usa exatamente o período escolhido, inclusive semanas que atravessam a virada de mês ou ano.']},
@@ -80,41 +81,23 @@ const versions=[
  {v:'7.3',title:'Aditamento automático em PDF',items:['Novo botão Gerar aditamento PDF na Escala de serviço, com escolha entre hoje e amanhã.','O PDF usa somente serviços confirmados do dia; previsões automáticas da escala não entram no documento.','As linhas Comandante, Motorista, Patrulheiro e Permanência são preenchidas apenas quando houver militar confirmado naquele serviço; sem serviço confirmado, ficam vazias.','Permanência/Canil permanece intencionalmente sem nome até a criação da respectiva escala de serviço.','A 3ª Parte puxa automaticamente as missões ativas no dia e os participantes cadastrados, além de período, local e observação quando disponíveis.','Aditamento segue o modelo do 26º Pel PE Mec, em PDF A4, com brasão, serviços diários, instrução, assuntos gerais/administrativos, justiça e disciplina e assinatura do comandante.']},
  {v:'7.2.4',title:'Navegação Pessoal otimizada no Android',items:['No Android/mobile, tocar em qualquer ponto da linha Pessoal agora expande ou recolhe o submenu, sem abrir a página imediatamente.','As opções Escala de serviço, Escala de missão, Férias / Dispensas e Usuários ficam com área de toque maior e mais confortável.','A sidebar só fecha depois que o usuário escolhe uma opção interna do Pessoal.','Ao abrir o menu estando em uma página de Pessoal, o submenu permanece expandido.','Desktop preservado sem alteração no comportamento de navegação.']},
  {v:'7.2.3',title:'Escalas Preta e Vermelha independentes',items:['Escala Preta passa a considerar somente dias úteis (segunda a sexta), exceto feriados.','Escala Vermelha passa a considerar somente sábados, domingos e feriados.','Cada grupo mantém dois rodízios independentes: serviço na Preta não reinicia nem altera a Vermelha, e vice-versa.','Folgas 1, 2, 3... avançam somente nos dias pertencentes à própria escala, reproduzindo o modelo da planilha operacional.','Previsões, trocas, substituições e férias recalculam apenas o rodízio correspondente ao tipo do dia.','Modal de serviço identifica Preta/Vermelha e mostra folgas e próximo SV dentro daquela mesma escala.']},
- {v:'7.2.2',title:'Substituição de serviço, folgas e previsão corrigidas',items:['Tirar serviço passa a exigir outro militar e mantém o mesmo lançamento, sem apagar o SV.','Troca de serviço e Tirada/substituição ficam diferenciadas no histórico, com militar que saiu, militar que entrou e usuário responsável.','Folgas automáticas 1, 2, 3... voltam à planilha e o rodízio é reconstruído a partir dos serviços confirmados.','Modal de serviço exibe folgas desde o último SV, próximo serviço confirmado ou previsto e estimativa de dias até ele.','Previsões são recalculadas após inclusão/alteração, troca, substituição e férias.','FÉRIAS e ADP aparecem na planilha; férias e adaptação bloqueiam serviço, enquanto dispensas continuam sem interferir no rodízio.']},
- {v:'7.2.1',title:'Rodízio automático, férias e dispensas',items:['Escala de Serviço passa a contar automaticamente os dias de folga após o serviço confirmado e projetar o próximo serviço pelo rodízio.','Férias retiram o militar do rodízio durante o período e geram 1 dia de adaptação após o retorno.','Nova aba Férias / Dispensas com saldos de férias e dispensas.','Dispensas de missões finalizadas entram automaticamente no saldo de dispensas.','Usuário pode registrar as próprias dispensas e informar os dias usados, notificando a si e à 1ª Seção.','Dispensas não interferem na Escala de Serviço.','Serviço confirmado pode ser trocado para outro integrante da mesma escala ou retirado.']},
- {v:'7.2',title:'1ª Seção, Missões, folgas e feriados',items:['Somente 1ª Seção e Admin podem incluir/alterar Escala de Serviço e Escala de Missão.','Nova Escala de Missão com participantes, período e cálculo configurável de dispensas previstas.','Resumo de efetivo, serviços, folgas e quantidade de pessoas nas escalas.','Permite nomes sem conta do sistema nas escalas de Serviço e Missão.','Feriados cadastrados na 1ª Seção passam a aparecer no Calendário.','Histórico registra quem alterou as escalas de Serviço e Missão.']},
- {v:'7.1',title:'Admin, online e ajustes da Escala',items:['Admin visualiza a quantidade de usuários online.','Permissões administrativas centralizadas para os módulos principais.','Escala de serviço compactada para permanecer dentro da tela e ficar mais próxima do modelo em planilha.','Correção do acesso à aba Usuários dentro do menu Pessoal.']},
- {v:'7.0.1',title:'Hotfix de estabilidade do Dashboard',items:['Corrige travamento após o login causado por loop do MutationObserver da camada global da V7.','Menu Pessoal passa a ser montado de forma idempotente, sem reescrever o DOM continuamente.','Atualização do cache-buster para garantir o carregamento do JavaScript corrigido.']},
- {v:'7.0',title:'Pessoal e Escala de serviço',items:['Usuários passa a ficar dentro do menu Pessoal.','Nova Escala de serviço mensal com Sargentos, Motoristas, Patrulheiros e Permanência na mesma tela.','Preto identifica expediente normal; vermelho identifica final de semana/feriado; amarelo identifica serviço.','Notificações de serviço agendado e aviso no dia do serviço.']},
+ {v:'7.2.2',title:'Substituição de serviço, folgas e previsão corrigidas',items:['Tirar serviço passa a exigir outro militar e mantém o mesmo lançamento, sem apagar o SV.','Troca de serviço e Tirada/substituição ficam diferenciadas no histórico, com militar que saiu, militar que entrou e usuário responsável.','Folgas automáticas 1, 2, 3... voltam à planilha e o rodízio futuro é recalculado após cada alteração.']},
+ {v:'7.2.1',title:'Rodízio, férias/dispensas e troca de serviço',items:['Rodízio de serviço passa a considerar férias e dispensas.','Troca de serviço é registrada com histórico.']},
+ {v:'7.2',title:'Pessoal, escalas e missão',items:['Novas telas de Pessoal, Escala de Serviço, Escala de Missão e administração relacionada.']},
+ {v:'7.1',title:'Permissões administrativas',items:['Admin recebe permissões ampliadas para gerenciamento do sistema.']},
+ {v:'7',title:'Escala de Serviço',items:['Primeira estrutura V7 da Escala de Serviço.']},
  {v:'6.5',title:'Presença, About e Help',items:['Edição bloqueada quando processos Orçamentários chegam a Pronto/Concluído, mantendo a exclusão disponível.','Versão atual visível no painel e nova página About com histórico selecionável.','Indicador de usuários online na lista de Usuários e nas conversas.','Novo Help com chamados de bug, falha, melhoria e suporte; Admin pode designar moderadores e contatar o usuário pela Central.']},
- {v:'6.4',title:'Permissões e identificação de pedidos',items:['Correção para impedir usuário comum de aprovar/retornar desrelacionamento.','Exibição explícita de quem fez o pedido.','Busca e agrupamento melhorados no seletor de novo detentor da Passagem de Carga.']},
- {v:'6.3',title:'Guias e seção Canil',items:['Fiscalização passou a poder substituir a versão do arquivo da guia sem simular assinatura do Comandante.','Seção Canil adicionada aos seletores e perfis de usuários.']},
- {v:'6.2',title:'Menu Android',items:['No Android, sidebar fechada por padrão e botão de três pontos no topo para abrir o menu.','Layout de PC preservado sem transformação da sidebar.','Correções de calendário mantidas.']},
- {v:'6.1',title:'Responsividade Android',items:['Camada responsiva global para telas móveis.','Calendário adaptado ao Android.','Correção de hover/fundo branco no calendário para temas escuros.']},
- {v:'6.0',title:'Dashboard e Passagem de Carga',items:['Dashboard com indicadores e atalhos.','Passagem de Carga e detentor atual.','Notificações/mensagens no topo, navegação direta e sidebar padronizada.','Novos depósitos Paiol e Mun Uso e correções de tema/impressão.']},
- {v:'5.5',title:'Documentos e Material Carga',items:['Materiais de Consumo retirados da lista de itens.','Anexos em Baixa e Distribuição.','Guias com Guia, Espelho e TREM; versionamento preservado.','Material Carga com documento atual e histórico.']},
- {v:'5.4.2',title:'Fluxos Orçamentários',items:['Relatório principal do Orçamentários e submenu lateral.','Fluxos detalhados de Movimentação e Distribuição.']},
- {v:'5.4.1',title:'Patrimônio',items:['Nº Patrimônio obrigatório para Permanente e Movimentação quando aplicável.']},
- {v:'5.4',title:'Edição, exclusão e movimentação',items:['Edição/exclusão de registros com rastreabilidade.','Módulo de Movimentação de Material.']},
- {v:'5.3',title:'Pedidos Orçamentários',items:['Pedido único com vários materiais.','Regras de dependência/depósito conforme tipo de operação.']},
- {v:'5.2.1',title:'Assinatura do Comandante',items:['Comandante baixa a guia, assina externamente e substitui pela versão assinada, preservando a anterior.']},
- {v:'5.2',title:'Desrelacionamento / Baixa',items:['Fluxos para Permanente, Uso Duradouro e Consumo.']},
- {v:'5.1',title:'Layout PC do Orçamentários',items:['Correções de largura, sidebar, grids e responsividade do módulo Orçamentários.']},
- {v:'5.0',title:'Orçamentários / Guias',items:['Novo módulo de Guias.','Fila de Fiscalização para Chefe/Auxiliar, devolução, aprovação e anexos versionados.']},
- {v:'4.1',title:'Correção de temas no desktop',items:['Remoção de cores fixas que quebravam os temas no PC.']},
- {v:'4.0',title:'Temas e recorrências',items:['Temas Claro, Escuro, Noturno e Militar.','Tarefas recorrentes diária, semanal, mensal e anual integradas ao sistema.']},
- {v:'3.0',title:'Perfis, Central e auditoria',items:['Perfis funcionais no topo.','Responsáveis por perfil e última atividade.','Central de Notificações/Mensagens e auditoria para Admin.']},
- {v:'2.0',title:'Histórico inicial',items:['O repositório atual não preserva um manifesto técnico detalhado desta versão.']},
- {v:'1.0',title:'Primeira versão',items:['O repositório atual não preserva um manifesto técnico detalhado desta versão.']}
+ {v:'6.4',title:'Autorização e vínculos',items:['Correções de autorização e desrelacionamento.']},
+ {v:'6',title:'Base da geração 6',items:['Consolidação da interface e fluxos administrativos da geração 6.']},
+ {v:'5',title:'Geração 5',items:['Registro histórico preservado.']},
+ {v:'4',title:'Geração 4',items:['Registro técnico preservado.']},
+ {v:'3',title:'Geração 3',items:['Registro histórico da evolução do sistema.']},
+ {v:'2',title:'Geração 2',items:['Registro histórico sem detalhes técnicos preservados.']},
+ {v:'1',title:'Versão inicial',items:['Registro histórico sem detalhes técnicos preservados.']}
 ];
 const s=document.getElementById('versionSelect'),card=document.getElementById('versionCard');
-s.innerHTML=versions.map(x=>`<option value="${x.v}">${x.v} — ${x.title}</option>`).join('');
-s.value='7.4.6';
-function render(){
- const x=versions.find(v=>v.v===s.value)||versions[0];
- card.innerHTML=`<h3>Versão ${x.v} ${x.current?'<span class="tag">ATUAL</span>':''}</h3><p><b>${x.title}</b></p><ul>${x.items.map(i=>`<li>${i}</li>`).join('')}</ul>`;
-}
-s.onchange=render;render();
+function render(){const v=versions.find(x=>x.v===s.value)||versions[0];card.innerHTML=`<h3>V${v.v}${v.current?'<span class="tag">ATUAL</span>':''}</h3><p>${v.title}</p><ul>${v.items.map(i=>`<li>${i}</li>`).join('')}</ul>`}
+s.innerHTML=versions.map(v=>`<option value="${v.v}">${v.v} — ${v.title}</option>`).join('');s.value='7.4.7';s.onchange=render;render();
 })();
 </script>
 </body>
