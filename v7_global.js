@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const VERSION='7.4.9';
+const VERSION='7.4.10';
 const $=id=>document.getElementById(id);
 const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
 let busy=false,timer=null,onlineTimer=null,adminActive=false;
@@ -124,14 +124,12 @@ function usersTitle(){
 async function detectAdmin(){
   const c=client(),u=logged();
   if(!c||!u?.id){adminActive=false;return false}
-  const local=norm(u.secao)==='admin';
-  if(local){adminActive=true;return true}
   try{
-    if(!u.perfil_id){adminActive=false;return false}
-    const r=await c.from('usuario_perfis').select('secao').eq('id',Number(u.perfil_id)).eq('usuario_id',Number(u.id)).eq('ativo',true).maybeSingle();
-    adminActive=!r.error&&norm(r.data?.secao)==='admin';
+    const r=await c.from('usuario_perfis').select('id,secao,ativo').eq('usuario_id',Number(u.id)).eq('ativo',true);
+    if(r.error)throw r.error;
+    adminActive=(r.data||[]).some(p=>norm(p.secao)==='admin');
     return adminActive;
-  }catch(_){adminActive=false;return false}
+  }catch(_){adminActive=norm(u.secao)==='admin';return adminActive}
 }
 function onlineHost(){
   return document.getElementById('v3UserZone')||document.querySelector('.header-actions,.topbar-right,.v7-top>div:last-child');
