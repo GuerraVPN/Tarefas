@@ -7,7 +7,7 @@ const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 const getUser=()=>{try{return JSON.parse(localStorage.getItem('usuarioLogado')||'null')}catch(_){return null}};
 const client=()=>{try{return typeof supabaseClient!=='undefined'?supabaseClient:null}catch(_){return null}};
-let adminProfileId=null,hasAdmin=false,adminChecked=false,currentState=null,ensureQueued=false;
+let adminProfileId=null,hasAdmin=false,adminChecked=false,currentState=null;
 
 function css(){
  if(document.getElementById('v7411Css'))return;
@@ -25,6 +25,8 @@ function css(){
  `;document.head.appendChild(s);
 }
 
+// V7.4.11.1: a visibilidade do menu depende apenas de existir perfil Admin ativo.
+// A autorização forte continua sendo confirmada pela RPC quando o painel abre/age.
 async function resolveAdmin(force=false){
  if(adminChecked&&!force)return hasAdmin;
  const u=getUser(),c=client();adminProfileId=null;hasAdmin=false;
@@ -32,13 +34,24 @@ async function resolveAdmin(force=false){
  try{
   const q=await c.from('usuario_perfis').select('id,secao,ativo').eq('usuario_id',Number(u.id)).eq('ativo',true).order('principal',{ascending:false}).order('id');
   if(q.error)throw q.error;
-  for(const p of q.data||[]){
-   if(norm(p.secao)!=='admin')continue;
-   const r=await c.rpc('v7_1_admin_total',{p_usuario_id:Number(u.id),p_perfil_id:Number(p.id)});
-   if(!r.error&&r.data===true){adminProfileId=Number(p.id);hasAdmin=true;break}
-  }
- }catch(e){console.warn('V7.4.11 admin:',e?.message||e)}
+  const p=(q.data||[]).find(x=>norm(x.secao)==='admin');
+  if(p){adminProfileId=Number(p.id);hasAdmin=true}
+  if(!hasAdmin&&norm(u.secao)==='admin'&&u.perfil_id){adminProfileId=Number(u.perfil_id);hasAdmin=true}
+ }catch(e){
+  console.warn('V7.4.11 admin:',e?.message||e);
+  if(norm(u.secao)==='admin'&&u.perfil_id){adminProfileId=Number(u.perfil_id);hasAdmin=true}
+ }
  adminChecked=true;return hasAdmin;
+}
+async function validateAdmin(){
+ const u=getUser(),c=client();
+ if(!u?.id||!c)return false;
+ if(!hasAdmin||!adminProfileId)await resolveAdmin(true);
+ if(!adminProfileId)return false;
+ try{
+  const r=await c.rpc('v7_1_admin_total',{p_usuario_id:Number(u.id),p_perfil_id:Number(adminProfileId)});
+  return !r.error&&r.data===true;
+ }catch(_){return false}
 }
 
 function host(){return document.querySelector('.sidebar .menu-items,.sidebar ul')}
@@ -46,13 +59,12 @@ function dashboardItem(h){return [...h.children].find(li=>{const btn=li.querySel
 function icon(){return '<span class="v6-nav-icon"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 7v5l3 2"/><path d="M16 3h5v5"/><path d="m21 3-6 6"/></svg></span>'}
 function stateName(){return currentState?.acao_pendente?'pending':currentState?.modo==='desligado'?'off':'online'}
 function syncState(){const li=document.getElementById('v7411SiteSidebarItem');if(li)li.dataset.state=stateName()}
-
 function ensureSiteItem(){
  if(!hasAdmin)return false;
  const h=host();if(!h)return false;
  let li=document.getElementById('v7411SiteSidebarItem');
  if(li&&li.parentElement===h){syncState();return true}
- document.getElementById('v7410SiteSidebarItem')?.remove();
+ document.querySelectorAll('#v749SiteSidebarItem,#v748SiteSidebarItem,#v7410SiteSidebarItem').forEach(x=>x.remove());
  if(li)li.remove();
  li=document.createElement('li');li.id='v7411SiteSidebarItem';li.dataset.v6Nav='site';
  li.innerHTML=`<button type="button" class="v6-nav-item" title="Abrir Painel SITE">${icon()}<span class="v6-nav-label">Painel SITE</span><span class="v7411-site-dot"></span></button>`;
@@ -60,39 +72,21 @@ function ensureSiteItem(){
  const d=dashboardItem(h);if(d?.nextSibling)h.insertBefore(li,d.nextSibling);else h.appendChild(li);
  syncState();return true;
 }
-function queueEnsure(){
- if(ensureQueued||!hasAdmin)return;
- ensureQueued=true;
- setTimeout(()=>{
-  ensureQueued=false;
-  const li=document.getElementById('v7411SiteSidebarItem');
-  if(!li||li.parentElement!==host())ensureSiteItem();
- },0);
-}
 
 async function loadState(){const c=client();if(!c)return null;const r=await c.rpc('v7_4_9_estado_site');if(r.error)throw r.error;currentState=Array.isArray(r.data)?r.data[0]:r.data;syncState();return currentState}
 function renderModal(){let m=document.getElementById('v7411Modal');if(!m){m=document.createElement('div');m.id='v7411Modal';document.body.appendChild(m)}const pending=currentState?.acao_pendente?`${esc(currentState.acao_pendente)} — ação pendente`:'Nenhuma ação pendente';m.innerHTML=`<div class="card"><h3>Painel SITE · V${VERSION}</h3><div class="sub">Controle administrativo global do TAREFAS.</div><div class="status"><b>Status:</b> ${currentState?.modo==='desligado'?'DESLIGADO / MANUTENÇÃO':'ONLINE'}<br><b>Ação:</b> ${pending}</div><div class="grid"><button class="danger" data-act="exit_users">EXIT USERS</button><button class="danger" data-act="desligar">Desligar site</button><button class="warn" data-act="reiniciar">Reiniciar site</button><button class="good" data-act="iniciar">Iniciar site</button>${currentState?.acao_pendente?'<button data-act="cancelar">Cancelar ação</button>':''}</div><button class="close" data-close>Fechar</button></div>`;m.hidden=false;m.querySelector('[data-close]').onclick=()=>m.hidden=true;m.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>act(b.dataset.act))}
-async function openPanel(){if(!await resolveAdmin(true))return alert('Painel SITE disponível somente para contas com perfil Admin ativo.');try{await loadState()}catch(e){return alert('Não foi possível consultar o estado do SITE: '+(e?.message||e))}renderModal()}
-async function act(action){const u=getUser(),c=client();if(!u?.id||!c||!adminProfileId)return alert('Não foi possível validar o perfil Admin.');const msg=action==='exit_users'?'Encerrar as sessões dos usuários comuns em 30 segundos?':action==='desligar'?'Desligar o site em 30 segundos?':action==='reiniciar'?'Reiniciar o site em 30 segundos?':action==='iniciar'?'Iniciar o site agora?':'Cancelar a ação pendente?';if(!confirm(msg))return;const r=await c.rpc('v7_4_9_controle_site',{p_acao:action,p_usuario_id:Number(u.id),p_perfil_id:Number(adminProfileId)});if(r.error)return alert(r.error.message||'Falha ao alterar o SITE.');currentState=Array.isArray(r.data)?r.data[0]:r.data;renderModal();syncState()}
-
-function stampVersion(){
- document.documentElement.dataset.tarefasVersion=VERSION;
- document.querySelectorAll('.v65-version-badge').forEach(b=>{const t='● TAREFAS v'+VERSION;if(b.textContent!==t)b.textContent=t;if(b.title!=='Sobre a versão '+VERSION)b.title='Sobre a versão '+VERSION});
- document.querySelectorAll('.v65-mobile-version').forEach(v=>{const t='v'+VERSION;if(v.textContent!==t)v.textContent=t});
-}
-
+async function openPanel(){if(!await validateAdmin())return alert('Painel SITE disponível somente para contas com perfil Admin ativo.');try{await loadState()}catch(e){return alert('Não foi possível consultar o estado do SITE: '+(e?.message||e))}renderModal()}
+async function act(action){const u=getUser(),c=client();if(!u?.id||!c||!await validateAdmin())return alert('Não foi possível validar o perfil Admin.');const msg=action==='exit_users'?'Encerrar as sessões dos usuários comuns em 30 segundos?':action==='desligar'?'Desligar o site em 30 segundos?':action==='reiniciar'?'Reiniciar o site em 30 segundos?':action==='iniciar'?'Iniciar o site agora?':'Cancelar a ação pendente?';if(!confirm(msg))return;const r=await c.rpc('v7_4_9_controle_site',{p_acao:action,p_usuario_id:Number(u.id),p_perfil_id:Number(adminProfileId)});if(r.error)return alert(r.error.message||'Falha ao alterar o SITE.');currentState=Array.isArray(r.data)?r.data[0]:r.data;renderModal();syncState()}
+function stampVersion(){document.documentElement.dataset.tarefasVersion=VERSION;document.querySelectorAll('.v65-version-badge').forEach(b=>{b.textContent='● TAREFAS v'+VERSION;b.title='Sobre a versão '+VERSION});document.querySelectorAll('.v65-mobile-version').forEach(v=>v.textContent='v'+VERSION)}
 async function init(){
  css();stampVersion();
  await resolveAdmin();
- if(hasAdmin)ensureSiteItem();
+ ensureSiteItem();
  loadState().catch(()=>{});
- const sidebar=document.querySelector('.sidebar');
- if(sidebar){
-  const obs=new MutationObserver(()=>queueEnsure());
-  obs.observe(sidebar,{childList:true,subtree:true});
- }
- window.addEventListener('focus',()=>{queueEnsure();loadState().catch(()=>{})});
- document.addEventListener('visibilitychange',()=>{if(!document.hidden){queueEnsure();loadState().catch(()=>{})}});
+ // Checagem local, sem consulta ao banco e sem mutar DOM quando o item já existe.
+ setInterval(()=>{if(hasAdmin)ensureSiteItem()},2000);
+ window.addEventListener('focus',()=>{ensureSiteItem();loadState().catch(()=>{})});
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden){ensureSiteItem();loadState().catch(()=>{})}});
  setInterval(()=>loadState().catch(()=>{}),30000);
 }
 window.SitePanel7411={open:openPanel,refresh:loadState,ensure:ensureSiteItem,version:VERSION};
