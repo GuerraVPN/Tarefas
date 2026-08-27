@@ -47,11 +47,6 @@
     localStorage.setItem('usuarioLogado', JSON.stringify(atual));
   }
 
-  // V7.4.9: algumas versões da página Configurações perdiam um item da
-  // sidebar depois da reconstrução visual e aplicarSidebar() tentava acessar
-  // .style de null. Criamos apenas os alvos ausentes, invisíveis, antes de
-  // devolver o estado dos perfis. Isso mantém compatibilidade com o código
-  // legado sem interferir no menu novo.
   function garantirAlvosConfiguracoes(){
     const pagina=(location.pathname.split('/').pop()||'').toLowerCase();
     if(pagina!=='configuracoes.html') return;
@@ -93,7 +88,6 @@
 
     if(!perfis.length) perfis = [fallbackPerfil(base)];
 
-    // Elimina somente duplicatas reais e nunca reduz a lista ao perfil ativo.
     const vistos=new Set();
     perfis=perfis.filter(p=>{
       const chave=p.id!=null?`id:${p.id}`:`${norm(p.secao)}|${norm(p.posicao)}`;
@@ -150,8 +144,7 @@
     if(!container || !estado) return;
     injetarEstilo();
 
-    const anterior = container.querySelector('#perfis26Box');
-    if(anterior) anterior.remove();
+    container.querySelectorAll('.perfis26-box').forEach(el=>el.remove());
 
     const box = document.createElement('div');
     box.id = 'perfis26Box';
@@ -188,39 +181,8 @@
 
   function escapeHtml(v){
     return String(v ?? '').replace(/[&<>"']/g, c => ({
-      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#039;'
     }[c]));
-  }
-
-  // V7.4.9: o cabeçalho novo podia montar o dropdown usando apenas o perfil
-  // atual. Sempre que o menu de usuário aparece/abre, reidratamos a caixa com
-  // TODOS os perfis ativos retornados de usuario_perfis.
-  let hidratando=false;
-  async function hidratarDropdownGlobal(){
-    if(hidratando) return;
-    const base=(()=>{try{return JSON.parse(localStorage.getItem('usuarioLogado')||'null')}catch(_){return null}})();
-    let client=null; try{client=typeof supabaseClient!=='undefined'?supabaseClient:null}catch(_){}
-    if(!base?.id||!client) return;
-    const candidatos=[...document.querySelectorAll('.v3-profile-menu,.profile-menu,.user-menu,[role="menu"]')];
-    const container=candidatos.find(el=>/alterar senha|configura/i.test(el.textContent||''));
-    if(!container) return;
-    hidratando=true;
-    try{
-      const estado=await carregar(client,base);
-      renderizarDropdown(container,estado,base);
-    }catch(e){console.warn('Perfis26 V7.4.9:',e?.message||e)}
-    finally{hidratando=false}
-  }
-
-  function iniciarHidratacaoGlobal(){
-    let timer=null;
-    const pedir=()=>{clearTimeout(timer);timer=setTimeout(hidratarDropdownGlobal,60)};
-    document.addEventListener('click',e=>{
-      if(e.target.closest('.v3-user-button,.top-avatar,.user-avatar,[data-user-menu],button')) pedir();
-    },true);
-    const obs=new MutationObserver(pedir);
-    obs.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
-    pedir();
   }
 
   window.Perfis26 = {
@@ -232,7 +194,4 @@
     erroTabelaAusente,
     storageKey
   };
-
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',iniciarHidratacaoGlobal);
-  else iniciarHidratacaoGlobal();
 })();
