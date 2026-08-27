@@ -10,7 +10,7 @@ function closeMenu(){
 function openMenu(){
   if(!MQ.matches)return;
   document.body.classList.add('v62-menu-open');
-  if(toggle) toggle.setAttribute('aria-expanded','true');
+  toggle?.setAttribute('aria-expanded','true');
 }
 function toggleMenu(){document.body.classList.contains('v62-menu-open')?closeMenu():openMenu();}
 
@@ -33,7 +33,6 @@ function makeBar(){
 function wireSidebar(){
   sidebar.addEventListener('click',function(e){
     if(!MQ.matches)return;
-
     const pessoalMain=e.target.closest('[data-v7-main]');
     if(pessoalMain){
       e.preventDefault();e.stopPropagation();
@@ -44,7 +43,6 @@ function wireSidebar(){
       }
       return;
     }
-
     const arrow=e.target.closest('.v6-orc-arrow');
     if(arrow){
       e.preventDefault();e.stopPropagation();
@@ -52,11 +50,8 @@ function wireSidebar(){
       if(parent) parent.classList.toggle('v62-subopen');
       return;
     }
-
     const nav=e.target.closest('a,button,.v6-nav-item,li');
-    if(nav){
-      window.setTimeout(closeMenu,120);
-    }
+    if(nav)window.setTimeout(closeMenu,120);
   });
 }
 
@@ -85,7 +80,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     document.head.appendChild(s);
   }
   add('v7_4_8_site_control.js?v=7.4.9','data-v748-site-control',function(){
-   add('v7_4_9_core.js?v=7.4.9','data-v749-core',function(){
+   add('v7_4_9_core.js?v=7.4.9.1','data-v749-core',function(){
     add('v7_4_7_mission_patch.js?v=7.4.9','data-v747-mission-patch',function(){
      add('v7_4_7_aditamento_patch.js?v=7.4.9','data-v747-aditamento-patch',function(){
       add('v6_5_patch.js?v=6.5','data-v65-loader',function(){
