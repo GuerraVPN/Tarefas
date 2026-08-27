@@ -43,9 +43,27 @@
       posicao: ativo.posicao || base.posicao || '',
       perfil_id: ativo.id ?? null
     };
-    // Não grava a lista de perfis inteira dentro da sessão.
     delete atual.perfis_disponiveis;
     localStorage.setItem('usuarioLogado', JSON.stringify(atual));
+  }
+
+  // V7.4.9: algumas versões da página Configurações perdiam um item da
+  // sidebar depois da reconstrução visual e aplicarSidebar() tentava acessar
+  // .style de null. Criamos apenas os alvos ausentes, invisíveis, antes de
+  // devolver o estado dos perfis. Isso mantém compatibilidade com o código
+  // legado sem interferir no menu novo.
+  function garantirAlvosConfiguracoes(){
+    const pagina=(location.pathname.split('/').pop()||'').toLowerCase();
+    if(pagina!=='configuracoes.html') return;
+    const chaves=['quadro','minhas','calendario','relatorios','usuarios'];
+    chaves.forEach(chave=>{
+      if(document.querySelector(`[data-pref-item="${chave}"]`)) return;
+      const el=document.createElement('span');
+      el.dataset.prefItem=chave;
+      el.hidden=true;
+      el.setAttribute('aria-hidden','true');
+      (document.body||document.documentElement).appendChild(el);
+    });
   }
 
   async function carregar(client, base){
@@ -75,6 +93,14 @@
 
     if(!perfis.length) perfis = [fallbackPerfil(base)];
 
+    // Elimina somente duplicatas reais e nunca reduz a lista ao perfil ativo.
+    const vistos=new Set();
+    perfis=perfis.filter(p=>{
+      const chave=p.id!=null?`id:${p.id}`:`${norm(p.secao)}|${norm(p.posicao)}`;
+      if(vistos.has(chave)) return false;
+      vistos.add(chave); return true;
+    });
+
     const salvo = localStorage.getItem(storageKey(base.id));
     let ativo = salvo ? perfis.find(p => String(p.id) === String(salvo)) : null;
     if(!ativo) ativo = perfis.find(p => p.principal) || perfis[0];
@@ -90,6 +116,7 @@
     };
 
     salvarUsuarioLocal(usuario, ativo);
+    garantirAlvosConfiguracoes();
 
     return {usuario, perfis, ativo, disponivel};
   }
@@ -165,6 +192,37 @@
     }[c]));
   }
 
+  // V7.4.9: o cabeçalho novo podia montar o dropdown usando apenas o perfil
+  // atual. Sempre que o menu de usuário aparece/abre, reidratamos a caixa com
+  // TODOS os perfis ativos retornados de usuario_perfis.
+  let hidratando=false;
+  async function hidratarDropdownGlobal(){
+    if(hidratando) return;
+    const base=(()=>{try{return JSON.parse(localStorage.getItem('usuarioLogado')||'null')}catch(_){return null}})();
+    let client=null; try{client=typeof supabaseClient!=='undefined'?supabaseClient:null}catch(_){}
+    if(!base?.id||!client) return;
+    const candidatos=[...document.querySelectorAll('.v3-profile-menu,.profile-menu,.user-menu,[role="menu"]')];
+    const container=candidatos.find(el=>/alterar senha|configura/i.test(el.textContent||''));
+    if(!container) return;
+    hidratando=true;
+    try{
+      const estado=await carregar(client,base);
+      renderizarDropdown(container,estado,base);
+    }catch(e){console.warn('Perfis26 V7.4.9:',e?.message||e)}
+    finally{hidratando=false}
+  }
+
+  function iniciarHidratacaoGlobal(){
+    let timer=null;
+    const pedir=()=>{clearTimeout(timer);timer=setTimeout(hidratarDropdownGlobal,60)};
+    document.addEventListener('click',e=>{
+      if(e.target.closest('.v3-user-button,.top-avatar,.user-avatar,[data-user-menu],button')) pedir();
+    },true);
+    const obs=new MutationObserver(pedir);
+    obs.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});
+    pedir();
+  }
+
   window.Perfis26 = {
     carregar,
     trocar,
@@ -174,4 +232,7 @@
     erroTabelaAusente,
     storageKey
   };
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',iniciarHidratacaoGlobal);
+  else iniciarHidratacaoGlobal();
 })();
