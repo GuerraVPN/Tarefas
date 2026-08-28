@@ -52,13 +52,17 @@ function install(){
   c.__v751RotationInstalled=true;return true;
 }
 if(!install()){
-  const timer=setInterval(()=>{if(install())clearInterval(timer)},0);
-  setTimeout(()=>clearInterval(timer),5000);
+  // V1.6: 0 ms podia saturar o thread principal do Android WebView.
+  let attempts=0;
+  const timer=setInterval(()=>{attempts++;if(install()||attempts>=40)clearInterval(timer)},125);
+  setTimeout(()=>clearInterval(timer),5200);
 }
 })();
 
 (function(){
 'use strict';
+// No APK o shell nativo é carregado; não crie uma segunda barra/menu mobile.
+if(window.__TAREFAS_NATIVE_APP__)return;
 const MQ=window.matchMedia('(max-width: 900px)');
 let sidebar=null,bar=null,backdrop=null,toggle=null;
 function closeMenu(){document.body.classList.remove('v62-menu-open');if(toggle)toggle.setAttribute('aria-expanded','false');}
