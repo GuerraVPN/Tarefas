@@ -34,6 +34,8 @@ await cp(path.join(root, 'app', 'service-worker.js'), path.join(dist, 'service-w
 await cp(path.join(root, 'app', 'mobile-bootstrap.js'), path.join(dist, 'mobile-bootstrap.js'));
 await cp(path.join(root, 'app', 'mobile-preload.js'), path.join(dist, 'mobile-preload.js'));
 await cp(path.join(root, 'app', 'mobile.css'), path.join(dist, 'mobile.css'));
+await cp(path.join(root, 'app', 'mobile-v12.css'), path.join(dist, 'mobile-v12.css'));
+await cp(path.join(root, 'app', 'mobile-v12.js'), path.join(dist, 'mobile-v12.js'));
 
 await build({
   entryPoints: [path.join(root, 'app', 'native-mobile-entry.js')],
@@ -57,18 +59,22 @@ for (const name of htmlFiles) {
   if (!html.includes('mobile.css')) {
     html = html.replace(/<\/head>/i, '  <link rel="stylesheet" href="mobile.css">\n</head>');
   }
+  if (!html.includes('mobile-v12.css')) {
+    html = html.replace(/<\/head>/i, '  <link rel="stylesheet" href="mobile-v12.css">\n</head>');
+  }
 
   if (!html.includes('manifest.webmanifest')) {
-    html = html.replace(/<\/head>/i, '  <link rel="manifest" href="manifest.webmanifest">\n  <meta name="theme-color" content="#0b1220">\n</head>');
+    html = html.replace(/<\/head>/i, '  <link rel="manifest" href="manifest.webmanifest">\n  <meta name="theme-color" content="#05090b">\n</head>');
   }
 
   if (!html.includes('mobile-bootstrap.js')) {
-    html = html.replace(/<\/body>/i, '  <script src="mobile-bootstrap.js"></script>\n  <script src="native-mobile.js"></script>\n</body>');
-  } else if (!html.includes('native-mobile.js')) {
-    html = html.replace(/<\/body>/i, '  <script src="native-mobile.js"></script>\n</body>');
+    html = html.replace(/<\/body>/i, '  <script src="mobile-bootstrap.js"></script>\n  <script src="mobile-v12.js"></script>\n  <script src="native-mobile.js"></script>\n</body>');
+  } else {
+    if (!html.includes('mobile-v12.js')) html = html.replace(/<\/body>/i, '  <script src="mobile-v12.js"></script>\n</body>');
+    if (!html.includes('native-mobile.js')) html = html.replace(/<\/body>/i, '  <script src="native-mobile.js"></script>\n</body>');
   }
 
   await writeFile(file, html, 'utf8');
 }
 
-console.log(`TAREFAS mobile: ${htmlFiles.length} páginas preparadas em dist/ com layout mobile, sessão persistente e notificações nativas`);
+console.log(`TAREFAS Android V1.2: ${htmlFiles.length} páginas preparadas com tema nativo, sessão persistente e notificações`);
