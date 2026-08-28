@@ -1,6 +1,7 @@
 (() => {
   'use strict';
-  document.documentElement.classList.add('tarefas-mobile-shell','tm-v13');
+  window.__TAREFAS_NATIVE_APP__ = true;
+  document.documentElement.classList.add('tarefas-native-app','tarefas-mobile-shell','tm-v16');
 
   const page = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
   const isLogin = page === 'index.html' || document.title.toLowerCase().includes('login');
@@ -56,8 +57,16 @@
   ];
 
   const readUser = () => { try { return JSON.parse(localStorage.getItem('usuarioLogado') || 'null'); } catch (_) { return null; } };
-  const esc = v => String(v ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
-  const navigate = href => { if (!href) return; const current = page + location.search; if (href !== current) location.href = href; };
+  const esc = v => String(v ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#039;'}[c]));
+  const timeout = (promise, ms, fallback=null) => Promise.race([
+    Promise.resolve(promise),
+    new Promise(resolve => setTimeout(() => resolve(fallback), ms))
+  ]);
+  const navigate = href => {
+    if (!href) return;
+    const current = page + location.search;
+    if (href !== current) location.href = href;
+  };
 
   function removeLegacyChrome(root=document){
     root.querySelectorAll?.('#v62MobileBar,.v62-mobile-bar,#v62MobileBackdrop,.v62-mobile-backdrop').forEach(el=>el.remove());
@@ -77,7 +86,7 @@
     const wrap=document.createElement('div');
     wrap.id=id; wrap.className='tm-sheet-wrap';
     wrap.innerHTML=`<div class="tm-sheet-backdrop" data-close></div><section class="tm-sheet" role="dialog" aria-modal="true"><header><h2>${esc(title)}</h2><button class="tm-icon" data-close aria-label="Fechar">${SVG.close}</button></header><div class="tm-sheet-body"></div></section>`;
-    wrap.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>wrap.remove()));
+    wrap.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>wrap.remove(),{once:true}));
     document.body.appendChild(wrap);
     requestAnimationFrame(()=>wrap.classList.add('open'));
     return wrap;
@@ -116,7 +125,8 @@
     let client=null; try { if(typeof supabaseClient!=='undefined') client=supabaseClient; } catch(_) {}
     if(!base?.id || !client || !window.Perfis26){ body.innerHTML='<div class="tm-empty">Não foi possível carregar os perfis nesta tela.</div>'; return; }
     try{
-      const estado=await window.Perfis26.carregar(client,base);
+      const estado=await timeout(window.Perfis26.carregar(client,base),4500,null);
+      if(!estado?.perfis){body.innerHTML='<div class="tm-empty">O carregamento dos perfis demorou demais. Feche e tente novamente.</div>';return;}
       body.innerHTML=`<div class="tm-profile-current"><span class="tm-avatar">${esc((base.nome_guerra||'U').slice(0,1).toUpperCase())}</span><div><strong>${esc(base.patente||'')} ${esc(base.nome_guerra||'')}</strong><small>Escolha o perfil de trabalho</small></div></div><div class="tm-profile-list"></div>`;
       const list=body.querySelector('.tm-profile-list');
       estado.perfis.forEach(p=>{
@@ -132,20 +142,22 @@
     const wrap=sheetBase('tmNotifications','Notificações');
     const body=wrap.querySelector('.tm-sheet-body');
     body.innerHTML='<div class="tm-loading">Carregando notificações…</div>';
-    if(window.TarefasNative?.notifications?.ensurePermission){ window.TarefasNative.notifications.ensurePermission().catch(()=>{}); }
+    if(window.TarefasNative?.notifications?.ensurePermission){ timeout(window.TarefasNative.notifications.ensurePermission(),3000,false).catch(()=>{}); }
     try{
       const api=window.Notificacoes26;
       if(!api){ body.innerHTML='<div class="tm-empty">Central de notificações indisponível nesta tela.</div><button class="tm-primary" data-central>Abrir Central</button>'; body.querySelector('[data-central]')?.addEventListener('click',()=>navigate('central.html?tab=notificacoes')); return; }
-      const [rows,counters]=await Promise.all([api.recentes(12),api.contadores()]);
-      body.innerHTML=`<div class="tm-notif-summary"><strong>${counters.notificacoes||0}</strong><span>não lidas</span><button data-central>Abrir Central</button></div><div class="tm-notif-list"></div>`;
+      const result=await timeout(Promise.all([api.recentes(12),api.contadores()]),5000,null);
+      if(!result){body.innerHTML='<div class="tm-empty">A central demorou demais para responder.</div><button class="tm-primary" data-central>Abrir Central</button>';body.querySelector('[data-central]')?.addEventListener('click',()=>navigate('central.html?tab=notificacoes'));return;}
+      const [rows,counters]=result;
+      body.innerHTML=`<div class="tm-notif-summary"><strong>${counters?.notificacoes||0}</strong><span>não lidas</span><button data-central>Abrir Central</button></div><div class="tm-notif-list"></div>`;
       body.querySelector('[data-central]')?.addEventListener('click',()=>navigate('central.html?tab=notificacoes'));
       const list=body.querySelector('.tm-notif-list');
-      if(!rows.length){ list.innerHTML='<div class="tm-empty">Nenhuma notificação recente.</div>'; return; }
+      if(!rows?.length){ list.innerHTML='<div class="tm-empty">Nenhuma notificação recente.</div>'; return; }
       rows.forEach(r=>{
         const b=document.createElement('button'); b.className='tm-notif-item'+(!r.lida?' unread':'');
         const when=r.criada_em?new Date(r.criada_em).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
         b.innerHTML=`<span class="tm-notif-dot"></span><span><strong>${esc(r.titulo||'Notificação')}</strong><small>${esc(r.mensagem||'')}</small><em>${esc(when)}</em></span>${SVG.chevron}`;
-        b.addEventListener('click',async()=>{ await api.marcarLida(r).catch(()=>{}); wrap.remove(); navigate(api.destinoNotificacao(r)); }); list.appendChild(b);
+        b.addEventListener('click',async()=>{ await timeout(api.marcarLida(r),2500,null).catch(()=>{}); wrap.remove(); navigate(api.destinoNotificacao(r)); }); list.appendChild(b);
       });
     }catch(err){ body.innerHTML=`<div class="tm-empty">Erro ao carregar notificações: ${esc(err?.message||err)}</div>`; }
   }
@@ -155,7 +167,7 @@
     removeLegacyChrome();
     const user=readUser();
     const header=document.createElement('header'); header.className='tm-app-header';
-    header.innerHTML=`<button class="tm-icon" data-menu aria-label="Menu">${SVG.menu}</button><img class="tm-app-logo" src="assets/logo.svg" alt=""><button class="tm-app-brand" data-profile><strong>TAREFAS</strong><small>V1.3 • WEB 7.5.2</small></button><button class="tm-icon tm-bell" data-bell aria-label="Notificações">${SVG.bell}<span class="tm-badge" hidden>0</span></button>`;
+    header.innerHTML=`<button class="tm-icon" data-menu aria-label="Menu">${SVG.menu}</button><img class="tm-app-logo" src="assets/logo.svg" alt=""><button class="tm-app-brand" data-profile><strong>TAREFAS</strong><small>V1.6 • WEB 7.5.2</small></button><button class="tm-icon tm-bell" data-bell aria-label="Notificações">${SVG.bell}<span class="tm-badge" hidden>0</span></button>`;
     header.querySelector('[data-menu]').addEventListener('click',openDrawer);
     header.querySelector('[data-profile]').addEventListener('click',openProfiles);
     header.querySelector('[data-bell]').addEventListener('click',openNotifications);
@@ -168,19 +180,37 @@
     document.body.append(header,nav);
 
     if(user?.nome_guerra) document.documentElement.dataset.tmUser=user.nome_guerra;
-    const refreshBadge=async()=>{ try{ const c=await window.Notificacoes26?.contadores?.(); const badge=header.querySelector('.tm-badge'); if(badge&&c){badge.textContent=String(c.notificacoes||0);badge.hidden=!(c.notificacoes>0);} }catch(_){} };
-    refreshBadge(); window.addEventListener('v3:contadores',refreshBadge); window.addEventListener('v6:notificacoes:update',refreshBadge);
+    const refreshBadge=async()=>{
+      try{
+        if(!window.Notificacoes26?.contadores)return;
+        const c=await timeout(window.Notificacoes26.contadores(),3500,null);
+        const badge=header.querySelector('.tm-badge');
+        if(badge&&c){badge.textContent=String(c.notificacoes||0);badge.hidden=!(c.notificacoes>0);}
+      }catch(_){}
+    };
+    setTimeout(refreshBadge,300);
+    window.addEventListener('v3:contadores',refreshBadge);
+    window.addEventListener('v6:notificacoes:update',refreshBadge);
   }
 
-  function adaptTables(root=document){ root.querySelectorAll?.('table').forEach(t=>{ if(t.closest('.tarefas-mobile-table-scroll'))return; const w=document.createElement('div');w.className='tarefas-mobile-table-scroll';t.parentNode.insertBefore(w,t);w.appendChild(t); }); }
+  function adaptTables(root=document){
+    root.querySelectorAll?.('table').forEach(t=>{
+      if(t.closest('.tarefas-mobile-table-scroll'))return;
+      const w=document.createElement('div');w.className='tarefas-mobile-table-scroll';
+      t.parentNode?.insertBefore(w,t);w.appendChild(t);
+    });
+  }
 
   function init(){
-    removeLegacyChrome(); buildShell(); adaptTables();
-    const observer=new MutationObserver(ms=>{ removeLegacyChrome(); for(const m of ms)for(const n of m.addedNodes){ if(n instanceof Element && !n.closest?.('.tm-sheet-wrap,.tm-app-header,.tm-bottom-nav')) adaptTables(n); } });
-    observer.observe(document.body,{childList:true,subtree:true});
+    removeLegacyChrome();
+    buildShell();
+    adaptTables();
+    // V1.6: não observa mais todo o body. As três limpezas abaixo cobrem scripts
+    // legados tardios sem criar ciclos de MutationObserver no WebView.
+    [150,600,1500].forEach(ms=>setTimeout(()=>removeLegacyChrome(),ms));
   }
 
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init,{once:true}); else init();
   window.addEventListener('online',()=>document.documentElement.classList.remove('is-offline'));
   window.addEventListener('offline',()=>document.documentElement.classList.add('is-offline'));
   if(!navigator.onLine) document.documentElement.classList.add('is-offline');
