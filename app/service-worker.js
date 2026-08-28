@@ -1,4 +1,4 @@
-const CACHE = 'tarefas-v7.5.2-app-v1';
+const CACHE = 'tarefas-v7.5.2-app-v1.6';
 const CORE = [
   './',
   './index.html',
@@ -7,6 +7,9 @@ const CORE = [
   './minhas_tarefas.html',
   './dashboard.css',
   './dashboard.js',
+  './mobile-preload.js',
+  './mobile-bootstrap.js',
+  './mobile.css',
   './v4_tema.css',
   './v7_5_2_version.js',
   './v7_5_2_service_labels.js'
@@ -40,6 +43,19 @@ self.addEventListener('fetch', (event) => {
           return res;
         })
         .catch(async () => (await caches.match(req)) || (await caches.match('./index.html')))
+    );
+    return;
+  }
+
+  // Network-first para JS/CSS evita prender uma versão antiga do shell após update.
+  if (/\.(?:js|css)$/.test(url.pathname)) {
+    event.respondWith(
+      fetch(req)
+        .then((res) => {
+          if (res && res.ok) caches.open(CACHE).then((cache) => cache.put(req, res.clone()));
+          return res;
+        })
+        .catch(() => caches.match(req))
     );
     return;
   }
