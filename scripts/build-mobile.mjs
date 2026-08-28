@@ -33,6 +33,7 @@ await cp(path.join(root, 'app', 'manifest.webmanifest'), path.join(dist, 'manife
 await cp(path.join(root, 'app', 'service-worker.js'), path.join(dist, 'service-worker.js'));
 await cp(path.join(root, 'app', 'mobile-bootstrap.js'), path.join(dist, 'mobile-bootstrap.js'));
 await cp(path.join(root, 'app', 'mobile-preload.js'), path.join(dist, 'mobile-preload.js'));
+await cp(path.join(root, 'app', 'mobile.css'), path.join(dist, 'mobile.css'));
 
 await build({
   entryPoints: [path.join(root, 'app', 'native-mobile-entry.js')],
@@ -53,6 +54,10 @@ for (const name of htmlFiles) {
     html = html.replace(/<head>/i, '<head>\n  <script src="mobile-preload.js"></script>');
   }
 
+  if (!html.includes('mobile.css')) {
+    html = html.replace(/<\/head>/i, '  <link rel="stylesheet" href="mobile.css">\n</head>');
+  }
+
   if (!html.includes('manifest.webmanifest')) {
     html = html.replace(/<\/head>/i, '  <link rel="manifest" href="manifest.webmanifest">\n  <meta name="theme-color" content="#0b1220">\n</head>');
   }
@@ -66,4 +71,4 @@ for (const name of htmlFiles) {
   await writeFile(file, html, 'utf8');
 }
 
-console.log(`TAREFAS mobile: ${htmlFiles.length} páginas preparadas em dist/ com sessão persistente e notificações nativas`);
+console.log(`TAREFAS mobile: ${htmlFiles.length} páginas preparadas em dist/ com layout mobile, sessão persistente e notificações nativas`);
