@@ -1,10 +1,11 @@
 {
   "name": "tarefas-app",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "private": true,
-  "description": "TAREFAS Android V1.5 baseado na versão web 7.5.2",
+  "description": "TAREFAS Android V1.6 baseado na versão web 7.5.2",
   "scripts": {
     "build:web": "node scripts/build-mobile.mjs",
+    "verify:web": "node scripts/verify-mobile-build.mjs dist",
     "cap:add:android": "npx cap add android",
     "cap:sync": "npm run build:web && npx cap sync android",
     "assets:android": "npx @capacitor/assets generate --android --assetPath assets --iconBackgroundColor '#040808' --iconBackgroundColorDark '#040808' --splashBackgroundColor '#040808' --splashBackgroundColorDark '#040808'",
