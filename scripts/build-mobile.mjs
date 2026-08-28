@@ -1,5 +1,6 @@
 import { cp, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { build } from 'esbuild';
 
 const root = process.cwd();
 const dist = path.join(root, 'dist');
@@ -15,8 +16,6 @@ for (const entry of entries) {
   const src = path.join(root, entry.name);
   const dst = path.join(dist, entry.name);
   if (entry.isDirectory()) {
-    // A versão web atual vive na raiz. Diretórios futuros de assets podem ser
-    // adicionados explicitamente aqui quando fizerem parte do frontend.
     if (entry.name === 'assets') await cp(src, dst, { recursive: true });
     continue;
   }
@@ -33,18 +32,38 @@ for (const size of [192, 512]) {
 await cp(path.join(root, 'app', 'manifest.webmanifest'), path.join(dist, 'manifest.webmanifest'));
 await cp(path.join(root, 'app', 'service-worker.js'), path.join(dist, 'service-worker.js'));
 await cp(path.join(root, 'app', 'mobile-bootstrap.js'), path.join(dist, 'mobile-bootstrap.js'));
+await cp(path.join(root, 'app', 'mobile-preload.js'), path.join(dist, 'mobile-preload.js'));
+
+await build({
+  entryPoints: [path.join(root, 'app', 'native-mobile-entry.js')],
+  outfile: path.join(dist, 'native-mobile.js'),
+  bundle: true,
+  minify: true,
+  format: 'iife',
+  platform: 'browser',
+  target: ['es2020']
+});
 
 const htmlFiles = (await readdir(dist)).filter((name) => name.endsWith('.html'));
 for (const name of htmlFiles) {
   const file = path.join(dist, name);
   let html = await readFile(file, 'utf8');
+
+  if (!html.includes('mobile-preload.js')) {
+    html = html.replace(/<head>/i, '<head>\n  <script src="mobile-preload.js"></script>');
+  }
+
   if (!html.includes('manifest.webmanifest')) {
     html = html.replace(/<\/head>/i, '  <link rel="manifest" href="manifest.webmanifest">\n  <meta name="theme-color" content="#0b1220">\n</head>');
   }
+
   if (!html.includes('mobile-bootstrap.js')) {
-    html = html.replace(/<\/body>/i, '  <script src="mobile-bootstrap.js"></script>\n</body>');
+    html = html.replace(/<\/body>/i, '  <script src="mobile-bootstrap.js"></script>\n  <script src="native-mobile.js"></script>\n</body>');
+  } else if (!html.includes('native-mobile.js')) {
+    html = html.replace(/<\/body>/i, '  <script src="native-mobile.js"></script>\n</body>');
   }
+
   await writeFile(file, html, 'utf8');
 }
 
-console.log(`TAREFAS mobile: ${htmlFiles.length} páginas preparadas em dist/`);
+console.log(`TAREFAS mobile: ${htmlFiles.length} páginas preparadas em dist/ com sessão persistente e notificações nativas`);
