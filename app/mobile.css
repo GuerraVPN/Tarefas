@@ -1,141 +1,406 @@
+/* TAREFAS Android — tema mobile escuro V1.2 preview */
+:root {
+  --tm-bg: #05090b;
+  --tm-bg-2: #08100d;
+  --tm-surface: #0b1113;
+  --tm-surface-2: #101719;
+  --tm-surface-3: #151d1f;
+  --tm-border: rgba(255,255,255,.085);
+  --tm-border-strong: rgba(95,232,52,.30);
+  --tm-text: #f5f7f6;
+  --tm-muted: #8f9b96;
+  --tm-green: #5fe834;
+  --tm-green-2: #39c516;
+  --tm-red: #ff3b30;
+  --tm-yellow: #ffc928;
+  --tm-blue: #4d91ff;
+  --tm-radius: 16px;
+  --tm-radius-sm: 12px;
+  --tm-header-h: 68px;
+  --tm-nav-h: 70px;
+}
+
 html.tarefas-mobile-shell,
 html.tarefas-mobile-shell body {
   max-width: 100%;
   overflow-x: hidden;
+  background: radial-gradient(circle at 50% -20%, #102218 0, var(--tm-bg) 43%, #020405 100%) !important;
+  color: var(--tm-text) !important;
+  color-scheme: dark;
 }
 
 html.tarefas-mobile-shell body {
   min-height: 100dvh;
+  margin: 0 !important;
+  padding: calc(var(--tm-header-h) + env(safe-area-inset-top, 0px)) 0 calc(var(--tm-nav-h) + env(safe-area-inset-bottom, 0px) + 14px) !important;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+  -webkit-font-smoothing: antialiased;
 }
 
-html.tarefas-mobile-shell * {
-  box-sizing: border-box;
-  max-width: 100%;
+html.tarefas-mobile-shell.mobile-login body {
+  padding: max(24px, env(safe-area-inset-top, 0px)) 18px max(24px, env(safe-area-inset-bottom, 0px)) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
+html.tarefas-mobile-shell * { box-sizing: border-box; }
 html.tarefas-mobile-shell img,
 html.tarefas-mobile-shell video,
 html.tarefas-mobile-shell canvas,
-html.tarefas-mobile-shell iframe {
-  height: auto;
-  max-width: 100%;
+html.tarefas-mobile-shell iframe { height: auto; max-width: 100%; }
+
+/* Shell nativo */
+.tm-app-header {
+  position: fixed;
+  z-index: 2147483000;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(var(--tm-header-h) + env(safe-area-inset-top, 0px));
+  padding: env(safe-area-inset-top, 0px) 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  background: rgba(3,7,8,.94);
+  border-bottom: 1px solid var(--tm-border);
+  backdrop-filter: blur(20px) saturate(130%);
+  -webkit-backdrop-filter: blur(20px) saturate(130%);
 }
 
-html.tarefas-mobile-shell input,
-html.tarefas-mobile-shell select,
-html.tarefas-mobile-shell textarea,
-html.tarefas-mobile-shell button {
-  min-height: 44px;
-  font-size: 16px;
+.tm-app-logo {
+  width: 38px;
+  height: 42px;
+  flex: 0 0 auto;
+  filter: drop-shadow(0 0 10px rgba(95,232,52,.17));
 }
 
-html.tarefas-mobile-shell input,
-html.tarefas-mobile-shell select,
-html.tarefas-mobile-shell textarea {
-  width: 100%;
+.tm-app-brand { min-width: 0; flex: 1; line-height: 1; }
+.tm-app-brand strong {
+  display: block;
+  font-size: 17px;
+  letter-spacing: .4px;
+  color: #fff;
+}
+.tm-app-brand small {
+  display: block;
+  margin-top: 5px;
+  color: var(--tm-green);
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: .35px;
 }
 
-html.tarefas-mobile-shell table {
-  width: 100%;
-  border-collapse: collapse;
+.tm-app-header-actions { display: flex; align-items: center; gap: 4px; }
+.tm-app-icon-btn {
+  width: 42px;
+  height: 42px;
+  min-height: 42px !important;
+  display: grid !important;
+  place-items: center;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  color: #fff !important;
+  box-shadow: none !important;
 }
+.tm-app-icon-btn:active { background: rgba(255,255,255,.07) !important; transform: scale(.96); }
+.tm-app-icon-btn svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; }
 
-html.tarefas-mobile-shell .tarefas-mobile-table-scroll {
-  width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+.tm-bottom-nav {
+  position: fixed;
+  z-index: 2147483000;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(var(--tm-nav-h) + env(safe-area-inset-bottom, 0px));
+  padding: 6px 7px env(safe-area-inset-bottom, 0px);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  background: rgba(4,8,9,.96);
+  border-top: 1px solid var(--tm-border);
+  box-shadow: 0 -12px 32px rgba(0,0,0,.30);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
-
-html.tarefas-mobile-shell .tarefas-mobile-table-scroll > table {
-  min-width: 640px;
+.tm-bottom-nav a {
+  min-width: 0;
+  min-height: 58px;
+  padding: 5px 2px 3px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: #89938f !important;
+  font-size: 10.5px !important;
+  line-height: 1 !important;
+  font-weight: 600;
+  text-decoration: none !important;
+  border-radius: 13px;
+  -webkit-tap-highlight-color: transparent;
 }
+.tm-bottom-nav a svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+.tm-bottom-nav a.active { color: var(--tm-green) !important; }
+.tm-bottom-nav a.active::after {
+  content: "";
+  position: absolute;
+  bottom: calc(3px + env(safe-area-inset-bottom, 0px));
+  width: 28px;
+  height: 2px;
+  border-radius: 4px;
+  background: var(--tm-green);
+  box-shadow: 0 0 10px rgba(95,232,52,.55);
+}
+.tm-bottom-nav a { position: relative; }
 
+.tm-offline-pill {
+  position: fixed;
+  z-index: 2147483001;
+  top: calc(var(--tm-header-h) + env(safe-area-inset-top, 0px) + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(-12px);
+  opacity: 0;
+  pointer-events: none;
+  padding: 7px 12px;
+  border: 1px solid rgba(255,201,40,.35);
+  border-radius: 999px;
+  background: #211b06;
+  color: #ffe88e;
+  font-size: 11px;
+  font-weight: 700;
+  transition: .2s ease;
+}
+html.is-offline .tm-offline-pill { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* Remove a estrutura desktop do APK */
+html.tarefas-mobile-shell:not(.mobile-login) .sidebar { display: none !important; }
+html.tarefas-mobile-shell:not(.mobile-login) main,
+html.tarefas-mobile-shell:not(.mobile-login) .v6-dashboard-main {
+  margin-left: 0 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  background: transparent !important;
+}
+html.tarefas-mobile-shell .v6-dashboard-top { display: none !important; }
+
+/* Área de conteúdo */
 html.tarefas-mobile-shell .container,
 html.tarefas-mobile-shell .content,
 html.tarefas-mobile-shell .main,
 html.tarefas-mobile-shell main,
 html.tarefas-mobile-shell section,
 html.tarefas-mobile-shell form,
+html.tarefas-mobile-shell .panel,
+html.tarefas-mobile-shell .modal-content { max-width: 100%; }
+
+html.tarefas-mobile-shell .v6-dashboard-content,
+html.tarefas-mobile-shell .content,
+html.tarefas-mobile-shell .container,
+html.tarefas-mobile-shell main > .main-content {
+  width: 100% !important;
+  max-width: 760px !important;
+  margin: 0 auto !important;
+  padding: 14px 14px 24px !important;
+}
+
+/* Cards / painéis */
 html.tarefas-mobile-shell .card,
 html.tarefas-mobile-shell .panel,
+html.tarefas-mobile-shell .v6-panel,
+html.tarefas-mobile-shell .v6-kpi,
+html.tarefas-mobile-shell .v6-welcome,
+html.tarefas-mobile-shell fieldset,
 html.tarefas-mobile-shell .modal-content {
+  background: linear-gradient(145deg, rgba(17,24,26,.97), rgba(8,13,14,.98)) !important;
+  color: var(--tm-text) !important;
+  border: 1px solid var(--tm-border) !important;
+  border-radius: var(--tm-radius) !important;
+  box-shadow: 0 10px 24px rgba(0,0,0,.20) !important;
+}
+
+html.tarefas-mobile-shell .v6-welcome {
+  padding: 18px !important;
+  border-color: rgba(95,232,52,.16) !important;
+  background: linear-gradient(135deg, rgba(22,39,27,.95), rgba(8,13,14,.98) 58%) !important;
+}
+html.tarefas-mobile-shell .v6-welcome h1,
+html.tarefas-mobile-shell .v6-welcome h2 { color: #fff !important; }
+html.tarefas-mobile-shell .v6-welcome p { color: #a9b2ae !important; }
+html.tarefas-mobile-shell .v6-welcome-badge {
+  background: rgba(95,232,52,.10) !important;
+  color: var(--tm-green) !important;
+  border: 1px solid rgba(95,232,52,.22) !important;
+  border-radius: 999px !important;
+}
+
+html.tarefas-mobile-shell .v6-section-head {
+  margin: 22px 2px 10px !important;
+  align-items: end !important;
+}
+html.tarefas-mobile-shell .v6-section-head h3 { color: #f7f9f8 !important; font-size: 15px !important; }
+html.tarefas-mobile-shell .v6-section-head span { color: var(--tm-muted) !important; font-size: 10px !important; }
+
+html.tarefas-mobile-shell .v6-kpis {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+  gap: 10px !important;
+}
+html.tarefas-mobile-shell .v6-kpi { padding: 14px !important; min-height: 112px; }
+html.tarefas-mobile-shell .v6-kpi strong { color: #fff !important; font-size: 25px !important; }
+html.tarefas-mobile-shell .v6-kpi small { color: #b7bfbc !important; }
+html.tarefas-mobile-shell .v6-kpi span { color: var(--tm-muted) !important; font-size: 10px !important; }
+html.tarefas-mobile-shell .v6-kpi-icon {
+  background: rgba(95,232,52,.11) !important;
+  color: var(--tm-green) !important;
+  border: 1px solid rgba(95,232,52,.18) !important;
+}
+
+html.tarefas-mobile-shell .v6-shortcuts {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+  gap: 10px !important;
+}
+html.tarefas-mobile-shell .v6-shortcuts a,
+html.tarefas-mobile-shell .v6-shortcut {
+  min-height: 86px !important;
+  border-radius: 14px !important;
+  border: 1px solid var(--tm-border) !important;
+  background: var(--tm-surface) !important;
+  color: #fff !important;
+}
+html.tarefas-mobile-shell .v6-grid2 { grid-template-columns: 1fr !important; gap: 12px !important; }
+
+html.tarefas-mobile-shell a { color: var(--tm-green); }
+html.tarefas-mobile-shell p,
+html.tarefas-mobile-shell small,
+html.tarefas-mobile-shell .muted,
+html.tarefas-mobile-shell .text-muted { color: var(--tm-muted); }
+html.tarefas-mobile-shell h1,
+html.tarefas-mobile-shell h2,
+html.tarefas-mobile-shell h3,
+html.tarefas-mobile-shell h4,
+html.tarefas-mobile-shell label { color: var(--tm-text); }
+
+/* Controles */
+html.tarefas-mobile-shell input,
+html.tarefas-mobile-shell select,
+html.tarefas-mobile-shell textarea,
+html.tarefas-mobile-shell button { min-height: 46px; font-size: 16px; }
+html.tarefas-mobile-shell input,
+html.tarefas-mobile-shell select,
+html.tarefas-mobile-shell textarea {
   width: 100%;
+  background: #0b1113 !important;
+  color: #fff !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  border-radius: 12px !important;
+  outline: none !important;
+}
+html.tarefas-mobile-shell input:focus,
+html.tarefas-mobile-shell select:focus,
+html.tarefas-mobile-shell textarea:focus {
+  border-color: rgba(95,232,52,.65) !important;
+  box-shadow: 0 0 0 3px rgba(95,232,52,.10) !important;
+}
+html.tarefas-mobile-shell button,
+html.tarefas-mobile-shell .btn,
+html.tarefas-mobile-shell a.button {
+  border-radius: 12px !important;
+  touch-action: manipulation;
+}
+html.tarefas-mobile-shell button[type="submit"],
+html.tarefas-mobile-shell .btn-primary {
+  background: linear-gradient(180deg, var(--tm-green), var(--tm-green-2)) !important;
+  color: #061004 !important;
+  border: 0 !important;
+  font-weight: 800 !important;
 }
 
+/* Tabelas */
+html.tarefas-mobile-shell table { width: 100%; border-collapse: collapse; color: #e9eeeb !important; }
+html.tarefas-mobile-shell .tarefas-mobile-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--tm-border);
+  border-radius: 14px;
+  background: var(--tm-surface);
+}
+html.tarefas-mobile-shell .tarefas-mobile-table-scroll > table { min-width: 640px; }
+html.tarefas-mobile-shell th { background: #101719 !important; color: #d9dfdc !important; }
+html.tarefas-mobile-shell td { border-color: rgba(255,255,255,.06) !important; }
+
+/* Modais */
 html.tarefas-mobile-shell .modal,
-html.tarefas-mobile-shell [role="dialog"] {
-  padding-left: 10px !important;
-  padding-right: 10px !important;
-}
-
+html.tarefas-mobile-shell [role="dialog"] { padding: 10px !important; }
 html.tarefas-mobile-shell .modal-content,
 html.tarefas-mobile-shell [role="dialog"] > div {
-  max-height: calc(100dvh - 24px);
+  max-height: calc(100dvh - 30px);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
 
+/* Login do APK */
+html.mobile-login .login {
+  width: min(100%, 390px) !important;
+  padding: 28px 22px !important;
+  background: linear-gradient(160deg, #101719, #080c0e) !important;
+  border: 1px solid var(--tm-border) !important;
+  border-radius: 22px !important;
+  box-shadow: 0 24px 80px rgba(0,0,0,.55) !important;
+}
+html.mobile-login .login::before {
+  content: "T";
+  display: grid;
+  place-items: center;
+  width: 62px;
+  height: 68px;
+  margin: 0 auto 14px;
+  color: var(--tm-green);
+  font-size: 36px;
+  font-weight: 950;
+  border: 2px solid #cfd5d2;
+  border-radius: 19px 19px 24px 24px;
+  background: #07100a;
+  box-shadow: inset 0 0 0 4px #17201b, 0 0 30px rgba(95,232,52,.10);
+}
+html.mobile-login .logo { color: #fff !important; font-size: 25px !important; letter-spacing: 1px; }
+html.mobile-login .subtitle { color: var(--tm-green) !important; font-size: 12px !important; font-weight: 700; }
+html.mobile-login .login h2 { color: #fff !important; }
+html.mobile-login .login input { padding: 13px 14px !important; }
+html.mobile-login .login button { min-height: 50px !important; }
+
 @media (max-width: 768px) {
-  html.tarefas-mobile-shell body {
-    margin: 0 !important;
-  }
-
-  html.tarefas-mobile-shell .container,
-  html.tarefas-mobile-shell .content,
-  html.tarefas-mobile-shell .main,
-  html.tarefas-mobile-shell main {
-    padding-left: 12px !important;
-    padding-right: 12px !important;
-  }
-
   html.tarefas-mobile-shell .row,
   html.tarefas-mobile-shell .grid,
   html.tarefas-mobile-shell .cards,
   html.tarefas-mobile-shell .toolbar,
   html.tarefas-mobile-shell .actions,
-  html.tarefas-mobile-shell .form-row {
-    flex-wrap: wrap !important;
-  }
-
+  html.tarefas-mobile-shell .form-row { flex-wrap: wrap !important; }
   html.tarefas-mobile-shell .row > *,
   html.tarefas-mobile-shell .grid > *,
   html.tarefas-mobile-shell .cards > *,
-  html.tarefas-mobile-shell .form-row > * {
-    min-width: 0;
-  }
-
-  html.tarefas-mobile-shell h1 { font-size: 1.5rem !important; }
-  html.tarefas-mobile-shell h2 { font-size: 1.25rem !important; }
-  html.tarefas-mobile-shell h3 { font-size: 1.1rem !important; }
-
-  html.tarefas-mobile-shell button,
-  html.tarefas-mobile-shell .btn,
-  html.tarefas-mobile-shell a.button {
-    touch-action: manipulation;
-  }
-
+  html.tarefas-mobile-shell .form-row > * { min-width: 0; }
+  html.tarefas-mobile-shell h1 { font-size: 1.45rem !important; }
+  html.tarefas-mobile-shell h2 { font-size: 1.22rem !important; }
+  html.tarefas-mobile-shell h3 { font-size: 1.02rem !important; }
   html.tarefas-mobile-shell pre,
-  html.tarefas-mobile-shell code {
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
-  }
+  html.tarefas-mobile-shell code { white-space: pre-wrap; overflow-wrap: anywhere; }
 }
 
-@media (max-width: 480px) {
-  html.tarefas-mobile-shell .container,
+@media (max-width: 420px) {
+  :root { --tm-header-h: 64px; --tm-nav-h: 68px; }
+  .tm-app-header { padding-left: 12px; padding-right: 10px; }
+  .tm-app-logo { width: 34px; height: 38px; }
+  .tm-app-brand strong { font-size: 16px; }
+  html.tarefas-mobile-shell .v6-dashboard-content,
   html.tarefas-mobile-shell .content,
-  html.tarefas-mobile-shell .main,
-  html.tarefas-mobile-shell main {
-    padding-left: 8px !important;
-    padding-right: 8px !important;
-  }
-
-  html.tarefas-mobile-shell .card,
-  html.tarefas-mobile-shell .panel,
-  html.tarefas-mobile-shell fieldset {
-    border-radius: 12px;
-  }
+  html.tarefas-mobile-shell .container,
+  html.tarefas-mobile-shell main > .main-content { padding-left: 10px !important; padding-right: 10px !important; }
+  html.tarefas-mobile-shell .v6-kpi { min-height: 105px; padding: 12px !important; }
 }
