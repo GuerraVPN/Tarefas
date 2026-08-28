@@ -37,42 +37,57 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build web bundle V1.6
+      - name: Build web bundle V1.7
         run: npm run build:web
 
-      - name: Conferência 1 - auditoria do bundle
+      - name: Conferência 1 - auditoria do bundle V1.7
         run: npm run verify:web
 
-      - name: Gerar ZIP V1.6
+      - name: Gerar ZIP V1.7
         run: |
-          rm -f TAREFAS-v1.6-web.zip
+          rm -f TAREFAS-v1.7-web.zip
           cd dist
-          zip -qr ../TAREFAS-v1.6-web.zip .
+          zip -qr ../TAREFAS-v1.7-web.zip .
 
-      - name: Conferência 2 - validar ZIP V1.6
+      - name: Conferência 2 - validar ZIP V1.7
         run: |
-          unzip -tq TAREFAS-v1.6-web.zip
-          rm -rf /tmp/tarefas-v16
-          mkdir -p /tmp/tarefas-v16
-          unzip -q TAREFAS-v1.6-web.zip -d /tmp/tarefas-v16
-          node scripts/verify-mobile-build.mjs /tmp/tarefas-v16
-          grep -q 'V1.6 • WEB 7.5.2' /tmp/tarefas-v16/mobile-bootstrap.js
-          grep -q '__TAREFAS_NATIVE_APP__' /tmp/tarefas-v16/mobile-preload.js
+          unzip -tq TAREFAS-v1.7-web.zip
+          rm -rf /tmp/tarefas-v17
+          mkdir -p /tmp/tarefas-v17
+          unzip -q TAREFAS-v1.7-web.zip -d /tmp/tarefas-v17
+          node scripts/verify-mobile-build.mjs /tmp/tarefas-v17
+          grep -q 'V1.7 • WEB 7.5.2' /tmp/tarefas-v17/mobile-v12.js
+          grep -q '__TAREFAS_NATIVE_APP__' /tmp/tarefas-v17/mobile-preload.js
+          grep -q 'v1_7_registrar_push_device' /tmp/tarefas-v17/native-mobile.js
 
-      - name: Upload ZIP V1.6 conferido
+      - name: Upload ZIP V1.7 conferido
         uses: actions/upload-artifact@v4
         with:
-          name: tarefas-android-v1.6-web-checked
-          path: TAREFAS-v1.6-web.zip
+          name: tarefas-android-v1.7-web-checked
+          path: TAREFAS-v1.7-web.zip
           if-no-files-found: error
+
+      - name: Conferir Firebase Android
+        run: |
+          if [ ! -s app/google-services.json ]; then
+            echo 'ERRO: app/google-services.json ausente. Adicione o arquivo do Firebase para br.com.guerravpn.tarefas.mobile.'
+            exit 1
+          fi
+          grep -q 'br.com.guerravpn.tarefas.mobile' app/google-services.json || {
+            echo 'ERRO: google-services.json não pertence ao package br.com.guerravpn.tarefas.mobile.'
+            exit 1
+          }
 
       - name: Add Android platform
         run: npx cap add android
 
+      - name: Instalar Firebase no projeto Android
+        run: cp app/google-services.json android/app/google-services.json
+
       - name: Set Android app version
         run: |
-          sed -i 's/versionCode 1/versionCode 16/' android/app/build.gradle
-          sed -i 's/versionName "1.0"/versionName "1.6"/' android/app/build.gradle
+          sed -i 's/versionCode 1/versionCode 17/' android/app/build.gradle
+          sed -i 's/versionName "1.0"/versionName "1.7"/' android/app/build.gradle
 
       - name: Install stable debug signing key
         run: |
@@ -97,16 +112,18 @@ jobs:
         working-directory: android
         run: ./gradlew assembleDebug
 
-      - name: Conferência 3 - validar APK V1.6
+      - name: Conferência 3 - validar APK V1.7 + push
         run: |
           APK='android/app/build/outputs/apk/debug/app-debug.apk'
           META='android/app/build/outputs/apk/debug/output-metadata.json'
           test -s "$APK"
           unzip -tq "$APK"
-          grep -q '"versionCode": 16' "$META"
-          grep -q '"versionName": "1.6"' "$META"
-          unzip -p "$APK" assets/public/mobile-bootstrap.js | grep -q 'V1.6 • WEB 7.5.2'
+          grep -q '"versionCode": 17' "$META"
+          grep -q '"versionName": "1.7"' "$META"
+          unzip -p "$APK" assets/public/mobile-v12.js | grep -q 'V1.7 • WEB 7.5.2'
           unzip -p "$APK" assets/public/mobile-preload.js | grep -q '__TAREFAS_NATIVE_APP__'
+          unzip -p "$APK" assets/public/native-mobile.js | grep -q 'v1_7_registrar_push_device'
+          unzip -l "$APK" | grep -q 'google-services'
           if unzip -p "$APK" assets/public/mobile-v12.js | grep -q 'new MutationObserver'; then
             echo 'ERRO: observer recursivo encontrado dentro do APK'
             exit 1
@@ -116,9 +133,9 @@ jobs:
           "$APKSIGNER" verify --verbose --print-certs "$APK"
           sha256sum "$APK"
 
-      - name: Upload APK V1.6
+      - name: Upload APK V1.7
         uses: actions/upload-artifact@v4
         with:
-          name: tarefas-android-v1.6-debug
+          name: tarefas-android-v1.7-debug
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
