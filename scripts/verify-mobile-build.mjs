@@ -6,7 +6,7 @@ const errors = [];
 const warnings = [];
 const required = [
   'index.html','dashboard.html','menu.html','minhas_tarefas.html','calendario.html','pessoal.html',
-  'mobile-preload.js','mobile-bootstrap.js','mobile-v12.js','mobile.css','native-mobile.js'
+  'mobile-preload.js','mobile-bootstrap.js','mobile-v12.js','mobile-login-v17.js','mobile.css','native-mobile.js'
 ];
 
 async function exists(rel){
@@ -21,22 +21,33 @@ for(const rel of (await readdir(root)).filter(x=>x.endsWith('.html'))){
   for(const needle of ['mobile-preload.js','mobile.css','mobile-bootstrap.js','native-mobile.js']){
     if(!html.includes(needle))errors.push(`${rel}: injeção ausente: ${needle}`);
   }
+  if(rel==='index.html'&&!html.includes('mobile-login-v17.js'))errors.push('index.html: login seguro de push V1.7 ausente');
 }
 
 if(await exists('mobile-preload.js')){
   const s=await text('mobile-preload.js');
   if(!s.includes('__TAREFAS_NATIVE_APP__'))errors.push('mobile-preload.js: flag nativa ausente');
-  if(!s.includes("tarefasAppVersion = '1.6'"))errors.push('mobile-preload.js: versão 1.6 não encontrada');
+  if(!s.includes("tarefasAppVersion = '1.7'"))errors.push('mobile-preload.js: versão 1.7 não encontrada');
 }
 if(await exists('mobile-bootstrap.js')){
   const s=await text('mobile-bootstrap.js');
-  if(!s.includes('V1.6 • WEB 7.5.2'))errors.push('mobile-bootstrap.js: cabeçalho V1.6 ausente');
-  if(/new\s+MutationObserver/.test(s))errors.push('mobile-bootstrap.js: MutationObserver global não permitido na V1.6');
+  if(/new\s+MutationObserver/.test(s))errors.push('mobile-bootstrap.js: MutationObserver global não permitido');
 }
 if(await exists('mobile-v12.js')){
   const s=await text('mobile-v12.js');
   if(/new\s+MutationObserver/.test(s))errors.push('mobile-v12.js: observer recursivo ainda presente');
-  if(!s.includes('V1.6 • WEB 7.5.2'))errors.push('mobile-v12.js: versão visual incorreta');
+  if(!s.includes('V1.7 • WEB 7.5.2'))errors.push('mobile-v12.js: versão visual V1.7 incorreta');
+}
+if(await exists('mobile-login-v17.js')){
+  const s=await text('mobile-login-v17.js');
+  if(!s.includes('v1_7_emitir_sessao_push'))errors.push('mobile-login-v17.js: emissão de sessão push ausente');
+  if(!s.includes('tarefasPushSession17'))errors.push('mobile-login-v17.js: chave de sessão push ausente');
+}
+if(await exists('native-mobile.js')){
+  const s=await text('native-mobile.js');
+  if(!s.includes('tarefasPushReady17'))errors.push('native-mobile.js: registro remoto V1.7 ausente');
+  if(!s.includes('v1_7_registrar_push_device'))errors.push('native-mobile.js: RPC de registro FCM ausente');
+  if(!s.includes('pushNotificationActionPerformed'))errors.push('native-mobile.js: abertura por toque no push ausente');
 }
 if(await exists('v6_2_mobile.js')){
   const s=await text('v6_2_mobile.js');
@@ -61,7 +72,7 @@ for(const rel of await readdir(root)){
 }
 if(total<100000)errors.push('bundle parece pequeno demais');
 
-console.log(`VERIFY V1.6: ${root}`);
+console.log(`VERIFY V1.7: ${root}`);
 console.log(`Arquivos raiz: ${(await readdir(root)).length}`);
 console.log(`Tamanho raiz (arquivos): ${total} bytes`);
 for(const w of warnings)console.warn('WARN:',w);
@@ -69,4 +80,4 @@ if(errors.length){
   for(const e of errors)console.error('ERRO:',e);
   process.exit(1);
 }
-console.log('OK: bundle V1.6 passou na verificação preventiva.');
+console.log('OK: bundle V1.7 passou na verificação preventiva de estabilidade e push.');
