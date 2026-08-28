@@ -8,7 +8,7 @@
 
   function patchVersion(){
     const el=document.querySelector('.tm-app-brand small');
-    if(el) el.textContent='V1.2 • WEB 7.5.2';
+    if(el) el.textContent='V1.3 • WEB 7.5.2';
   }
 
   function addProfileCard(){
@@ -25,27 +25,42 @@
     content.prepend(card);
   }
 
-  function addServiceHub(){
-    if(page!=='menu') return;
-    const host=document.querySelector('.main-content, main, .content');
-    if(!host || document.querySelector('.tm-v12-services-hero')) return;
-    const hero=document.createElement('section');
-    hero.className='tm-v12-services-hero';
-    hero.innerHTML='<small>CENTRAL DE SERVIÇOS</small><h2>Escalas e serviços</h2><p>Acesse rapidamente as áreas mais usadas no celular.</p>';
-    const grid=document.createElement('section');
-    grid.className='tm-v12-service-grid';
-    grid.innerHTML=`
-      <a class="tm-v12-service-card" href="pessoal.html"><span class="ico">📅</span><div><strong>Escala Preta</strong><small>Dias da semana</small></div></a>
-      <a class="tm-v12-service-card red" href="pessoal.html"><span class="ico">🗓️</span><div><strong>Escala Vermelha</strong><small>Finais de semana e feriados</small></div></a>
-      <a class="tm-v12-service-card" href="calendario.html"><span class="ico">▦</span><div><strong>Calendário</strong><small>Visualize serviços e datas</small></div></a>
-      <a class="tm-v12-service-card" href="missao.html"><span class="ico">⇄</span><div><strong>Serviços</strong><small>Trocas, histórico e missões</small></div></a>`;
-    host.prepend(grid);
-    host.prepend(hero);
+  function removeOldServiceHub(){
+    document.querySelectorAll('.tm-v12-services-hero,.tm-v12-service-grid').forEach(el=>el.remove());
   }
 
-  window.addEventListener('DOMContentLoaded',()=>{
+  function activateOrcModule(){
+    if(page!=='orcamentarios') return;
+    const modulo=new URLSearchParams(location.search).get('modulo');
+    const nav=document.getElementById('orcModuleNav');
+    if(nav){
+      nav.hidden=false;
+      nav.setAttribute('aria-hidden','false');
+      nav.style.removeProperty('display');
+    }
+    if(!modulo) return;
+    const target=document.querySelector(`.orc-module-btn[data-orc-module="${CSS.escape(modulo)}"]`);
+    if(target) setTimeout(()=>target.click(),120);
+  }
+
+  function stripLegacyMobileChrome(){
+    document.querySelectorAll('#v62MobileBar,.v62-mobile-bar,#v62MobileBackdrop,.v62-mobile-backdrop').forEach(el=>el.remove());
+    document.body?.classList.remove('v62-mobile-ready','v62-menu-open');
+  }
+
+  function apply(){
     patchVersion();
     addProfileCard();
-    addServiceHub();
+    removeOldServiceHub();
+    stripLegacyMobileChrome();
+    activateOrcModule();
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',apply); else apply();
+
+  const obs=new MutationObserver(()=>{
+    patchVersion();
+    stripLegacyMobileChrome();
   });
+  window.addEventListener('DOMContentLoaded',()=>document.body&&obs.observe(document.body,{childList:true,subtree:true}));
 })();
