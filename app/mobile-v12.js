@@ -8,7 +8,7 @@
 
   function patchVersion(){
     const el=document.querySelector('.tm-app-brand small');
-    if(el) el.textContent='V1.3 • WEB 7.5.2';
+    if(el) el.textContent='V1.4 • WEB 7.5.2';
   }
 
   function addProfileCard(){
