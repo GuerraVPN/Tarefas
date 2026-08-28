@@ -33,6 +33,7 @@ await cp(path.join(root, 'app', 'manifest.webmanifest'), path.join(dist, 'manife
 await cp(path.join(root, 'app', 'service-worker.js'), path.join(dist, 'service-worker.js'));
 await cp(path.join(root, 'app', 'mobile-bootstrap.js'), path.join(dist, 'mobile-bootstrap.js'));
 await cp(path.join(root, 'app', 'mobile-preload.js'), path.join(dist, 'mobile-preload.js'));
+await cp(path.join(root, 'app', 'mobile-login-v17.js'), path.join(dist, 'mobile-login-v17.js'));
 await cp(path.join(root, 'app', 'mobile.css'), path.join(dist, 'mobile.css'));
 await cp(path.join(root, 'app', 'mobile-v12.css'), path.join(dist, 'mobile-v12.css'));
 await cp(path.join(root, 'app', 'mobile-v16.css'), path.join(dist, 'mobile-v16.css'));
@@ -71,6 +72,10 @@ for (const name of htmlFiles) {
     html = html.replace(/<\/head>/i, '  <link rel="manifest" href="manifest.webmanifest">\n  <meta name="theme-color" content="#05090b">\n</head>');
   }
 
+  if (name === 'index.html' && !html.includes('mobile-login-v17.js')) {
+    html = html.replace(/<\/body>/i, '  <script src="mobile-login-v17.js"></script>\n</body>');
+  }
+
   if (!html.includes('mobile-bootstrap.js')) {
     html = html.replace(/<\/body>/i, '  <script src="mobile-bootstrap.js"></script>\n  <script src="mobile-v12.js"></script>\n  <script src="native-mobile.js"></script>\n</body>');
   } else {
@@ -81,4 +86,4 @@ for (const name of htmlFiles) {
   await writeFile(file, html, 'utf8');
 }
 
-console.log(`TAREFAS Android V1.6: ${htmlFiles.length} páginas preparadas com shell estável, sessão persistente e notificações`);
+console.log(`TAREFAS Android V1.7: ${htmlFiles.length} páginas preparadas com push remoto FCM, sessão persistente e shell estável`);
