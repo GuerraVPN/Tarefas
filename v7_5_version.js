@@ -13,5 +13,5 @@ function apply(){
  });
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply);else apply();
-setTimeout(apply,800);setTimeout(apply,1800);
+setInterval(apply,750);
 })();
