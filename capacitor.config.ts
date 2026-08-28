@@ -1,13 +1,13 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'br.com.guerravpn.tarefas',
+  appId: 'br.com.guerravpn.tarefas.mobile',
   appName: 'TAREFAS',
   webDir: 'dist',
   bundledWebRuntime: false,
   android: {
     allowMixedContent: false,
-    backgroundColor: '#0b1220'
+    backgroundColor: '#040808'
   },
   server: {
     androidScheme: 'https'
