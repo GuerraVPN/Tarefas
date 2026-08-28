@@ -1,0 +1,44 @@
+/* TAREFAS Android V1.2 — acabamento visual exclusivo do APK */
+html.tarefas-mobile-shell.tm-page-configuracoes .header,
+html.tarefas-mobile-shell.tm-page-configuracoes .status-strip{display:none!important}
+html.tarefas-mobile-shell.tm-page-configuracoes .content{padding:12px 12px 28px!important;max-width:760px!important;margin:0 auto!important}
+html.tarefas-mobile-shell.tm-page-configuracoes .grid{display:grid!important;grid-template-columns:1fr!important;gap:12px!important}
+html.tarefas-mobile-shell.tm-page-configuracoes .card{overflow:hidden!important;background:linear-gradient(145deg,#0e1517,#080d0e)!important;border:1px solid rgba(255,255,255,.08)!important;border-radius:16px!important}
+html.tarefas-mobile-shell.tm-page-configuracoes .card-title{padding:15px 16px!important;border-bottom:1px solid rgba(255,255,255,.07)!important;font-size:14px!important;color:#fff!important}
+html.tarefas-mobile-shell.tm-page-configuracoes .card-body{padding:16px!important}
+html.tarefas-mobile-shell.tm-page-configuracoes .avatar-large{width:66px!important;height:66px!important;border:2px solid rgba(95,232,52,.45)!important;background:#09120c!important;color:#5fe834!important}
+html.tarefas-mobile-shell.tm-page-configuracoes .section-label{color:#f4f7f5!important}
+html.tarefas-mobile-shell.tm-page-configuracoes .hint{background:#0a1112!important;border-color:rgba(255,255,255,.07)!important;color:#8f9b96!important}
+html.tarefas-mobile-shell.tm-page-configuracoes .theme-previews{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+html.tarefas-mobile-shell.tm-page-configuracoes .theme-preview{background:#0b1113!important;border-color:rgba(255,255,255,.09)!important;color:#fff!important}
+html.tarefas-mobile-shell.tm-page-configuracoes .theme-preview.selected{border-color:#5fe834!important;box-shadow:0 0 0 2px rgba(95,232,52,.08)!important}
+
+.tm-v12-profile-card{margin:2px 0 14px;padding:16px;border-radius:18px;background:linear-gradient(135deg,#112016,#0a1110 62%);border:1px solid rgba(95,232,52,.18);display:flex;align-items:center;gap:13px}
+.tm-v12-avatar{width:52px;height:52px;flex:0 0 52px;border-radius:50%;display:grid;place-items:center;background:#0a140c;border:1px solid rgba(95,232,52,.35);color:#5fe834;font-size:22px;font-weight:900}
+.tm-v12-profile-copy{min-width:0;flex:1}.tm-v12-profile-copy strong{display:block;color:#fff;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tm-v12-profile-copy small{display:block;color:#8f9b96;margin-top:4px;font-size:11px}.tm-v12-profile-badge{padding:6px 9px;border-radius:999px;background:rgba(95,232,52,.10);color:#5fe834;font-size:10px;font-weight:800}
+
+html.tarefas-mobile-shell.tm-page-menu .header,
+html.tarefas-mobile-shell.tm-page-menu .topbar{display:none!important}
+html.tarefas-mobile-shell.tm-page-menu .main-content,
+html.tarefas-mobile-shell.tm-page-menu main{max-width:760px!important;margin:0 auto!important;background:transparent!important}
+.tm-v12-services-hero{margin:4px 12px 12px;padding:17px;border-radius:18px;background:linear-gradient(135deg,#122216,#090f0d 64%);border:1px solid rgba(95,232,52,.18)}
+.tm-v12-services-hero small{color:#5fe834;font-weight:800;font-size:10px;letter-spacing:.45px}.tm-v12-services-hero h2{margin:7px 0 4px!important;color:#fff!important;font-size:20px!important}.tm-v12-services-hero p{margin:0!important;color:#8f9b96!important;font-size:12px!important;line-height:1.45}
+.tm-v12-service-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0 12px 14px}
+.tm-v12-service-card{min-height:118px;padding:14px;border-radius:16px;text-decoration:none!important;background:linear-gradient(145deg,#0e1517,#090e0f);border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;justify-content:space-between;color:#fff!important}
+.tm-v12-service-card:active{transform:scale(.985)}.tm-v12-service-card .ico{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:rgba(95,232,52,.10);border:1px solid rgba(95,232,52,.16);font-size:19px}.tm-v12-service-card.red .ico{background:rgba(255,59,48,.10);border-color:rgba(255,59,48,.20)}.tm-v12-service-card strong{display:block;font-size:13px;margin-top:12px}.tm-v12-service-card small{display:block;color:#8f9b96;font-size:10px;margin-top:3px;line-height:1.3}
+
+html.tarefas-mobile-shell.tm-page-minhas_tarefas .content,
+html.tarefas-mobile-shell.tm-page-pessoal .content{padding:12px!important}
+html.tarefas-mobile-shell.tm-page-minhas_tarefas .card,
+html.tarefas-mobile-shell.tm-page-pessoal .card{background:linear-gradient(145deg,#0e1517,#080d0e)!important;border-color:rgba(255,255,255,.08)!important}
+
+html.tarefas-mobile-shell .notification-panel,
+html.tarefas-mobile-shell .notifications-panel,
+html.tarefas-mobile-shell [class*="notification-card"],
+html.tarefas-mobile-shell [class*="notificacao-card"]{background:#0c1315!important;color:#fff!important;border-color:rgba(255,255,255,.08)!important;border-radius:14px!important}
+html.tarefas-mobile-shell .notification-item,
+html.tarefas-mobile-shell [class*="notificacao-item"]{border-color:rgba(255,255,255,.07)!important;color:#e9eeeb!important}
+
+.tm-app-brand small{font-variant-numeric:tabular-nums}
+.tm-app-header::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,rgba(95,232,52,.32),transparent)}
+@media(max-width:420px){.tm-v12-service-grid{grid-template-columns:1fr 1fr}.tm-v12-service-card{min-height:108px;padding:12px}.tm-v12-profile-badge{display:none}html.tarefas-mobile-shell.tm-page-configuracoes .theme-previews{grid-template-columns:1fr!important}}
