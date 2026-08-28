@@ -9,7 +9,7 @@
 
   function patchVersion(){
     const el=document.querySelector('.tm-app-brand small');
-    const text='V1.6 • WEB 7.5.2';
+    const text='V1.7 • WEB 7.5.2';
     if(el && el.textContent!==text) el.textContent=text;
   }
 
@@ -59,12 +59,9 @@
     activateOrcModule();
   }
 
-  // V1.6: sem MutationObserver global. O observer anterior reescrevia o próprio
-  // conteúdo observado e podia entrar em ciclo infinito no Android WebView.
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',apply,{once:true});
   else apply();
 
-  // Pequenas conferências pontuais, sem observar todo o DOM continuamente.
   setTimeout(patchVersion,250);
   setTimeout(stripLegacyMobileChrome,500);
 })();
