@@ -1,0 +1,22 @@
+{
+  "name": "tarefas-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "TAREFAS Android/PWA baseado na versão web 7.5.2",
+  "scripts": {
+    "build:web": "node scripts/build-mobile.mjs",
+    "cap:add:android": "npx cap add android",
+    "cap:sync": "npm run build:web && npx cap sync android",
+    "cap:open": "npx cap open android",
+    "android": "npm run cap:sync && npm run cap:open"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.5.0",
+    "@capacitor/app": "8.1.1",
+    "@capacitor/core": "8.5.0",
+    "@capacitor/preferences": "8.0.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.0"
+  }
+}
