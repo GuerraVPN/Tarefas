@@ -35,6 +35,7 @@ await cp(path.join(root, 'app', 'mobile-bootstrap.js'), path.join(dist, 'mobile-
 await cp(path.join(root, 'app', 'mobile-preload.js'), path.join(dist, 'mobile-preload.js'));
 await cp(path.join(root, 'app', 'mobile.css'), path.join(dist, 'mobile.css'));
 await cp(path.join(root, 'app', 'mobile-v12.css'), path.join(dist, 'mobile-v12.css'));
+await cp(path.join(root, 'app', 'mobile-v15.css'), path.join(dist, 'mobile-v15.css'));
 await cp(path.join(root, 'app', 'mobile-v12.js'), path.join(dist, 'mobile-v12.js'));
 
 await build({
@@ -62,6 +63,9 @@ for (const name of htmlFiles) {
   if (!html.includes('mobile-v12.css')) {
     html = html.replace(/<\/head>/i, '  <link rel="stylesheet" href="mobile-v12.css">\n</head>');
   }
+  if (!html.includes('mobile-v15.css')) {
+    html = html.replace(/<\/head>/i, '  <link rel="stylesheet" href="mobile-v15.css">\n</head>');
+  }
 
   if (!html.includes('manifest.webmanifest')) {
     html = html.replace(/<\/head>/i, '  <link rel="manifest" href="manifest.webmanifest">\n  <meta name="theme-color" content="#05090b">\n</head>');
@@ -77,4 +81,4 @@ for (const name of htmlFiles) {
   await writeFile(file, html, 'utf8');
 }
 
-console.log(`TAREFAS Android V1.2: ${htmlFiles.length} páginas preparadas com tema nativo, sessão persistente e notificações`);
+console.log(`TAREFAS Android V1.5: ${htmlFiles.length} páginas preparadas com tema nativo, sessão persistente e notificações`);
