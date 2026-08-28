@@ -5,6 +5,8 @@ const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
 const fmt=v=>Number(v||0).toLocaleString('pt-BR');
 const money=v=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(v)||0);
+const wait=(ms)=>new Promise(r=>setTimeout(r,ms));
+async function withTimeout(promise,ms,fallback){return Promise.race([Promise.resolve(promise),wait(ms).then(()=>fallback)])}
 const ICON={
  dashboard:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
  board:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 4v16M16 4v16"/></svg>',
@@ -20,18 +22,16 @@ const ICON={
  clock:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
  mail:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>'
 };
-let user=null;
+let user=null,loading=false;
 function icon(name){return ICON[name]||ICON.dashboard}
 function profileLabel(){return [user?.secao,user?.posicao].filter(Boolean).join(' — ')||'Perfil ativo'}
-async function initUser(){
- const base=JSON.parse(localStorage.getItem('usuarioLogado')||'null');if(!base?.id)return false;
- user=base;
- if(window.Perfis26){try{const s=await Perfis26.carregar(supabaseClient,base);user=s.usuario}catch(_){}}
+function renderUser(){
+ if(!user)return;
  $('dashGreeting').textContent=`Bem-vindo, ${[user.patente,user.nome_guerra].filter(Boolean).join(' ')||'usuário'}.`;
  $('dashProfile').textContent=profileLabel();
- return true;
 }
 function shortcuts(){
+ if(!user)return;
  const admin=norm(user?.secao)==='admin';
  const data=[
   ['board','Quadro','Visão Kanban das tarefas','menu.html'],
@@ -42,16 +42,33 @@ function shortcuts(){
   ['bell','Central','Notificações e mensagens','central.html'],
   ['budget','Orçamentários','Resumo e módulos orçamentários','orcamentarios.html'],
   ['file','Material Carga','Carga das dependências e depósitos','orcamentarios.html?modulo=material_carga'],
-  ['tasks','Passagem de Carga','Histórico e troca de detentores','orcamentarios.html?modulo=passagem_carga'],
+  ['dashboard','Passagem de Carga','Histórico e troca de detentores','orcamentarios.html?modulo=passagem_carga'],
   ...(admin?[['shield','Histórico / Auditoria','Ações e reversões','historico_auditoria.html']]:[]),
   ['settings','Configurações','Preferências do sistema','configuracoes.html']
  ];
- $('shortcutGrid').innerHTML=data.map(([i,t,s,u])=>`<button class="v6-shortcut" data-url="${esc(u)}"><span class="v6-shortcut-icon">${icon(i)}</span><span><strong>${esc(t)}</strong><small>${esc(s)}</small></span></button>`).join('');
- $('shortcutGrid').onclick=e=>{const b=e.target.closest('[data-url]');if(b)location.href=b.dataset.url};
+ const grid=$('shortcutGrid');
+ if(grid){
+  grid.innerHTML=data.map(([i,t,s,u])=>`<button class="v6-shortcut" data-url="${esc(u)}"><span class="v6-shortcut-icon">${icon(i)}</span><span><strong>${esc(t)}</strong><small>${esc(s)}</small></span></button>`).join('');
+  grid.onclick=e=>{const b=e.target.closest('[data-url]');if(b)location.href=b.dataset.url};
+ }
  document.querySelectorAll('[data-icon]').forEach(el=>el.innerHTML=icon(el.dataset.icon));
 }
+async function syncProfile(base){
+ if(!window.Perfis26)return;
+ try{
+  const client=(typeof supabaseClient!=='undefined')?supabaseClient:null;
+  if(!client)return;
+  const state=await withTimeout(window.Perfis26.carregar(client,base),2500,null);
+  if(state?.usuario){user=state.usuario;renderUser();shortcuts();}
+ }catch(_){}
+}
 async function querySafe(table,select='*',build=null){
- try{let q=supabaseClient.from(table).select(select);if(build)q=build(q);const r=await q;return r.error?[]:(r.data||[])}catch(_){return[]}
+ try{
+  if(typeof supabaseClient==='undefined'||!supabaseClient)return[];
+  let q=supabaseClient.from(table).select(select);if(build)q=build(q);
+  const r=await withTimeout(q,4500,{data:[],error:{message:'timeout'}});
+  return r?.error?[]:(r?.data||[]);
+ }catch(_){return[]}
 }
 function taskStats(tasks){
  const today=new Date();today.setHours(0,0,0,0);
@@ -63,8 +80,7 @@ function taskStats(tasks){
  return {open:open.length,pending,andamento,done,late,total:tasks.length};
 }
 function renderBars(s){
- const max=Math.max(1,s.total);
- const rows=[['Pendentes',s.pending],['Em andamento',s.andamento],['Concluídas',s.done],['Vencidas',s.late]];
+ const max=Math.max(1,s.total),rows=[['Pendentes',s.pending],['Em andamento',s.andamento],['Concluídas',s.done],['Vencidas',s.late]];
  $('taskBars').innerHTML=rows.map(([n,v])=>`<div class="v6-bar-row"><span>${n}</span><div class="v6-bar-track"><div class="v6-bar-fill" style="width:${Math.min(100,(v/max)*100)}%"></div></div><b>${v}</b></div>`).join('');
 }
 function renderRecent(tasks){
@@ -72,35 +88,48 @@ function renderRecent(tasks){
  $('recentTasks').innerHTML=a.length?a.map(t=>`<div class="v6-recent-row"><span>${esc(t.codigo||'#'+t.id)}</span><b>${esc(t.titulo||'Sem título')}</b><time>${new Date(t.atualizado_em||t.criado_em).toLocaleString('pt-BR')}</time></div>`).join(''):'<div class="v6-empty">Nenhuma tarefa encontrada.</div>';
 }
 async function load(){
- const [tasks,users,guides,pedidos,movs,docs,passagens,notifs]=await Promise.all([
-  querySafe('tarefas','id,codigo,titulo,status,prazo,secao,criado_em,atualizado_em',q=>{q=q.eq('recorrencia_modelo',false);return ['admin','comandante'].includes(norm(user?.secao))?q:q.eq('secao',user?.secao||'')}),
-  querySafe('usuarios','id,ativo'),
-  querySafe('guias_orcamentarias','id,etapa_orcamentaria,situacao_fiscalizacao'),
-  querySafe('pedidos_orcamentarios','id,tipo,categoria,status,valor_total'),
-  querySafe('movimentacoes_material','id,status,valor_total'),
-  querySafe('orc_documentos_carga','id,tipo_referencia,referencia,versao'),
-  querySafe('orc_passagens_carga','id,status,dependencia,data_passagem'),
-  querySafe('notificacoes','id,lida,perfil_id',q=>q.eq('usuario_id',String(user.id)).eq('lida',false))
- ]);
- const ts=taskStats(tasks);
- $('kOpen').textContent=fmt(ts.open);$('kOpenSub').textContent=`${fmt(ts.pending)} pendentes · ${fmt(ts.andamento)} em andamento`;$('kLate').textContent=fmt(ts.late);
- $('kUsers').textContent=fmt(users.filter(x=>x.ativo!==false).length);
- const vis=notifs.filter(x=>x.perfil_id==null||String(x.perfil_id)===String(user.perfil_id??''));$('kNotifs').textContent=fmt(vis.length);
- $('kGuides').textContent=fmt(guides.length);$('kGuidesSub').textContent=`${fmt(guides.filter(x=>x.etapa_orcamentaria==='aguardando_inclusao_carga').length)} aguardando inclusão`;
- renderBars(ts);renderRecent(tasks);
- const baixas=pedidos.filter(x=>x.tipo==='desrelacionamento_baixa'),dist=pedidos.filter(x=>x.tipo==='distribuicao');
- const latestDocs=new Set(docs.map(x=>`${x.tipo_referencia}|${x.referencia}`));
- const budget=[
-  ['Guias na Fiscalização',guides.filter(x=>['aguardando_fiscalizacao','em_analise_fiscalizacao'].includes(x.situacao_fiscalizacao)).length,''],
-  ['Baixas em andamento',baixas.filter(x=>x.status!=='pronto').length,money(baixas.reduce((s,x)=>s+Number(x.valor_total||0),0))],
-  ['Distribuições em andamento',dist.filter(x=>x.status!=='pronto').length,money(dist.reduce((s,x)=>s+Number(x.valor_total||0),0))],
-  ['Movimentações em andamento',movs.filter(x=>x.status!=='pronto').length,money(movs.reduce((s,x)=>s+Number(x.valor_total||0),0))],
-  ['Documentos de carga',latestDocs.size,'dependências/depósitos com versão'],
-  ['Passagens de carga',passagens.filter(x=>x.status==='em_andamento').length,`${passagens.filter(x=>x.status==='concluida').length} concluída(s)`]
- ];
- $('budgetCards').innerHTML=budget.map(([n,v,s])=>`<div class="v6-budget-card"><small>${esc(n)}</small><strong>${esc(v)}</strong><span>${esc(s||'')}</span></div>`).join('');
- $('dashUpdated').textContent='Atualizado em '+new Date().toLocaleString('pt-BR');
+ if(loading||!user)return; loading=true;
+ $('dashUpdated').textContent='Atualizando...';
+ try{
+  const [tasks,users,guides,pedidos,movs,docs,passagens,notifs]=await Promise.all([
+   querySafe('tarefas','id,codigo,titulo,status,prazo,secao,criado_em,atualizado_em',q=>{q=q.eq('recorrencia_modelo',false);return ['admin','comandante'].includes(norm(user?.secao))?q:q.eq('secao',user?.secao||'')}),
+   querySafe('usuarios','id,ativo'),
+   querySafe('guias_orcamentarias','id,etapa_orcamentaria,situacao_fiscalizacao'),
+   querySafe('pedidos_orcamentarios','id,tipo,categoria,status,valor_total'),
+   querySafe('movimentacoes_material','id,status,valor_total'),
+   querySafe('orc_documentos_carga','id,tipo_referencia,referencia,versao'),
+   querySafe('orc_passagens_carga','id,status,dependencia,data_passagem'),
+   querySafe('notificacoes','id,lida,perfil_id',q=>q.eq('usuario_id',String(user.id)).eq('lida',false))
+  ]);
+  const ts=taskStats(tasks);
+  $('kOpen').textContent=fmt(ts.open);$('kOpenSub').textContent=`${fmt(ts.pending)} pendentes · ${fmt(ts.andamento)} em andamento`;$('kLate').textContent=fmt(ts.late);
+  $('kUsers').textContent=fmt(users.filter(x=>x.ativo!==false).length);
+  const vis=notifs.filter(x=>x.perfil_id==null||String(x.perfil_id)===String(user.perfil_id??''));$('kNotifs').textContent=fmt(vis.length);
+  $('kGuides').textContent=fmt(guides.length);$('kGuidesSub').textContent=`${fmt(guides.filter(x=>x.etapa_orcamentaria==='aguardando_inclusao_carga').length)} aguardando inclusão`;
+  renderBars(ts);renderRecent(tasks);
+  const baixas=pedidos.filter(x=>x.tipo==='desrelacionamento_baixa'),dist=pedidos.filter(x=>x.tipo==='distribuicao');
+  const latestDocs=new Set(docs.map(x=>`${x.tipo_referencia}|${x.referencia}`));
+  const budget=[
+   ['Guias na Fiscalização',guides.filter(x=>['aguardando_fiscalizacao','em_analise_fiscalizacao'].includes(x.situacao_fiscalizacao)).length,''],
+   ['Baixas em andamento',baixas.filter(x=>x.status!=='pronto').length,money(baixas.reduce((s,x)=>s+Number(x.valor_total||0),0))],
+   ['Distribuições em andamento',dist.filter(x=>x.status!=='pronto').length,money(dist.reduce((s,x)=>s+Number(x.valor_total||0),0))],
+   ['Movimentações em andamento',movs.filter(x=>x.status!=='pronto').length,money(movs.reduce((s,x)=>s+Number(x.valor_total||0),0))],
+   ['Documentos de carga',latestDocs.size,'dependências/depósitos com versão'],
+   ['Passagens de carga',passagens.filter(x=>x.status==='em_andamento').length,`${passagens.filter(x=>x.status==='concluida').length} concluída(s)`]
+  ];
+  $('budgetCards').innerHTML=budget.map(([n,v,s])=>`<div class="v6-budget-card"><small>${esc(n)}</small><strong>${esc(v)}</strong><span>${esc(s||'')}</span></div>`).join('');
+  $('dashUpdated').textContent='Atualizado em '+new Date().toLocaleString('pt-BR');
+ }finally{loading=false}
 }
-async function start(){if(!await initUser())return;shortcuts();await load()}
+async function start(){
+ const base=JSON.parse(localStorage.getItem('usuarioLogado')||'null');if(!base?.id)return;
+ user=base;
+ renderUser();
+ shortcuts();
+ syncProfile(base).then(()=>load());
+ await load();
+ setTimeout(()=>load(),7000);
+}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
+window.addEventListener('online',()=>load());
 })();
