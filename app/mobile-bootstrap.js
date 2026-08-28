@@ -16,8 +16,18 @@
     more:'<svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg>',
     close:'<svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg>',
     chevron:'<svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>',
-    user:'<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>'
+    down:'<svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>'
   };
+
+  const ORC = [
+    ['Relatório geral','orcamentarios.html','Visão consolidada'],
+    ['Guias','orcamentarios.html?modulo=guias','Guias e fiscalização'],
+    ['Desrelacionamento / Baixa','orcamentarios.html?modulo=baixas','Baixas e desrelacionamentos'],
+    ['Distribuição','orcamentarios.html?modulo=distribuicao','Distribuição de material'],
+    ['Movimentação de Material','orcamentarios.html?modulo=movimentacao','Movimentações entre cargas'],
+    ['Material Carga / Depósito','orcamentarios.html?modulo=material_carga','Controle de material carga'],
+    ['Passagem de Carga','orcamentarios.html?modulo=passagem_carga','Passagens e detentores']
+  ];
 
   const AREAS = [
     ['Principal', [
@@ -31,13 +41,11 @@
       ['Missões','missao.html','Missões e serviços'],
       ['Férias e dispensas','ferias_dispensas.html','Ausências e dispensas']
     ]],
-    ['Comunicação', [
-      ['Central','central.html','Notificações e mensagens']
-    ]],
+    ['Comunicação', [['Central','central.html','Notificações e mensagens']]],
     ['Gestão', [
       ['Usuários','usuarios.html','Cadastros e acessos'],
       ['Relatórios','relatorios.html','Indicadores e relatórios'],
-      ['Orçamentários','orcamentarios.html','Guias, pedidos e movimentações'],
+      ['Orçamentários','#orcamentarios','Guias, baixas, distribuição e movimentações'],
       ['Histórico / Auditoria','historico_auditoria.html','Histórico de alterações']
     ]],
     ['Sistema', [
@@ -49,7 +57,7 @@
 
   const readUser = () => { try { return JSON.parse(localStorage.getItem('usuarioLogado') || 'null'); } catch (_) { return null; } };
   const esc = v => String(v ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
-  const navigate = href => { if (href && href !== page) location.href = href; };
+  const navigate = href => { if (!href) return; const current = page + location.search; if (href !== current) location.href = href; };
 
   function removeLegacyChrome(root=document){
     root.querySelectorAll?.('#v62MobileBar,.v62-mobile-bar,#v62MobileBackdrop,.v62-mobile-backdrop').forEach(el=>el.remove());
@@ -75,12 +83,28 @@
     return wrap;
   }
 
+  function orcSubmenu(){
+    return `<div class="tm-drawer-sub" data-orc-sub hidden>${ORC.map(([name,href,desc])=>`<button class="tm-drawer-subitem" data-href="${href}"><span><strong>${esc(name)}</strong><small>${esc(desc)}</small></span>${SVG.chevron}</button>`).join('')}</div>`;
+  }
+
   function openDrawer(){
     const user=readUser();
     const wrap=sheetBase('tmDrawer','Menu');
     const body=wrap.querySelector('.tm-sheet-body');
-    body.innerHTML=`<button class="tm-user-card" id="tmProfileButton"><span class="tm-avatar">${esc((user?.nome_guerra||'U').slice(0,1).toUpperCase())}</span><span><strong>${esc(user?.patente||'')} ${esc(user?.nome_guerra||'Usuário')}</strong><small>${esc(user?.secao||'')} • ${esc(user?.posicao||'')}</small></span>${SVG.chevron}</button>` + AREAS.map(([group,items])=>`<div class="tm-drawer-group"><h3>${esc(group)}</h3>${items.map(([name,href,desc])=>`<button class="tm-drawer-item ${page===href?'active':''}" data-href="${href}"><span><strong>${esc(name)}</strong><small>${esc(desc)}</small></span>${SVG.chevron}</button>`).join('')}</div>`).join('');
+    body.innerHTML=`<button class="tm-user-card" id="tmProfileButton"><span class="tm-avatar">${esc((user?.nome_guerra||'U').slice(0,1).toUpperCase())}</span><span><strong>${esc(user?.patente||'')} ${esc(user?.nome_guerra||'Usuário')}</strong><small>${esc(user?.secao||'')} • ${esc(user?.posicao||'')}</small></span>${SVG.chevron}</button>` + AREAS.map(([group,items])=>`<div class="tm-drawer-group"><h3>${esc(group)}</h3>${items.map(([name,href,desc])=> href==='#orcamentarios' ? `<button class="tm-drawer-item tm-drawer-parent" data-orc-toggle aria-expanded="false"><span><strong>${esc(name)}</strong><small>${esc(desc)}</small></span><span class="tm-orc-chevron">${SVG.down}</span></button>${orcSubmenu()}` : `<button class="tm-drawer-item ${page===href?'active':''}" data-href="${href}"><span><strong>${esc(name)}</strong><small>${esc(desc)}</small></span>${SVG.chevron}</button>`).join('')}</div>`).join('');
     body.querySelectorAll('[data-href]').forEach(btn=>btn.addEventListener('click',()=>navigate(btn.dataset.href)));
+    body.querySelector('[data-orc-toggle]')?.addEventListener('click',e=>{
+      const btn=e.currentTarget, sub=body.querySelector('[data-orc-sub]');
+      const open=btn.getAttribute('aria-expanded')==='true';
+      btn.setAttribute('aria-expanded',String(!open));
+      if(sub) sub.hidden=open;
+      btn.classList.toggle('open',!open);
+    });
+    if(page==='orcamentarios.html'){
+      const btn=body.querySelector('[data-orc-toggle]'), sub=body.querySelector('[data-orc-sub]');
+      if(btn){btn.setAttribute('aria-expanded','true');btn.classList.add('open');}
+      if(sub) sub.hidden=false;
+    }
     body.querySelector('#tmProfileButton')?.addEventListener('click',()=>{wrap.remove();openProfiles();});
   }
 
@@ -121,7 +145,7 @@
         const b=document.createElement('button'); b.className='tm-notif-item'+(!r.lida?' unread':'');
         const when=r.criada_em?new Date(r.criada_em).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'';
         b.innerHTML=`<span class="tm-notif-dot"></span><span><strong>${esc(r.titulo||'Notificação')}</strong><small>${esc(r.mensagem||'')}</small><em>${esc(when)}</em></span>${SVG.chevron}`;
-        b.addEventListener('click',async()=>{ await api.marcarLida(r).catch(()=>{}); wrap.remove(); const dest=api.destinoNotificacao(r); navigate(dest); }); list.appendChild(b);
+        b.addEventListener('click',async()=>{ await api.marcarLida(r).catch(()=>{}); wrap.remove(); navigate(api.destinoNotificacao(r)); }); list.appendChild(b);
       });
     }catch(err){ body.innerHTML=`<div class="tm-empty">Erro ao carregar notificações: ${esc(err?.message||err)}</div>`; }
   }
