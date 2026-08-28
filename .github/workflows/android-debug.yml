@@ -37,16 +37,42 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build web bundle
+      - name: Build web bundle V1.6
         run: npm run build:web
+
+      - name: Conferência 1 - auditoria do bundle
+        run: npm run verify:web
+
+      - name: Gerar ZIP V1.6
+        run: |
+          rm -f TAREFAS-v1.6-web.zip
+          cd dist
+          zip -qr ../TAREFAS-v1.6-web.zip .
+
+      - name: Conferência 2 - validar ZIP V1.6
+        run: |
+          unzip -tq TAREFAS-v1.6-web.zip
+          rm -rf /tmp/tarefas-v16
+          mkdir -p /tmp/tarefas-v16
+          unzip -q TAREFAS-v1.6-web.zip -d /tmp/tarefas-v16
+          node scripts/verify-mobile-build.mjs /tmp/tarefas-v16
+          grep -q 'V1.6 • WEB 7.5.2' /tmp/tarefas-v16/mobile-bootstrap.js
+          grep -q '__TAREFAS_NATIVE_APP__' /tmp/tarefas-v16/mobile-preload.js
+
+      - name: Upload ZIP V1.6 conferido
+        uses: actions/upload-artifact@v4
+        with:
+          name: tarefas-android-v1.6-web-checked
+          path: TAREFAS-v1.6-web.zip
+          if-no-files-found: error
 
       - name: Add Android platform
         run: npx cap add android
 
       - name: Set Android app version
         run: |
-          sed -i 's/versionCode 1/versionCode 15/' android/app/build.gradle
-          sed -i 's/versionName "1.0"/versionName "1.5"/' android/app/build.gradle
+          sed -i 's/versionCode 1/versionCode 16/' android/app/build.gradle
+          sed -i 's/versionName "1.0"/versionName "1.6"/' android/app/build.gradle
 
       - name: Install stable debug signing key
         run: |
@@ -71,9 +97,28 @@ jobs:
         working-directory: android
         run: ./gradlew assembleDebug
 
-      - name: Upload APK
+      - name: Conferência 3 - validar APK V1.6
+        run: |
+          APK='android/app/build/outputs/apk/debug/app-debug.apk'
+          META='android/app/build/outputs/apk/debug/output-metadata.json'
+          test -s "$APK"
+          unzip -tq "$APK"
+          grep -q '"versionCode": 16' "$META"
+          grep -q '"versionName": "1.6"' "$META"
+          unzip -p "$APK" assets/public/mobile-bootstrap.js | grep -q 'V1.6 • WEB 7.5.2'
+          unzip -p "$APK" assets/public/mobile-preload.js | grep -q '__TAREFAS_NATIVE_APP__'
+          if unzip -p "$APK" assets/public/mobile-v12.js | grep -q 'new MutationObserver'; then
+            echo 'ERRO: observer recursivo encontrado dentro do APK'
+            exit 1
+          fi
+          APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)"
+          test -n "$APKSIGNER"
+          "$APKSIGNER" verify --verbose --print-certs "$APK"
+          sha256sum "$APK"
+
+      - name: Upload APK V1.6
         uses: actions/upload-artifact@v4
         with:
-          name: tarefas-android-v1.5-debug
+          name: tarefas-android-v1.6-debug
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
