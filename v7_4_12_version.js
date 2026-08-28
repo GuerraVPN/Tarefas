@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const VERSION='7.4.12';
+const VERSION='7.5';
 function apply(){
  document.documentElement.dataset.tarefasVersion=VERSION;
  document.querySelectorAll('.v65-version-badge').forEach(b=>{
@@ -13,5 +13,5 @@ function apply(){
  });
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply);else apply();
-setTimeout(apply,1000);setTimeout(apply,3000);
+setInterval(apply,750);
 })();
