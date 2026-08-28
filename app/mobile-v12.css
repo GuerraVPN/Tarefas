@@ -1,4 +1,4 @@
-/* TAREFAS Android V1.2 — acabamento visual exclusivo do APK */
+/* TAREFAS Android V1.3 — acabamento visual exclusivo do APK */
 html.tarefas-mobile-shell.tm-page-configuracoes .header,
 html.tarefas-mobile-shell.tm-page-configuracoes .status-strip{display:none!important}
 html.tarefas-mobile-shell.tm-page-configuracoes .content{padding:12px 12px 28px!important;max-width:760px!important;margin:0 auto!important}
@@ -21,11 +21,7 @@ html.tarefas-mobile-shell.tm-page-menu .header,
 html.tarefas-mobile-shell.tm-page-menu .topbar{display:none!important}
 html.tarefas-mobile-shell.tm-page-menu .main-content,
 html.tarefas-mobile-shell.tm-page-menu main{max-width:760px!important;margin:0 auto!important;background:transparent!important}
-.tm-v12-services-hero{margin:4px 12px 12px;padding:17px;border-radius:18px;background:linear-gradient(135deg,#122216,#090f0d 64%);border:1px solid rgba(95,232,52,.18)}
-.tm-v12-services-hero small{color:#5fe834;font-weight:800;font-size:10px;letter-spacing:.45px}.tm-v12-services-hero h2{margin:7px 0 4px!important;color:#fff!important;font-size:20px!important}.tm-v12-services-hero p{margin:0!important;color:#8f9b96!important;font-size:12px!important;line-height:1.45}
-.tm-v12-service-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0 12px 14px}
-.tm-v12-service-card{min-height:118px;padding:14px;border-radius:16px;text-decoration:none!important;background:linear-gradient(145deg,#0e1517,#090e0f);border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;justify-content:space-between;color:#fff!important}
-.tm-v12-service-card:active{transform:scale(.985)}.tm-v12-service-card .ico{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:rgba(95,232,52,.10);border:1px solid rgba(95,232,52,.16);font-size:19px}.tm-v12-service-card.red .ico{background:rgba(255,59,48,.10);border-color:rgba(255,59,48,.20)}.tm-v12-service-card strong{display:block;font-size:13px;margin-top:12px}.tm-v12-service-card small{display:block;color:#8f9b96;font-size:10px;margin-top:3px;line-height:1.3}
+.tm-v12-services-hero,.tm-v12-service-grid{display:none!important}
 
 html.tarefas-mobile-shell.tm-page-minhas_tarefas .content,
 html.tarefas-mobile-shell.tm-page-pessoal .content{padding:12px!important}
@@ -39,6 +35,36 @@ html.tarefas-mobile-shell [class*="notificacao-card"]{background:#0c1315!importa
 html.tarefas-mobile-shell .notification-item,
 html.tarefas-mobile-shell [class*="notificacao-item"]{border-color:rgba(255,255,255,.07)!important;color:#e9eeeb!important}
 
+/* V1.3: remove controles de menu antigos e mantém apenas o shell do APK */
+html.tarefas-mobile-shell .menu-toggle,
+html.tarefas-mobile-shell .mobile-menu-toggle,
+html.tarefas-mobile-shell #menuToggle,
+html.tarefas-mobile-shell #v62MobileBar,
+html.tarefas-mobile-shell .v62-mobile-bar,
+html.tarefas-mobile-shell #v62MobileBackdrop,
+html.tarefas-mobile-shell .v62-mobile-backdrop{display:none!important}
+
+/* V1.3: seletor horizontal dos módulos Orçamentários */
+html.tarefas-mobile-shell.tm-page-orcamentarios #orcModuleNav{display:flex!important;overflow-x:auto!important;gap:8px!important;padding:10px 12px!important;margin:0 0 10px!important;scrollbar-width:none!important;background:transparent!important}
+html.tarefas-mobile-shell.tm-page-orcamentarios #orcModuleNav::-webkit-scrollbar{display:none!important}
+html.tarefas-mobile-shell.tm-page-orcamentarios #orcModuleNav .orc-module-btn{flex:0 0 auto!important;min-height:40px!important;padding:9px 12px!important;border-radius:999px!important;background:#0c1415!important;border:1px solid rgba(255,255,255,.10)!important;color:#dce3df!important;font-size:11px!important;white-space:nowrap!important}
+html.tarefas-mobile-shell.tm-page-orcamentarios #orcModuleNav .orc-module-btn.active{background:rgba(95,232,52,.12)!important;border-color:rgba(95,232,52,.45)!important;color:#5fe834!important}
+html.tarefas-mobile-shell.tm-page-orcamentarios .orc-page{padding:10px 10px 24px!important;max-width:760px!important;margin:0 auto!important}
+html.tarefas-mobile-shell.tm-page-orcamentarios .orc-grid,
+html.tarefas-mobile-shell.tm-page-orcamentarios .pedido-grid{grid-template-columns:1fr!important;gap:12px!important}
+html.tarefas-mobile-shell.tm-page-orcamentarios .orc-toolbar,
+html.tarefas-mobile-shell.tm-page-orcamentarios .orc-filters,
+html.tarefas-mobile-shell.tm-page-orcamentarios .pedido-toolbar,
+html.tarefas-mobile-shell.tm-page-orcamentarios .pedido-filters{display:flex!important;flex-wrap:wrap!important;gap:8px!important}
+html.tarefas-mobile-shell.tm-page-orcamentarios .orc-toolbar>*,
+html.tarefas-mobile-shell.tm-page-orcamentarios .orc-filters>*,
+html.tarefas-mobile-shell.tm-page-orcamentarios .pedido-filters>*{min-width:0!important;max-width:100%!important}
+
+/* Escalas largas não devem ser esmagadas no celular */
+html.tarefas-mobile-shell.tm-page-pessoal [class*="escala"],
+html.tarefas-mobile-shell.tm-page-pessoal [class*="scale"]{max-width:100%!important}
+html.tarefas-mobile-shell.tm-page-pessoal .tarefas-mobile-table-scroll{overflow-x:auto!important}
+
 .tm-app-brand small{font-variant-numeric:tabular-nums}
 .tm-app-header::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,rgba(95,232,52,.32),transparent)}
-@media(max-width:420px){.tm-v12-service-grid{grid-template-columns:1fr 1fr}.tm-v12-service-card{min-height:108px;padding:12px}.tm-v12-profile-badge{display:none}html.tarefas-mobile-shell.tm-page-configuracoes .theme-previews{grid-template-columns:1fr!important}}
+@media(max-width:420px){.tm-v12-profile-badge{display:none}html.tarefas-mobile-shell.tm-page-configuracoes .theme-previews{grid-template-columns:1fr!important}}
