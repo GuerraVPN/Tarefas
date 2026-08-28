@@ -65,7 +65,7 @@ function init(){
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 
-/* V7 loader — V7.4.12 */
+/* V7 loader — V7.5 */
 (function(){
   function add(src,attr,done){
     const old=document.querySelector('script['+attr+'],script[src*="'+src.split('?')[0]+'"]');
@@ -75,18 +75,18 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     if(done)s.onload=done;
     document.head.appendChild(s);
   }
-  add('v7_4_12_site.js?v=7.4.12','data-v7412-site',function(){
-   add('v7_4_7_mission_patch.js?v=7.4.12','data-v747-mission-patch',function(){
-    add('v7_4_7_aditamento_patch.js?v=7.4.12','data-v747-aditamento-patch',function(){
+  add('v7_4_12_site.js?v=7.5','data-v7412-site',function(){
+   add('v7_4_7_mission_patch.js?v=7.5','data-v747-mission-patch',function(){
+    add('v7_4_7_aditamento_patch.js?v=7.5','data-v747-aditamento-patch',function(){
      add('v6_5_patch.js?v=6.5','data-v65-loader',function(){
-      add('v7_4_12_global.js?v=7.4.12','data-v7412-global',function(){
-       add('v7_4_12_version.js?v=7.4.12','data-v7412-version',function(){
-        add('v7_4_3_period.js?v=7.4.12','data-v743-period',function(){
-         add('v7_4_3_pdf.js?v=7.4.12','data-v743-pdf',function(){
-          add('v7_4_2_search_order.js?v=7.4.12','data-v742-search-order',function(){
-           add('v7_4_2_transfer.js?v=7.4.12','data-v742-transfer',function(){
-            add('v7_4_2_replace.js?v=7.4.12','data-v742-replace',function(){
-             add('v7_4_12_about.js?v=7.4.12','data-v7412-about');
+      add('v7_4_12_global.js?v=7.5','data-v7412-global',function(){
+       add('v7_5_version.js?v=7.5','data-v75-version',function(){
+        add('v7_4_3_period.js?v=7.5','data-v743-period',function(){
+         add('v7_4_3_pdf.js?v=7.5','data-v743-pdf',function(){
+          add('v7_4_2_search_order.js?v=7.5','data-v742-search-order',function(){
+           add('v7_4_2_transfer.js?v=7.5','data-v742-transfer',function(){
+            add('v7_4_2_replace.js?v=7.5','data-v742-replace',function(){
+             add('v7_5_about.js?v=7.5','data-v75-about');
             });
            });
           });
