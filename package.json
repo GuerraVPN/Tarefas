@@ -1,8 +1,8 @@
 {
   "name": "tarefas-app",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "private": true,
-  "description": "TAREFAS Android V1.6 baseado na versão web 7.5.2",
+  "description": "TAREFAS Android V1.7 baseado na versão web 7.5.2",
   "scripts": {
     "build:web": "node scripts/build-mobile.mjs",
     "verify:web": "node scripts/verify-mobile-build.mjs dist",
@@ -17,7 +17,8 @@
     "@capacitor/app": "8.1.1",
     "@capacitor/core": "8.5.0",
     "@capacitor/local-notifications": "8.0.1",
-    "@capacitor/preferences": "8.0.1"
+    "@capacitor/preferences": "8.0.1",
+    "@capacitor/push-notifications": "8.0.1"
   },
   "devDependencies": {
     "@capacitor/assets": "3.0.5",
