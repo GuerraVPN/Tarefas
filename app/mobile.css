@@ -1,0 +1,141 @@
+html.tarefas-mobile-shell,
+html.tarefas-mobile-shell body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+html.tarefas-mobile-shell body {
+  min-height: 100dvh;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+html.tarefas-mobile-shell * {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+html.tarefas-mobile-shell img,
+html.tarefas-mobile-shell video,
+html.tarefas-mobile-shell canvas,
+html.tarefas-mobile-shell iframe {
+  height: auto;
+  max-width: 100%;
+}
+
+html.tarefas-mobile-shell input,
+html.tarefas-mobile-shell select,
+html.tarefas-mobile-shell textarea,
+html.tarefas-mobile-shell button {
+  min-height: 44px;
+  font-size: 16px;
+}
+
+html.tarefas-mobile-shell input,
+html.tarefas-mobile-shell select,
+html.tarefas-mobile-shell textarea {
+  width: 100%;
+}
+
+html.tarefas-mobile-shell table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+html.tarefas-mobile-shell .tarefas-mobile-table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+html.tarefas-mobile-shell .tarefas-mobile-table-scroll > table {
+  min-width: 640px;
+}
+
+html.tarefas-mobile-shell .container,
+html.tarefas-mobile-shell .content,
+html.tarefas-mobile-shell .main,
+html.tarefas-mobile-shell main,
+html.tarefas-mobile-shell section,
+html.tarefas-mobile-shell form,
+html.tarefas-mobile-shell .card,
+html.tarefas-mobile-shell .panel,
+html.tarefas-mobile-shell .modal-content {
+  width: 100%;
+}
+
+html.tarefas-mobile-shell .modal,
+html.tarefas-mobile-shell [role="dialog"] {
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+}
+
+html.tarefas-mobile-shell .modal-content,
+html.tarefas-mobile-shell [role="dialog"] > div {
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 768px) {
+  html.tarefas-mobile-shell body {
+    margin: 0 !important;
+  }
+
+  html.tarefas-mobile-shell .container,
+  html.tarefas-mobile-shell .content,
+  html.tarefas-mobile-shell .main,
+  html.tarefas-mobile-shell main {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  html.tarefas-mobile-shell .row,
+  html.tarefas-mobile-shell .grid,
+  html.tarefas-mobile-shell .cards,
+  html.tarefas-mobile-shell .toolbar,
+  html.tarefas-mobile-shell .actions,
+  html.tarefas-mobile-shell .form-row {
+    flex-wrap: wrap !important;
+  }
+
+  html.tarefas-mobile-shell .row > *,
+  html.tarefas-mobile-shell .grid > *,
+  html.tarefas-mobile-shell .cards > *,
+  html.tarefas-mobile-shell .form-row > * {
+    min-width: 0;
+  }
+
+  html.tarefas-mobile-shell h1 { font-size: 1.5rem !important; }
+  html.tarefas-mobile-shell h2 { font-size: 1.25rem !important; }
+  html.tarefas-mobile-shell h3 { font-size: 1.1rem !important; }
+
+  html.tarefas-mobile-shell button,
+  html.tarefas-mobile-shell .btn,
+  html.tarefas-mobile-shell a.button {
+    touch-action: manipulation;
+  }
+
+  html.tarefas-mobile-shell pre,
+  html.tarefas-mobile-shell code {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 480px) {
+  html.tarefas-mobile-shell .container,
+  html.tarefas-mobile-shell .content,
+  html.tarefas-mobile-shell .main,
+  html.tarefas-mobile-shell main {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  html.tarefas-mobile-shell .card,
+  html.tarefas-mobile-shell .panel,
+  html.tarefas-mobile-shell fieldset {
+    border-radius: 12px;
+  }
+}
