@@ -1,4 +1,5 @@
 (() => {
+  'use strict';
   const page = (location.pathname.split('/').pop() || 'index.html').toLowerCase().replace('.html','');
   document.documentElement.classList.add(`tm-page-${page}`);
 
@@ -8,7 +9,8 @@
 
   function patchVersion(){
     const el=document.querySelector('.tm-app-brand small');
-    if(el) el.textContent='V1.5 • WEB 7.5.2';
+    const text='V1.6 • WEB 7.5.2';
+    if(el && el.textContent!==text) el.textContent=text;
   }
 
   function addProfileCard(){
@@ -39,7 +41,8 @@
       nav.style.removeProperty('display');
     }
     if(!modulo) return;
-    const target=document.querySelector(`.orc-module-btn[data-orc-module="${CSS.escape(modulo)}"]`);
+    const safe=window.CSS?.escape?CSS.escape(modulo):modulo.replace(/[^a-z0-9_\-]/gi,'');
+    const target=document.querySelector(`.orc-module-btn[data-orc-module="${safe}"]`);
     if(target) setTimeout(()=>target.click(),120);
   }
 
@@ -56,11 +59,12 @@
     activateOrcModule();
   }
 
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',apply); else apply();
+  // V1.6: sem MutationObserver global. O observer anterior reescrevia o próprio
+  // conteúdo observado e podia entrar em ciclo infinito no Android WebView.
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',apply,{once:true});
+  else apply();
 
-  const obs=new MutationObserver(()=>{
-    patchVersion();
-    stripLegacyMobileChrome();
-  });
-  window.addEventListener('DOMContentLoaded',()=>document.body&&obs.observe(document.body,{childList:true,subtree:true}));
+  // Pequenas conferências pontuais, sem observar todo o DOM continuamente.
+  setTimeout(patchVersion,250);
+  setTimeout(stripLegacyMobileChrome,500);
 })();
