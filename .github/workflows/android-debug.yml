@@ -116,7 +116,6 @@ jobs:
         run: |
           set -euo pipefail
           APK='android/app/build/outputs/apk/debug/app-debug.apk'
-          META='android/app/build/outputs/apk/debug/output-metadata.json'
 
           echo '[3.1] Integridade do APK'
           test -s "$APK"
@@ -147,7 +146,7 @@ jobs:
           fi
 
           echo '[3.4] Recursos Firebase processados pelo Gradle'
-          GS="$(find android/app/build/generated -type f -name values.xml -path '*google-services*' | head -1)"
+          GS="$(grep -rl --include='*.xml' 'google_app_id' android/app/build/generated | head -1)"
           test -n "$GS"
           test -s "$GS"
           grep -q 'google_app_id' "$GS"
