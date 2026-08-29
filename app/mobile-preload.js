@@ -2,11 +2,13 @@
   'use strict';
 
   window.__TAREFAS_NATIVE_APP__ = true;
-  document.documentElement.classList.add('tarefas-native-app', 'tarefas-mobile-shell', 'tm-v17');
-  document.documentElement.dataset.tarefasAppVersion = '1.7';
+  document.documentElement.classList.add('tarefas-native-app', 'tarefas-mobile-shell', 'tm-v18');
+  document.documentElement.dataset.tarefasAppVersion = '1.8.0';
+  document.documentElement.dataset.tarefasAppBuild = '180';
 
   const USER_KEY = 'usuarioLogado';
   const ACTIVITY_KEY = 'sessao26_ultima_atividade';
+  // Mantidos por compatibilidade com a sessão FCM criada na V1.7.
   const PUSH_SESSION_KEY = 'tarefasPushSession17';
   const PUSH_PASSWORD_KEY = 'tarefasPushPassword17';
 
