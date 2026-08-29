@@ -1,8 +1,8 @@
 (() => {
   'use strict';
 
-  const APP_VERSION = '1.8.7';
-  const APP_BUILD = 187;
+  const APP_VERSION = '1.8.8';
+  const APP_BUILD = 188;
   const APP_CHANNEL = 'beta';
   const PUSH_SESSION_KEY = 'tarefasPushSession17';
 
