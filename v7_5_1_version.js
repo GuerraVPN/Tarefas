@@ -1,18 +1,18 @@
 (function(){
 'use strict';
-if(window.__TAREFAS_V753_VERSION__)return;
-window.__TAREFAS_V753_VERSION__=true;
-const VERSION='7.5.3',BADGE='● TAREFAS v'+VERSION;
+if(window.__TAREFAS_V754_VERSION__)return;
+window.__TAREFAS_V754_VERSION__=true;
+const VERSION='7.5.4',BADGE='● TAREFAS v'+VERSION;
 let busy=false;
 function addPatch(){
- if(window.__TAREFAS_V753_PATCH__||document.querySelector('script[src*="v7_5_3_patch.js"]'))return;
- const s=document.createElement('script');s.src='v7_5_3_patch.js?v=7.5.3';s.defer=true;document.head.appendChild(s);
+ if(window.__TAREFAS_V754_PATCH__||document.querySelector('script[src*="v7_5_4_patch.js"]'))return;
+ const s=document.createElement('script');s.src='v7_5_4_patch.js?v=7.5.4';s.defer=true;document.head.appendChild(s);
 }
 function ensureLabels(){
  const page=(location.pathname.split('/').pop()||'').toLowerCase();
  if(page!=='pessoal.html'||window.__TAREFAS_V752_SERVICE_LABELS__)return;
  if(document.querySelector('script[src*="v7_5_2_service_labels.js"]'))return;
- const s=document.createElement('script');s.src='v7_5_2_service_labels.js?v=7.5.3';s.defer=true;document.head.appendChild(s);
+ const s=document.createElement('script');s.src='v7_5_2_service_labels.js?v=7.5.4';s.defer=true;document.head.appendChild(s);
 }
 function apply(){
  if(busy)return;busy=true;
