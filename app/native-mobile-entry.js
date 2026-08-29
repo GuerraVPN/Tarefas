@@ -5,9 +5,10 @@ import { PushNotifications } from '@capacitor/push-notifications';
 import { Preferences } from '@capacitor/preferences';
 
 const CHANNEL_ID = 'tarefas-geral';
+// Chaves V1.7 mantidas para atualizar sem perder o dispositivo/sessão já registrados.
 const PUSH_SESSION_KEY = 'tarefasPushSession17';
 const DEVICE_ID_KEY = 'tarefasDeviceId17';
-const APP_VERSION = '1.7';
+const APP_VERSION = '1.8.0';
 let pushInitialized = false;
 let lastToken = '';
 
