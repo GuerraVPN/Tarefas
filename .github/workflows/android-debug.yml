@@ -1,4 +1,4 @@
-name: Android Debug APK
+name: Android Beta APK
 
 on:
   workflow_dispatch:
@@ -37,40 +37,41 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build web bundle 1.8.0
+      - name: Build web bundle 1.8.1 beta
         run: npm run build:web
 
-      - name: Conferência 1 - auditoria do bundle 1.8.0
+      - name: Conferência 1 - auditoria do bundle 1.8.1
         run: npm run verify:web
 
-      - name: Gerar ZIP 1.8.0
+      - name: Gerar ZIP 1.8.1
         run: |
-          rm -f TAREFAS-1.8.0-web.zip
+          rm -f TAREFAS-1.8.1-web.zip
           cd dist
-          zip -qr ../TAREFAS-1.8.0-web.zip .
+          zip -qr ../TAREFAS-1.8.1-web.zip .
 
-      - name: Conferência 2 - validar ZIP 1.8.0
+      - name: Conferência 2 - validar ZIP 1.8.1
         run: |
-          unzip -tq TAREFAS-1.8.0-web.zip
-          rm -rf /tmp/tarefas-180
-          mkdir -p /tmp/tarefas-180
-          unzip -q TAREFAS-1.8.0-web.zip -d /tmp/tarefas-180
-          node scripts/verify-mobile-build.mjs /tmp/tarefas-180
-          grep -q '1.8.0 • WEB 7.5.2' /tmp/tarefas-180/mobile-v12.js
-          grep -q 'tarefasAppBuild = '\''180'\''' /tmp/tarefas-180/mobile-preload.js
-          grep -q 'Desrelacionamento / Baixa' /tmp/tarefas-180/mobile-bootstrap.js
-          grep -q 'Sobre o app' /tmp/tarefas-180/mobile-bootstrap.js
-          grep -q '#tmDrawer .tm-drawer-item' /tmp/tarefas-180/mobile-v18.css
-          grep -q 'v1_7_registrar_push_device' /tmp/tarefas-180/native-mobile.js
-          grep -q 'tarefas:file-saved' /tmp/tarefas-180/native-mobile.js
-          grep -q 'tarefas:file-imported' /tmp/tarefas-180/native-mobile.js
-          grep -q 'Salvar ou abrir arquivo' /tmp/tarefas-180/native-mobile.js
+          unzip -tq TAREFAS-1.8.1-web.zip
+          rm -rf /tmp/tarefas-181
+          mkdir -p /tmp/tarefas-181
+          unzip -q TAREFAS-1.8.1-web.zip -d /tmp/tarefas-181
+          node scripts/verify-mobile-build.mjs /tmp/tarefas-181
+          grep -q '1.8.1 • WEB 7.5.2' /tmp/tarefas-181/mobile-v12.js
+          grep -q 'tarefasAppBuild = '\''181'\''' /tmp/tarefas-181/mobile-preload.js
+          grep -q 'v1_8_get_beta_updates' /tmp/tarefas-181/mobile-updates-v181.js
+          grep -q 'v1_8_set_beta_updates' /tmp/tarefas-181/mobile-updates-v181.js
+          grep -q 'v1_8_latest_app_version' /tmp/tarefas-181/mobile-updates-v181.js
+          grep -q 'v1_8_app_version_history' /tmp/tarefas-181/mobile-updates-v181.js
+          grep -q 'Receber versões beta' /tmp/tarefas-181/mobile-updates-v181.js
+          grep -q 'Baixar atualização' /tmp/tarefas-181/mobile-updates-v181.js
+          grep -q 'v1_7_registrar_push_device' /tmp/tarefas-181/native-mobile.js
+          grep -q 'tarefas:file-saved' /tmp/tarefas-181/native-mobile.js
 
-      - name: Upload ZIP 1.8.0 conferido
+      - name: Upload ZIP 1.8.1 conferido
         uses: actions/upload-artifact@v4
         with:
-          name: tarefas-android-1.8.0-web-checked
-          path: TAREFAS-1.8.0-web.zip
+          name: tarefas-android-1.8.1-beta-web-checked
+          path: TAREFAS-1.8.1-web.zip
           if-no-files-found: error
 
       - name: Conferir Firebase Android
@@ -101,15 +102,14 @@ jobs:
           PY
           grep -q 'READ_EXTERNAL_STORAGE' android/app/src/main/AndroidManifest.xml
           grep -q 'WRITE_EXTERNAL_STORAGE' android/app/src/main/AndroidManifest.xml
-          grep -q 'requestLegacyExternalStorage="true"' android/app/src/main/AndroidManifest.xml
 
       - name: Instalar Firebase no projeto Android
         run: cp app/google-services.json android/app/google-services.json
 
       - name: Set Android app version
         run: |
-          sed -i 's/versionCode 1/versionCode 180/' android/app/build.gradle
-          sed -i 's/versionName "1.0"/versionName "1.8.0"/' android/app/build.gradle
+          sed -i 's/versionCode 1/versionCode 181/' android/app/build.gradle
+          sed -i 's/versionName "1.0"/versionName "1.8.1"/' android/app/build.gradle
 
       - name: Install stable debug signing key
         run: |
@@ -134,7 +134,7 @@ jobs:
         working-directory: android
         run: ./gradlew assembleDebug
 
-      - name: Conferência 3 - validar APK 1.8.0 + layout + push + arquivos
+      - name: Conferência 3 - validar APK 1.8.1 beta
         run: |
           set -euo pipefail
           APK='android/app/build/outputs/apk/debug/app-debug.apk'
@@ -149,31 +149,36 @@ jobs:
           with open('android/app/build/outputs/apk/debug/output-metadata.json', encoding='utf-8') as f:
               meta=json.load(f)
           el=meta['elements'][0]
-          assert int(el['versionCode']) == 180, el
-          assert str(el['versionName']) == '1.8.0', el
-          print('versionCode=180 / versionName=1.8.0 OK')
+          assert int(el['versionCode']) == 181, el
+          assert str(el['versionName']) == '1.8.1', el
+          print('versionCode=181 / versionName=1.8.1 BETA OK')
           PY
 
-          echo '[3.3] Bundle 1.8.0 dentro do APK'
-          unzip -p "$APK" assets/public/mobile-bootstrap.js > /tmp/180-bootstrap.js
-          unzip -p "$APK" assets/public/mobile-v12.js > /tmp/180-mobile-ui.js
-          unzip -p "$APK" assets/public/mobile-preload.js > /tmp/180-preload.js
-          unzip -p "$APK" assets/public/mobile-v18.css > /tmp/180-layout.css
-          unzip -p "$APK" assets/public/native-mobile.js > /tmp/180-native.js
-          grep -q "APP_VERSION = '1.8.0'" /tmp/180-bootstrap.js
-          grep -q 'APP_BUILD = 180' /tmp/180-bootstrap.js
-          grep -q '1.8.0 • WEB 7.5.2' /tmp/180-mobile-ui.js
-          grep -q 'Desrelacionamento / Baixa' /tmp/180-bootstrap.js
-          grep -q 'Sobre o app' /tmp/180-bootstrap.js
-          grep -q 'tm-about-page' /tmp/180-bootstrap.js
-          grep -q '#tmDrawer .tm-drawer-item' /tmp/180-layout.css
-          grep -q 'v1_7_emitir_sessao_push' /tmp/180-preload.js
-          grep -q 'v1_7_registrar_push_device' /tmp/180-native.js
-          grep -q 'pushNotificationActionPerformed' /tmp/180-native.js
-          grep -q 'tarefas:file-saved' /tmp/180-native.js
-          grep -q 'tarefas:file-imported' /tmp/180-native.js
-          grep -q 'Salvar ou abrir arquivo' /tmp/180-native.js
-          if grep -q 'new MutationObserver' /tmp/180-mobile-ui.js /tmp/180-bootstrap.js; then
+          echo '[3.3] Bundle, updates, push e arquivos dentro do APK'
+          unzip -p "$APK" assets/public/mobile-bootstrap.js > /tmp/181-bootstrap.js
+          unzip -p "$APK" assets/public/mobile-v12.js > /tmp/181-mobile-ui.js
+          unzip -p "$APK" assets/public/mobile-preload.js > /tmp/181-preload.js
+          unzip -p "$APK" assets/public/mobile-updates-v181.js > /tmp/181-updates.js
+          unzip -p "$APK" assets/public/mobile-v181.css > /tmp/181-updates.css
+          unzip -p "$APK" assets/public/native-mobile.js > /tmp/181-native.js
+          grep -q "APP_VERSION = '1.8.1'" /tmp/181-bootstrap.js
+          grep -q 'APP_BUILD = 181' /tmp/181-bootstrap.js
+          grep -q '1.8.1 • WEB 7.5.2' /tmp/181-mobile-ui.js
+          grep -q "APP_CHANNEL = 'beta'" /tmp/181-updates.js
+          grep -q 'v1_8_get_beta_updates' /tmp/181-updates.js
+          grep -q 'v1_8_set_beta_updates' /tmp/181-updates.js
+          grep -q 'v1_8_latest_app_version' /tmp/181-updates.js
+          grep -q 'v1_8_app_version_history' /tmp/181-updates.js
+          grep -q 'Receber versões beta' /tmp/181-updates.js
+          grep -q 'Baixar atualização' /tmp/181-updates.js
+          grep -q '.tm-update-history' /tmp/181-updates.css
+          grep -q '.tm-switch' /tmp/181-updates.css
+          grep -q 'v1_7_emitir_sessao_push' /tmp/181-preload.js
+          grep -q 'v1_7_registrar_push_device' /tmp/181-native.js
+          grep -q 'pushNotificationActionPerformed' /tmp/181-native.js
+          grep -q 'tarefas:file-saved' /tmp/181-native.js
+          grep -q 'Salvar ou abrir arquivo' /tmp/181-native.js
+          if grep -q 'new MutationObserver' /tmp/181-mobile-ui.js /tmp/181-bootstrap.js /tmp/181-updates.js; then
             echo 'ERRO: observer recursivo encontrado dentro do APK'
             exit 1
           fi
@@ -186,12 +191,12 @@ jobs:
           grep -q 'gcm_defaultSenderId' "$GS"
           grep -q 'google_api_key' "$GS"
 
-          echo '[3.5] Permissões de arquivos no APK'
+          echo '[3.5] Permissões de arquivos'
           AAPT="$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)"
           test -n "$AAPT"
-          "$AAPT" dump permissions "$APK" > /tmp/180-permissions.txt
-          grep -q 'android.permission.READ_EXTERNAL_STORAGE' /tmp/180-permissions.txt
-          grep -q 'android.permission.WRITE_EXTERNAL_STORAGE' /tmp/180-permissions.txt
+          "$AAPT" dump permissions "$APK" > /tmp/181-permissions.txt
+          grep -q 'android.permission.READ_EXTERNAL_STORAGE' /tmp/181-permissions.txt
+          grep -q 'android.permission.WRITE_EXTERNAL_STORAGE' /tmp/181-permissions.txt
 
           echo '[3.6] Assinatura de build e hash'
           APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)"
@@ -199,10 +204,10 @@ jobs:
           "$APKSIGNER" verify --verbose --print-certs "$APK"
           sha256sum "$APK"
 
-      - name: Upload APK 1.8.0
+      - name: Upload APK 1.8.1 beta
         uses: actions/upload-artifact@v4
         with:
-          name: tarefas-android-1.8.0-debug
+          name: tarefas-android-1.8.1-beta-debug
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
 
