@@ -59,6 +59,7 @@ jobs:
           grep -q 'V1.7 • WEB 7.5.2' /tmp/tarefas-v17/mobile-v12.js
           grep -q '__TAREFAS_NATIVE_APP__' /tmp/tarefas-v17/mobile-preload.js
           grep -q 'v1_7_registrar_push_device' /tmp/tarefas-v17/native-mobile.js
+          grep -q 'v1_7_emitir_sessao_push' /tmp/tarefas-v17/mobile-preload.js
 
       - name: Upload ZIP V1.7 conferido
         uses: actions/upload-artifact@v4
@@ -69,14 +70,13 @@ jobs:
 
       - name: Conferir Firebase Android
         run: |
-          if [ ! -s app/google-services.json ]; then
-            echo 'ERRO: app/google-services.json ausente. Adicione o arquivo do Firebase para br.com.guerravpn.tarefas.mobile.'
-            exit 1
-          fi
-          grep -q 'br.com.guerravpn.tarefas.mobile' app/google-services.json || {
-            echo 'ERRO: google-services.json não pertence ao package br.com.guerravpn.tarefas.mobile.'
-            exit 1
-          }
+          curl --fail --silent --show-error --retry 3 \
+            'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/firebase-config-v17' \
+            -o app/google-services.json
+          test -s app/google-services.json
+          grep -q 'br.com.guerravpn.tarefas.mobile' app/google-services.json
+          grep -q 'tarefas-561c8' app/google-services.json
+          grep -q 'current_key' app/google-services.json
 
       - name: Add Android platform
         run: npx cap add android
@@ -116,14 +116,18 @@ jobs:
         run: |
           APK='android/app/build/outputs/apk/debug/app-debug.apk'
           META='android/app/build/outputs/apk/debug/output-metadata.json'
+          GS='android/app/build/generated/res/google-services/debug/values/values.xml'
           test -s "$APK"
           unzip -tq "$APK"
           grep -q '"versionCode": 17' "$META"
           grep -q '"versionName": "1.7"' "$META"
           unzip -p "$APK" assets/public/mobile-v12.js | grep -q 'V1.7 • WEB 7.5.2'
-          unzip -p "$APK" assets/public/mobile-preload.js | grep -q '__TAREFAS_NATIVE_APP__'
+          unzip -p "$APK" assets/public/mobile-preload.js | grep -q 'v1_7_emitir_sessao_push'
           unzip -p "$APK" assets/public/native-mobile.js | grep -q 'v1_7_registrar_push_device'
-          unzip -l "$APK" | grep -q 'google-services'
+          test -s "$GS"
+          grep -q 'google_app_id' "$GS"
+          grep -q 'gcm_defaultSenderId' "$GS"
+          grep -q 'google_api_key' "$GS"
           if unzip -p "$APK" assets/public/mobile-v12.js | grep -q 'new MutationObserver'; then
             echo 'ERRO: observer recursivo encontrado dentro do APK'
             exit 1
