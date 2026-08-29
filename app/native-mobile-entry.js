@@ -1,5 +1,6 @@
 import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
+import { FileTransfer } from '@capacitor/file-transfer';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { PushNotifications } from '@capacitor/push-notifications';
@@ -10,9 +11,10 @@ const CHANNEL_ID = 'tarefas-geral';
 // Chaves V1.7 mantidas para atualizar sem perder o dispositivo/sessão já registrados.
 const PUSH_SESSION_KEY = 'tarefasPushSession17';
 const DEVICE_ID_KEY = 'tarefasDeviceId17';
-const APP_VERSION = '1.8.0';
+const APP_VERSION = '1.8.3';
 const FILES_FOLDER = 'TAREFAS';
 let pushInitialized = false;
+let pushListenersInstalled = false;
 let lastToken = '';
 let fileBridgeInstalled = false;
 
@@ -57,8 +59,8 @@ async function ensureFilesPermission(){
     permission = await Filesystem.requestPermissions();
     return permission.publicStorage === 'granted';
   } catch (err) {
-    // Android 11+ usa armazenamento com escopo; o seletor de documentos pode
-    // funcionar sem uma permissão ampla. A gravação é tentada normalmente.
+    // Android 11+ usa armazenamento com escopo; Documents/Cache continuam
+    // disponíveis para arquivos criados pelo próprio aplicativo.
     console.warn('[TAREFAS FILES] Permissão pública não exigida/disponível:', err);
     return true;
   }
@@ -75,6 +77,7 @@ function sanitizeFilename(value, mime=''){
       'text/plain':'.txt',
       'image/jpeg':'.jpg',
       'image/png':'.png',
+      'application/vnd.android.package-archive':'.apk',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':'.xlsx',
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document':'.docx'
     })[String(mime || '').split(';')[0].toLowerCase()];
@@ -91,6 +94,19 @@ function filenameFromUrl(url){
   } catch (_) {
     return sanitizeFilename(`TAREFAS-${Date.now()}`);
   }
+}
+
+function mimeFromFilename(filename){
+  const name=String(filename||'').toLowerCase();
+  if(name.endsWith('.apk')) return 'application/vnd.android.package-archive';
+  if(name.endsWith('.pdf')) return 'application/pdf';
+  if(name.endsWith('.csv')) return 'text/csv';
+  if(name.endsWith('.json')) return 'application/json';
+  if(name.endsWith('.png')) return 'image/png';
+  if(name.endsWith('.jpg')||name.endsWith('.jpeg')) return 'image/jpeg';
+  if(name.endsWith('.xlsx')) return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+  if(name.endsWith('.docx')) return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+  return 'application/octet-stream';
 }
 
 function blobToBase64(blob){
@@ -125,7 +141,7 @@ async function saveBlob(blob, filename){
       filename: name,
       path: `Documentos/${FILES_FOLDER}/${name}`,
       uri: result.uri,
-      mimeType: blob.type || 'application/octet-stream'
+      mimeType: blob.type || mimeFromFilename(name)
     };
     window.dispatchEvent(new CustomEvent('tarefas:file-saved', { detail: info }));
     return info;
@@ -150,7 +166,7 @@ async function saveBlob(blob, filename){
         filename: name,
         path: null,
         uri: temp.uri,
-        mimeType: blob.type || 'application/octet-stream'
+        mimeType: blob.type || mimeFromFilename(name)
       };
       window.dispatchEvent(new CustomEvent('tarefas:file-saved', { detail: info }));
       return info;
@@ -160,9 +176,57 @@ async function saveBlob(blob, filename){
   }
 }
 
+async function nativeDownloadUrl(url, filename){
+  const source=String(url||'').trim();
+  if(!/^https:\/\//i.test(source)) throw new Error('URL de download inválida.');
+  const name=sanitizeFilename(filename || filenameFromUrl(source));
+  const mimeType=mimeFromFilename(name);
+  await ensureFilesPermission();
+
+  // Caminho principal: baixa pelo stack HTTP nativo direto para Documentos/TAREFAS.
+  try {
+    const placeholder=await Filesystem.writeFile({
+      path:`${FILES_FOLDER}/${name}`,
+      data:'',
+      directory:Directory.Documents,
+      recursive:true
+    });
+    const targetUri=placeholder.uri || (await Filesystem.getUri({path:`${FILES_FOLDER}/${name}`,directory:Directory.Documents})).uri;
+    await FileTransfer.downloadFile({url:source,path:targetUri,progress:true});
+    const info={
+      ok:true,saved:true,shared:false,filename:name,
+      path:`Documentos/${FILES_FOLDER}/${name}`,
+      uri:targetUri,mimeType
+    };
+    window.dispatchEvent(new CustomEvent('tarefas:file-saved',{detail:info}));
+    return info;
+  } catch (documentsError) {
+    console.warn('[TAREFAS FILES] Download em Documents falhou, usando Cache + Android:',documentsError);
+
+    // Fallback: ainda usa FileTransfer nativo (sem CORS), depois abre o seletor do Android.
+    try {
+      const temp=await Filesystem.writeFile({
+        path:`downloads/${name}`,
+        data:'',
+        directory:Directory.Cache,
+        recursive:true
+      });
+      const targetUri=temp.uri || (await Filesystem.getUri({path:`downloads/${name}`,directory:Directory.Cache})).uri;
+      await FileTransfer.downloadFile({url:source,path:targetUri,progress:true});
+      await Share.share({title:name,dialogTitle:'Salvar ou abrir atualização',files:[targetUri]});
+      const info={ok:true,saved:false,shared:true,filename:name,path:null,uri:targetUri,mimeType};
+      window.dispatchEvent(new CustomEvent('tarefas:file-saved',{detail:info}));
+      return info;
+    } catch (fallbackError) {
+      throw new Error(`Não foi possível baixar o arquivo: ${fallbackError?.message || documentsError?.message || fallbackError}`);
+    }
+  }
+}
+
 async function downloadUrl(url, filename){
   if (!url) throw new Error('URL de download ausente.');
-  const response = await fetch(String(url), { credentials: 'include' });
+  if (Capacitor.isNativePlatform()) return nativeDownloadUrl(url, filename);
+  const response = await fetch(String(url), { credentials: 'omit' });
   if (!response.ok) throw new Error(`Download falhou (${response.status}).`);
   const blob = await response.blob();
   return saveBlob(blob, filename || filenameFromUrl(String(url)));
@@ -172,8 +236,6 @@ function installFileBridge(){
   if (fileBridgeInstalled || !Capacitor.isNativePlatform()) return;
   fileBridgeInstalled = true;
 
-  // Antes do seletor de arquivos ser aberto, prepara a permissão necessária em
-  // Android antigo. Em Android novo o próprio seletor do sistema controla o acesso.
   document.addEventListener('pointerdown', (event) => {
     const input = event.target instanceof HTMLInputElement ? event.target : null;
     if (input?.type === 'file') ensureFilesPermission().catch(() => {});
@@ -292,10 +354,63 @@ async function registerToken(token){
   return true;
 }
 
+function updateDestination(data){
+  let version=String(data?.referencia_id || '').trim();
+  if(!version){
+    try{version=new URL(String(data?.destino_url||''),location.href).searchParams.get('version')||'';}catch(_){}
+  }
+  return `about.html?update=${encodeURIComponent(version)}`;
+}
+
 function destinationFrom(notification){
-  const data = notification?.data || notification?.notification?.data || {};
-  const href = String(data.destino_url || 'central.html?tab=notificacoes');
-  return href.endsWith('.html') || href.includes('.html?') ? href : 'central.html?tab=notificacoes';
+  const data = notification?.data || notification?.extra || notification?.notification?.data || notification?.notification?.extra || {};
+  if(String(data.tipo||'')==='app_update' || String(data.referencia_tipo||'')==='app_version') return updateDestination(data);
+
+  const raw=String(data.destino_url || 'central.html?tab=notificacoes').trim();
+  try{
+    const parsed=new URL(raw,location.href);
+    if(parsed.origin!==location.origin){
+      if(parsed.pathname.includes('/tarefas-update/')) return updateDestination(data);
+      return 'central.html?tab=notificacoes';
+    }
+    const file=parsed.pathname.split('/').pop() || '';
+    if(!file.endsWith('.html')) return 'central.html?tab=notificacoes';
+    return `${file}${parsed.search}${parsed.hash}`;
+  }catch(_){
+    return raw.endsWith('.html') || raw.includes('.html?') ? raw : 'central.html?tab=notificacoes';
+  }
+}
+
+function openNotificationDestination(notification){
+  const href=destinationFrom(notification);
+  if(href) location.href=href;
+}
+
+async function installPushListeners(){
+  if(pushListenersInstalled) return;
+  pushListenersInstalled=true;
+  await PushNotifications.addListener('registration', async ({ value }) => {
+    await registerToken(value).catch(err => console.warn('[TAREFAS PUSH] Registro:', err));
+  });
+  await PushNotifications.addListener('registrationError', error => {
+    console.error('[TAREFAS PUSH] Firebase registration error:', error);
+    window.dispatchEvent(new CustomEvent('tarefas:push-status',{detail:{ready:false,reason:'registration_error'}}));
+  });
+  await PushNotifications.addListener('pushNotificationReceived', async notification => {
+    window.dispatchEvent(new CustomEvent('v6:notificacoes:update'));
+    const body = notification.body || notification.data?.mensagem || 'Você recebeu uma nova notificação.';
+    await notify({
+      title: notification.title || 'TAREFAS',
+      body,
+      extra: notification.data || {}
+    }).catch(() => {});
+  });
+  await PushNotifications.addListener('pushNotificationActionPerformed', action => {
+    openNotificationDestination(action.notification);
+  });
+  await LocalNotifications.addListener('localNotificationActionPerformed', action => {
+    openNotificationDestination(action.notification);
+  });
 }
 
 async function initializeRemotePush(){
@@ -318,27 +433,7 @@ async function initializeRemotePush(){
     return false;
   }
 
-  await PushNotifications.addListener('registration', async ({ value }) => {
-    await registerToken(value).catch(err => console.warn('[TAREFAS PUSH] Registro:', err));
-  });
-  await PushNotifications.addListener('registrationError', error => {
-    console.error('[TAREFAS PUSH] Firebase registration error:', error);
-    window.dispatchEvent(new CustomEvent('tarefas:push-status',{detail:{ready:false,reason:'registration_error'}}));
-  });
-  await PushNotifications.addListener('pushNotificationReceived', async notification => {
-    window.dispatchEvent(new CustomEvent('v6:notificacoes:update'));
-    const body = notification.body || notification.data?.mensagem || 'Você recebeu uma nova notificação.';
-    await notify({
-      title: notification.title || 'TAREFAS',
-      body,
-      extra: notification.data || {}
-    }).catch(() => {});
-  });
-  await PushNotifications.addListener('pushNotificationActionPerformed', action => {
-    const href = destinationFrom(action.notification);
-    if (href) location.href = href;
-  });
-
+  await installPushListeners();
   await PushNotifications.register();
   return true;
 }
