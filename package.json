@@ -1,8 +1,8 @@
 {
   "name": "tarefas-app",
-  "version": "1.8.4",
+  "version": "1.8.5",
   "private": true,
-  "description": "TAREFAS Android 1.8.4 build 184 beta baseado na versão web 7.5.3",
+  "description": "TAREFAS Android 1.8.5 build 185 beta baseado na versão web 7.5.3",
   "scripts": {
     "build:web": "node scripts/build-mobile.mjs",
     "verify:web": "node scripts/verify-mobile-build.mjs dist",
@@ -13,6 +13,7 @@
     "android": "npm run cap:sync && npm run assets:android && npm run cap:open"
   },
   "dependencies": {
+    "@capawesome-team/capacitor-file-opener": "8.0.2",
     "@capacitor/android": "8.5.0",
     "@capacitor/app": "8.1.1",
     "@capacitor/core": "8.5.0",
