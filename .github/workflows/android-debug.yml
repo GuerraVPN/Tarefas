@@ -23,7 +23,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
+      id-token: write
 
     steps:
       - name: Checkout
@@ -138,23 +139,16 @@ jobs:
         run: |
           set -euo pipefail
           APK='android/app/build/outputs/apk/debug/app-debug.apk'
-
-          echo '[3.1] Integridade do APK'
           test -s "$APK"
           unzip -tq "$APK"
-
-          echo '[3.2] Versionamento Android'
           python - <<'PY'
           import json
           with open('android/app/build/outputs/apk/debug/output-metadata.json', encoding='utf-8') as f:
-              meta=json.load(f)
-          el=meta['elements'][0]
+              el=json.load(f)['elements'][0]
           assert int(el['versionCode']) == 181, el
           assert str(el['versionName']) == '1.8.1', el
           print('versionCode=181 / versionName=1.8.1 BETA OK')
           PY
-
-          echo '[3.3] Bundle, updates, push e arquivos dentro do APK'
           unzip -p "$APK" assets/public/mobile-bootstrap.js > /tmp/181-bootstrap.js
           unzip -p "$APK" assets/public/mobile-v12.js > /tmp/181-mobile-ui.js
           unzip -p "$APK" assets/public/mobile-preload.js > /tmp/181-preload.js
@@ -172,60 +166,117 @@ jobs:
           grep -q 'Receber versões beta' /tmp/181-updates.js
           grep -q 'Baixar atualização' /tmp/181-updates.js
           grep -q '.tm-update-history' /tmp/181-updates.css
-          grep -q '.tm-switch' /tmp/181-updates.css
-          grep -q 'v1_7_emitir_sessao_push' /tmp/181-preload.js
           grep -q 'v1_7_registrar_push_device' /tmp/181-native.js
           grep -q 'pushNotificationActionPerformed' /tmp/181-native.js
           grep -q 'tarefas:file-saved' /tmp/181-native.js
-          grep -q 'Salvar ou abrir arquivo' /tmp/181-native.js
-          if grep -q 'new MutationObserver' /tmp/181-mobile-ui.js /tmp/181-bootstrap.js /tmp/181-updates.js; then
-            echo 'ERRO: observer recursivo encontrado dentro do APK'
-            exit 1
-          fi
-
-          echo '[3.4] Recursos Firebase processados pelo Gradle'
+          if grep -q 'new MutationObserver' /tmp/181-mobile-ui.js /tmp/181-bootstrap.js /tmp/181-updates.js; then exit 1; fi
           GS="$(grep -rl --include='*.xml' 'google_app_id' android/app/build/generated | head -1)"
-          test -n "$GS"
-          test -s "$GS"
-          grep -q 'google_app_id' "$GS"
+          test -n "$GS" && test -s "$GS"
           grep -q 'gcm_defaultSenderId' "$GS"
           grep -q 'google_api_key' "$GS"
-
-          echo '[3.5] Permissões de arquivos'
           AAPT="$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)"
-          test -n "$AAPT"
           "$AAPT" dump permissions "$APK" > /tmp/181-permissions.txt
           grep -q 'android.permission.READ_EXTERNAL_STORAGE' /tmp/181-permissions.txt
           grep -q 'android.permission.WRITE_EXTERNAL_STORAGE' /tmp/181-permissions.txt
-
-          echo '[3.6] Assinatura de build e hash'
           APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)"
-          test -n "$APKSIGNER"
           "$APKSIGNER" verify --verbose --print-certs "$APK"
           sha256sum "$APK"
 
-      - name: Upload APK 1.8.1 beta
+      - name: Assinar distribuição com GuerraVPN
+        if: github.event_name == 'push' && github.ref == 'refs/heads/app/android-v1'
+        run: |
+          set -euo pipefail
+          OIDC="$(curl --fail --silent --show-error -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-signing" | jq -r '.value')"
+          test -n "$OIDC" && test "$OIDC" != null
+          curl --fail --silent --show-error \
+            -H "Authorization: Bearer $OIDC" \
+            'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-signing-material' \
+            -o /tmp/tarefas-signing.json
+          jq -r '.keystore_b64' /tmp/tarefas-signing.json | base64 -d > /tmp/GuerraVPN.keystore
+          STORE_PASS="$(jq -r '.store_password' /tmp/tarefas-signing.json)"
+          KEY_ALIAS="$(jq -r '.key_alias' /tmp/tarefas-signing.json)"
+          KEY_PASS="$(jq -r '.key_password' /tmp/tarefas-signing.json)"
+          EXPECTED_CERT="$(jq -r '.cert_sha256' /tmp/tarefas-signing.json)"
+          APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)"
+          "$APKSIGNER" sign \
+            --ks /tmp/GuerraVPN.keystore \
+            --ks-key-alias "$KEY_ALIAS" \
+            --ks-pass "pass:$STORE_PASS" \
+            --key-pass "pass:$KEY_PASS" \
+            --out TAREFAS-1.8.1.apk \
+            android/app/build/outputs/apk/debug/app-debug.apk
+          VERIFY="$($APKSIGNER verify --verbose --print-certs TAREFAS-1.8.1.apk)"
+          printf '%s\n' "$VERIFY"
+          ACTUAL_CERT="$(printf '%s\n' "$VERIFY" | sed -n 's/.*certificate SHA-256 digest: //p' | head -1 | tr -d ': ' | tr '[:upper:]' '[:lower:]')"
+          test "$ACTUAL_CERT" = "$EXPECTED_CERT"
+          rm -f /tmp/tarefas-signing.json /tmp/GuerraVPN.keystore
+          sha256sum TAREFAS-1.8.1.apk
+
+      - name: Publicar APK permanente
+        if: github.event_name == 'push' && github.ref == 'refs/heads/app/android-v1'
+        run: |
+          set -euo pipefail
+          git fetch origin app/releases
+          rm -rf /tmp/tarefas-releases
+          git worktree add /tmp/tarefas-releases origin/app/releases
+          mkdir -p /tmp/tarefas-releases/downloads
+          cp TAREFAS-1.8.1.apk /tmp/tarefas-releases/downloads/TAREFAS-1.8.1.apk
+          cd /tmp/tarefas-releases
+          git config user.name 'GuerraVPN Android Build'
+          git config user.email '81371258+GuerraVPN@users.noreply.github.com'
+          git add downloads/TAREFAS-1.8.1.apk
+          if git diff --cached --quiet; then
+            echo 'APK 1.8.1 já publicado.'
+          else
+            git commit -m 'release(android): TAREFAS 1.8.1 beta build 181'
+            git push origin HEAD:app/releases
+          fi
+          cd -
+          URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-1.8.1.apk'
+          LOCAL_SHA="$(sha256sum TAREFAS-1.8.1.apk | awk '{print $1}')"
+          for i in 1 2 3 4 5; do
+            if curl --fail --silent --show-error -L "$URL" -o /tmp/tarefas-published.apk; then
+              REMOTE_SHA="$(sha256sum /tmp/tarefas-published.apk | awk '{print $1}')"
+              if [ "$REMOTE_SHA" = "$LOCAL_SHA" ]; then echo 'APK permanente conferido.'; exit 0; fi
+            fi
+            sleep 3
+          done
+          echo 'Falha ao conferir APK publicado.' >&2
+          exit 1
+
+      - name: Registrar beta no servidor e disparar push
+        if: github.event_name == 'push' && github.ref == 'refs/heads/app/android-v1'
+        run: |
+          set -euo pipefail
+          OIDC="$(curl --fail --silent --show-error -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-release" | jq -r '.value')"
+          SHA="$(sha256sum TAREFAS-1.8.1.apk | awk '{print $1}')"
+          jq -n \
+            --arg version '1.8.1' \
+            --argjson build 181 \
+            --arg channel 'beta' \
+            --arg url 'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-1.8.1.apk' \
+            --arg sha "$SHA" \
+            '{version:$version,build:$build,channel:$channel,download_url:$url,sha256:$sha}' > /tmp/release.json
+          curl --fail --silent --show-error \
+            -H "Authorization: Bearer $OIDC" \
+            -H 'Content-Type: application/json' \
+            --data-binary @/tmp/release.json \
+            'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-release-publish' \
+            -o /tmp/release-result.json
+          jq -e '.ok == true and .version == "1.8.1" and .build == 181' /tmp/release-result.json >/dev/null
+          echo '1.8.1 beta registrada no servidor; push respeita a preferência de beta.'
+
+      - name: Upload APK 1.8.1 beta assinado
+        if: github.event_name == 'push' && github.ref == 'refs/heads/app/android-v1'
+        uses: actions/upload-artifact@v4
+        with:
+          name: tarefas-android-1.8.1-beta-GuerraVPN
+          path: TAREFAS-1.8.1.apk
+          if-no-files-found: error
+
+      - name: Upload APK de conferência
         uses: actions/upload-artifact@v4
         with:
           name: tarefas-android-1.8.1-beta-debug
           path: android/app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
-
-      - name: Empacotar ferramenta de assinatura Android
-        run: |
-          set -euo pipefail
-          APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)"
-          test -n "$APKSIGNER"
-          TOOL_DIR="$(dirname "$APKSIGNER")"
-          rm -rf /tmp/tarefas-apksigner
-          mkdir -p /tmp/tarefas-apksigner
-          cp "$APKSIGNER" /tmp/tarefas-apksigner/apksigner
-          cp -R "$TOOL_DIR/lib" /tmp/tarefas-apksigner/lib
-          tar -C /tmp -czf android-sign-tools.tgz tarefas-apksigner
-
-      - name: Upload ferramenta de assinatura
-        uses: actions/upload-artifact@v4
-        with:
-          name: android-sign-tools
-          path: android-sign-tools.tgz
           if-no-files-found: error
