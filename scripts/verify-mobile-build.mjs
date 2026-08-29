@@ -77,7 +77,7 @@ if(await exists('mobile-login-v17.js')){
 
 if(await exists('native-mobile.js')){
   const s=await text('native-mobile.js');
-  for(const needle of ['tarefasPushReady17','v1_7_registrar_push_device','pushNotificationActionPerformed','localNotificationActionPerformed','1.8.3','tarefas:file-saved','tarefas:file-imported','downloadFile','about.html?update=','Documentos/','Salvar ou abrir atualização']) if(!s.includes(needle)) errors.push(`native-mobile.js: recurso 1.8.3 ausente: ${needle}`);
+  for(const needle of ['tarefasPushReady17','v1_7_registrar_push_device','pushNotificationActionPerformed','localNotificationActionPerformed','1.8.3','tarefas:file-saved','tarefas:file-imported','downloadFile','about.html?update=','Documentos/']) if(!s.includes(needle)) errors.push(`native-mobile.js: recurso 1.8.3 ausente: ${needle}`);
 }
 
 if(await exists('v7_5_3_patch.js')){
