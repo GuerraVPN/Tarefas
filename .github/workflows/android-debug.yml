@@ -62,6 +62,9 @@ jobs:
           grep -q 'Sobre o app' /tmp/tarefas-180/mobile-bootstrap.js
           grep -q '#tmDrawer .tm-drawer-item' /tmp/tarefas-180/mobile-v18.css
           grep -q 'v1_7_registrar_push_device' /tmp/tarefas-180/native-mobile.js
+          grep -q 'tarefas:file-saved' /tmp/tarefas-180/native-mobile.js
+          grep -q 'tarefas:file-imported' /tmp/tarefas-180/native-mobile.js
+          grep -q 'Salvar ou abrir arquivo' /tmp/tarefas-180/native-mobile.js
 
       - name: Upload ZIP 1.8.0 conferido
         uses: actions/upload-artifact@v4
@@ -82,6 +85,23 @@ jobs:
 
       - name: Add Android platform
         run: npx cap add android
+
+      - name: Configurar acesso a arquivos Android
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('android/app/src/main/AndroidManifest.xml')
+          s=p.read_text(encoding='utf-8')
+          permissions='''    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />\n    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />\n'''
+          if 'android.permission.READ_EXTERNAL_STORAGE' not in s:
+              s=s.replace('<application', permissions+'    <application', 1)
+          if 'android:requestLegacyExternalStorage' not in s:
+              s=s.replace('<application', '<application android:requestLegacyExternalStorage="true"', 1)
+          p.write_text(s, encoding='utf-8')
+          PY
+          grep -q 'READ_EXTERNAL_STORAGE' android/app/src/main/AndroidManifest.xml
+          grep -q 'WRITE_EXTERNAL_STORAGE' android/app/src/main/AndroidManifest.xml
+          grep -q 'requestLegacyExternalStorage="true"' android/app/src/main/AndroidManifest.xml
 
       - name: Instalar Firebase no projeto Android
         run: cp app/google-services.json android/app/google-services.json
@@ -114,7 +134,7 @@ jobs:
         working-directory: android
         run: ./gradlew assembleDebug
 
-      - name: Conferência 3 - validar APK 1.8.0 + layout + push
+      - name: Conferência 3 - validar APK 1.8.0 + layout + push + arquivos
         run: |
           set -euo pipefail
           APK='android/app/build/outputs/apk/debug/app-debug.apk'
@@ -150,6 +170,9 @@ jobs:
           grep -q 'v1_7_emitir_sessao_push' /tmp/180-preload.js
           grep -q 'v1_7_registrar_push_device' /tmp/180-native.js
           grep -q 'pushNotificationActionPerformed' /tmp/180-native.js
+          grep -q 'tarefas:file-saved' /tmp/180-native.js
+          grep -q 'tarefas:file-imported' /tmp/180-native.js
+          grep -q 'Salvar ou abrir arquivo' /tmp/180-native.js
           if grep -q 'new MutationObserver' /tmp/180-mobile-ui.js /tmp/180-bootstrap.js; then
             echo 'ERRO: observer recursivo encontrado dentro do APK'
             exit 1
@@ -163,7 +186,14 @@ jobs:
           grep -q 'gcm_defaultSenderId' "$GS"
           grep -q 'google_api_key' "$GS"
 
-          echo '[3.5] Assinatura de build e hash'
+          echo '[3.5] Permissões de arquivos no APK'
+          AAPT="$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)"
+          test -n "$AAPT"
+          "$AAPT" dump permissions "$APK" > /tmp/180-permissions.txt
+          grep -q 'android.permission.READ_EXTERNAL_STORAGE' /tmp/180-permissions.txt
+          grep -q 'android.permission.WRITE_EXTERNAL_STORAGE' /tmp/180-permissions.txt
+
+          echo '[3.6] Assinatura de build e hash'
           APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)"
           test -n "$APKSIGNER"
           "$APKSIGNER" verify --verbose --print-certs "$APK"
