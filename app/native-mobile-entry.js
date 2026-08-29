@@ -1,5 +1,6 @@
 import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
+import { FileOpener } from '@capawesome-team/capacitor-file-opener';
 import { FileTransfer } from '@capacitor/file-transfer';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { LocalNotifications } from '@capacitor/local-notifications';
@@ -11,8 +12,9 @@ const CHANNEL_ID = 'tarefas-geral';
 // Chaves V1.7 mantidas para atualizar sem perder o dispositivo/sessão já registrados.
 const PUSH_SESSION_KEY = 'tarefasPushSession17';
 const DEVICE_ID_KEY = 'tarefasDeviceId17';
-const APP_VERSION = '1.8.4';
+const APP_VERSION = '1.8.5';
 const FILES_FOLDER = 'TAREFAS';
+const UPDATES_FOLDER = `${FILES_FOLDER}/Atualização`;
 let pushInitialized = false;
 let pushListenersInstalled = false;
 let lastToken = '';
@@ -88,6 +90,10 @@ function filenameFromUrl(url){
   } catch (_) { return sanitizeFilename(`TAREFAS-${Date.now()}`); }
 }
 
+function updateChannelFolder(channel){
+  return String(channel || '').trim().toLowerCase() === 'beta' ? 'Beta' : 'Oficial';
+}
+
 function blobToBase64(blob){
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -123,24 +129,48 @@ async function saveBlob(blob, filename){
   }
 }
 
-async function downloadUrl(url, filename){
+async function openApkInstaller(uri){
+  try {
+    await FileOpener.openFile({ path:uri, mimeType:'application/vnd.android.package-archive' });
+    return { opened:true, error:null };
+  } catch (err) {
+    console.warn('[TAREFAS UPDATE] Não foi possível abrir o instalador Android:', err);
+    return { opened:false, error:String(err?.message || err || 'Falha ao abrir instalador') };
+  }
+}
+
+async function downloadUrl(url, filename, options={}){
   if (!url) throw new Error('URL de download ausente.');
   const href=String(url),name=sanitizeFilename(filename || filenameFromUrl(href));
+  const isApk=name.toLowerCase().endsWith('.apk');
+  const channelFolder=updateChannelFolder(options?.channel);
+  const targetFolder=isApk?`${UPDATES_FOLDER}/${channelFolder}`:FILES_FOLDER;
+  const displayFolder=isApk?`Documentos/${UPDATES_FOLDER}/${channelFolder}`:`Documentos/${FILES_FOLDER}`;
   await ensureFilesPermission();
   if (Capacitor.isNativePlatform()) {
     try {
-      const target=await Filesystem.getUri({directory:Directory.Documents,path:`${FILES_FOLDER}/${name}`});
+      await Filesystem.mkdir({directory:Directory.Documents,path:targetFolder,recursive:true}).catch(()=>{});
+      const target=await Filesystem.getUri({directory:Directory.Documents,path:`${targetFolder}/${name}`});
       await FileTransfer.downloadFile({url:href,path:target.uri,progress:false});
-      const info={ok:true,saved:true,shared:false,filename:name,path:`Documentos/${FILES_FOLDER}/${name}`,uri:target.uri,mimeType:name.toLowerCase().endsWith('.apk')?'application/vnd.android.package-archive':'application/octet-stream'};
+      let installer={opened:false,error:null};
+      if(isApk && options?.autoInstall!==false) installer=await openApkInstaller(target.uri);
+      const info={
+        ok:true,saved:true,shared:false,filename:name,path:`${displayFolder}/${name}`,uri:target.uri,
+        mimeType:isApk?'application/vnd.android.package-archive':'application/octet-stream',
+        updateChannel:isApk?channelFolder:null,installerOpened:installer.opened,installerError:installer.error
+      };
       window.dispatchEvent(new CustomEvent('tarefas:file-saved',{detail:info}));
       return info;
     } catch (nativeError) {
       console.warn('[TAREFAS FILES] FileTransfer em Documents falhou:',nativeError);
+      if(isApk){
+        throw new Error(`Não foi possível salvar a atualização em ${displayFolder}: ${nativeError?.message || nativeError}`);
+      }
       try {
         const temp=await Filesystem.getUri({directory:Directory.Cache,path:`updates/${name}`});
         await FileTransfer.downloadFile({url:href,path:temp.uri,progress:false});
-        await Share.share({title:name,dialogTitle:'Salvar ou abrir atualização',files:[temp.uri]});
-        const info={ok:true,saved:false,shared:true,filename:name,path:null,uri:temp.uri,mimeType:name.toLowerCase().endsWith('.apk')?'application/vnd.android.package-archive':'application/octet-stream'};
+        await Share.share({title:name,dialogTitle:'Salvar ou abrir arquivo',files:[temp.uri]});
+        const info={ok:true,saved:false,shared:true,filename:name,path:null,uri:temp.uri,mimeType:'application/octet-stream'};
         window.dispatchEvent(new CustomEvent('tarefas:file-saved',{detail:info}));
         return info;
       } catch (fallbackError) {
@@ -223,7 +253,7 @@ async function unregisterCurrentDevice(){
   const id=await deviceId();const {data,error}=await c.rpc('v1_7_desregistrar_push_device',{p_session_token:sessionToken,p_device_id:id});if(!error&&data===true)localStorage.removeItem('tarefasPushReady17');return !error&&data===true;
 }
 
-window.TarefasNative=Object.freeze({notifications:{ensurePermission:async()=>(await ensureLocalPermission())&&(await ensurePushPermission()),notify,registerPush:initializeRemotePush,unregisterPush:unregisterCurrentDevice,isPushReady:()=>localStorage.getItem('tarefasPushReady17')==='1'},files:{ensurePermission:ensureFilesPermission,saveBlob,downloadUrl,folder:`Documentos/${FILES_FOLDER}`},isNative:Capacitor.isNativePlatform(),platform:Capacitor.getPlatform(),appVersion:APP_VERSION});
+window.TarefasNative=Object.freeze({notifications:{ensurePermission:async()=>(await ensureLocalPermission())&&(await ensurePushPermission()),notify,registerPush:initializeRemotePush,unregisterPush:unregisterCurrentDevice,isPushReady:()=>localStorage.getItem('tarefasPushReady17')==='1'},files:{ensurePermission:ensureFilesPermission,saveBlob,downloadUrl,folder:`Documentos/${FILES_FOLDER}`,updatesFolder:`Documentos/${UPDATES_FOLDER}`},isNative:Capacitor.isNativePlatform(),platform:Capacitor.getPlatform(),appVersion:APP_VERSION});
 
 window.addEventListener('DOMContentLoaded',()=>{installFileBridge();initializeRemotePush().catch(err=>{pushInitialized=false;console.warn('[TAREFAS PUSH] Inicialização:',err)})});
 window.addEventListener('tarefas:push-session-ready',()=>{pushInitialized=false;initializeRemotePush().catch(err=>console.warn('[TAREFAS PUSH] Reinicialização:',err))});
