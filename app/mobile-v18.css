@@ -1,0 +1,69 @@
+/* TAREFAS Android 1.8.0 — layout universal do APK */
+html.tarefas-mobile-shell.tm-v18{--tm18-gap:12px;--tm18-radius:16px;--tm18-surface:#091112;--tm18-surface2:#0d1718;--tm18-line:rgba(255,255,255,.09);--tm18-green:#5fe834;--tm18-muted:#8c9993}
+html.tarefas-mobile-shell.tm-v18 body{overflow-x:hidden!important}
+html.tarefas-mobile-shell.tm-v18 body>*{max-width:100%}
+html.tarefas-mobile-shell.tm-v18 .tm-v18-content{width:100%!important;max-width:780px!important;margin:0 auto!important;padding:14px!important}
+html.tarefas-mobile-shell.tm-v18 .main,html.tarefas-mobile-shell.tm-v18 .main-content,html.tarefas-mobile-shell.tm-v18 main{min-width:0!important;max-width:100%!important}
+html.tarefas-mobile-shell.tm-v18 .content,html.tarefas-mobile-shell.tm-v18 .container,html.tarefas-mobile-shell.tm-v18 .page,html.tarefas-mobile-shell.tm-v18 .page-wrap{min-width:0!important;max-width:780px!important}
+html.tarefas-mobile-shell.tm-v18 .row,html.tarefas-mobile-shell.tm-v18 .grid,html.tarefas-mobile-shell.tm-v18 [class*="grid"],html.tarefas-mobile-shell.tm-v18 [class*="columns"]{max-width:100%!important}
+html.tarefas-mobile-shell.tm-v18 .card,html.tarefas-mobile-shell.tm-v18 .panel,html.tarefas-mobile-shell.tm-v18 .box,html.tarefas-mobile-shell.tm-v18 fieldset,html.tarefas-mobile-shell.tm-v18 .modal-content{max-width:100%!important;overflow:hidden;border-radius:var(--tm18-radius)!important}
+
+/* Cabeçalhos e ações de todas as páginas */
+html.tarefas-mobile-shell.tm-v18 .header,html.tarefas-mobile-shell.tm-v18 .topbar,html.tarefas-mobile-shell.tm-v18 .page-header,html.tarefas-mobile-shell.tm-v18 .content-header{display:flex!important;align-items:flex-start!important;gap:10px!important;flex-wrap:wrap!important;padding:12px 14px!important;min-height:0!important}
+html.tarefas-mobile-shell.tm-v18 .header>*,html.tarefas-mobile-shell.tm-v18 .topbar>*,html.tarefas-mobile-shell.tm-v18 .page-header>*,html.tarefas-mobile-shell.tm-v18 .content-header>*{min-width:0!important;max-width:100%!important}
+html.tarefas-mobile-shell.tm-v18 .header-actions,html.tarefas-mobile-shell.tm-v18 .actions,html.tarefas-mobile-shell.tm-v18 .toolbar{width:100%!important;display:flex!important;gap:8px!important;flex-wrap:wrap!important}
+html.tarefas-mobile-shell.tm-v18 .header-actions .btn,html.tarefas-mobile-shell.tm-v18 .actions .btn,html.tarefas-mobile-shell.tm-v18 .toolbar .btn{flex:1 1 145px!important}
+
+/* Tabs e filtros roláveis, sem quebrar a largura do WebView */
+html.tarefas-mobile-shell.tm-v18 .tm-v18-tabs,html.tarefas-mobile-shell.tm-v18 .tabs,html.tarefas-mobile-shell.tm-v18 .tab-list,html.tarefas-mobile-shell.tm-v18 .tab-buttons,html.tarefas-mobile-shell.tm-v18 .orc-module-nav{display:flex!important;gap:8px!important;max-width:100%!important;overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:6px 2px 10px!important;white-space:nowrap!important}
+html.tarefas-mobile-shell.tm-v18 .tm-v18-tabs::-webkit-scrollbar,html.tarefas-mobile-shell.tm-v18 .tabs::-webkit-scrollbar,html.tarefas-mobile-shell.tm-v18 .tab-list::-webkit-scrollbar,html.tarefas-mobile-shell.tm-v18 .tab-buttons::-webkit-scrollbar,html.tarefas-mobile-shell.tm-v18 .orc-module-nav::-webkit-scrollbar{display:none}
+html.tarefas-mobile-shell.tm-v18 .tm-v18-tabs>button,html.tarefas-mobile-shell.tm-v18 .tm-v18-tabs>a,html.tarefas-mobile-shell.tm-v18 .tabs>button,html.tarefas-mobile-shell.tm-v18 .tabs>a,html.tarefas-mobile-shell.tm-v18 .tab-list>button,html.tarefas-mobile-shell.tm-v18 .tab-buttons>button,html.tarefas-mobile-shell.tm-v18 .orc-module-nav>button{flex:0 0 auto!important;width:auto!important;min-width:max-content!important;min-height:42px!important;padding:0 13px!important;border-radius:999px!important;background:#0c1516!important;border:1px solid var(--tm18-line)!important;color:#dce5e0!important;box-shadow:none!important}
+html.tarefas-mobile-shell.tm-v18 .tm-v18-tabs>.active,html.tarefas-mobile-shell.tm-v18 .tabs>.active,html.tarefas-mobile-shell.tm-v18 .tab-list>.active,html.tarefas-mobile-shell.tm-v18 .tab-buttons>.active,html.tarefas-mobile-shell.tm-v18 .orc-module-nav>.active{background:rgba(95,232,52,.1)!important;border-color:rgba(95,232,52,.42)!important;color:var(--tm18-green)!important}
+
+/* Formulários */
+html.tarefas-mobile-shell.tm-v18 form{max-width:100%!important}
+html.tarefas-mobile-shell.tm-v18 .form-row,html.tarefas-mobile-shell.tm-v18 .form-grid,html.tarefas-mobile-shell.tm-v18 .filters,html.tarefas-mobile-shell.tm-v18 .filter-bar{display:grid!important;grid-template-columns:1fr!important;gap:10px!important;max-width:100%!important}
+html.tarefas-mobile-shell.tm-v18 input,html.tarefas-mobile-shell.tm-v18 select,html.tarefas-mobile-shell.tm-v18 textarea{max-width:100%!important;min-width:0!important}
+html.tarefas-mobile-shell.tm-v18 textarea{min-height:110px!important;resize:vertical}
+
+/* Tabelas e listas */
+html.tarefas-mobile-shell.tm-v18 .tarefas-mobile-table-scroll{max-width:100%!important;margin:8px 0 14px!important;overflow:auto!important}
+html.tarefas-mobile-shell.tm-v18 table{font-size:12px!important}
+html.tarefas-mobile-shell.tm-v18 th,html.tarefas-mobile-shell.tm-v18 td{padding:9px 8px!important;vertical-align:middle!important}
+html.tarefas-mobile-shell.tm-v18 ul,html.tarefas-mobile-shell.tm-v18 ol{max-width:100%}
+
+/* Drawer V1.8: todos os módulos são itens diretos, nunca herdam botões grandes do site */
+html.tarefas-mobile-shell.tm-v18 #tmDrawer .tm-sheet{max-height:92dvh!important}
+html.tarefas-mobile-shell.tm-v18 #tmDrawer .tm-sheet-body{padding:12px 14px calc(24px + env(safe-area-inset-bottom,0px))!important}
+html.tarefas-mobile-shell.tm-v18 #tmDrawer .tm-drawer-group{margin-top:18px!important;padding:0!important;background:transparent!important}
+html.tarefas-mobile-shell.tm-v18 #tmDrawer .tm-drawer-group h3{margin:0 4px 7px!important}
+html.tarefas-mobile-shell.tm-v18 #tmDrawer .tm-drawer-item{box-sizing:border-box!important;position:relative!important;width:100%!important;height:auto!important;min-height:60px!important;max-height:none!important;margin:0!important;padding:10px 12px!important;display:grid!important;grid-template-columns:minmax(0,1fr) 20px!important;gap:10px!important;align-items:center!important;border:0!important;border-bottom:1px solid rgba(255,255,255,.055)!important;border-radius:0!important;background:transparent!important;background-image:none!important;color:#fff!important;box-shadow:none!important;transform:none!important;clip-path:none!important;overflow:hidden!important;text-align:left!important}
+html.tarefas-mobile-shell.tm-v18 #tmDrawer .tm-drawer-item:before,html.tarefas-mobile-shell.tm-v18 #tmDrawer .tm-drawer-item:after{display:none!important;content:none!important}
+html.tarefas-mobile-shell.tm-v18 #tmDrawer .tm-drawer-item>span{display:block!important;min-width:0!important;max-width:100%!important}
+html.tarefas-mobile-shell.tm-v18 #tmDrawer .tm-drawer-item strong{display:block!important;font-size:14px!important;line-height:1.25!important;white-space:normal!important;overflow-wrap:anywhere!important;color:inherit!important}
+html.tarefas-mobile-shell.tm-v18 #tmDrawer .tm-drawer-item small{display:block!important;margin-top:3px!important;font-size:10.5px!important;line-height:1.25!important;white-space:normal!important;color:#7f8a85!important}
+html.tarefas-mobile-shell.tm-v18 #tmDrawer .tm-drawer-item>svg{width:18px!important;height:18px!important;max-width:18px!important;max-height:18px!important;fill:none!important;stroke:currentColor!important;stroke-width:1.8!important;background:none!important}
+html.tarefas-mobile-shell.tm-v18 #tmDrawer .tm-drawer-item.active{background:rgba(95,232,52,.075)!important;border-radius:12px!important;border-bottom-color:transparent!important;color:var(--tm18-green)!important}
+html.tarefas-mobile-shell.tm-v18 #tmDrawer .tm-user-card{height:auto!important;max-height:none!important;overflow:hidden!important;background-image:linear-gradient(135deg,#102218,#0a1110)!important}
+html.tarefas-mobile-shell.tm-v18 #tmDrawer .tm-user-card:before,html.tarefas-mobile-shell.tm-v18 #tmDrawer .tm-user-card:after{display:none!important;content:none!important}
+
+/* Modal e sheets */
+html.tarefas-mobile-shell.tm-v18 .modal,html.tarefas-mobile-shell.tm-v18 [role="dialog"]{max-width:100vw!important}
+html.tarefas-mobile-shell.tm-v18 .modal-content{max-height:86dvh!important;overflow:auto!important}
+html.tarefas-mobile-shell.tm-v18 .tm-sheet button{font-family:inherit!important}
+
+/* Páginas operacionais */
+html.tarefas-mobile-shell.tm-v18.tm-page-pessoal .escala-container,html.tarefas-mobile-shell.tm-v18.tm-page-missao .missao-container,html.tarefas-mobile-shell.tm-v18.tm-page-ferias_dispensas .ferias-container,html.tarefas-mobile-shell.tm-v18.tm-page-central .central-container,html.tarefas-mobile-shell.tm-v18.tm-page-usuarios .usuarios-container,html.tarefas-mobile-shell.tm-v18.tm-page-relatorios .relatorios-container,html.tarefas-mobile-shell.tm-v18.tm-page-orcamentarios .orc-container,html.tarefas-mobile-shell.tm-v18.tm-page-historico_auditoria .audit-container{max-width:100%!important;min-width:0!important}
+html.tarefas-mobile-shell.tm-v18.tm-page-orcamentarios [class*="module"],html.tarefas-mobile-shell.tm-v18.tm-page-orcamentarios [class*="modulo"]{max-width:100%!important}
+
+/* About exclusivo do app */
+html.tarefas-mobile-shell.tm-v18.tm-page-about body{display:block!important}
+html.tarefas-mobile-shell.tm-v18 .tm-about-page{width:100%!important;max-width:780px!important;margin:0 auto!important;padding:16px 14px calc(var(--tm-nav) + env(safe-area-inset-bottom,0px) + 34px)!important;background:transparent!important}
+.tm-about-hero{display:flex;align-items:center;gap:15px;padding:20px;border-radius:20px;background:linear-gradient(135deg,#102419,#07100b);border:1px solid rgba(95,232,52,.2);margin-bottom:12px}
+.tm-about-logo{width:70px;height:70px;display:grid;place-items:center;flex:0 0 70px;border-radius:18px;background:#07110b;border:1px solid rgba(95,232,52,.22)}
+.tm-about-logo img{width:54px;height:54px;object-fit:contain}.tm-about-hero h1{margin:5px 0 3px!important;font-size:27px!important}.tm-about-hero p{margin:0!important;font-size:12px}.tm-about-chip{display:inline-flex;padding:4px 8px;border-radius:999px;background:rgba(95,232,52,.12);color:var(--tm18-green);font-size:9px;font-weight:900;letter-spacing:.8px}
+.tm-about-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:12px}.tm-about-grid article{min-width:0;padding:14px;border-radius:15px;background:#0b1314;border:1px solid var(--tm18-line)}.tm-about-grid small,.tm-about-grid strong{display:block}.tm-about-grid small{font-size:9.5px;color:var(--tm18-muted)!important;margin-bottom:5px}.tm-about-grid strong{font-size:13px;color:#fff!important;overflow-wrap:anywhere}
+.tm-about-card{padding:16px;margin-bottom:12px;border-radius:17px;background:#0b1314;border:1px solid var(--tm18-line)}.tm-about-card h2{font-size:16px!important;margin:0 0 12px!important}.tm-about-card ul{margin:0!important;padding-left:20px!important;line-height:1.55!important;font-size:12px!important}.tm-about-feature{display:grid;grid-template-columns:28px 1fr;gap:9px;align-items:start;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.055)}.tm-about-feature:last-child{border-bottom:0}.tm-about-feature>span{width:25px;height:25px;display:grid;place-items:center;border-radius:50%;background:rgba(95,232,52,.1);color:var(--tm18-green);font-weight:900}.tm-about-feature strong,.tm-about-feature small{display:block}.tm-about-feature strong{font-size:13px}.tm-about-feature small{margin-top:3px;font-size:10.5px;line-height:1.35}.tm-about-status p{display:flex;align-items:center;gap:8px;margin:0 0 5px!important}.tm-status-dot{width:9px;height:9px;border-radius:50%;background:var(--tm18-green);box-shadow:0 0 10px rgba(95,232,52,.65)}.tm-about-footer{text-align:center;padding:8px 0 0;color:#748078;font-size:10px}
+
+/* Telas pequenas */
+@media(max-width:390px){.tm-about-grid{grid-template-columns:1fr}.tm-about-hero{align-items:flex-start}.tm-about-logo{width:58px;height:58px;flex-basis:58px}.tm-about-logo img{width:45px;height:45px}}
