@@ -1,8 +1,8 @@
 {
   "name": "tarefas-app",
-  "version": "1.8.8",
+  "version": "1.8.9",
   "private": true,
-  "description": "TAREFAS Android 1.8.8 build 188 beta baseado na versão web 7.5.5",
+  "description": "TAREFAS Android 1.8.9 build 189 beta baseado na versão web 7.5.5",
   "scripts": {
     "build:web": "node scripts/build-mobile.mjs",
     "verify:web": "node scripts/verify-mobile-build.mjs dist",
