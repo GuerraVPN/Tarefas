@@ -9,7 +9,7 @@
 
   function patchVersion(){
     const el=document.querySelector('.tm-app-brand small');
-    const text='V1.7 • WEB 7.5.2';
+    const text='1.8.0 • WEB 7.5.2';
     if(el && el.textContent!==text) el.textContent=text;
   }
 
