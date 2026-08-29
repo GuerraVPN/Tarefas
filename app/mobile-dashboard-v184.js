@@ -61,10 +61,7 @@
     card.title=`${state.kind==='confirmed'?'Serviço confirmado':'Próximo serviço previsto'} em ${br(state.date)}`;
   }
 
-  async function q(table,select,build){
-    const c=client();if(!c) return [];
-    try{let req=c.from(table).select(select);if(build)req=build(req);const r=await req;return r.error?[]:(r.data||[])}catch(_){return []}
-  }
+  async function q(table,select,build){const c=client();if(!c) return [];try{let req=c.from(table).select(select);if(build)req=build(req);const r=await req;return r.error?[]:(r.data||[])}catch(_){return []}}
 
   function predictedForGroup({group,members,services,vacations,holidaySet,userId,start,end}){
     const rows=members.filter(x=>x.grupo===group).sort((a,b)=>(a.ordem||100)-(b.ordem||100)||Number(a.id)-Number(b.id));
@@ -74,14 +71,10 @@
     const userKey=`u:${userId}`;
     if(!keys.includes(userKey)) return [];
     const out=[];
-
     for(const lane of ['preta','vermelha']){
       const queue=[...keys];
       let confirmed=services.filter(s=>s.grupo===group&&keys.includes(rotationKey(s))&&laneFor(s.data_servico,holidaySet)===lane).slice();
-      for(const row of rows){
-        const anchor=inheritedAnchor(row,lane),key=personKey(row);
-        if(anchor&&!confirmed.some(s=>rotationKey(s)===key&&s.data_servico>=anchor)) confirmed.push({id:-Number(row.id||0),grupo:group,data_servico:anchor,_rotation_key:key,_inherited:true});
-      }
+      for(const row of rows){const anchor=inheritedAnchor(row,lane),key=personKey(row);if(anchor&&!confirmed.some(s=>rotationKey(s)===key&&s.data_servico>=anchor))confirmed.push({id:-Number(row.id||0),grupo:group,data_servico:anchor,_rotation_key:key,_inherited:true})}
       confirmed.sort((a,b)=>String(a.data_servico).localeCompare(String(b.data_servico))||Number(a.id||0)-Number(b.id||0));
       if(!confirmed.length) continue;
       const anchorDate=confirmed[0].data_servico;
@@ -91,11 +84,7 @@
         if(laneFor(date,holidaySet)!==lane){date=addDays(date,1);continue}
         const actuals=confirmed.filter(s=>s.data_servico===date);
         if(actuals.length){actuals.forEach(s=>moveToBack(queue,s._rotation_key||rotationKey(s)))}
-        else{
-          let idx=-1;
-          for(let i=0;i<queue.length;i++){const row=rowMap.get(queue[i]);if(row&&eligible(vacations,row,date)){idx=i;break}}
-          if(idx>=0){const key=queue[idx];if(key===userKey&&date>=start)out.push({date,group,lane,kind:'predicted',mark:'PREV.'});queue.splice(idx,1);queue.push(key)}
-        }
+        else{let idx=-1;for(let i=0;i<queue.length;i++){const row=rowMap.get(queue[i]);if(row&&eligible(vacations,row,date)){idx=i;break}}if(idx>=0){const key=queue[idx];if(key===userKey&&date>=start)out.push({date,group,lane,kind:'predicted',mark:'PREV.'});queue.splice(idx,1);queue.push(key)}}
         date=addDays(date,1);
       }
     }
@@ -103,8 +92,7 @@
   }
 
   async function load(){
-    if(loading)return;loading=true;
-    ensureCard();
+    if(loading)return;loading=true;ensureCard();
     try{
       const user=readUser(),c=client();if(!user?.id||!c){setCard(null);return}
       const today=todayIso(),from=addDays(today,-365),to=addDays(today,365),uid=Number(user.id);
@@ -117,17 +105,12 @@
       const holidaySet=new Set(holidays.map(h=>h.data));
       const groups=[...new Set(members.filter(m=>String(m.usuario_id)===String(uid)).map(m=>m.grupo))];
       const candidates=[];
-
-      // Serviços efetivamente atribuídos ao usuário sempre têm prioridade sobre uma
-      // previsão na mesma data. Substituto é mostrado como TSV.
       for(const s of services.filter(s=>String(s.usuario_id)===String(uid)&&s.data_servico>=today)){
         const substituted=!!(s.rodizio_usuario_id||s.rodizio_pessoa_externa_id);
-        candidates.push({date:s.data_servico,group:s.grupo,lane:laneFor(s.data_servico,holidaySet),kind:'confirmed',mark:substituted?'TSV':(s.marcacao||'SV')});
+        candidates.push({date:s.data_servico,group:s.grupo,lane:laneFor(s.data_servico,holidaySet),kind:'confirmed',mark:substituted?'TS':(s.marcacao||'SV')});
       }
       for(const group of groups)candidates.push(...predictedForGroup({group,members,services,vacations,holidaySet,userId:uid,start:today,end:to}));
-
       candidates.sort((a,b)=>a.date.localeCompare(b.date)||eventPriority(a)-eventPriority(b));
-      // Se o mesmo dia já estiver confirmado para o usuário, elimina a previsão daquele dia/grupo.
       const next=candidates.find((x,i,arr)=>x.kind==='confirmed'||!arr.some(y=>y.kind==='confirmed'&&y.date===x.date&&y.group===x.group))||null;
       setCard(next);
     }finally{loading=false}
