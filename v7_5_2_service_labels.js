@@ -37,9 +37,9 @@ function apply(){
    const executor=keyCell(s.grupo,s.data_servico,s.usuario_id,s.pessoa_externa_id);
    const original=keyCell(s.grupo,s.data_servico,s.rodizio_usuario_id,s.rodizio_pessoa_externa_id);
    if(executor){
-     executor.textContent='TSV';executor.classList.add('service');executor.classList.remove('predicted','folga-count');
-     executor.dataset.v752Label='TSV';executor.dataset.v752ServiceId=String(s.id);
-     executor.title='TSV · Tirando serviço por substituição';
+     executor.textContent='TS';executor.classList.add('service');executor.classList.remove('predicted','folga-count');
+     executor.dataset.v752Label='TS';executor.dataset.v752ServiceId=String(s.id);
+     executor.title='TS · Tirando serviço por substituição';
    }
    if(original){
      original.textContent='SV';original.classList.add('service');original.classList.remove('predicted','folga-count');
