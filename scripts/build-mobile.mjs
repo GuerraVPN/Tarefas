@@ -50,19 +50,19 @@ async function patch(rel, replacements){
   await writeFile(file,text,'utf8');
 }
 
-// A base visual 1.8.0 continua reaproveitada; a distribuição atual é 1.8.4/184 BETA.
+// A base visual 1.8.0 continua reaproveitada; a distribuição atual é 1.8.5/185 BETA.
 await patch('mobile-bootstrap.js', [
-  ["const APP_VERSION = '1.8.0';", "const APP_VERSION = '1.8.4';"],
-  ['const APP_BUILD = 180;', 'const APP_BUILD = 184;']
+  ["const APP_VERSION = '1.8.0';", "const APP_VERSION = '1.8.5';"],
+  ['const APP_BUILD = 180;', 'const APP_BUILD = 185;']
 ]);
 await patch('mobile-preload.js', [
-  ["tarefasAppVersion = '1.8.0'", "tarefasAppVersion = '1.8.4'"],
-  ["tarefasAppBuild = '180'", "tarefasAppBuild = '184'"]
+  ["tarefasAppVersion = '1.8.0'", "tarefasAppVersion = '1.8.5'"],
+  ["tarefasAppBuild = '180'", "tarefasAppBuild = '185'"]
 ]);
-await patch('mobile-v12.js', [['1.8.0 • WEB 7.5.2','1.8.4 • WEB 7.5.3']]);
+await patch('mobile-v12.js', [['1.8.0 • WEB 7.5.2','1.8.5 • WEB 7.5.3']]);
 await patch('mobile-updates-v181.js', [
-  ["const APP_VERSION = '1.8.1';", "const APP_VERSION = '1.8.4';"],
-  ['const APP_BUILD = 181;', 'const APP_BUILD = 184;']
+  ["const APP_VERSION = '1.8.1';", "const APP_VERSION = '1.8.5';"],
+  ['const APP_BUILD = 181;', 'const APP_BUILD = 185;']
 ]);
 
 await build({
@@ -109,4 +109,4 @@ for (const name of htmlFiles) {
   await writeFile(file, html, 'utf8');
 }
 
-console.log(`TAREFAS Android 1.8.4 build 184 BETA: ${htmlFiles.length} páginas preparadas sobre Web 7.5.3 com próximo serviço no Resumo rápido, download nativo e push interno`);
+console.log(`TAREFAS Android 1.8.5 build 185 BETA: ${htmlFiles.length} páginas preparadas sobre Web 7.5.3 com atualização salva por canal, reuso do APK e abertura automática do instalador`);
