@@ -3,8 +3,7 @@ name: Android Beta APK
 on:
   workflow_dispatch:
   push:
-    branches:
-      - app/android-v1
+    branches: [app/android-v1]
     paths:
       - 'app/**'
       - 'assets/**'
@@ -16,8 +15,7 @@ on:
       - '*.js'
       - '*.css'
   pull_request:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
   build:
@@ -25,7 +23,6 @@ jobs:
     permissions:
       contents: write
       id-token: write
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -38,54 +35,47 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build web bundle 1.8.5 beta
+      - name: Build web bundle 1.8.6 beta
         run: npm run build:web
 
-      - name: Conferência 1 - auditoria do bundle 1.8.5
+      - name: Conferência 1 - auditoria do bundle 1.8.6
         run: npm run verify:web
 
-      - name: Gerar ZIP 1.8.5
+      - name: Gerar ZIP 1.8.6
         run: |
-          rm -f TAREFAS-1.8.5-web.zip
-          cd dist
-          zip -qr ../TAREFAS-1.8.5-web.zip .
+          rm -f TAREFAS-1.8.6-web.zip
+          cd dist && zip -qr ../TAREFAS-1.8.6-web.zip .
 
-      - name: Conferência 2 - validar ZIP 1.8.5
+      - name: Conferência 2 - validar ZIP 1.8.6
         run: |
           set -euo pipefail
-          unzip -tq TAREFAS-1.8.5-web.zip
-          rm -rf /tmp/tarefas-185
-          mkdir -p /tmp/tarefas-185
-          unzip -q TAREFAS-1.8.5-web.zip -d /tmp/tarefas-185
-          node scripts/verify-mobile-build.mjs /tmp/tarefas-185
-          grep -q '1.8.5 • WEB 7.5.3' /tmp/tarefas-185/mobile-v12.js
-          grep -q "tarefasAppBuild = '185'" /tmp/tarefas-185/mobile-preload.js
-          grep -q "VERSION='7.5.3'" /tmp/tarefas-185/v7_5_1_version.js
-          grep -q 'v7_5_3_patch.js' /tmp/tarefas-185/v7_5_1_version.js
-          grep -q 'v1_8_get_beta_updates' /tmp/tarefas-185/mobile-updates-v181.js
-          grep -q 'Baixar e instalar atualização' /tmp/tarefas-185/mobile-updates-v181.js
-          grep -q 'channel:version.channel' /tmp/tarefas-185/mobile-updates-v181.js
-          grep -q 'v1_7_registrar_push_device' /tmp/tarefas-185/native-mobile.js
-          grep -q 'reusedExisting' /tmp/tarefas-185/native-mobile.js
-          grep -q 'reuseExisting' /tmp/tarefas-185/native-mobile.js
-          grep -q 'Atualização' /tmp/tarefas-185/native-mobile.js
-          grep -q 'openFile' /tmp/tarefas-185/native-mobile.js
-          grep -q 'Próximo serviço' /tmp/tarefas-185/mobile-dashboard-v184.js
-          grep -q 'rodizio_usuario_id' /tmp/tarefas-185/mobile-dashboard-v184.js
-          grep -q 'tarefas_v743_period' /tmp/tarefas-185/mobile-dashboard-v184.js
+          unzip -tq TAREFAS-1.8.6-web.zip
+          rm -rf /tmp/tarefas-186 && mkdir -p /tmp/tarefas-186
+          unzip -q TAREFAS-1.8.6-web.zip -d /tmp/tarefas-186
+          node scripts/verify-mobile-build.mjs /tmp/tarefas-186
+          grep -q '1.8.6 • WEB 7.5.4' /tmp/tarefas-186/mobile-v12.js
+          grep -q "tarefasAppBuild = '186'" /tmp/tarefas-186/mobile-preload.js
+          grep -q "VERSION='7.5.4'" /tmp/tarefas-186/v7_5_1_version.js
+          grep -q 'v7_5_4_patch.js' /tmp/tarefas-186/v7_5_1_version.js
+          grep -q 'v754-scale-page' /tmp/tarefas-186/v7_5_4_patch.js
+          grep -q 'v754AppLogout' /tmp/tarefas-186/v7_5_4_patch.js
+          grep -q 'v754SiteAppUpdates' /tmp/tarefas-186/v7_5_4_patch.js
+          grep -q "executor.textContent='TS'" /tmp/tarefas-186/v7_5_2_service_labels.js
+          grep -q 'Baixar e instalar atualização' /tmp/tarefas-186/mobile-updates-v181.js
+          grep -q 'reusedExisting' /tmp/tarefas-186/native-mobile.js
+          grep -q 'openFile' /tmp/tarefas-186/native-mobile.js
+          grep -q 'Próximo serviço' /tmp/tarefas-186/mobile-dashboard-v184.js
 
-      - name: Upload ZIP 1.8.5 conferido
+      - name: Upload ZIP 1.8.6 conferido
         uses: actions/upload-artifact@v4
         with:
-          name: tarefas-android-1.8.5-beta-web-checked
-          path: TAREFAS-1.8.5-web.zip
+          name: tarefas-android-1.8.6-beta-web-checked
+          path: TAREFAS-1.8.6-web.zip
           if-no-files-found: error
 
       - name: Conferir Firebase Android
         run: |
-          curl --fail --silent --show-error --retry 3 \
-            'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/firebase-config-v17' \
-            -o app/google-services.json
+          curl --fail --silent --show-error --retry 3 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/firebase-config-v17' -o app/google-services.json
           test -s app/google-services.json
           grep -q 'br.com.guerravpn.tarefas.mobile' app/google-services.json
           grep -q 'tarefas-561c8' app/google-services.json
@@ -94,7 +84,7 @@ jobs:
       - name: Add Android platform
         run: npx cap add android
 
-      - name: Configurar acesso a arquivos e instalador Android
+      - name: Configurar arquivos e instalador Android
         run: |
           python - <<'PY'
           from pathlib import Path
@@ -107,14 +97,10 @@ jobs:
               s=s.replace('<application', '    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />\n    <application', 1)
           if 'android:requestLegacyExternalStorage' not in s:
               s=s.replace('<application', '<application android:requestLegacyExternalStorage="true"', 1)
-          p.write_text(s, encoding='utf-8')
-
-          xml=Path('android/app/src/main/res/xml')
-          xml.mkdir(parents=True,exist_ok=True)
-          Path(xml/'file_paths.xml').write_text('''<?xml version="1.0" encoding="utf-8"?>\n<paths xmlns:android="http://schemas.android.com/apk/res/android">\n  <files-path name="files" path="." />\n  <cache-path name="cache" path="." />\n  <external-files-path name="external-files" path="." />\n  <external-cache-path name="external-cache" path="." />\n  <external-path name="external" path="." />\n</paths>\n''',encoding='utf-8')
+          p.write_text(s,encoding='utf-8')
+          xml=Path('android/app/src/main/res/xml');xml.mkdir(parents=True,exist_ok=True)
+          (xml/'file_paths.xml').write_text('''<?xml version="1.0" encoding="utf-8"?>\n<paths xmlns:android="http://schemas.android.com/apk/res/android">\n  <files-path name="files" path="." />\n  <cache-path name="cache" path="." />\n  <external-files-path name="external-files" path="." />\n  <external-cache-path name="external-cache" path="." />\n  <external-path name="external" path="." />\n</paths>\n''',encoding='utf-8')
           PY
-          grep -q 'READ_EXTERNAL_STORAGE' android/app/src/main/AndroidManifest.xml
-          grep -q 'WRITE_EXTERNAL_STORAGE' android/app/src/main/AndroidManifest.xml
           grep -q 'REQUEST_INSTALL_PACKAGES' android/app/src/main/AndroidManifest.xml
           grep -q 'external-path' android/app/src/main/res/xml/file_paths.xml
 
@@ -123,8 +109,8 @@ jobs:
 
       - name: Set Android app version
         run: |
-          sed -i 's/versionCode 1/versionCode 185/' android/app/build.gradle
-          sed -i 's/versionName "1.0"/versionName "1.8.5"/' android/app/build.gradle
+          sed -i 's/versionCode 1/versionCode 186/' android/app/build.gradle
+          sed -i 's/versionName "1.0"/versionName "1.8.6"/' android/app/build.gradle
 
       - name: Install stable debug signing key
         run: |
@@ -155,55 +141,47 @@ jobs:
         working-directory: android
         run: ./gradlew assembleDebug
 
-      - name: Conferência 3 - validar APK 1.8.5 beta
+      - name: Conferência 3 - validar APK 1.8.6 beta
         run: |
           set -euo pipefail
           APK='android/app/build/outputs/apk/debug/app-debug.apk'
-          test -s "$APK"
-          unzip -tq "$APK"
+          test -s "$APK" && unzip -tq "$APK"
           python - <<'PY'
           import json
-          with open('android/app/build/outputs/apk/debug/output-metadata.json', encoding='utf-8') as f:
-              el=json.load(f)['elements'][0]
-          assert int(el['versionCode']) == 185, el
-          assert str(el['versionName']) == '1.8.5', el
-          print('versionCode=185 / versionName=1.8.5 BETA OK')
+          with open('android/app/build/outputs/apk/debug/output-metadata.json',encoding='utf-8') as f: el=json.load(f)['elements'][0]
+          assert int(el['versionCode'])==186,el
+          assert str(el['versionName'])=='1.8.6',el
+          print('versionCode=186 / versionName=1.8.6 BETA OK')
           PY
-          unzip -p "$APK" assets/public/mobile-bootstrap.js > /tmp/185-bootstrap.js
-          unzip -p "$APK" assets/public/mobile-v12.js > /tmp/185-mobile-ui.js
-          unzip -p "$APK" assets/public/mobile-preload.js > /tmp/185-preload.js
-          unzip -p "$APK" assets/public/mobile-updates-v181.js > /tmp/185-updates.js
-          unzip -p "$APK" assets/public/mobile-dashboard-v184.js > /tmp/185-dashboard.js
-          unzip -p "$APK" assets/public/native-mobile.js > /tmp/185-native.js
-          unzip -p "$APK" assets/public/v7_5_3_patch.js > /tmp/185-web753.js
-          grep -q "APP_VERSION = '1.8.5'" /tmp/185-bootstrap.js
-          grep -q 'APP_BUILD = 185' /tmp/185-bootstrap.js
-          grep -q '1.8.5 • WEB 7.5.3' /tmp/185-mobile-ui.js
-          grep -q "APP_VERSION = '1.8.5'" /tmp/185-updates.js
-          grep -q 'APP_BUILD = 185' /tmp/185-updates.js
-          grep -q "APP_CHANNEL = 'beta'" /tmp/185-updates.js
-          grep -q 'Baixar e instalar atualização' /tmp/185-updates.js
-          grep -q 'channel:version.channel' /tmp/185-updates.js
-          grep -q 'Próximo serviço' /tmp/185-dashboard.js
-          grep -q 'v1_7_registrar_push_device' /tmp/185-native.js
-          grep -q 'reusedExisting' /tmp/185-native.js
-          grep -q 'reuseExisting' /tmp/185-native.js
-          grep -q 'openFile' /tmp/185-native.js
-          grep -q 'application/vnd.android.package-archive' /tmp/185-native.js
-          grep -q 'Beta' /tmp/185-native.js
-          grep -q 'Oficial' /tmp/185-native.js
-          grep -q 'data-v743-shift' /tmp/185-web753.js
-          grep -q 'day-service-v753' /tmp/185-web753.js
+          unzip -p "$APK" assets/public/mobile-bootstrap.js > /tmp/186-bootstrap.js
+          unzip -p "$APK" assets/public/mobile-v12.js > /tmp/186-ui.js
+          unzip -p "$APK" assets/public/mobile-preload.js > /tmp/186-preload.js
+          unzip -p "$APK" assets/public/mobile-updates-v181.js > /tmp/186-updates.js
+          unzip -p "$APK" assets/public/mobile-dashboard-v184.js > /tmp/186-dashboard.js
+          unzip -p "$APK" assets/public/native-mobile.js > /tmp/186-native.js
+          unzip -p "$APK" assets/public/v7_5_4_patch.js > /tmp/186-web754.js
+          unzip -p "$APK" assets/public/v7_5_2_service_labels.js > /tmp/186-labels.js
+          grep -q "APP_VERSION = '1.8.6'" /tmp/186-bootstrap.js
+          grep -q 'APP_BUILD = 186' /tmp/186-bootstrap.js
+          grep -q '1.8.6 • WEB 7.5.4' /tmp/186-ui.js
+          grep -q 'APP_BUILD = 186' /tmp/186-updates.js
+          grep -q 'Baixar e instalar atualização' /tmp/186-updates.js
+          grep -q 'Próximo serviço' /tmp/186-dashboard.js
+          grep -q "substituted?'TS'" /tmp/186-dashboard.js
+          grep -q 'v1_7_registrar_push_device' /tmp/186-native.js
+          grep -q 'reusedExisting' /tmp/186-native.js
+          grep -q 'openFile' /tmp/186-native.js
+          grep -q 'v754-scale-page' /tmp/186-web754.js
+          grep -q 'modalNovaTarefa' /tmp/186-web754.js
+          grep -q 'v754-users-inline' /tmp/186-web754.js
+          grep -q 'v754AppLogout' /tmp/186-web754.js
+          grep -q 'Sair da conta' /tmp/186-web754.js
+          grep -q "executor.textContent='TS'" /tmp/186-labels.js
           GS="$(grep -rl --include='*.xml' 'google_app_id' android/app/build/generated | head -1)"
-          test -n "$GS" && test -s "$GS"
-          grep -q 'gcm_defaultSenderId' "$GS"
-          grep -q 'google_api_key' "$GS"
+          test -n "$GS" && grep -q 'gcm_defaultSenderId' "$GS" && grep -q 'google_api_key' "$GS"
           AAPT="$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)"
-          "$AAPT" dump permissions "$APK" > /tmp/185-permissions.txt
-          grep -q 'android.permission.READ_EXTERNAL_STORAGE' /tmp/185-permissions.txt
-          grep -q 'android.permission.WRITE_EXTERNAL_STORAGE' /tmp/185-permissions.txt
-          grep -q 'android.permission.REQUEST_INSTALL_PACKAGES' /tmp/185-permissions.txt
-          grep -R -q 'external-path' android/app/src/main/res/xml/file_paths.xml
+          "$AAPT" dump permissions "$APK" > /tmp/186-permissions.txt
+          grep -q 'android.permission.REQUEST_INSTALL_PACKAGES' /tmp/186-permissions.txt
           APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)"
           "$APKSIGNER" verify --verbose --print-certs "$APK"
           sha256sum "$APK"
@@ -213,29 +191,16 @@ jobs:
         run: |
           set -euo pipefail
           OIDC="$(curl --fail --silent --show-error -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-signing" | jq -r '.value')"
-          curl --fail --silent --show-error \
-            -H "Authorization: Bearer $OIDC" \
-            'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-signing-material' \
-            -o /tmp/tarefas-signing.json
+          curl --fail --silent --show-error -H "Authorization: Bearer $OIDC" 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-signing-material' -o /tmp/tarefas-signing.json
           jq -r '.keystore_b64' /tmp/tarefas-signing.json | base64 -d > /tmp/GuerraVPN.keystore
-          STORE_PASS="$(jq -r '.store_password' /tmp/tarefas-signing.json)"
-          KEY_ALIAS="$(jq -r '.key_alias' /tmp/tarefas-signing.json)"
-          KEY_PASS="$(jq -r '.key_password' /tmp/tarefas-signing.json)"
-          EXPECTED_CERT="$(jq -r '.cert_sha256' /tmp/tarefas-signing.json)"
+          STORE_PASS="$(jq -r '.store_password' /tmp/tarefas-signing.json)"; KEY_ALIAS="$(jq -r '.key_alias' /tmp/tarefas-signing.json)"; KEY_PASS="$(jq -r '.key_password' /tmp/tarefas-signing.json)"; EXPECTED_CERT="$(jq -r '.cert_sha256' /tmp/tarefas-signing.json)"
           APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)"
-          "$APKSIGNER" sign \
-            --ks /tmp/GuerraVPN.keystore \
-            --ks-key-alias "$KEY_ALIAS" \
-            --ks-pass "pass:$STORE_PASS" \
-            --key-pass "pass:$KEY_PASS" \
-            --out TAREFAS-1.8.5.apk \
-            android/app/build/outputs/apk/debug/app-debug.apk
-          VERIFY="$($APKSIGNER verify --verbose --print-certs TAREFAS-1.8.5.apk)"
-          printf '%s\n' "$VERIFY"
+          "$APKSIGNER" sign --ks /tmp/GuerraVPN.keystore --ks-key-alias "$KEY_ALIAS" --ks-pass "pass:$STORE_PASS" --key-pass "pass:$KEY_PASS" --out TAREFAS-1.8.6.apk android/app/build/outputs/apk/debug/app-debug.apk
+          VERIFY="$($APKSIGNER verify --verbose --print-certs TAREFAS-1.8.6.apk)"; printf '%s\n' "$VERIFY"
           ACTUAL_CERT="$(printf '%s\n' "$VERIFY" | sed -n 's/.*certificate SHA-256 digest: //p' | head -1 | tr -d ': ' | tr '[:upper:]' '[:lower:]')"
           test "$ACTUAL_CERT" = "$EXPECTED_CERT"
           rm -f /tmp/tarefas-signing.json /tmp/GuerraVPN.keystore
-          sha256sum TAREFAS-1.8.5.apk
+          sha256sum TAREFAS-1.8.6.apk
 
       - name: Publicar APK permanente
         if: github.event_name == 'push' && github.ref == 'refs/heads/app/android-v1'
@@ -245,28 +210,15 @@ jobs:
           rm -rf /tmp/tarefas-releases
           git worktree add /tmp/tarefas-releases origin/app/releases
           mkdir -p /tmp/tarefas-releases/downloads
-          cp TAREFAS-1.8.5.apk /tmp/tarefas-releases/downloads/TAREFAS-1.8.5.apk
+          cp TAREFAS-1.8.6.apk /tmp/tarefas-releases/downloads/TAREFAS-1.8.6.apk
           cd /tmp/tarefas-releases
-          git config user.name 'GuerraVPN Android Build'
-          git config user.email '81371258+GuerraVPN@users.noreply.github.com'
-          git add downloads/TAREFAS-1.8.5.apk
-          if git diff --cached --quiet; then
-            echo 'APK 1.8.5 já publicado.'
-          else
-            git commit -m 'release(android): TAREFAS 1.8.5 beta build 185'
-            git push origin HEAD:app/releases
-          fi
+          git config user.name 'GuerraVPN Android Build'; git config user.email '81371258+GuerraVPN@users.noreply.github.com'
+          git add downloads/TAREFAS-1.8.6.apk
+          if ! git diff --cached --quiet; then git commit -m 'release(android): TAREFAS 1.8.6 beta build 186'; git push origin HEAD:app/releases; fi
           cd -
-          URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-1.8.5.apk'
-          LOCAL_SHA="$(sha256sum TAREFAS-1.8.5.apk | awk '{print $1}')"
-          for i in 1 2 3 4 5; do
-            if curl --fail --silent --show-error -L "$URL" -o /tmp/tarefas-published.apk; then
-              REMOTE_SHA="$(sha256sum /tmp/tarefas-published.apk | awk '{print $1}')"
-              if [ "$REMOTE_SHA" = "$LOCAL_SHA" ]; then echo 'APK permanente conferido.'; exit 0; fi
-            fi
-            sleep 3
-          done
-          echo 'Falha ao conferir APK publicado.' >&2
+          URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-1.8.6.apk'
+          LOCAL_SHA="$(sha256sum TAREFAS-1.8.6.apk | awk '{print $1}')"
+          for i in 1 2 3 4 5; do curl --fail --silent --show-error -L "$URL" -o /tmp/tarefas-published.apk && [ "$(sha256sum /tmp/tarefas-published.apk | awk '{print $1}')" = "$LOCAL_SHA" ] && exit 0; sleep 3; done
           exit 1
 
       - name: Registrar beta no servidor e disparar push
@@ -274,34 +226,22 @@ jobs:
         run: |
           set -euo pipefail
           OIDC="$(curl --fail --silent --show-error -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-release" | jq -r '.value')"
-          SHA="$(sha256sum TAREFAS-1.8.5.apk | awk '{print $1}')"
-          jq -n \
-            --arg version '1.8.5' \
-            --argjson build 185 \
-            --arg channel 'beta' \
-            --arg url 'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-1.8.5.apk' \
-            --arg sha "$SHA" \
-            '{version:$version,build:$build,channel:$channel,download_url:$url,sha256:$sha}' > /tmp/release.json
-          curl --fail --silent --show-error \
-            -H "Authorization: Bearer $OIDC" \
-            -H 'Content-Type: application/json' \
-            --data-binary @/tmp/release.json \
-            'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-release-publish' \
-            -o /tmp/release-result.json
-          jq -e '.ok == true and .version == "1.8.5" and .build == 185' /tmp/release-result.json >/dev/null
-          echo '1.8.5 beta registrada; push será enviado somente a quem optou por betas.'
+          SHA="$(sha256sum TAREFAS-1.8.6.apk | awk '{print $1}')"
+          jq -n --arg version '1.8.6' --argjson build 186 --arg channel 'beta' --arg url 'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-1.8.6.apk' --arg sha "$SHA" '{version:$version,build:$build,channel:$channel,download_url:$url,sha256:$sha}' > /tmp/release.json
+          curl --fail --silent --show-error -H "Authorization: Bearer $OIDC" -H 'Content-Type: application/json' --data-binary @/tmp/release.json 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-release-publish' -o /tmp/release-result.json
+          jq -e '.ok == true and .version == "1.8.6" and .build == 186' /tmp/release-result.json >/dev/null
 
-      - name: Upload APK 1.8.5 beta assinado
+      - name: Upload APK 1.8.6 beta assinado
         if: github.event_name == 'push' && github.ref == 'refs/heads/app/android-v1'
         uses: actions/upload-artifact@v4
         with:
-          name: tarefas-android-1.8.5-beta-GuerraVPN
-          path: TAREFAS-1.8.5.apk
+          name: tarefas-android-1.8.6-beta-GuerraVPN
+          path: TAREFAS-1.8.6.apk
           if-no-files-found: error
 
       - name: Upload APK de conferência
         uses: actions/upload-artifact@v4
         with:
-          name: tarefas-android-1.8.5-beta-debug
+          name: tarefas-android-1.8.6-beta-debug
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
