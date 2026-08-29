@@ -11,7 +11,7 @@ const CHANNEL_ID = 'tarefas-geral';
 // Chaves V1.7 mantidas para atualizar sem perder o dispositivo/sessão já registrados.
 const PUSH_SESSION_KEY = 'tarefasPushSession17';
 const DEVICE_ID_KEY = 'tarefasDeviceId17';
-const APP_VERSION = '1.8.3';
+const APP_VERSION = '1.8.4';
 const FILES_FOLDER = 'TAREFAS';
 let pushInitialized = false;
 let pushListenersInstalled = false;
@@ -59,8 +59,6 @@ async function ensureFilesPermission(){
     permission = await Filesystem.requestPermissions();
     return permission.publicStorage === 'granted';
   } catch (err) {
-    // Android 11+ usa armazenamento com escopo; Documents/Cache continuam
-    // disponíveis para arquivos criados pelo próprio aplicativo.
     console.warn('[TAREFAS FILES] Permissão pública não exigida/disponível:', err);
     return true;
   }
@@ -71,15 +69,11 @@ function sanitizeFilename(value, mime=''){
   if (!name) name = `TAREFAS-${new Date().toISOString().replace(/[:.]/g,'-')}`;
   if (!/\.[a-z0-9]{1,8}$/i.test(name)) {
     const ext = ({
-      'application/pdf':'.pdf',
-      'text/csv':'.csv',
-      'application/json':'.json',
-      'text/plain':'.txt',
-      'image/jpeg':'.jpg',
-      'image/png':'.png',
-      'application/vnd.android.package-archive':'.apk',
+      'application/pdf':'.pdf','text/csv':'.csv','application/json':'.json','text/plain':'.txt',
+      'image/jpeg':'.jpg','image/png':'.png',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':'.xlsx',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document':'.docx'
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document':'.docx',
+      'application/vnd.android.package-archive':'.apk'
     })[String(mime || '').split(';')[0].toLowerCase()];
     if (ext) name += ext;
   }
@@ -91,22 +85,7 @@ function filenameFromUrl(url){
     const parsed = new URL(url, location.href);
     const leaf = decodeURIComponent(parsed.pathname.split('/').filter(Boolean).pop() || '');
     return sanitizeFilename(leaf || `TAREFAS-${Date.now()}`);
-  } catch (_) {
-    return sanitizeFilename(`TAREFAS-${Date.now()}`);
-  }
-}
-
-function mimeFromFilename(filename){
-  const name=String(filename||'').toLowerCase();
-  if(name.endsWith('.apk')) return 'application/vnd.android.package-archive';
-  if(name.endsWith('.pdf')) return 'application/pdf';
-  if(name.endsWith('.csv')) return 'text/csv';
-  if(name.endsWith('.json')) return 'application/json';
-  if(name.endsWith('.png')) return 'image/png';
-  if(name.endsWith('.jpg')||name.endsWith('.jpeg')) return 'image/jpeg';
-  if(name.endsWith('.xlsx')) return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-  if(name.endsWith('.docx')) return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-  return 'application/octet-stream';
+  } catch (_) { return sanitizeFilename(`TAREFAS-${Date.now()}`); }
 }
 
 function blobToBase64(blob){
@@ -126,49 +105,17 @@ async function saveBlob(blob, filename){
   const name = sanitizeFilename(filename, blob.type);
   const data = await blobToBase64(blob);
   await ensureFilesPermission();
-
   try {
-    const result = await Filesystem.writeFile({
-      path: `${FILES_FOLDER}/${name}`,
-      data,
-      directory: Directory.Documents,
-      recursive: true
-    });
-    const info = {
-      ok: true,
-      saved: true,
-      shared: false,
-      filename: name,
-      path: `Documentos/${FILES_FOLDER}/${name}`,
-      uri: result.uri,
-      mimeType: blob.type || mimeFromFilename(name)
-    };
+    const result = await Filesystem.writeFile({ path: `${FILES_FOLDER}/${name}`, data, directory: Directory.Documents, recursive: true });
+    const info = { ok:true,saved:true,shared:false,filename:name,path:`Documentos/${FILES_FOLDER}/${name}`,uri:result.uri,mimeType:blob.type||'application/octet-stream' };
     window.dispatchEvent(new CustomEvent('tarefas:file-saved', { detail: info }));
     return info;
   } catch (publicError) {
-    console.warn('[TAREFAS FILES] Documents indisponível, usando seletor nativo:', publicError);
-    const temp = await Filesystem.writeFile({
-      path: `exports/${name}`,
-      data,
-      directory: Directory.Cache,
-      recursive: true
-    });
+    const temp = await Filesystem.writeFile({ path:`exports/${name}`,data,directory:Directory.Cache,recursive:true });
     try {
-      await Share.share({
-        title: name,
-        dialogTitle: 'Salvar ou abrir arquivo',
-        files: [temp.uri]
-      });
-      const info = {
-        ok: true,
-        saved: false,
-        shared: true,
-        filename: name,
-        path: null,
-        uri: temp.uri,
-        mimeType: blob.type || mimeFromFilename(name)
-      };
-      window.dispatchEvent(new CustomEvent('tarefas:file-saved', { detail: info }));
+      await Share.share({ title:name,dialogTitle:'Salvar ou abrir arquivo',files:[temp.uri] });
+      const info={ok:true,saved:false,shared:true,filename:name,path:null,uri:temp.uri,mimeType:blob.type||'application/octet-stream'};
+      window.dispatchEvent(new CustomEvent('tarefas:file-saved',{detail:info}));
       return info;
     } catch (shareError) {
       throw new Error(`Não foi possível salvar o arquivo: ${shareError?.message || publicError?.message || shareError}`);
@@ -176,316 +123,108 @@ async function saveBlob(blob, filename){
   }
 }
 
-async function nativeDownloadUrl(url, filename){
-  const source=String(url||'').trim();
-  if(!/^https:\/\//i.test(source)) throw new Error('URL de download inválida.');
-  const name=sanitizeFilename(filename || filenameFromUrl(source));
-  const mimeType=mimeFromFilename(name);
-  await ensureFilesPermission();
-
-  // Caminho principal: baixa pelo stack HTTP nativo direto para Documentos/TAREFAS.
-  try {
-    const placeholder=await Filesystem.writeFile({
-      path:`${FILES_FOLDER}/${name}`,
-      data:'',
-      directory:Directory.Documents,
-      recursive:true
-    });
-    const targetUri=placeholder.uri || (await Filesystem.getUri({path:`${FILES_FOLDER}/${name}`,directory:Directory.Documents})).uri;
-    await FileTransfer.downloadFile({url:source,path:targetUri,progress:true});
-    const info={
-      ok:true,saved:true,shared:false,filename:name,
-      path:`Documentos/${FILES_FOLDER}/${name}`,
-      uri:targetUri,mimeType
-    };
-    window.dispatchEvent(new CustomEvent('tarefas:file-saved',{detail:info}));
-    return info;
-  } catch (documentsError) {
-    console.warn('[TAREFAS FILES] Download em Documents falhou, usando Cache + Android:',documentsError);
-
-    // Fallback: ainda usa FileTransfer nativo (sem CORS), depois abre o seletor do Android.
-    try {
-      const temp=await Filesystem.writeFile({
-        path:`downloads/${name}`,
-        data:'',
-        directory:Directory.Cache,
-        recursive:true
-      });
-      const targetUri=temp.uri || (await Filesystem.getUri({path:`downloads/${name}`,directory:Directory.Cache})).uri;
-      await FileTransfer.downloadFile({url:source,path:targetUri,progress:true});
-      await Share.share({title:name,dialogTitle:'Salvar ou abrir atualização',files:[targetUri]});
-      const info={ok:true,saved:false,shared:true,filename:name,path:null,uri:targetUri,mimeType};
-      window.dispatchEvent(new CustomEvent('tarefas:file-saved',{detail:info}));
-      return info;
-    } catch (fallbackError) {
-      throw new Error(`Não foi possível baixar o arquivo: ${fallbackError?.message || documentsError?.message || fallbackError}`);
-    }
-  }
-}
-
 async function downloadUrl(url, filename){
   if (!url) throw new Error('URL de download ausente.');
-  if (Capacitor.isNativePlatform()) return nativeDownloadUrl(url, filename);
-  const response = await fetch(String(url), { credentials: 'omit' });
-  if (!response.ok) throw new Error(`Download falhou (${response.status}).`);
-  const blob = await response.blob();
-  return saveBlob(blob, filename || filenameFromUrl(String(url)));
+  const href=String(url),name=sanitizeFilename(filename || filenameFromUrl(href));
+  await ensureFilesPermission();
+  if (Capacitor.isNativePlatform()) {
+    try {
+      const target=await Filesystem.getUri({directory:Directory.Documents,path:`${FILES_FOLDER}/${name}`});
+      await FileTransfer.downloadFile({url:href,path:target.uri,progress:false});
+      const info={ok:true,saved:true,shared:false,filename:name,path:`Documentos/${FILES_FOLDER}/${name}`,uri:target.uri,mimeType:name.toLowerCase().endsWith('.apk')?'application/vnd.android.package-archive':'application/octet-stream'};
+      window.dispatchEvent(new CustomEvent('tarefas:file-saved',{detail:info}));
+      return info;
+    } catch (nativeError) {
+      console.warn('[TAREFAS FILES] FileTransfer em Documents falhou:',nativeError);
+      try {
+        const temp=await Filesystem.getUri({directory:Directory.Cache,path:`updates/${name}`});
+        await FileTransfer.downloadFile({url:href,path:temp.uri,progress:false});
+        await Share.share({title:name,dialogTitle:'Salvar ou abrir atualização',files:[temp.uri]});
+        const info={ok:true,saved:false,shared:true,filename:name,path:null,uri:temp.uri,mimeType:name.toLowerCase().endsWith('.apk')?'application/vnd.android.package-archive':'application/octet-stream'};
+        window.dispatchEvent(new CustomEvent('tarefas:file-saved',{detail:info}));
+        return info;
+      } catch (fallbackError) {
+        throw new Error(`Download nativo falhou: ${fallbackError?.message || nativeError?.message || fallbackError}`);
+      }
+    }
+  }
+  const response=await fetch(href,{credentials:'include'});
+  if(!response.ok)throw new Error(`Download falhou (${response.status}).`);
+  return saveBlob(await response.blob(),name);
 }
 
 function installFileBridge(){
   if (fileBridgeInstalled || !Capacitor.isNativePlatform()) return;
   fileBridgeInstalled = true;
-
-  document.addEventListener('pointerdown', (event) => {
-    const input = event.target instanceof HTMLInputElement ? event.target : null;
-    if (input?.type === 'file') ensureFilesPermission().catch(() => {});
-  }, true);
-
-  document.addEventListener('change', (event) => {
-    const input = event.target instanceof HTMLInputElement ? event.target : null;
-    if (input?.type !== 'file') return;
-    window.dispatchEvent(new CustomEvent('tarefas:file-imported', {
-      detail: { count: input.files?.length || 0 }
-    }));
-  }, true);
-
-  const originalClick = HTMLAnchorElement.prototype.click;
-  const bypass = new WeakSet();
-
-  const handleAnchorDownload = async (anchor) => {
-    const href = String(anchor.href || '');
-    if (!href) throw new Error('Link de download vazio.');
-    const result = await downloadUrl(href, anchor.download || filenameFromUrl(href));
-    if (result.saved) window.alert(`Arquivo salvo em ${result.path}`);
-    return result;
-  };
-
-  const fallback = (anchor) => {
-    bypass.add(anchor);
-    try { originalClick.call(anchor); }
-    finally { setTimeout(() => bypass.delete(anchor), 0); }
-  };
-
-  HTMLAnchorElement.prototype.click = function(){
-    if (this.hasAttribute('download') && this.href && !bypass.has(this)) {
-      handleAnchorDownload(this).catch(err => {
-        console.warn('[TAREFAS FILES] Download nativo falhou; usando fluxo web:', err);
-        fallback(this);
-      });
-      return;
-    }
-    return originalClick.call(this);
-  };
-
-  document.addEventListener('click', (event) => {
-    const target = event.target instanceof Element ? event.target.closest('a[download]') : null;
-    if (!target || bypass.has(target)) return;
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    handleAnchorDownload(target).catch(err => {
-      console.warn('[TAREFAS FILES] Download nativo falhou; usando fluxo web:', err);
-      fallback(target);
-    });
-  }, true);
+  document.addEventListener('pointerdown', event => { const input=event.target instanceof HTMLInputElement?event.target:null;if(input?.type==='file')ensureFilesPermission().catch(()=>{}); }, true);
+  document.addEventListener('change', event => { const input=event.target instanceof HTMLInputElement?event.target:null;if(input?.type==='file')window.dispatchEvent(new CustomEvent('tarefas:file-imported',{detail:{count:input.files?.length||0}})); }, true);
+  const originalClick=HTMLAnchorElement.prototype.click,bypass=new WeakSet();
+  const handle=async anchor=>{const href=String(anchor.href||'');if(!href)throw new Error('Link de download vazio.');const result=await downloadUrl(href,anchor.download||filenameFromUrl(href));if(result.saved)window.alert(`Arquivo salvo em ${result.path}`);return result};
+  const fallback=anchor=>{bypass.add(anchor);try{originalClick.call(anchor)}finally{setTimeout(()=>bypass.delete(anchor),0)}};
+  HTMLAnchorElement.prototype.click=function(){if(this.hasAttribute('download')&&this.href&&!bypass.has(this)){handle(this).catch(err=>{console.warn('[TAREFAS FILES] Download nativo falhou; usando fluxo web:',err);fallback(this)});return}return originalClick.call(this)};
+  document.addEventListener('click',event=>{const target=event.target instanceof Element?event.target.closest('a[download]'):null;if(!target||bypass.has(target))return;event.preventDefault();event.stopImmediatePropagation();handle(target).catch(err=>{console.warn('[TAREFAS FILES] Download nativo falhou; usando fluxo web:',err);fallback(target)})},true);
 }
 
 async function ensureChannel(){
   if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'android') return;
-  await PushNotifications.createChannel({
-    id: CHANNEL_ID,
-    name: 'TAREFAS',
-    description: 'Tarefas, escalas, serviços e avisos importantes',
-    importance: 5,
-    visibility: 0,
-    vibration: true
-  }).catch(() => {});
-  await LocalNotifications.createChannel({
-    id: CHANNEL_ID,
-    name: 'TAREFAS',
-    description: 'Tarefas, escalas, serviços e avisos importantes',
-    importance: 5,
-    visibility: 1,
-    vibration: true
-  }).catch(() => {});
+  await PushNotifications.createChannel({id:CHANNEL_ID,name:'TAREFAS',description:'Tarefas, escalas, serviços e avisos importantes',importance:5,visibility:0,vibration:true}).catch(()=>{});
+  await LocalNotifications.createChannel({id:CHANNEL_ID,name:'TAREFAS',description:'Tarefas, escalas, serviços e avisos importantes',importance:5,visibility:1,vibration:true}).catch(()=>{});
 }
 
-async function notify({ title = 'TAREFAS', body, id, at, extra } = {}){
-  if (!body) throw new Error('O corpo da notificação é obrigatório.');
-  const allowed = await ensureLocalPermission();
-  if (!allowed) return false;
+async function notify({ title='TAREFAS', body, id, at, extra }={}){
+  if(!body)throw new Error('O corpo da notificação é obrigatório.');
+  if(!await ensureLocalPermission())return false;
   await ensureChannel();
-  await LocalNotifications.schedule({
-    notifications: [{
-      title,
-      body,
-      id: Number(id) || Math.max(1, Math.floor(Date.now() % 2147483000)),
-      channelId: Capacitor.getPlatform() === 'android' ? CHANNEL_ID : undefined,
-      schedule: at ? { at: new Date(at) } : { at: new Date(Date.now() + 250) },
-      extra: extra || {}
-    }]
-  });
+  await LocalNotifications.schedule({notifications:[{title,body,id:Number(id)||Math.max(1,Math.floor(Date.now()%2147483000)),channelId:Capacitor.getPlatform()==='android'?CHANNEL_ID:undefined,schedule:at?{at:new Date(at)}:{at:new Date(Date.now()+250)},extra:extra||{}}]});
   return true;
 }
 
 async function registerToken(token){
-  const value = String(token || '').trim();
-  if (!value || value === lastToken) return false;
-  const user = readUser();
-  const sessionToken = localStorage.getItem(PUSH_SESSION_KEY);
-  const client = getClient();
-  if (!user?.id || !sessionToken || !client) return false;
-
-  const id = await deviceId();
-  const { data, error } = await client.rpc('v1_7_registrar_push_device', {
-    p_session_token: sessionToken,
-    p_fcm_token: value,
-    p_device_id: id,
-    p_platform: Capacitor.getPlatform(),
-    p_app_version: APP_VERSION,
-    p_perfil_id: user.perfil_id == null ? null : Number(user.perfil_id)
-  });
-  if (error || data !== true) {
-    console.warn('[TAREFAS PUSH] Falha ao registrar aparelho:', error?.message || 'sessão de push inválida');
-    return false;
-  }
-  lastToken = value;
-  localStorage.setItem('tarefasPushReady17','1');
-  window.dispatchEvent(new CustomEvent('tarefas:push-status',{detail:{ready:true}}));
-  return true;
-}
-
-function updateDestination(data){
-  let version=String(data?.referencia_id || '').trim();
-  if(!version){
-    try{version=new URL(String(data?.destino_url||''),location.href).searchParams.get('version')||'';}catch(_){}
-  }
-  return `about.html?update=${encodeURIComponent(version)}`;
+  const value=String(token||'').trim();if(!value||value===lastToken)return false;
+  const user=readUser(),sessionToken=localStorage.getItem(PUSH_SESSION_KEY),c=getClient();if(!user?.id||!sessionToken||!c)return false;
+  const id=await deviceId();
+  const {data,error}=await c.rpc('v1_7_registrar_push_device',{p_session_token:sessionToken,p_fcm_token:value,p_device_id:id,p_platform:Capacitor.getPlatform(),p_app_version:APP_VERSION,p_perfil_id:user.perfil_id==null?null:Number(user.perfil_id)});
+  if(error||data!==true){console.warn('[TAREFAS PUSH] Falha ao registrar aparelho:',error?.message||'sessão de push inválida');return false}
+  lastToken=value;localStorage.setItem('tarefasPushReady17','1');window.dispatchEvent(new CustomEvent('tarefas:push-status',{detail:{ready:true}}));return true;
 }
 
 function destinationFrom(notification){
-  const data = notification?.data || notification?.extra || notification?.notification?.data || notification?.notification?.extra || {};
-  if(String(data.tipo||'')==='app_update' || String(data.referencia_tipo||'')==='app_version') return updateDestination(data);
-
-  const raw=String(data.destino_url || 'central.html?tab=notificacoes').trim();
-  try{
-    const parsed=new URL(raw,location.href);
-    if(parsed.origin!==location.origin){
-      if(parsed.pathname.includes('/tarefas-update/')) return updateDestination(data);
-      return 'central.html?tab=notificacoes';
-    }
-    const file=parsed.pathname.split('/').pop() || '';
-    if(!file.endsWith('.html')) return 'central.html?tab=notificacoes';
-    return `${file}${parsed.search}${parsed.hash}`;
-  }catch(_){
-    return raw.endsWith('.html') || raw.includes('.html?') ? raw : 'central.html?tab=notificacoes';
-  }
+  const data=notification?.data||notification?.notification?.data||{};
+  const tipo=String(data.tipo||'');
+  const ref=String(data.referencia_id||'').trim();
+  if(tipo==='app_update'||String(data.referencia_tipo||'')==='app_version')return `about.html?update=${encodeURIComponent(ref||'latest')}`;
+  const href=String(data.destino_url||'central.html?tab=notificacoes').trim();
+  if(/^https?:\/\//i.test(href))return 'central.html?tab=notificacoes';
+  return href.endsWith('.html')||href.includes('.html?')?href:'central.html?tab=notificacoes';
 }
 
-function openNotificationDestination(notification){
-  const href=destinationFrom(notification);
-  if(href) location.href=href;
-}
+function navigateNotification(notification){const href=destinationFrom(notification);if(href)location.href=href}
 
 async function installPushListeners(){
-  if(pushListenersInstalled) return;
-  pushListenersInstalled=true;
-  await PushNotifications.addListener('registration', async ({ value }) => {
-    await registerToken(value).catch(err => console.warn('[TAREFAS PUSH] Registro:', err));
-  });
-  await PushNotifications.addListener('registrationError', error => {
-    console.error('[TAREFAS PUSH] Firebase registration error:', error);
-    window.dispatchEvent(new CustomEvent('tarefas:push-status',{detail:{ready:false,reason:'registration_error'}}));
-  });
-  await PushNotifications.addListener('pushNotificationReceived', async notification => {
-    window.dispatchEvent(new CustomEvent('v6:notificacoes:update'));
-    const body = notification.body || notification.data?.mensagem || 'Você recebeu uma nova notificação.';
-    await notify({
-      title: notification.title || 'TAREFAS',
-      body,
-      extra: notification.data || {}
-    }).catch(() => {});
-  });
-  await PushNotifications.addListener('pushNotificationActionPerformed', action => {
-    openNotificationDestination(action.notification);
-  });
-  await LocalNotifications.addListener('localNotificationActionPerformed', action => {
-    openNotificationDestination(action.notification);
-  });
+  if(pushListenersInstalled)return;pushListenersInstalled=true;
+  await PushNotifications.addListener('registration',async({value})=>{await registerToken(value).catch(err=>console.warn('[TAREFAS PUSH] Registro:',err))});
+  await PushNotifications.addListener('registrationError',error=>{console.error('[TAREFAS PUSH] Firebase registration error:',error);window.dispatchEvent(new CustomEvent('tarefas:push-status',{detail:{ready:false,reason:'registration_error'}}))});
+  await PushNotifications.addListener('pushNotificationReceived',async notification=>{window.dispatchEvent(new CustomEvent('v6:notificacoes:update'));const body=notification.body||notification.data?.mensagem||'Você recebeu uma nova notificação.';await notify({title:notification.title||'TAREFAS',body,extra:notification.data||{}}).catch(()=>{})});
+  await PushNotifications.addListener('pushNotificationActionPerformed',action=>navigateNotification(action.notification));
+  await LocalNotifications.addListener('localNotificationActionPerformed',action=>navigateNotification({data:action.notification?.extra||{}}));
 }
 
 async function initializeRemotePush(){
-  if (pushInitialized || !Capacitor.isNativePlatform()) return false;
-  const user = readUser();
-  if (!user?.id) return false;
-  const sessionToken = localStorage.getItem(PUSH_SESSION_KEY);
-  if (!sessionToken) {
-    localStorage.removeItem('tarefasPushReady17');
-    window.dispatchEvent(new CustomEvent('tarefas:push-status',{detail:{ready:false,reason:'login_required'}}));
-    return false;
-  }
-
-  pushInitialized = true;
-  await ensureChannel();
-  const allowed = await ensurePushPermission();
-  if (!allowed) {
-    pushInitialized = false;
-    window.dispatchEvent(new CustomEvent('tarefas:push-status',{detail:{ready:false,reason:'permission_denied'}}));
-    return false;
-  }
-
-  await installPushListeners();
-  await PushNotifications.register();
-  return true;
+  if(pushInitialized||!Capacitor.isNativePlatform())return false;
+  const user=readUser();if(!user?.id)return false;
+  const sessionToken=localStorage.getItem(PUSH_SESSION_KEY);if(!sessionToken){localStorage.removeItem('tarefasPushReady17');window.dispatchEvent(new CustomEvent('tarefas:push-status',{detail:{ready:false,reason:'login_required'}}));return false}
+  pushInitialized=true;await ensureChannel();
+  if(!await ensurePushPermission()){pushInitialized=false;window.dispatchEvent(new CustomEvent('tarefas:push-status',{detail:{ready:false,reason:'permission_denied'}}));return false}
+  await installPushListeners();await PushNotifications.register();return true;
 }
 
 async function unregisterCurrentDevice(){
-  const client = getClient();
-  const sessionToken = localStorage.getItem(PUSH_SESSION_KEY);
-  if (!client || !sessionToken) return false;
-  const id = await deviceId();
-  const { data, error } = await client.rpc('v1_7_desregistrar_push_device', {
-    p_session_token: sessionToken,
-    p_device_id: id
-  });
-  if (!error && data === true) localStorage.removeItem('tarefasPushReady17');
-  return !error && data === true;
+  const c=getClient(),sessionToken=localStorage.getItem(PUSH_SESSION_KEY);if(!c||!sessionToken)return false;
+  const id=await deviceId();const {data,error}=await c.rpc('v1_7_desregistrar_push_device',{p_session_token:sessionToken,p_device_id:id});if(!error&&data===true)localStorage.removeItem('tarefasPushReady17');return !error&&data===true;
 }
 
-window.TarefasNative = Object.freeze({
-  notifications: {
-    ensurePermission: async () => (await ensureLocalPermission()) && (await ensurePushPermission()),
-    notify,
-    registerPush: initializeRemotePush,
-    unregisterPush: unregisterCurrentDevice,
-    isPushReady: () => localStorage.getItem('tarefasPushReady17') === '1'
-  },
-  files: {
-    ensurePermission: ensureFilesPermission,
-    saveBlob,
-    downloadUrl,
-    folder: `Documentos/${FILES_FOLDER}`
-  },
-  isNative: Capacitor.isNativePlatform(),
-  platform: Capacitor.getPlatform(),
-  appVersion: APP_VERSION
-});
+window.TarefasNative=Object.freeze({notifications:{ensurePermission:async()=>(await ensureLocalPermission())&&(await ensurePushPermission()),notify,registerPush:initializeRemotePush,unregisterPush:unregisterCurrentDevice,isPushReady:()=>localStorage.getItem('tarefasPushReady17')==='1'},files:{ensurePermission:ensureFilesPermission,saveBlob,downloadUrl,folder:`Documentos/${FILES_FOLDER}`},isNative:Capacitor.isNativePlatform(),platform:Capacitor.getPlatform(),appVersion:APP_VERSION});
 
-window.addEventListener('DOMContentLoaded', () => {
-  installFileBridge();
-  initializeRemotePush().catch(err => {
-    pushInitialized = false;
-    console.warn('[TAREFAS PUSH] Inicialização:', err);
-  });
-});
-
-window.addEventListener('tarefas:push-session-ready', () => {
-  pushInitialized = false;
-  initializeRemotePush().catch(err => console.warn('[TAREFAS PUSH] Reinicialização:', err));
-});
-
-App.addListener('appStateChange', ({ isActive }) => {
-  if (isActive && Capacitor.isNativePlatform()) {
-    pushInitialized = false;
-    initializeRemotePush().catch(() => {});
-  }
-}).catch(() => {});
+window.addEventListener('DOMContentLoaded',()=>{installFileBridge();initializeRemotePush().catch(err=>{pushInitialized=false;console.warn('[TAREFAS PUSH] Inicialização:',err)})});
+window.addEventListener('tarefas:push-session-ready',()=>{pushInitialized=false;initializeRemotePush().catch(err=>console.warn('[TAREFAS PUSH] Reinicialização:',err))});
+App.addListener('appStateChange',({isActive})=>{if(isActive&&Capacitor.isNativePlatform()){pushInitialized=false;initializeRemotePush().catch(()=>{})}}).catch(()=>{});
