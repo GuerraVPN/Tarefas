@@ -9,104 +9,31 @@ const excluded = new Set(['dist', 'android', 'node_modules', '.git', '.github', 
 
 await rm(dist, { recursive: true, force: true });
 await mkdir(dist, { recursive: true });
-
-const entries = await readdir(root, { withFileTypes: true });
-for (const entry of entries) {
+for (const entry of await readdir(root, { withFileTypes: true })) {
   if (excluded.has(entry.name)) continue;
-  const src = path.join(root, entry.name);
-  const dst = path.join(dist, entry.name);
-  if (entry.isDirectory()) {
-    if (entry.name === 'assets') await cp(src, dst, { recursive: true });
-    continue;
-  }
+  const src = path.join(root, entry.name), dst = path.join(dist, entry.name);
+  if (entry.isDirectory()) { if (entry.name === 'assets') await cp(src, dst, { recursive: true }); continue; }
   if (allowed.has(path.extname(entry.name).toLowerCase())) await cp(src, dst);
 }
-
 await mkdir(path.join(dist, 'assets', 'icons'), { recursive: true });
-for (const size of [192, 512]) {
-  const src = path.join(root, 'app-assets', `icon-${size}.png`);
-  const dst = path.join(dist, 'assets', 'icons', `icon-${size}.png`);
-  try { await cp(src, dst); } catch (_) {}
+for (const size of [192, 512]) { try { await cp(path.join(root,'app-assets',`icon-${size}.png`),path.join(dist,'assets','icons',`icon-${size}.png`)); } catch (_) {} }
+for (const file of ['manifest.webmanifest','service-worker.js','mobile-bootstrap.js','mobile-preload.js','mobile-login-v17.js','mobile.css','mobile-v12.css','mobile-v16.css','mobile-v18.css','mobile-v181.css','mobile-v12.js','mobile-updates-v181.js','mobile-dashboard-v184.js']) {
+  await cp(path.join(root,'app',file),path.join(dist,file));
 }
-
-await cp(path.join(root, 'app', 'manifest.webmanifest'), path.join(dist, 'manifest.webmanifest'));
-await cp(path.join(root, 'app', 'service-worker.js'), path.join(dist, 'service-worker.js'));
-await cp(path.join(root, 'app', 'mobile-bootstrap.js'), path.join(dist, 'mobile-bootstrap.js'));
-await cp(path.join(root, 'app', 'mobile-preload.js'), path.join(dist, 'mobile-preload.js'));
-await cp(path.join(root, 'app', 'mobile-login-v17.js'), path.join(dist, 'mobile-login-v17.js'));
-await cp(path.join(root, 'app', 'mobile.css'), path.join(dist, 'mobile.css'));
-await cp(path.join(root, 'app', 'mobile-v12.css'), path.join(dist, 'mobile-v12.css'));
-await cp(path.join(root, 'app', 'mobile-v16.css'), path.join(dist, 'mobile-v16.css'));
-await cp(path.join(root, 'app', 'mobile-v18.css'), path.join(dist, 'mobile-v18.css'));
-await cp(path.join(root, 'app', 'mobile-v181.css'), path.join(dist, 'mobile-v181.css'));
-await cp(path.join(root, 'app', 'mobile-v12.js'), path.join(dist, 'mobile-v12.js'));
-await cp(path.join(root, 'app', 'mobile-updates-v181.js'), path.join(dist, 'mobile-updates-v181.js'));
-await cp(path.join(root, 'app', 'mobile-dashboard-v184.js'), path.join(dist, 'mobile-dashboard-v184.js'));
-
-async function patch(rel, replacements){
-  const file=path.join(dist,rel);
-  let text=await readFile(file,'utf8');
-  for(const [from,to] of replacements) text=text.split(from).join(to);
-  await writeFile(file,text,'utf8');
+async function patch(rel,replacements){const file=path.join(dist,rel);let text=await readFile(file,'utf8');for(const [from,to] of replacements)text=text.split(from).join(to);await writeFile(file,text,'utf8')}
+await patch('mobile-bootstrap.js',[["const APP_VERSION = '1.8.0';","const APP_VERSION = '1.8.6';"],['const APP_BUILD = 180;','const APP_BUILD = 186;']]);
+await patch('mobile-preload.js',[["tarefasAppVersion = '1.8.0'","tarefasAppVersion = '1.8.6'"],["tarefasAppBuild = '180'","tarefasAppBuild = '186'"]]);
+await patch('mobile-v12.js',[['1.8.0 • WEB 7.5.2','1.8.6 • WEB 7.5.4']]);
+await patch('mobile-updates-v181.js',[["const APP_VERSION = '1.8.1';","const APP_VERSION = '1.8.6';"],['const APP_BUILD = 181;','const APP_BUILD = 186;']]);
+await build({entryPoints:[path.join(root,'app','native-mobile-entry.js')],outfile:path.join(dist,'native-mobile.js'),bundle:true,minify:true,format:'iife',platform:'browser',target:['es2020'],charset:'utf8'});
+const htmlFiles=(await readdir(dist)).filter(name=>name.endsWith('.html'));
+for(const name of htmlFiles){
+ const file=path.join(dist,name);let html=await readFile(file,'utf8');
+ if(!html.includes('mobile-preload.js'))html=html.replace(/<head>/i,'<head>\n  <script src="mobile-preload.js"></script>');
+ for(const css of ['mobile.css','mobile-v12.css','mobile-v16.css','mobile-v18.css','mobile-v181.css'])if(!html.includes(css))html=html.replace(/<\/head>/i,`  <link rel="stylesheet" href="${css}">\n</head>`);
+ if(!html.includes('manifest.webmanifest'))html=html.replace(/<\/head>/i,'  <link rel="manifest" href="manifest.webmanifest">\n  <meta name="theme-color" content="#05090b">\n</head>');
+ if(name==='index.html'&&!html.includes('mobile-login-v17.js'))html=html.replace(/<\/body>/i,'  <script src="mobile-login-v17.js"></script>\n</body>');
+ for(const js of ['mobile-bootstrap.js','mobile-v12.js','native-mobile.js','mobile-updates-v181.js','mobile-dashboard-v184.js'])if(!html.includes(js))html=html.replace(/<\/body>/i,`  <script src="${js}"></script>\n</body>`);
+ await writeFile(file,html,'utf8');
 }
-
-// A base visual 1.8.0 continua reaproveitada; a distribuição atual é 1.8.5/185 BETA.
-await patch('mobile-bootstrap.js', [
-  ["const APP_VERSION = '1.8.0';", "const APP_VERSION = '1.8.5';"],
-  ['const APP_BUILD = 180;', 'const APP_BUILD = 185;']
-]);
-await patch('mobile-preload.js', [
-  ["tarefasAppVersion = '1.8.0'", "tarefasAppVersion = '1.8.5'"],
-  ["tarefasAppBuild = '180'", "tarefasAppBuild = '185'"]
-]);
-await patch('mobile-v12.js', [['1.8.0 • WEB 7.5.2','1.8.5 • WEB 7.5.3']]);
-await patch('mobile-updates-v181.js', [
-  ["const APP_VERSION = '1.8.1';", "const APP_VERSION = '1.8.5';"],
-  ['const APP_BUILD = 181;', 'const APP_BUILD = 185;']
-]);
-
-await build({
-  entryPoints: [path.join(root, 'app', 'native-mobile-entry.js')],
-  outfile: path.join(dist, 'native-mobile.js'),
-  bundle: true,
-  minify: true,
-  format: 'iife',
-  platform: 'browser',
-  target: ['es2020'],
-  charset: 'utf8'
-});
-
-const htmlFiles = (await readdir(dist)).filter((name) => name.endsWith('.html'));
-for (const name of htmlFiles) {
-  const file = path.join(dist, name);
-  let html = await readFile(file, 'utf8');
-
-  if (!html.includes('mobile-preload.js')) {
-    html = html.replace(/<head>/i, '<head>\n  <script src="mobile-preload.js"></script>');
-  }
-
-  for (const css of ['mobile.css','mobile-v12.css','mobile-v16.css','mobile-v18.css','mobile-v181.css']) {
-    if (!html.includes(css)) html = html.replace(/<\/head>/i, `  <link rel="stylesheet" href="${css}">\n</head>`);
-  }
-
-  if (!html.includes('manifest.webmanifest')) {
-    html = html.replace(/<\/head>/i, '  <link rel="manifest" href="manifest.webmanifest">\n  <meta name="theme-color" content="#05090b">\n</head>');
-  }
-
-  if (name === 'index.html' && !html.includes('mobile-login-v17.js')) {
-    html = html.replace(/<\/body>/i, '  <script src="mobile-login-v17.js"></script>\n</body>');
-  }
-
-  if (!html.includes('mobile-bootstrap.js')) {
-    html = html.replace(/<\/body>/i, '  <script src="mobile-bootstrap.js"></script>\n  <script src="mobile-v12.js"></script>\n  <script src="native-mobile.js"></script>\n  <script src="mobile-updates-v181.js"></script>\n  <script src="mobile-dashboard-v184.js"></script>\n</body>');
-  } else {
-    if (!html.includes('mobile-v12.js')) html = html.replace(/<\/body>/i, '  <script src="mobile-v12.js"></script>\n</body>');
-    if (!html.includes('native-mobile.js')) html = html.replace(/<\/body>/i, '  <script src="native-mobile.js"></script>\n</body>');
-    if (!html.includes('mobile-updates-v181.js')) html = html.replace(/<\/body>/i, '  <script src="mobile-updates-v181.js"></script>\n</body>');
-    if (!html.includes('mobile-dashboard-v184.js')) html = html.replace(/<\/body>/i, '  <script src="mobile-dashboard-v184.js"></script>\n</body>');
-  }
-
-  await writeFile(file, html, 'utf8');
-}
-
-console.log(`TAREFAS Android 1.8.5 build 185 BETA: ${htmlFiles.length} páginas preparadas sobre Web 7.5.3 com atualização salva por canal, reuso do APK e abertura automática do instalador`);
+console.log(`TAREFAS Android 1.8.6 build 186 BETA: ${htmlFiles.length} páginas preparadas sobre Web 7.5.4 com layout das escalas, TS, modal de tarefa, usuários inline e sair da conta`);
