@@ -1,4 +1,4 @@
-const CACHE = 'tarefas-v7.5.2-app-v1.6';
+const CACHE = 'tarefas-v7.5.2-app-v1.8.0';
 const CORE = [
   './',
   './index.html',
@@ -10,6 +10,7 @@ const CORE = [
   './mobile-preload.js',
   './mobile-bootstrap.js',
   './mobile.css',
+  './mobile-v18.css',
   './v4_tema.css',
   './v7_5_2_version.js',
   './v7_5_2_service_labels.js'
@@ -47,7 +48,6 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Network-first para JS/CSS evita prender uma versão antiga do shell após update.
   if (/\.(?:js|css)$/.test(url.pathname)) {
     event.respondWith(
       fetch(req)
