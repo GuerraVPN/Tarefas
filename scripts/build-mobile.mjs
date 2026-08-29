@@ -71,7 +71,8 @@ await build({
   minify: true,
   format: 'iife',
   platform: 'browser',
-  target: ['es2020']
+  target: ['es2020'],
+  charset: 'utf8'
 });
 
 const htmlFiles = (await readdir(dist)).filter((name) => name.endsWith('.html'));
