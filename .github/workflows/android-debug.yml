@@ -35,46 +35,38 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build web bundle 1.8.8 beta
+      - name: Build web bundle 1.8.9 beta
         run: npm run build:web
 
-      - name: Conferência 1 - auditoria do bundle 1.8.8
+      - name: Conferência 1 - auditoria do bundle 1.8.9
         run: npm run verify:web
 
-      - name: Gerar ZIP 1.8.8
+      - name: Gerar ZIP 1.8.9
         run: |
-          rm -f TAREFAS-1.8.8-web.zip
-          cd dist && zip -qr ../TAREFAS-1.8.8-web.zip .
+          rm -f TAREFAS-1.8.9-web.zip
+          cd dist && zip -qr ../TAREFAS-1.8.9-web.zip .
 
-      - name: Conferência 2 - validar ZIP 1.8.8
+      - name: Conferência 2 - validar ZIP 1.8.9
         run: |
           set -euo pipefail
-          unzip -tq TAREFAS-1.8.8-web.zip
-          rm -rf /tmp/tarefas-188 && mkdir -p /tmp/tarefas-188
-          unzip -q TAREFAS-1.8.8-web.zip -d /tmp/tarefas-188
-          node scripts/verify-mobile-build.mjs /tmp/tarefas-188
-          grep -q '1.8.8 • WEB 7.5.5' /tmp/tarefas-188/mobile-v12.js
-          grep -q "tarefasAppBuild = '188'" /tmp/tarefas-188/mobile-preload.js
-          grep -q "VERSION='7.5.5'" /tmp/tarefas-188/v7_5_1_version.js
-          grep -q 'v7_5_5_patch.js' /tmp/tarefas-188/v7_5_1_version.js
-          grep -q 'shiftService' /tmp/tarefas-188/v7_5_5_patch.js
-          grep -q 'v755MissionPeriodFix' /tmp/tarefas-188/v7_5_5_patch.js
-          grep -q "const enabled=page==='pessoal.html';" /tmp/tarefas-188/v7_4_3_period.js
-          grep -q 'Limpar versões anteriores' /tmp/tarefas-188/mobile-updates-v181.js
-          grep -q 'Conceder acesso total aos arquivos' /tmp/tarefas-188/mobile-updates-v181.js
-          grep -q 'Downloads/TAREFAS' /tmp/tarefas-188/native-mobile.js
-          grep -q 'StorageAccess' /tmp/tarefas-188/native-mobile.js
-          grep -q 'clearOldUpdates' /tmp/tarefas-188/native-mobile.js
-          grep -q 'prop-btn' /tmp/tarefas-188/mobile-users-inline-v188.js
-          grep -q 'msg-btn' /tmp/tarefas-188/mobile-users-inline-v188.js
-          grep -q 'insertAdjacentElement' /tmp/tarefas-188/mobile-users-inline-v188.js
-          grep -q 'afterend' /tmp/tarefas-188/mobile-users-inline-v188.js
+          unzip -tq TAREFAS-1.8.9-web.zip
+          rm -rf /tmp/tarefas-189 && mkdir -p /tmp/tarefas-189
+          unzip -q TAREFAS-1.8.9-web.zip -d /tmp/tarefas-189
+          node scripts/verify-mobile-build.mjs /tmp/tarefas-189
+          grep -q '1.8.9 • WEB 7.5.5' /tmp/tarefas-189/mobile-v12.js
+          grep -q "tarefasAppBuild = '189'" /tmp/tarefas-189/mobile-preload.js
+          grep -q 'mobile-users-inline-v189.js' /tmp/tarefas-189/usuarios.html
+          grep -q 'actionSequence' /tmp/tarefas-189/mobile-users-inline-v189.js
+          grep -q 'restorePanels();' /tmp/tarefas-189/mobile-users-inline-v189.js
+          grep -q 'sendToSource(other)' /tmp/tarefas-189/mobile-users-inline-v189.js
+          grep -q 'sequence!==actionSequence' /tmp/tarefas-189/mobile-users-inline-v189.js
+          ! grep -q 'mobile-users-inline-v188.js' /tmp/tarefas-189/usuarios.html
 
-      - name: Upload ZIP 1.8.8 conferido
+      - name: Upload ZIP 1.8.9 conferido
         uses: actions/upload-artifact@v4
         with:
-          name: tarefas-android-1.8.8-beta-web-checked
-          path: TAREFAS-1.8.8-web.zip
+          name: tarefas-android-1.8.9-beta-web-checked
+          path: TAREFAS-1.8.9-web.zip
           if-no-files-found: error
 
       - name: Conferir Firebase Android
@@ -93,8 +85,8 @@ jobs:
 
       - name: Set Android app version
         run: |
-          sed -i 's/versionCode 1/versionCode 188/' android/app/build.gradle
-          sed -i 's/versionName "1.0"/versionName "1.8.8"/' android/app/build.gradle
+          sed -i 's/versionCode 1/versionCode 189/' android/app/build.gradle
+          sed -i 's/versionName "1.0"/versionName "1.8.9"/' android/app/build.gradle
 
       - name: Install stable debug signing key
         run: |
@@ -135,13 +127,10 @@ jobs:
           cp app/android/StorageAccessPlugin.java "$JAVA_DIR/StorageAccessPlugin.java"
           cat > "$JAVA_DIR/MainActivity.java" <<'JAVA'
           package br.com.guerravpn.tarefas.mobile;
-
           import android.os.Bundle;
           import com.getcapacitor.BridgeActivity;
-
           public class MainActivity extends BridgeActivity {
-              @Override
-              public void onCreate(Bundle savedInstanceState) {
+              @Override public void onCreate(Bundle savedInstanceState) {
                   registerPlugin(StorageAccessPlugin.class);
                   super.onCreate(savedInstanceState);
               }
@@ -170,7 +159,7 @@ jobs:
         working-directory: android
         run: ./gradlew assembleDebug
 
-      - name: Conferência 3 - validar APK 1.8.8 beta
+      - name: Conferência 3 - validar APK 1.8.9 beta
         run: |
           set -euo pipefail
           APK='android/app/build/outputs/apk/debug/app-debug.apk'
@@ -178,45 +167,34 @@ jobs:
           python - <<'PY'
           import json
           with open('android/app/build/outputs/apk/debug/output-metadata.json',encoding='utf-8') as f: el=json.load(f)['elements'][0]
-          assert int(el['versionCode'])==188,el
-          assert str(el['versionName'])=='1.8.8',el
-          print('versionCode=188 / versionName=1.8.8 BETA OK')
+          assert int(el['versionCode'])==189,el
+          assert str(el['versionName'])=='1.8.9',el
+          print('versionCode=189 / versionName=1.8.9 BETA OK')
           PY
-          unzip -p "$APK" assets/public/mobile-bootstrap.js > /tmp/188-bootstrap.js
-          unzip -p "$APK" assets/public/mobile-v12.js > /tmp/188-ui.js
-          unzip -p "$APK" assets/public/mobile-preload.js > /tmp/188-preload.js
-          unzip -p "$APK" assets/public/mobile-updates-v181.js > /tmp/188-updates.js
-          unzip -p "$APK" assets/public/mobile-users-inline-v188.js > /tmp/188-users-inline.js
-          unzip -p "$APK" assets/public/native-mobile.js > /tmp/188-native.js
-          unzip -p "$APK" assets/public/v7_5_4_patch.js > /tmp/188-web754.js
-          unzip -p "$APK" assets/public/v7_5_5_patch.js > /tmp/188-web755.js
-          unzip -p "$APK" assets/public/v7_4_3_period.js > /tmp/188-period.js
-          grep -q "APP_VERSION = '1.8.8'" /tmp/188-bootstrap.js
-          grep -q 'APP_BUILD = 188' /tmp/188-bootstrap.js
-          grep -q '1.8.8 • WEB 7.5.5' /tmp/188-ui.js
-          grep -q 'APP_BUILD = 188' /tmp/188-updates.js
-          grep -q 'prop-btn' /tmp/188-users-inline.js
-          grep -q 'msg-btn' /tmp/188-users-inline.js
-          grep -q 'profilePanel' /tmp/188-users-inline.js
-          grep -q 'messagePanel' /tmp/188-users-inline.js
-          grep -q 'insertAdjacentElement' /tmp/188-users-inline.js
-          grep -q 'afterend' /tmp/188-users-inline.js
-          grep -q "page()!=='usuarios.html'||native()" /tmp/188-web754.js
-          grep -q 'StorageAccess' /tmp/188-native.js
-          grep -q 'downloadToDownloads' /tmp/188-native.js
-          grep -q 'saveBase64ToDownloads' /tmp/188-native.js
-          grep -q 'clearOldUpdates' /tmp/188-native.js
-          grep -q 'Downloads/TAREFAS' /tmp/188-native.js
-          grep -q 'application/vnd.android.package-archive' /tmp/188-native.js
-          grep -q 'shiftService' /tmp/188-web755.js
-          grep -q 'v755MissionPeriodFix' /tmp/188-web755.js
-          grep -q "const enabled=page==='pessoal.html';" /tmp/188-period.js
-          GS="$(grep -rl --include='*.xml' 'google_app_id' android/app/build/generated | head -1)"
-          test -n "$GS" && grep -q 'gcm_defaultSenderId' "$GS" && grep -q 'google_api_key' "$GS"
+          unzip -p "$APK" assets/public/mobile-bootstrap.js > /tmp/189-bootstrap.js
+          unzip -p "$APK" assets/public/mobile-v12.js > /tmp/189-ui.js
+          unzip -p "$APK" assets/public/mobile-preload.js > /tmp/189-preload.js
+          unzip -p "$APK" assets/public/mobile-updates-v181.js > /tmp/189-updates.js
+          unzip -p "$APK" assets/public/mobile-users-inline-v189.js > /tmp/189-users-inline.js
+          unzip -p "$APK" assets/public/native-mobile.js > /tmp/189-native.js
+          unzip -p "$APK" assets/public/v7_5_4_patch.js > /tmp/189-web754.js
+          grep -q "APP_VERSION = '1.8.9'" /tmp/189-bootstrap.js
+          grep -q 'APP_BUILD = 189' /tmp/189-bootstrap.js
+          grep -q '1.8.9 • WEB 7.5.5' /tmp/189-ui.js
+          grep -q 'APP_BUILD = 189' /tmp/189-updates.js
+          grep -q 'actionSequence' /tmp/189-users-inline.js
+          grep -q 'restorePanels();' /tmp/189-users-inline.js
+          grep -q 'sendToSource(other)' /tmp/189-users-inline.js
+          grep -q 'sequence!==actionSequence' /tmp/189-users-inline.js
+          grep -q 'tm-users-inline-source-189' /tmp/189-users-inline.js
+          grep -q "page()!=='usuarios.html'||native()" /tmp/189-web754.js
+          grep -q '1.8.9' /tmp/189-native.js
+          grep -q 'StorageAccess' /tmp/189-native.js
+          grep -q 'Downloads/TAREFAS' /tmp/189-native.js
           AAPT="$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)"
-          "$AAPT" dump permissions "$APK" > /tmp/188-permissions.txt
-          grep -q 'android.permission.MANAGE_EXTERNAL_STORAGE' /tmp/188-permissions.txt
-          grep -q 'android.permission.REQUEST_INSTALL_PACKAGES' /tmp/188-permissions.txt
+          "$AAPT" dump permissions "$APK" > /tmp/189-permissions.txt
+          grep -q 'android.permission.MANAGE_EXTERNAL_STORAGE' /tmp/189-permissions.txt
+          grep -q 'android.permission.REQUEST_INSTALL_PACKAGES' /tmp/189-permissions.txt
           APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)"
           "$APKSIGNER" verify --verbose --print-certs "$APK"
           sha256sum "$APK"
@@ -233,13 +211,13 @@ jobs:
           KEY_PASS="$(jq -r '.key_password' /tmp/tarefas-signing.json)"
           EXPECTED_CERT="$(jq -r '.cert_sha256' /tmp/tarefas-signing.json)"
           APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)"
-          "$APKSIGNER" sign --ks /tmp/GuerraVPN.keystore --ks-key-alias "$KEY_ALIAS" --ks-pass "pass:$STORE_PASS" --key-pass "pass:$KEY_PASS" --out TAREFAS-1.8.8.apk android/app/build/outputs/apk/debug/app-debug.apk
-          VERIFY="$($APKSIGNER verify --verbose --print-certs TAREFAS-1.8.8.apk)"
+          "$APKSIGNER" sign --ks /tmp/GuerraVPN.keystore --ks-key-alias "$KEY_ALIAS" --ks-pass "pass:$STORE_PASS" --key-pass "pass:$KEY_PASS" --out TAREFAS-1.8.9.apk android/app/build/outputs/apk/debug/app-debug.apk
+          VERIFY="$($APKSIGNER verify --verbose --print-certs TAREFAS-1.8.9.apk)"
           printf '%s\n' "$VERIFY"
           ACTUAL_CERT="$(printf '%s\n' "$VERIFY" | sed -n 's/.*certificate SHA-256 digest: //p' | head -1 | tr -d ': ' | tr '[:upper:]' '[:lower:]')"
           test "$ACTUAL_CERT" = "$EXPECTED_CERT"
           rm -f /tmp/tarefas-signing.json /tmp/GuerraVPN.keystore
-          sha256sum TAREFAS-1.8.8.apk
+          sha256sum TAREFAS-1.8.9.apk
 
       - name: Publicar APK permanente
         if: github.event_name == 'push' && github.ref == 'refs/heads/app/android-v1'
@@ -249,18 +227,18 @@ jobs:
           rm -rf /tmp/tarefas-releases
           git worktree add /tmp/tarefas-releases origin/app/releases
           mkdir -p /tmp/tarefas-releases/downloads
-          cp TAREFAS-1.8.8.apk /tmp/tarefas-releases/downloads/TAREFAS-1.8.8.apk
+          cp TAREFAS-1.8.9.apk /tmp/tarefas-releases/downloads/TAREFAS-1.8.9.apk
           cd /tmp/tarefas-releases
           git config user.name 'GuerraVPN Android Build'
           git config user.email '81371258+GuerraVPN@users.noreply.github.com'
-          git add downloads/TAREFAS-1.8.8.apk
+          git add downloads/TAREFAS-1.8.9.apk
           if ! git diff --cached --quiet; then
-            git commit -m 'release(android): TAREFAS 1.8.8 beta build 188'
+            git commit -m 'release(android): TAREFAS 1.8.9 beta build 189'
             git push origin HEAD:app/releases
           fi
           cd -
-          URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-1.8.8.apk'
-          LOCAL_SHA="$(sha256sum TAREFAS-1.8.8.apk | awk '{print $1}')"
+          URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-1.8.9.apk'
+          LOCAL_SHA="$(sha256sum TAREFAS-1.8.9.apk | awk '{print $1}')"
           for i in 1 2 3 4 5; do
             if curl --fail --silent --show-error -L "$URL" -o /tmp/tarefas-published.apk; then
               [ "$(sha256sum /tmp/tarefas-published.apk | awk '{print $1}')" = "$LOCAL_SHA" ] && echo 'APK permanente conferido.' && exit 0
@@ -274,23 +252,23 @@ jobs:
         run: |
           set -euo pipefail
           OIDC="$(curl --fail --silent --show-error -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-release" | jq -r '.value')"
-          SHA="$(sha256sum TAREFAS-1.8.8.apk | awk '{print $1}')"
-          jq -n --arg version '1.8.8' --argjson build 188 --arg channel 'beta' --arg url 'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-1.8.8.apk' --arg sha "$SHA" '{version:$version,build:$build,channel:$channel,download_url:$url,sha256:$sha}' > /tmp/release.json
+          SHA="$(sha256sum TAREFAS-1.8.9.apk | awk '{print $1}')"
+          jq -n --arg version '1.8.9' --argjson build 189 --arg channel 'beta' --arg url 'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-1.8.9.apk' --arg sha "$SHA" '{version:$version,build:$build,channel:$channel,download_url:$url,sha256:$sha}' > /tmp/release.json
           curl --fail --silent --show-error -H "Authorization: Bearer $OIDC" -H 'Content-Type: application/json' --data-binary @/tmp/release.json 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-release-publish' -o /tmp/release-result.json
           cat /tmp/release-result.json
-          jq -e '.ok == true and .version == "1.8.8" and .build == 188' /tmp/release-result.json >/dev/null
+          jq -e '.ok == true and .version == "1.8.9" and .build == 189' /tmp/release-result.json >/dev/null
 
-      - name: Upload APK 1.8.8 beta assinado
+      - name: Upload APK 1.8.9 beta assinado
         if: github.event_name == 'push' && github.ref == 'refs/heads/app/android-v1'
         uses: actions/upload-artifact@v4
         with:
-          name: tarefas-android-1.8.8-beta-GuerraVPN
-          path: TAREFAS-1.8.8.apk
+          name: tarefas-android-1.8.9-beta-GuerraVPN
+          path: TAREFAS-1.8.9.apk
           if-no-files-found: error
 
       - name: Upload APK de conferência
         uses: actions/upload-artifact@v4
         with:
-          name: tarefas-android-1.8.8-debug-check
+          name: tarefas-android-1.8.9-debug-check
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
