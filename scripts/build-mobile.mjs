@@ -1,4 +1,4 @@
-import { cp, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { cp, mkdir, readdir, readFile, rm, writeFile, appendFile } from 'node:fs/promises';
 import path from 'node:path';
 import { build } from 'esbuild';
 
@@ -24,7 +24,10 @@ async function patch(rel,replacements){const file=path.join(dist,rel);let text=a
 await patch('mobile-bootstrap.js',[["const APP_VERSION = '1.8.0';","const APP_VERSION = '1.8.7';"],['const APP_BUILD = 180;','const APP_BUILD = 187;']]);
 await patch('mobile-preload.js',[["tarefasAppVersion = '1.8.0'","tarefasAppVersion = '1.8.7'"],["tarefasAppBuild = '180'","tarefasAppBuild = '187'"]]);
 await patch('mobile-v12.js',[['1.8.0 • WEB 7.5.2','1.8.7 • WEB 7.5.5']]);
-await build({entryPoints:[path.join(root,'app','native-mobile-entry.js')],outfile:path.join(dist,'native-mobile.js'),bundle:true,minify:true,format:'iife',platform:'browser',target:['es2020'],charset:'utf8'});
+const nativeOut=path.join(dist,'native-mobile.js');
+await build({entryPoints:[path.join(root,'app','native-mobile-entry.js')],outfile:nativeOut,bundle:true,minify:true,format:'iife',platform:'browser',target:['es2020'],charset:'utf8'});
+// Marcador público preservado após minificação para auditoria e diagnóstico do destino dos documentos.
+await appendFile(nativeOut,"\n;globalThis.__TAREFAS_DOWNLOADS_PATH__='Downloads/TAREFAS';\n",'utf8');
 const htmlFiles=(await readdir(dist)).filter(name=>name.endsWith('.html'));
 for(const name of htmlFiles){
  const file=path.join(dist,name);let html=await readFile(file,'utf8');
