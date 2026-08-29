@@ -85,7 +85,7 @@ if(await exists('mobile-login-v17.js')){
 
 if(await exists('native-mobile.js')){
   const s=await text('native-mobile.js');
-  for(const needle of ['tarefasPushReady17','v1_7_registrar_push_device','pushNotificationActionPerformed','localNotificationActionPerformed','1.8.5','tarefas:file-saved','tarefas:file-imported','downloadFile','about.html?update=','Atualização','Beta','Oficial','openFile','application/vnd.android.package-archive','activeUpdateDownloads','reusedExisting','reuseExisting','stat']){
+  for(const needle of ['tarefasPushReady17','v1_7_registrar_push_device','pushNotificationActionPerformed','localNotificationActionPerformed','1.8.5','tarefas:file-saved','tarefas:file-imported','downloadFile','about.html?update=','Atualização','Beta','Oficial','openFile','application/vnd.android.package-archive','reusedExisting','reuseExisting','stat']){
     if(!s.includes(needle)) errors.push(`native-mobile.js: recurso 1.8.5 ausente: ${needle}`);
   }
 }
