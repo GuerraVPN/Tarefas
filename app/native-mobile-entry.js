@@ -192,6 +192,11 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+window.addEventListener('tarefas:push-session-ready', () => {
+  pushInitialized = false;
+  initializeRemotePush().catch(err => console.warn('[TAREFAS PUSH] Reinicialização:', err));
+});
+
 App.addListener('appStateChange', ({ isActive }) => {
   if (isActive && Capacitor.isNativePlatform()) {
     pushInitialized = false;
