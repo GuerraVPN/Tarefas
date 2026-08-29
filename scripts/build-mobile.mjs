@@ -49,16 +49,20 @@ async function patch(rel, replacements){
   await writeFile(file,text,'utf8');
 }
 
-// A base V1.8.0 continua reaproveitada, mas o bundle de distribuição é 1.8.1/181.
+// A base visual 1.8.0 continua reaproveitada; a distribuição atual é 1.8.2/182 BETA.
 await patch('mobile-bootstrap.js', [
-  ["const APP_VERSION = '1.8.0';", "const APP_VERSION = '1.8.1';"],
-  ['const APP_BUILD = 180;', 'const APP_BUILD = 181;']
+  ["const APP_VERSION = '1.8.0';", "const APP_VERSION = '1.8.2';"],
+  ['const APP_BUILD = 180;', 'const APP_BUILD = 182;']
 ]);
 await patch('mobile-preload.js', [
-  ["tarefasAppVersion = '1.8.0'", "tarefasAppVersion = '1.8.1'"],
-  ["tarefasAppBuild = '180'", "tarefasAppBuild = '181'"]
+  ["tarefasAppVersion = '1.8.0'", "tarefasAppVersion = '1.8.2'"],
+  ["tarefasAppBuild = '180'", "tarefasAppBuild = '182'"]
 ]);
-await patch('mobile-v12.js', [['1.8.0 • WEB 7.5.2','1.8.1 • WEB 7.5.2']]);
+await patch('mobile-v12.js', [['1.8.0 • WEB 7.5.2','1.8.2 • WEB 7.5.3']]);
+await patch('mobile-updates-v181.js', [
+  ["const APP_VERSION = '1.8.1';", "const APP_VERSION = '1.8.2';"],
+  ['const APP_BUILD = 181;', 'const APP_BUILD = 182;']
+]);
 
 await build({
   entryPoints: [path.join(root, 'app', 'native-mobile-entry.js')],
@@ -69,7 +73,7 @@ await build({
   platform: 'browser',
   target: ['es2020']
 });
-await patch('native-mobile.js', [['1.8.0','1.8.1']]);
+await patch('native-mobile.js', [['1.8.0','1.8.2']]);
 
 const htmlFiles = (await readdir(dist)).filter((name) => name.endsWith('.html'));
 for (const name of htmlFiles) {
@@ -103,4 +107,4 @@ for (const name of htmlFiles) {
   await writeFile(file, html, 'utf8');
 }
 
-console.log(`TAREFAS Android 1.8.1 build 181: ${htmlFiles.length} páginas preparadas com updates oficial/beta, histórico, arquivos e push FCM`);
+console.log(`TAREFAS Android 1.8.2 build 182 BETA: ${htmlFiles.length} páginas preparadas sobre Web 7.5.3 com updates, calendário de serviço, arquivos e push FCM`);
