@@ -9,7 +9,7 @@ const required = [
   'missao.html','ferias_dispensas.html','central.html','usuarios.html','relatorios.html','orcamentarios.html',
   'historico_auditoria.html','configuracoes.html','help.html','about.html',
   'v7_5_3_patch.js','v7_5_1_version.js','v7_5_1_about.js',
-  'mobile-preload.js','mobile-bootstrap.js','mobile-v12.js','mobile-login-v17.js','mobile.css','mobile-v18.css','mobile-v181.css','mobile-updates-v181.js','native-mobile.js'
+  'mobile-preload.js','mobile-bootstrap.js','mobile-v12.js','mobile-login-v17.js','mobile.css','mobile-v18.css','mobile-v181.css','mobile-updates-v181.js','mobile-dashboard-v184.js','native-mobile.js'
 ];
 
 async function exists(rel){ try{ await access(path.join(root, rel)); return true; }catch{return false;} }
@@ -19,7 +19,7 @@ for(const rel of required) if(!await exists(rel)) errors.push(`arquivo ausente: 
 
 for(const rel of (await readdir(root)).filter(x=>x.endsWith('.html'))){
   const html=await text(rel);
-  for(const needle of ['mobile-preload.js','mobile.css','mobile-v18.css','mobile-v181.css','mobile-bootstrap.js','native-mobile.js','mobile-updates-v181.js']){
+  for(const needle of ['mobile-preload.js','mobile.css','mobile-v18.css','mobile-v181.css','mobile-bootstrap.js','native-mobile.js','mobile-updates-v181.js','mobile-dashboard-v184.js']){
     if(!html.includes(needle)) errors.push(`${rel}: injeção ausente: ${needle}`);
   }
   if(rel==='index.html'&&!html.includes('mobile-login-v17.js')) errors.push('index.html: login seguro de push ausente');
@@ -28,16 +28,16 @@ for(const rel of (await readdir(root)).filter(x=>x.endsWith('.html'))){
 if(await exists('mobile-preload.js')){
   const s=await text('mobile-preload.js');
   if(!s.includes('__TAREFAS_NATIVE_APP__')) errors.push('mobile-preload.js: flag nativa ausente');
-  if(!s.includes("tarefasAppVersion = '1.8.3'")) errors.push('mobile-preload.js: versão 1.8.3 não encontrada');
-  if(!s.includes("tarefasAppBuild = '183'")) errors.push('mobile-preload.js: build 183 não encontrado');
+  if(!s.includes("tarefasAppVersion = '1.8.4'")) errors.push('mobile-preload.js: versão 1.8.4 não encontrada');
+  if(!s.includes("tarefasAppBuild = '184'")) errors.push('mobile-preload.js: build 184 não encontrado');
   if(!s.includes('v1_7_emitir_sessao_push')) errors.push('mobile-preload.js: compatibilidade da sessão push ausente');
 }
 
 if(await exists('mobile-bootstrap.js')){
   const s=await text('mobile-bootstrap.js');
   if(/new\s+MutationObserver/.test(s)) errors.push('mobile-bootstrap.js: MutationObserver global não permitido');
-  if(!s.includes("const APP_VERSION = '1.8.3'")) errors.push('mobile-bootstrap.js: APP_VERSION incorreta');
-  if(!s.includes('const APP_BUILD = 183')) errors.push('mobile-bootstrap.js: APP_BUILD 183 ausente');
+  if(!s.includes("const APP_VERSION = '1.8.4'")) errors.push('mobile-bootstrap.js: APP_VERSION incorreta');
+  if(!s.includes('const APP_BUILD = 184')) errors.push('mobile-bootstrap.js: APP_BUILD 184 ausente');
   if(!s.includes("['Desrelacionamento / Baixa','orcamentarios.html?modulo=baixas'")) errors.push('mobile-bootstrap.js: Desrelacionamento não está direto no menu');
   if(s.includes("'#orcamentarios'")) errors.push('mobile-bootstrap.js: submenu Orçamentários legado ainda existe');
   if(!s.includes('Sobre o app')) errors.push('mobile-bootstrap.js: About do app ausente');
@@ -45,10 +45,18 @@ if(await exists('mobile-bootstrap.js')){
 
 if(await exists('mobile-updates-v181.js')){
   const s=await text('mobile-updates-v181.js');
-  for(const needle of ['1.8.3','APP_BUILD = 183',"APP_CHANNEL = 'beta'",'v1_8_get_beta_updates','v1_8_set_beta_updates','v1_8_latest_app_version','v1_8_app_version_history','Receber versões beta','Baixar atualização','TarefasNative?.files?.downloadUrl']){
+  for(const needle of ['1.8.4','APP_BUILD = 184',"APP_CHANNEL = 'beta'",'v1_8_get_beta_updates','v1_8_set_beta_updates','v1_8_latest_app_version','v1_8_app_version_history','Receber versões beta','Baixar atualização','TarefasNative?.files?.downloadUrl']){
     if(!s.includes(needle)) errors.push(`mobile-updates-v181.js: recurso ausente: ${needle}`);
   }
   if(/new\s+MutationObserver/.test(s)) errors.push('mobile-updates-v181.js: MutationObserver não permitido');
+}
+
+if(await exists('mobile-dashboard-v184.js')){
+  const s=await text('mobile-dashboard-v184.js');
+  for(const needle of ['Próximo serviço','PREV.','TSV','Escala Preta','Escala Vermelha','escala_integrantes','escala_servicos','pessoal_ferias','rodizio_usuario_id','rodizio_pessoa_externa_id','tarefas_v743_period','pessoal.html']){
+    if(!s.includes(needle)) errors.push(`mobile-dashboard-v184.js: recurso ausente: ${needle}`);
+  }
+  if(/new\s+MutationObserver/.test(s)) errors.push('mobile-dashboard-v184.js: MutationObserver não permitido');
 }
 
 if(await exists('mobile-v181.css')){
@@ -66,7 +74,7 @@ if(await exists('mobile-v18.css')){
 if(await exists('mobile-v12.js')){
   const s=await text('mobile-v12.js');
   if(/new\s+MutationObserver/.test(s)) errors.push('mobile-v12.js: observer recursivo ainda presente');
-  if(!s.includes('1.8.3 • WEB 7.5.3')) errors.push('mobile-v12.js: versão visual 1.8.3 / Web 7.5.3 incorreta');
+  if(!s.includes('1.8.4 • WEB 7.5.3')) errors.push('mobile-v12.js: versão visual 1.8.4 / Web 7.5.3 incorreta');
 }
 
 if(await exists('mobile-login-v17.js')){
@@ -77,7 +85,7 @@ if(await exists('mobile-login-v17.js')){
 
 if(await exists('native-mobile.js')){
   const s=await text('native-mobile.js');
-  for(const needle of ['tarefasPushReady17','v1_7_registrar_push_device','pushNotificationActionPerformed','localNotificationActionPerformed','1.8.3','tarefas:file-saved','tarefas:file-imported','downloadFile','about.html?update=','Documentos/']) if(!s.includes(needle)) errors.push(`native-mobile.js: recurso 1.8.3 ausente: ${needle}`);
+  for(const needle of ['tarefasPushReady17','v1_7_registrar_push_device','pushNotificationActionPerformed','localNotificationActionPerformed','1.8.4','tarefas:file-saved','tarefas:file-imported','downloadFile','about.html?update=','Documentos/']) if(!s.includes(needle)) errors.push(`native-mobile.js: recurso 1.8.4 ausente: ${needle}`);
 }
 
 if(await exists('v7_5_3_patch.js')){
@@ -110,9 +118,9 @@ for(const rel of await readdir(root)){
 }
 if(total<100000) errors.push('bundle parece pequeno demais');
 
-console.log(`VERIFY 1.8.3 build 183 BETA / WEB 7.5.3: ${root}`);
+console.log(`VERIFY 1.8.4 build 184 BETA / WEB 7.5.3: ${root}`);
 console.log(`Arquivos raiz: ${(await readdir(root)).length}`);
 console.log(`Tamanho raiz (arquivos): ${total} bytes`);
 for(const w of warnings) console.warn('WARN:',w);
 if(errors.length){ for(const e of errors) console.error('ERRO:',e); process.exit(1); }
-console.log('OK: bundle 1.8.3 passou na verificação preventiva de download nativo sem CORS e abertura interna de push de atualização.');
+console.log('OK: bundle 1.8.4 passou na verificação preventiva, incluindo próximo serviço previsto/confirmado no Dashboard.');
