@@ -175,3 +175,22 @@ jobs:
           name: tarefas-android-1.8.0-debug
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
+
+      - name: Empacotar ferramenta de assinatura Android
+        run: |
+          set -euo pipefail
+          APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)"
+          test -n "$APKSIGNER"
+          TOOL_DIR="$(dirname "$APKSIGNER")"
+          rm -rf /tmp/tarefas-apksigner
+          mkdir -p /tmp/tarefas-apksigner
+          cp "$APKSIGNER" /tmp/tarefas-apksigner/apksigner
+          cp -R "$TOOL_DIR/lib" /tmp/tarefas-apksigner/lib
+          tar -C /tmp -czf android-sign-tools.tgz tarefas-apksigner
+
+      - name: Upload ferramenta de assinatura
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-sign-tools
+          path: android-sign-tools.tgz
+          if-no-files-found: error
