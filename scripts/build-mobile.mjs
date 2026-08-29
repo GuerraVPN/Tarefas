@@ -37,6 +37,7 @@ await cp(path.join(root, 'app', 'mobile-login-v17.js'), path.join(dist, 'mobile-
 await cp(path.join(root, 'app', 'mobile.css'), path.join(dist, 'mobile.css'));
 await cp(path.join(root, 'app', 'mobile-v12.css'), path.join(dist, 'mobile-v12.css'));
 await cp(path.join(root, 'app', 'mobile-v16.css'), path.join(dist, 'mobile-v16.css'));
+await cp(path.join(root, 'app', 'mobile-v18.css'), path.join(dist, 'mobile-v18.css'));
 await cp(path.join(root, 'app', 'mobile-v12.js'), path.join(dist, 'mobile-v12.js'));
 
 await build({
@@ -58,14 +59,8 @@ for (const name of htmlFiles) {
     html = html.replace(/<head>/i, '<head>\n  <script src="mobile-preload.js"></script>');
   }
 
-  if (!html.includes('mobile.css')) {
-    html = html.replace(/<\/head>/i, '  <link rel="stylesheet" href="mobile.css">\n</head>');
-  }
-  if (!html.includes('mobile-v12.css')) {
-    html = html.replace(/<\/head>/i, '  <link rel="stylesheet" href="mobile-v12.css">\n</head>');
-  }
-  if (!html.includes('mobile-v16.css')) {
-    html = html.replace(/<\/head>/i, '  <link rel="stylesheet" href="mobile-v16.css">\n</head>');
+  for (const css of ['mobile.css','mobile-v12.css','mobile-v16.css','mobile-v18.css']) {
+    if (!html.includes(css)) html = html.replace(/<\/head>/i, `  <link rel="stylesheet" href="${css}">\n</head>`);
   }
 
   if (!html.includes('manifest.webmanifest')) {
@@ -86,4 +81,4 @@ for (const name of htmlFiles) {
   await writeFile(file, html, 'utf8');
 }
 
-console.log(`TAREFAS Android V1.7: ${htmlFiles.length} páginas preparadas com push remoto FCM, sessão persistente e shell estável`);
+console.log(`TAREFAS Android 1.8.0 build 180: ${htmlFiles.length} páginas preparadas com layout universal, About do app e push FCM`);
