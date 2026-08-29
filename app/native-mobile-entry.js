@@ -15,6 +15,7 @@ const DEVICE_ID_KEY = 'tarefasDeviceId17';
 const APP_VERSION = '1.8.5';
 const FILES_FOLDER = 'TAREFAS';
 const UPDATES_FOLDER = `${FILES_FOLDER}/Atualização`;
+const activeUpdateDownloads = new Map();
 let pushInitialized = false;
 let pushListenersInstalled = false;
 let lastToken = '';
@@ -139,6 +140,49 @@ async function openApkInstaller(uri){
   }
 }
 
+async function existingUpdateInfo(targetPath, displayPath, name, channelFolder, autoInstall){
+  try {
+    const stat=await Filesystem.stat({directory:Directory.Documents,path:targetPath});
+    if(Number(stat?.size||0)<=0) return null;
+    const target=await Filesystem.getUri({directory:Directory.Documents,path:targetPath});
+    let installer={opened:false,error:null};
+    if(autoInstall!==false) installer=await openApkInstaller(target.uri);
+    return {
+      ok:true,saved:true,shared:false,reusedExisting:true,downloaded:false,filename:name,path:displayPath,uri:target.uri,
+      mimeType:'application/vnd.android.package-archive',updateChannel:channelFolder,
+      installerOpened:installer.opened,installerError:installer.error
+    };
+  } catch (_) {
+    return null;
+  }
+}
+
+async function performNativeDownload(href,name,isApk,channelFolder,targetFolder,displayFolder,options){
+  await Filesystem.mkdir({directory:Directory.Documents,path:targetFolder,recursive:true}).catch(()=>{});
+  const targetPath=`${targetFolder}/${name}`;
+  const displayPath=`${displayFolder}/${name}`;
+
+  if(isApk && options?.reuseExisting!==false){
+    const existing=await existingUpdateInfo(targetPath,displayPath,name,channelFolder,options?.autoInstall);
+    if(existing){
+      window.dispatchEvent(new CustomEvent('tarefas:file-saved',{detail:existing}));
+      return existing;
+    }
+  }
+
+  const target=await Filesystem.getUri({directory:Directory.Documents,path:targetPath});
+  await FileTransfer.downloadFile({url:href,path:target.uri,progress:false});
+  let installer={opened:false,error:null};
+  if(isApk && options?.autoInstall!==false) installer=await openApkInstaller(target.uri);
+  const info={
+    ok:true,saved:true,shared:false,reusedExisting:false,downloaded:true,filename:name,path:displayPath,uri:target.uri,
+    mimeType:isApk?'application/vnd.android.package-archive':'application/octet-stream',
+    updateChannel:isApk?channelFolder:null,installerOpened:installer.opened,installerError:installer.error
+  };
+  window.dispatchEvent(new CustomEvent('tarefas:file-saved',{detail:info}));
+  return info;
+}
+
 async function downloadUrl(url, filename, options={}){
   if (!url) throw new Error('URL de download ausente.');
   const href=String(url),name=sanitizeFilename(filename || filenameFromUrl(href));
@@ -146,38 +190,38 @@ async function downloadUrl(url, filename, options={}){
   const channelFolder=updateChannelFolder(options?.channel);
   const targetFolder=isApk?`${UPDATES_FOLDER}/${channelFolder}`:FILES_FOLDER;
   const displayFolder=isApk?`Documentos/${UPDATES_FOLDER}/${channelFolder}`:`Documentos/${FILES_FOLDER}`;
+  const updateKey=isApk?`${channelFolder}/${name}`:null;
   await ensureFilesPermission();
+
   if (Capacitor.isNativePlatform()) {
-    try {
-      await Filesystem.mkdir({directory:Directory.Documents,path:targetFolder,recursive:true}).catch(()=>{});
-      const target=await Filesystem.getUri({directory:Directory.Documents,path:`${targetFolder}/${name}`});
-      await FileTransfer.downloadFile({url:href,path:target.uri,progress:false});
-      let installer={opened:false,error:null};
-      if(isApk && options?.autoInstall!==false) installer=await openApkInstaller(target.uri);
-      const info={
-        ok:true,saved:true,shared:false,filename:name,path:`${displayFolder}/${name}`,uri:target.uri,
-        mimeType:isApk?'application/vnd.android.package-archive':'application/octet-stream',
-        updateChannel:isApk?channelFolder:null,installerOpened:installer.opened,installerError:installer.error
-      };
-      window.dispatchEvent(new CustomEvent('tarefas:file-saved',{detail:info}));
-      return info;
-    } catch (nativeError) {
-      console.warn('[TAREFAS FILES] FileTransfer em Documents falhou:',nativeError);
-      if(isApk){
-        throw new Error(`Não foi possível salvar a atualização em ${displayFolder}: ${nativeError?.message || nativeError}`);
-      }
+    if(updateKey && activeUpdateDownloads.has(updateKey)) return activeUpdateDownloads.get(updateKey);
+    const operation=(async()=>{
       try {
-        const temp=await Filesystem.getUri({directory:Directory.Cache,path:`updates/${name}`});
-        await FileTransfer.downloadFile({url:href,path:temp.uri,progress:false});
-        await Share.share({title:name,dialogTitle:'Salvar ou abrir arquivo',files:[temp.uri]});
-        const info={ok:true,saved:false,shared:true,filename:name,path:null,uri:temp.uri,mimeType:'application/octet-stream'};
-        window.dispatchEvent(new CustomEvent('tarefas:file-saved',{detail:info}));
-        return info;
-      } catch (fallbackError) {
-        throw new Error(`Download nativo falhou: ${fallbackError?.message || nativeError?.message || fallbackError}`);
+        return await performNativeDownload(href,name,isApk,channelFolder,targetFolder,displayFolder,options);
+      } catch (nativeError) {
+        console.warn('[TAREFAS FILES] FileTransfer em Documents falhou:',nativeError);
+        if(isApk){
+          throw new Error(`Não foi possível salvar a atualização em ${displayFolder}: ${nativeError?.message || nativeError}`);
+        }
+        try {
+          const temp=await Filesystem.getUri({directory:Directory.Cache,path:`updates/${name}`});
+          await FileTransfer.downloadFile({url:href,path:temp.uri,progress:false});
+          await Share.share({title:name,dialogTitle:'Salvar ou abrir arquivo',files:[temp.uri]});
+          const info={ok:true,saved:false,shared:true,filename:name,path:null,uri:temp.uri,mimeType:'application/octet-stream'};
+          window.dispatchEvent(new CustomEvent('tarefas:file-saved',{detail:info}));
+          return info;
+        } catch (fallbackError) {
+          throw new Error(`Download nativo falhou: ${fallbackError?.message || nativeError?.message || fallbackError}`);
+        }
       }
+    })();
+    if(updateKey){
+      activeUpdateDownloads.set(updateKey,operation);
+      operation.finally(()=>{if(activeUpdateDownloads.get(updateKey)===operation)activeUpdateDownloads.delete(updateKey)}).catch(()=>{});
     }
+    return operation;
   }
+
   const response=await fetch(href,{credentials:'include'});
   if(!response.ok)throw new Error(`Download falhou (${response.status}).`);
   return saveBlob(await response.blob(),name);
@@ -198,7 +242,7 @@ function installFileBridge(){
 async function ensureChannel(){
   if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'android') return;
   await PushNotifications.createChannel({id:CHANNEL_ID,name:'TAREFAS',description:'Tarefas, escalas, serviços e avisos importantes',importance:5,visibility:0,vibration:true}).catch(()=>{});
-  await LocalNotifications.createChannel({id:CHANNEL_ID,name:'TAREFAS',description:'Tarefas, escalas, serviços e avisos importantes',importance:5,visibility:1,vibration:true}).catch(()=>{});
+  await LocalNotifications.createChannel({id:CHANNEL_ID,name:'TAREFAS',description:'TareFAS, escalas, serviços e avisos importantes',importance:5,visibility:1,vibration:true}).catch(()=>{});
 }
 
 async function notify({ title='TAREFAS', body, id, at, extra }={}){
