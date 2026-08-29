@@ -70,6 +70,10 @@ if(await exists('native-mobile.js')){
   if(!s.includes('v1_7_registrar_push_device'))errors.push('native-mobile.js: RPC de registro FCM ausente');
   if(!s.includes('pushNotificationActionPerformed'))errors.push('native-mobile.js: abertura por toque no push ausente');
   if(!s.includes('1.8.0'))errors.push('native-mobile.js: app_version 1.8.0 ausente');
+  if(!s.includes('tarefas:file-saved'))errors.push('native-mobile.js: ponte de download de arquivos ausente');
+  if(!s.includes('tarefas:file-imported'))errors.push('native-mobile.js: integração de importação de arquivos ausente');
+  if(!s.includes('Salvar ou abrir arquivo'))errors.push('native-mobile.js: fallback nativo de salvamento ausente');
+  if(!s.includes('DOCUMENTS'))errors.push('native-mobile.js: diretório Documents não está presente');
 }
 
 if(await exists('v6_2_mobile.js')){
@@ -104,4 +108,4 @@ if(errors.length){
   for(const e of errors)console.error('ERRO:',e);
   process.exit(1);
 }
-console.log('OK: bundle 1.8.0 passou na verificação preventiva de layout, About, navegação e push.');
+console.log('OK: bundle 1.8.0 passou na verificação preventiva de layout, About, navegação, push e arquivos.');
