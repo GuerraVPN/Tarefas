@@ -38,7 +38,27 @@ await cp(path.join(root, 'app', 'mobile.css'), path.join(dist, 'mobile.css'));
 await cp(path.join(root, 'app', 'mobile-v12.css'), path.join(dist, 'mobile-v12.css'));
 await cp(path.join(root, 'app', 'mobile-v16.css'), path.join(dist, 'mobile-v16.css'));
 await cp(path.join(root, 'app', 'mobile-v18.css'), path.join(dist, 'mobile-v18.css'));
+await cp(path.join(root, 'app', 'mobile-v181.css'), path.join(dist, 'mobile-v181.css'));
 await cp(path.join(root, 'app', 'mobile-v12.js'), path.join(dist, 'mobile-v12.js'));
+await cp(path.join(root, 'app', 'mobile-updates-v181.js'), path.join(dist, 'mobile-updates-v181.js'));
+
+async function patch(rel, replacements){
+  const file=path.join(dist,rel);
+  let text=await readFile(file,'utf8');
+  for(const [from,to] of replacements) text=text.split(from).join(to);
+  await writeFile(file,text,'utf8');
+}
+
+// A base V1.8.0 continua reaproveitada, mas o bundle de distribuição é 1.8.1/181.
+await patch('mobile-bootstrap.js', [
+  ["const APP_VERSION = '1.8.0';", "const APP_VERSION = '1.8.1';"],
+  ['const APP_BUILD = 180;', 'const APP_BUILD = 181;']
+]);
+await patch('mobile-preload.js', [
+  ["tarefasAppVersion = '1.8.0'", "tarefasAppVersion = '1.8.1'"],
+  ["tarefasAppBuild = '180'", "tarefasAppBuild = '181'"]
+]);
+await patch('mobile-v12.js', [['1.8.0 • WEB 7.5.2','1.8.1 • WEB 7.5.2']]);
 
 await build({
   entryPoints: [path.join(root, 'app', 'native-mobile-entry.js')],
@@ -49,6 +69,7 @@ await build({
   platform: 'browser',
   target: ['es2020']
 });
+await patch('native-mobile.js', [['1.8.0','1.8.1']]);
 
 const htmlFiles = (await readdir(dist)).filter((name) => name.endsWith('.html'));
 for (const name of htmlFiles) {
@@ -59,7 +80,7 @@ for (const name of htmlFiles) {
     html = html.replace(/<head>/i, '<head>\n  <script src="mobile-preload.js"></script>');
   }
 
-  for (const css of ['mobile.css','mobile-v12.css','mobile-v16.css','mobile-v18.css']) {
+  for (const css of ['mobile.css','mobile-v12.css','mobile-v16.css','mobile-v18.css','mobile-v181.css']) {
     if (!html.includes(css)) html = html.replace(/<\/head>/i, `  <link rel="stylesheet" href="${css}">\n</head>`);
   }
 
@@ -72,13 +93,14 @@ for (const name of htmlFiles) {
   }
 
   if (!html.includes('mobile-bootstrap.js')) {
-    html = html.replace(/<\/body>/i, '  <script src="mobile-bootstrap.js"></script>\n  <script src="mobile-v12.js"></script>\n  <script src="native-mobile.js"></script>\n</body>');
+    html = html.replace(/<\/body>/i, '  <script src="mobile-bootstrap.js"></script>\n  <script src="mobile-v12.js"></script>\n  <script src="native-mobile.js"></script>\n  <script src="mobile-updates-v181.js"></script>\n</body>');
   } else {
     if (!html.includes('mobile-v12.js')) html = html.replace(/<\/body>/i, '  <script src="mobile-v12.js"></script>\n</body>');
     if (!html.includes('native-mobile.js')) html = html.replace(/<\/body>/i, '  <script src="native-mobile.js"></script>\n</body>');
+    if (!html.includes('mobile-updates-v181.js')) html = html.replace(/<\/body>/i, '  <script src="mobile-updates-v181.js"></script>\n</body>');
   }
 
   await writeFile(file, html, 'utf8');
 }
 
-console.log(`TAREFAS Android 1.8.0 build 180: ${htmlFiles.length} páginas preparadas com layout universal, About do app e push FCM`);
+console.log(`TAREFAS Android 1.8.1 build 181: ${htmlFiles.length} páginas preparadas com updates oficial/beta, histórico, arquivos e push FCM`);
