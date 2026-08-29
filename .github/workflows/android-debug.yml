@@ -114,24 +114,48 @@ jobs:
 
       - name: Conferência 3 - validar APK V1.7 + push
         run: |
+          set -euo pipefail
           APK='android/app/build/outputs/apk/debug/app-debug.apk'
           META='android/app/build/outputs/apk/debug/output-metadata.json'
-          GS='android/app/build/generated/res/google-services/debug/values/values.xml'
+
+          echo '[3.1] Integridade do APK'
           test -s "$APK"
           unzip -tq "$APK"
-          grep -q '"versionCode": 17' "$META"
-          grep -q '"versionName": "1.7"' "$META"
-          unzip -p "$APK" assets/public/mobile-v12.js | grep -q 'V1.7 • WEB 7.5.2'
-          unzip -p "$APK" assets/public/mobile-preload.js | grep -q 'v1_7_emitir_sessao_push'
-          unzip -p "$APK" assets/public/native-mobile.js | grep -q 'v1_7_registrar_push_device'
+
+          echo '[3.2] Versionamento Android'
+          python - <<'PY'
+          import json
+          with open('android/app/build/outputs/apk/debug/output-metadata.json', encoding='utf-8') as f:
+              meta=json.load(f)
+          el=meta['elements'][0]
+          assert int(el['versionCode']) == 17, el
+          assert str(el['versionName']) == '1.7', el
+          print('versionCode=17 / versionName=1.7 OK')
+          PY
+
+          echo '[3.3] Bundle V1.7 dentro do APK'
+          unzip -p "$APK" assets/public/mobile-v12.js > /tmp/v17-mobile-ui.js
+          unzip -p "$APK" assets/public/mobile-preload.js > /tmp/v17-preload.js
+          unzip -p "$APK" assets/public/native-mobile.js > /tmp/v17-native.js
+          grep -q 'V1.7 • WEB 7.5.2' /tmp/v17-mobile-ui.js
+          grep -q 'v1_7_emitir_sessao_push' /tmp/v17-preload.js
+          grep -q 'v1_7_registrar_push_device' /tmp/v17-native.js
+          grep -q 'PushNotifications' /tmp/v17-native.js || grep -q 'pushNotificationReceived' /tmp/v17-native.js
+          if grep -q 'new MutationObserver' /tmp/v17-mobile-ui.js; then
+            echo 'ERRO: observer recursivo encontrado dentro do APK'
+            exit 1
+          fi
+
+          echo '[3.4] Recursos Firebase processados pelo Gradle'
+          GS="$(find android/app/build/generated -type f -name values.xml -path '*google-services*' | head -1)"
+          test -n "$GS"
           test -s "$GS"
           grep -q 'google_app_id' "$GS"
           grep -q 'gcm_defaultSenderId' "$GS"
           grep -q 'google_api_key' "$GS"
-          if unzip -p "$APK" assets/public/mobile-v12.js | grep -q 'new MutationObserver'; then
-            echo 'ERRO: observer recursivo encontrado dentro do APK'
-            exit 1
-          fi
+          echo "Firebase resources: $GS"
+
+          echo '[3.5] Assinatura e hash'
           APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)"
           test -n "$APKSIGNER"
           "$APKSIGNER" verify --verbose --print-certs "$APK"
