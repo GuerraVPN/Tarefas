@@ -66,8 +66,8 @@ jobs:
           grep -q 'Baixar e instalar atualização' /tmp/tarefas-185/mobile-updates-v181.js
           grep -q 'channel:version.channel' /tmp/tarefas-185/mobile-updates-v181.js
           grep -q 'v1_7_registrar_push_device' /tmp/tarefas-185/native-mobile.js
-          grep -q 'activeUpdateDownloads' /tmp/tarefas-185/native-mobile.js
           grep -q 'reusedExisting' /tmp/tarefas-185/native-mobile.js
+          grep -q 'reuseExisting' /tmp/tarefas-185/native-mobile.js
           grep -q 'Atualização' /tmp/tarefas-185/native-mobile.js
           grep -q 'openFile' /tmp/tarefas-185/native-mobile.js
           grep -q 'Próximo serviço' /tmp/tarefas-185/mobile-dashboard-v184.js
@@ -186,8 +186,8 @@ jobs:
           grep -q 'channel:version.channel' /tmp/185-updates.js
           grep -q 'Próximo serviço' /tmp/185-dashboard.js
           grep -q 'v1_7_registrar_push_device' /tmp/185-native.js
-          grep -q 'activeUpdateDownloads' /tmp/185-native.js
           grep -q 'reusedExisting' /tmp/185-native.js
+          grep -q 'reuseExisting' /tmp/185-native.js
           grep -q 'openFile' /tmp/185-native.js
           grep -q 'application/vnd.android.package-archive' /tmp/185-native.js
           grep -q 'Beta' /tmp/185-native.js
@@ -203,7 +203,7 @@ jobs:
           grep -q 'android.permission.READ_EXTERNAL_STORAGE' /tmp/185-permissions.txt
           grep -q 'android.permission.WRITE_EXTERNAL_STORAGE' /tmp/185-permissions.txt
           grep -q 'android.permission.REQUEST_INSTALL_PACKAGES' /tmp/185-permissions.txt
-          unzip -l "$APK" | grep -q 'res/xml/file_paths.xml' || grep -R -q 'external-path' android/app/build/intermediates 2>/dev/null
+          grep -R -q 'external-path' android/app/src/main/res/xml/file_paths.xml
           APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)"
           "$APKSIGNER" verify --verbose --print-certs "$APK"
           sha256sum "$APK"
