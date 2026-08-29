@@ -21,10 +21,9 @@ for (const file of ['manifest.webmanifest','service-worker.js','mobile-bootstrap
   await cp(path.join(root,'app',file),path.join(dist,file));
 }
 async function patch(rel,replacements){const file=path.join(dist,rel);let text=await readFile(file,'utf8');for(const [from,to] of replacements)text=text.split(from).join(to);await writeFile(file,text,'utf8')}
-await patch('mobile-bootstrap.js',[["const APP_VERSION = '1.8.0';","const APP_VERSION = '1.8.6';"],['const APP_BUILD = 180;','const APP_BUILD = 186;']]);
-await patch('mobile-preload.js',[["tarefasAppVersion = '1.8.0'","tarefasAppVersion = '1.8.6'"],["tarefasAppBuild = '180'","tarefasAppBuild = '186'"]]);
-await patch('mobile-v12.js',[['1.8.0 • WEB 7.5.2','1.8.6 • WEB 7.5.4']]);
-await patch('mobile-updates-v181.js',[["const APP_VERSION = '1.8.1';","const APP_VERSION = '1.8.6';"],['const APP_BUILD = 181;','const APP_BUILD = 186;']]);
+await patch('mobile-bootstrap.js',[["const APP_VERSION = '1.8.0';","const APP_VERSION = '1.8.7';"],['const APP_BUILD = 180;','const APP_BUILD = 187;']]);
+await patch('mobile-preload.js',[["tarefasAppVersion = '1.8.0'","tarefasAppVersion = '1.8.7'"],["tarefasAppBuild = '180'","tarefasAppBuild = '187'"]]);
+await patch('mobile-v12.js',[['1.8.0 • WEB 7.5.2','1.8.7 • WEB 7.5.5']]);
 await build({entryPoints:[path.join(root,'app','native-mobile-entry.js')],outfile:path.join(dist,'native-mobile.js'),bundle:true,minify:true,format:'iife',platform:'browser',target:['es2020'],charset:'utf8'});
 const htmlFiles=(await readdir(dist)).filter(name=>name.endsWith('.html'));
 for(const name of htmlFiles){
@@ -36,4 +35,4 @@ for(const name of htmlFiles){
  for(const js of ['mobile-bootstrap.js','mobile-v12.js','native-mobile.js','mobile-updates-v181.js','mobile-dashboard-v184.js'])if(!html.includes(js))html=html.replace(/<\/body>/i,`  <script src="${js}"></script>\n</body>`);
  await writeFile(file,html,'utf8');
 }
-console.log(`TAREFAS Android 1.8.6 build 186 BETA: ${htmlFiles.length} páginas preparadas sobre Web 7.5.4 com layout das escalas, TS, modal de tarefa, usuários inline e sair da conta`);
+console.log(`TAREFAS Android 1.8.7 build 187 BETA: ${htmlFiles.length} páginas preparadas sobre Web 7.5.5 com navegação das escalas, Downloads/TAREFAS, acesso total e limpeza de APKs antigos`);
