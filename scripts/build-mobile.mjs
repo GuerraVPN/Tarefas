@@ -24,11 +24,10 @@ async function patch(rel,replacements){const file=path.join(dist,rel);let text=a
 await patch('mobile-bootstrap.js',[["const APP_VERSION = '1.8.0';","const APP_VERSION = '1.8.9';"],['const APP_BUILD = 180;','const APP_BUILD = 189;']]);
 await patch('mobile-preload.js',[["tarefasAppVersion = '1.8.0'","tarefasAppVersion = '1.8.9'"],["tarefasAppBuild = '180'","tarefasAppBuild = '189'"]]);
 await patch('mobile-v12.js',[['1.8.0 • WEB 7.5.2','1.8.9 • WEB 7.5.5']]);
-// O patch antigo movia o bloco inteiro de propriedades + mensagens. No APK,
-// o comportamento legado fica desativado e o painel mobile 1.8.9 controla uma ação por vez.
 await patch('v7_5_4_patch.js',[["function usersInline(){if(page()!=='usuarios.html')return;","function usersInline(){if(page()!=='usuarios.html'||native())return;"]]);
 const nativeOut=path.join(dist,'native-mobile.js');
 await build({entryPoints:[path.join(root,'app','native-mobile-entry.js')],outfile:nativeOut,bundle:true,minify:true,format:'iife',platform:'browser',target:['es2020'],charset:'utf8'});
+await patch('native-mobile.js',[["1.8.8","1.8.9"]]);
 await appendFile(nativeOut,"\n;globalThis.__TAREFAS_DOWNLOADS_PATH__='Downloads/TAREFAS';\n",'utf8');
 const htmlFiles=(await readdir(dist)).filter(name=>name.endsWith('.html'));
 for(const name of htmlFiles){
