@@ -61,9 +61,14 @@
     try{
       const filename=`TAREFAS-${String(version.version_name||'update')}.apk`;
       if(window.TarefasNative?.files?.downloadUrl){
-        const result=await window.TarefasNative.files.downloadUrl(version.download_url,filename);
-        if(result?.saved) alert(`Atualização salva em ${result.path}. Abra o APK para instalar.`);
-        else if(result?.shared) alert('Escolha onde salvar ou abrir o APK da atualização.');
+        if(button) button.textContent='Baixando e preparando instalação…';
+        const result=await window.TarefasNative.files.downloadUrl(version.download_url,filename,{channel:version.channel||'official',autoInstall:true});
+        if(result?.installerOpened) return;
+        if(result?.saved){
+          const extra=result?.installerError?`\n\nO Android não abriu o instalador automaticamente: ${result.installerError}`:'';
+          alert(`Atualização salva em ${result.path}.${extra}\n\nSe for a primeira atualização pelo app, permita “Instalar apps desconhecidos” para o TAREFAS e tente novamente.`);
+        }
+        else if(result?.shared) alert('Escolha o instalador do Android para abrir o APK da atualização.');
       }else{
         location.href=version.download_url;
       }
@@ -90,7 +95,7 @@
         <div class="tm-update-title"><div><span class="tm-update-eyebrow">ATUALIZAÇÕES</span><h2>Atualização do aplicativo</h2></div><span class="tm-update-installed">${APP_CHANNEL==='beta'?'BETA':'OFICIAL'} ${APP_VERSION}</span></div>
         <p class="tm-update-status ${newer?'available':''}">${esc(statusText(latest))}</p>
         ${latest?`<div class="tm-update-latest"><div><small>Versão mais recente para você</small><strong>${esc(latest.version_name)}</strong><span>Build ${esc(latest.build)}</span></div><span class="tm-update-channel ${latest.channel==='beta'?'beta':''}">${latestBadge}</span></div>`:''}
-        ${newer?`<div class="tm-update-news"><strong>${esc(latest.title||'Nova versão')}</strong><ul>${listItems(latest.changelog)}</ul></div><button class="tm-primary tm-update-download" id="tmUpdateDownload" ${latest.download_url?'':'disabled'}>${latest.download_url?'Baixar atualização':'Download sendo preparado'}</button>`:''}
+        ${newer?`<div class="tm-update-news"><strong>${esc(latest.title||'Nova versão')}</strong><ul>${listItems(latest.changelog)}</ul></div><button class="tm-primary tm-update-download" id="tmUpdateDownload" ${latest.download_url?'':'disabled'}>${latest.download_url?'Baixar e instalar atualização':'Download sendo preparado'}</button>`:''}
       </section>
       <section class="tm-update-card">
         <div class="tm-update-setting"><div><strong>Receber versões beta</strong><small>Ao ativar, versões de teste aparecem como atualização e você recebe push quando uma nova beta for publicada.</small></div><label class="tm-switch"><input id="tmBetaUpdates" type="checkbox" ${state.beta?'checked':''}><span></span></label></div>
