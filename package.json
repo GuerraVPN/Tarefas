@@ -1,8 +1,8 @@
 {
   "name": "tarefas-app",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "private": true,
-  "description": "TAREFAS Android V1.7 baseado na versão web 7.5.2",
+  "description": "TAREFAS Android 1.8.0 build 180 baseado na versão web 7.5.2",
   "scripts": {
     "build:web": "node scripts/build-mobile.mjs",
     "verify:web": "node scripts/verify-mobile-build.mjs dist",
