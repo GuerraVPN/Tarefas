@@ -38,7 +38,11 @@
       .bn-head h3 { font-size: 17px !important; line-height: 1.2; }
       .bn-new, .bn-close { min-height: 40px; touch-action: manipulation; }
       .bn-list { padding: 9px !important; overscroll-behavior: contain; }
-      .bn-note { padding: 10px !important; border-radius: 14px !important; }
+      .bn-note {
+        padding: 10px !important;
+        border-radius: 14px !important;
+        background: var(--v4-surface, #fff) !important;
+      }
       .bn-note-head { align-items: center; }
       .bn-title { min-width: 0; min-height: 38px; font-size: 15px !important; }
       .bn-note-actions button { min-width: 36px; min-height: 36px; font-size: 16px; }
@@ -55,6 +59,7 @@
         max-height: 42vh !important;
         font-size: 14px !important;
         padding: 11px !important;
+        background: var(--v4-surface-2, #fff) !important;
         -webkit-user-select: text;
         user-select: text;
       }
