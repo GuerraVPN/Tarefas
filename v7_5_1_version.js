@@ -1,10 +1,21 @@
 (function(){
 'use strict';
-if(window.__TAREFAS_V752_VERSION__)return;
-window.__TAREFAS_V752_VERSION__=true;
-const VERSION='7.5.2',BADGE='● TAREFAS v'+VERSION;
+if(window.__TAREFAS_V753_VERSION__)return;
+window.__TAREFAS_V753_VERSION__=true;
+const VERSION='7.5.3',BADGE='● TAREFAS v'+VERSION;
 let busy=false;
-function ensureLabels(){const page=(location.pathname.split('/').pop()||'').toLowerCase();if(page!=='pessoal.html'||window.__TAREFAS_V752_SERVICE_LABELS__)return;if(document.querySelector('script[src*="v7_5_2_service_labels.js"]'))return;const s=document.createElement('script');s.src='v7_5_2_service_labels.js?v=7.5.2';s.defer=true;document.head.appendChild(s);}
+function addPatch(){
+ const page=(location.pathname.split('/').pop()||'').toLowerCase();
+ if(!['pessoal.html','calendario.html'].includes(page)||window.__TAREFAS_V753_PATCH__)return;
+ if(document.querySelector('script[src*="v7_5_3_patch.js"]'))return;
+ const s=document.createElement('script');s.src='v7_5_3_patch.js?v=7.5.3';s.defer=true;document.head.appendChild(s);
+}
+function ensureLabels(){
+ const page=(location.pathname.split('/').pop()||'').toLowerCase();
+ if(page!=='pessoal.html'||window.__TAREFAS_V752_SERVICE_LABELS__)return;
+ if(document.querySelector('script[src*="v7_5_2_service_labels.js"]'))return;
+ const s=document.createElement('script');s.src='v7_5_2_service_labels.js?v=7.5.3';s.defer=true;document.head.appendChild(s);
+}
 function apply(){
  if(busy)return;busy=true;
  try{
@@ -13,7 +24,7 @@ function apply(){
   document.querySelectorAll('.v65-mobile-version').forEach(v=>{const t='v'+VERSION;if(v.textContent!==t)v.textContent=t});
   const siteTitle=document.querySelector('#v7412Modal h3'),title='Painel SITE · V'+VERSION;
   if(siteTitle&&siteTitle.textContent!==title)siteTitle.textContent=title;
-  ensureLabels();
+  ensureLabels();addPatch();
  }finally{busy=false}
 }
 function watch(){apply();const obs=new MutationObserver(()=>queueMicrotask(apply));obs.observe(document.body,{subtree:true,childList:true,characterData:true});}
