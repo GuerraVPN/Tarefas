@@ -41,6 +41,7 @@ await cp(path.join(root, 'app', 'mobile-v18.css'), path.join(dist, 'mobile-v18.c
 await cp(path.join(root, 'app', 'mobile-v181.css'), path.join(dist, 'mobile-v181.css'));
 await cp(path.join(root, 'app', 'mobile-v12.js'), path.join(dist, 'mobile-v12.js'));
 await cp(path.join(root, 'app', 'mobile-updates-v181.js'), path.join(dist, 'mobile-updates-v181.js'));
+await cp(path.join(root, 'app', 'mobile-dashboard-v184.js'), path.join(dist, 'mobile-dashboard-v184.js'));
 
 async function patch(rel, replacements){
   const file=path.join(dist,rel);
@@ -49,19 +50,19 @@ async function patch(rel, replacements){
   await writeFile(file,text,'utf8');
 }
 
-// A base visual 1.8.0 continua reaproveitada; a distribuição atual é 1.8.3/183 BETA.
+// A base visual 1.8.0 continua reaproveitada; a distribuição atual é 1.8.4/184 BETA.
 await patch('mobile-bootstrap.js', [
-  ["const APP_VERSION = '1.8.0';", "const APP_VERSION = '1.8.3';"],
-  ['const APP_BUILD = 180;', 'const APP_BUILD = 183;']
+  ["const APP_VERSION = '1.8.0';", "const APP_VERSION = '1.8.4';"],
+  ['const APP_BUILD = 180;', 'const APP_BUILD = 184;']
 ]);
 await patch('mobile-preload.js', [
-  ["tarefasAppVersion = '1.8.0'", "tarefasAppVersion = '1.8.3'"],
-  ["tarefasAppBuild = '180'", "tarefasAppBuild = '183'"]
+  ["tarefasAppVersion = '1.8.0'", "tarefasAppVersion = '1.8.4'"],
+  ["tarefasAppBuild = '180'", "tarefasAppBuild = '184'"]
 ]);
-await patch('mobile-v12.js', [['1.8.0 • WEB 7.5.2','1.8.3 • WEB 7.5.3']]);
+await patch('mobile-v12.js', [['1.8.0 • WEB 7.5.2','1.8.4 • WEB 7.5.3']]);
 await patch('mobile-updates-v181.js', [
-  ["const APP_VERSION = '1.8.1';", "const APP_VERSION = '1.8.3';"],
-  ['const APP_BUILD = 181;', 'const APP_BUILD = 183;']
+  ["const APP_VERSION = '1.8.1';", "const APP_VERSION = '1.8.4';"],
+  ['const APP_BUILD = 181;', 'const APP_BUILD = 184;']
 ]);
 
 await build({
@@ -97,14 +98,15 @@ for (const name of htmlFiles) {
   }
 
   if (!html.includes('mobile-bootstrap.js')) {
-    html = html.replace(/<\/body>/i, '  <script src="mobile-bootstrap.js"></script>\n  <script src="mobile-v12.js"></script>\n  <script src="native-mobile.js"></script>\n  <script src="mobile-updates-v181.js"></script>\n</body>');
+    html = html.replace(/<\/body>/i, '  <script src="mobile-bootstrap.js"></script>\n  <script src="mobile-v12.js"></script>\n  <script src="native-mobile.js"></script>\n  <script src="mobile-updates-v181.js"></script>\n  <script src="mobile-dashboard-v184.js"></script>\n</body>');
   } else {
     if (!html.includes('mobile-v12.js')) html = html.replace(/<\/body>/i, '  <script src="mobile-v12.js"></script>\n</body>');
     if (!html.includes('native-mobile.js')) html = html.replace(/<\/body>/i, '  <script src="native-mobile.js"></script>\n</body>');
     if (!html.includes('mobile-updates-v181.js')) html = html.replace(/<\/body>/i, '  <script src="mobile-updates-v181.js"></script>\n</body>');
+    if (!html.includes('mobile-dashboard-v184.js')) html = html.replace(/<\/body>/i, '  <script src="mobile-dashboard-v184.js"></script>\n</body>');
   }
 
   await writeFile(file, html, 'utf8');
 }
 
-console.log(`TAREFAS Android 1.8.3 build 183 BETA: ${htmlFiles.length} páginas preparadas sobre Web 7.5.3 com download nativo e push interno de atualização`);
+console.log(`TAREFAS Android 1.8.4 build 184 BETA: ${htmlFiles.length} páginas preparadas sobre Web 7.5.3 com próximo serviço no Resumo rápido, download nativo e push interno`);
