@@ -1,8 +1,8 @@
 {
   "name": "tarefas-app",
-  "version": "1.9.4",
+  "version": "1.9.5",
   "private": true,
-  "description": "TAREFAS Android 1.9.4 build 194 beta com a atualização Web 7.5.7 aplicada, incluindo contraste das escalas e histórico atualizado",
+  "description": "TAREFAS Android 1.9.5 build 195 beta com barra de progresso real no download das atualizações, incluindo porcentagem, tamanho, velocidade e tempo restante",
   "scripts": {
     "build:web": "node scripts/build-mobile.mjs",
     "verify:web": "node scripts/verify-mobile-build.mjs dist",
