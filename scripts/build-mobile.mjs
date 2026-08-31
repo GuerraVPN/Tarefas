@@ -21,14 +21,14 @@ for (const file of ['manifest.webmanifest','service-worker.js','mobile-bootstrap
   await cp(path.join(root,'app',file),path.join(dist,file));
 }
 async function patch(rel,replacements){const file=path.join(dist,rel);let text=await readFile(file,'utf8');for(const [from,to] of replacements)text=text.split(from).join(to);await writeFile(file,text,'utf8')}
-await patch('mobile-bootstrap.js',[["const APP_VERSION = '1.8.0';","const APP_VERSION = '1.9.2';"],['const APP_BUILD = 180;','const APP_BUILD = 192;']]);
-await patch('mobile-preload.js',[["tarefasAppVersion = '1.8.0'","tarefasAppVersion = '1.9.2'"],["tarefasAppBuild = '180'","tarefasAppBuild = '192'"]]);
-await patch('mobile-v12.js',[['1.8.0 • WEB 7.5.2','1.9.2 • WEB 7.5.6']]);
-await patch('mobile-updates-v181.js',[["const APP_VERSION = '1.8.9';","const APP_VERSION = '1.9.2';"],["const APP_BUILD = 189;","const APP_BUILD = 192;"]]);
+await patch('mobile-bootstrap.js',[["const APP_VERSION = '1.8.0';","const APP_VERSION = '1.9.3';"],['const APP_BUILD = 180;','const APP_BUILD = 193;'],["const WEB_VERSION = '7.5.2';","const WEB_VERSION = '7.5.6';"]]);
+await patch('mobile-preload.js',[["tarefasAppVersion = '1.8.0'","tarefasAppVersion = '1.9.3'"],["tarefasAppBuild = '180'","tarefasAppBuild = '193'"]]);
+await patch('mobile-v12.js',[['1.8.0 • WEB 7.5.2','1.9.3 • WEB 7.5.6']]);
+await patch('mobile-updates-v181.js',[["const APP_VERSION = '1.8.9';","const APP_VERSION = '1.9.3';"],["const APP_BUILD = 189;","const APP_BUILD = 193;"]]);
 await patch('v7_5_4_patch.js',[["function usersInline(){if(page()!=='usuarios.html')return;","function usersInline(){if(page()!=='usuarios.html'||native())return;"]]);
 const nativeOut=path.join(dist,'native-mobile.js');
 await build({entryPoints:[path.join(root,'app','native-mobile-entry.js')],outfile:nativeOut,bundle:true,minify:true,format:'iife',platform:'browser',target:['es2020'],charset:'utf8'});
-await patch('native-mobile.js',[["1.8.8","1.9.2"]]);
+await patch('native-mobile.js',[["1.8.8","1.9.3"]]);
 await appendFile(nativeOut,"\n;globalThis.__TAREFAS_DOWNLOADS_PATH__='Downloads/TAREFAS';\n",'utf8');
 const htmlFiles=(await readdir(dist)).filter(name=>name.endsWith('.html'));
 for(const name of htmlFiles){
@@ -40,4 +40,4 @@ for(const name of htmlFiles){
  for(const js of ['mobile-bootstrap.js','mobile-v12.js','native-mobile.js','mobile-updates-v181.js','mobile-dashboard-v184.js','mobile-users-inline-v189.js','bloco_notas.js','mobile-notes-v191.js'])if(!html.includes(js))html=html.replace(/<\/body>/i,`  <script src="${js}"></script>\n</body>`);
  await writeFile(file,html,'utf8');
 }
-console.log(`TAREFAS Android 1.9.2 build 192 BETA: ${htmlFiles.length} páginas preparadas sobre Web 7.5.6 com calendário/serviço, Dashboard e notificações Orçamentários corrigidos`);
+console.log(`TAREFAS Android 1.9.3 build 193 BETA: ${htmlFiles.length} páginas preparadas sobre Web 7.5.6 com Base web do About corrigida`);
