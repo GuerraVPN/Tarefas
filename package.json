@@ -1,8 +1,8 @@
 {
   "name": "tarefas-app",
-  "version": "1.9.1",
+  "version": "1.9.2",
   "private": true,
-  "description": "TAREFAS Android 1.9.1 build 191 beta baseado na versão web 7.5.5 com Bloco de Notas restaurado",
+  "description": "TAREFAS Android 1.9.2 build 192 beta baseado na versão web 7.5.6 com correções de calendário, próximo serviço, Fiscalização e notificações Orçamentários",
   "scripts": {
     "build:web": "node scripts/build-mobile.mjs",
     "verify:web": "node scripts/verify-mobile-build.mjs dist",
