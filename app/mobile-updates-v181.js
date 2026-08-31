@@ -11,18 +11,53 @@
   const sessionToken = () => localStorage.getItem(PUSH_SESSION_KEY) || '';
 
   function listItems(value){const rows=Array.isArray(value)?value:[];return rows.map(item=>`<li>${esc(item)}</li>`).join('')}
-  function fmtBytes(value){const n=Number(value||0);if(n<1024)return`${n} B`;if(n<1024*1024)return`${(n/1024).toFixed(1)} KB`;return`${(n/1024/1024).toFixed(1)} MB`}
+  function fmtBytes(value){const n=Math.max(0,Number(value||0));if(n<1024)return`${Math.round(n)} B`;if(n<1024*1024)return`${(n/1024).toFixed(1)} KB`;if(n<1024*1024*1024)return`${(n/1024/1024).toFixed(2)} MB`;return`${(n/1024/1024/1024).toFixed(2)} GB`}
+  function fmtSpeed(value){const n=Math.max(0,Number(value||0));return n>0?`${fmtBytes(n)}/s`:'Calculando…'}
+  function fmtEta(seconds){const n=Math.max(0,Math.round(Number(seconds||0)));if(!Number.isFinite(n)||n<=0)return'';if(n<60)return`${n}s restantes`;const min=Math.floor(n/60),sec=n%60;return`${min}min ${sec.toString().padStart(2,'0')}s restantes`}
   function statusText(latest){if(!latest)return'Não foi possível consultar a versão mais recente.';const build=Number(latest.build||0);if(build>APP_BUILD)return`Atualização ${latest.version_name} disponível.`;if(build===APP_BUILD)return'Você está usando a versão mais recente deste canal.';if(APP_CHANNEL==='beta')return'Você está usando uma versão beta mais nova que o canal selecionado.';return'Aplicativo atualizado.'}
 
   async function rpc(name,args={}){const client=getClient();if(!client)throw new Error('Conexão com o servidor indisponível nesta tela.');const {data,error}=await client.rpc(name,args);if(error)throw error;return data}
   async function loadState(){const token=sessionToken();const [beta,latestRows,history]=await Promise.all([rpc('v1_8_get_beta_updates',{p_session_token:token}).catch(()=>false),rpc('v1_8_latest_app_version',{p_session_token:token}),rpc('v1_8_app_version_history',{p_session_token:token})]);let storage={granted:false,required:false};try{storage=await window.TarefasNative?.files?.checkAllFilesAccess?.()||storage}catch(_){}return{beta:beta===true,latest:Array.isArray(latestRows)?latestRows[0]||null:latestRows||null,history:Array.isArray(history)?history:[],storage}}
   async function saveBeta(enabled){const token=sessionToken();if(!token)throw new Error('Faça login novamente para alterar o canal de atualizações.');const ok=await rpc('v1_8_set_beta_updates',{p_session_token:token,p_receive_beta:!!enabled});if(ok!==true)throw new Error('Não foi possível salvar a preferência de versões beta.');return true}
 
+  function progressEls(){return{box:document.getElementById('tmUpdateProgress'),status:document.getElementById('tmUpdateProgressStatus'),percent:document.getElementById('tmUpdateProgressPercent'),bar:document.getElementById('tmUpdateProgressBar'),size:document.getElementById('tmUpdateProgressSize'),speed:document.getElementById('tmUpdateProgressSpeed'),eta:document.getElementById('tmUpdateProgressEta')}}
+  function showProgress(){const el=progressEls();if(el.box)el.box.hidden=false;return el}
+  function paintProgress(detail={}){
+    const el=showProgress(),bytes=Math.max(0,Number(detail.bytes||0)),total=Math.max(0,Number(detail.contentLength||0)),computable=detail.lengthComputable!==false&&total>0;
+    const percent=computable?Math.max(0,Math.min(100,Number(detail.percent ?? bytes/total*100)||0)):detail.state==='downloaded'||detail.state==='reused'?100:0;
+    const speed=Math.max(0,Number(detail.speedBps||0)),eta=computable&&speed>0&&bytes<total?(total-bytes)/speed:0;
+    if(el.bar)el.bar.style.width=`${percent}%`;
+    if(el.percent)el.percent.textContent=computable||percent===100?`${Math.round(percent)}%`:'…';
+    if(el.size)el.size.textContent=computable?`${fmtBytes(bytes)} / ${fmtBytes(total)}`:`${fmtBytes(bytes)} baixados`;
+    if(el.speed)el.speed.textContent=detail.state==='downloaded'||detail.state==='reused'?'Concluído':fmtSpeed(speed);
+    if(el.eta)el.eta.textContent=eta?fmtEta(eta):(computable&&bytes<total?'Calculando tempo restante…':'');
+    if(el.status){
+      if(detail.state==='starting')el.status.textContent='Preparando download…';
+      else if(detail.state==='downloaded')el.status.textContent='Download concluído. Abrindo instalador…';
+      else if(detail.state==='reused')el.status.textContent='APK já baixado. Abrindo instalador…';
+      else if(detail.state==='error')el.status.textContent='Falha no download';
+      else el.status.textContent='Baixando atualização…';
+    }
+  }
+
   async function downloadUpdate(version){
     if(!version?.download_url)throw new Error('O download desta versão ainda não foi publicado.');
     const button=document.getElementById('tmUpdateDownload');if(button){button.disabled=true;button.textContent='Baixando atualização…'}
-    try{const filename=`TAREFAS-${String(version.version_name||'update')}.apk`;if(window.TarefasNative?.files?.downloadUrl){if(button)button.textContent='Baixando e preparando instalação…';const result=await window.TarefasNative.files.downloadUrl(version.download_url,filename,{channel:version.channel||'official',autoInstall:true});if(result?.installerOpened)return;if(result?.saved){const extra=result?.installerError?`\n\nO Android não abriu o instalador automaticamente: ${result.installerError}`:'';alert(`Atualização salva em ${result.path}.${extra}\n\nSe for a primeira atualização pelo app, permita “Instalar apps desconhecidos” para o TAREFAS e tente novamente.`)}else if(result?.shared)alert('Escolha o instalador do Android para abrir o APK da atualização.')}else location.href=version.download_url}
-    finally{if(button){button.disabled=false;button.textContent='Baixar atualização'}}
+    paintProgress({state:'starting',bytes:0,contentLength:0,lengthComputable:false,percent:0,speedBps:0});
+    const href=String(version.download_url),onProgress=event=>{const d=event?.detail||{};if(String(d.url||'')!==href)return;paintProgress(d)};
+    window.addEventListener('tarefas:update-download-progress',onProgress);
+    try{
+      const filename=`TAREFAS-${String(version.version_name||'update')}.apk`;
+      if(window.TarefasNative?.files?.downloadUrl){
+        const result=await window.TarefasNative.files.downloadUrl(version.download_url,filename,{channel:version.channel||'official',autoInstall:true});
+        if(result?.reusedExisting)paintProgress({state:'reused',bytes:Number(result.size||0),contentLength:Number(result.size||0),lengthComputable:Number(result.size||0)>0,percent:100});
+        else if(result?.saved)paintProgress({state:'downloaded',bytes:Number(result.size||0),contentLength:Number(result.size||0),lengthComputable:Number(result.size||0)>0,percent:100});
+        if(result?.installerOpened)return;
+        if(result?.saved){const extra=result?.installerError?`\n\nO Android não abriu o instalador automaticamente: ${result.installerError}`:'';alert(`Atualização salva em ${result.path}.${extra}\n\nSe for a primeira atualização pelo app, permita “Instalar apps desconhecidos” para o TAREFAS e tente novamente.`)}
+        else if(result?.shared)alert('Escolha o instalador do Android para abrir o APK da atualização.');
+      }else location.href=version.download_url;
+    }catch(err){paintProgress({state:'error'});throw err}
+    finally{window.removeEventListener('tarefas:update-download-progress',onProgress);if(button){button.disabled=false;button.textContent='Baixar e instalar atualização'}}
   }
 
   async function requestStorageAccess(root){
@@ -52,7 +87,7 @@
         <div class="tm-update-title"><div><span class="tm-update-eyebrow">ATUALIZAÇÕES</span><h2>Atualização do aplicativo</h2></div><span class="tm-update-installed">${APP_CHANNEL==='beta'?'BETA':'OFICIAL'} ${APP_VERSION}</span></div>
         <p class="tm-update-status ${newer?'available':''}">${esc(statusText(latest))}</p>
         ${latest?`<div class="tm-update-latest"><div><small>Versão mais recente para você</small><strong>${esc(latest.version_name)}</strong><span>Build ${esc(latest.build)}</span></div><span class="tm-update-channel ${latest.channel==='beta'?'beta':''}">${latestBadge}</span></div>`:''}
-        ${newer?`<div class="tm-update-news"><strong>${esc(latest.title||'Nova versão')}</strong><ul>${listItems(latest.changelog)}</ul></div><button class="tm-primary tm-update-download" id="tmUpdateDownload" ${latest.download_url?'':'disabled'}>${latest.download_url?'Baixar e instalar atualização':'Download sendo preparado'}</button>`:''}
+        ${newer?`<div class="tm-update-news"><strong>${esc(latest.title||'Nova versão')}</strong><ul>${listItems(latest.changelog)}</ul></div><button class="tm-primary tm-update-download" id="tmUpdateDownload" ${latest.download_url?'':'disabled'}>${latest.download_url?'Baixar e instalar atualização':'Download sendo preparado'}</button><div class="tm-update-progress" id="tmUpdateProgress" hidden aria-live="polite"><div class="tm-update-progress-head"><strong id="tmUpdateProgressStatus">Preparando download…</strong><span id="tmUpdateProgressPercent">0%</span></div><div class="tm-update-progress-track"><span id="tmUpdateProgressBar"></span></div><div class="tm-update-progress-meta"><span id="tmUpdateProgressSize">0 B baixados</span><span id="tmUpdateProgressSpeed">Calculando…</span></div><small id="tmUpdateProgressEta"></small></div>`:''}
       </section>
       <section class="tm-update-card">
         <div class="tm-update-setting"><div><strong>Receber versões beta</strong><small>Ao ativar, versões de teste aparecem como atualização e você recebe push quando uma nova beta for publicada.</small></div><label class="tm-switch"><input id="tmBetaUpdates" type="checkbox" ${state.beta?'checked':''}><span></span></label></div>
