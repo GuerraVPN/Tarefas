@@ -33,41 +33,44 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build web bundle 1.9.2 beta
+      - name: Build web bundle 1.9.3 beta
         run: npm run build:web
 
-      - name: Conferência 1 - auditoria do bundle 1.9.2
+      - name: Conferência 1 - auditoria do bundle 1.9.3
         run: npm run verify:web
 
-      - name: Gerar ZIP 1.9.2
+      - name: Gerar ZIP 1.9.3
         run: |
-          rm -f TAREFAS-1.9.2-web.zip
-          cd dist && zip -qr ../TAREFAS-1.9.2-web.zip .
+          rm -f TAREFAS-1.9.3-web.zip
+          cd dist && zip -qr ../TAREFAS-1.9.3-web.zip .
 
-      - name: Conferência 2 - validar ZIP 1.9.2
+      - name: Conferência 2 - validar ZIP 1.9.3
         run: |
           set -euo pipefail
-          unzip -tq TAREFAS-1.9.2-web.zip
-          rm -rf /tmp/tarefas-192 && mkdir -p /tmp/tarefas-192
-          unzip -q TAREFAS-1.9.2-web.zip -d /tmp/tarefas-192
-          node scripts/verify-mobile-build.mjs /tmp/tarefas-192
-          grep -q '1.9.2 • WEB 7.5.6' /tmp/tarefas-192/mobile-v12.js
-          grep -q "tarefasAppBuild = '192'" /tmp/tarefas-192/mobile-preload.js
-          grep -q "APP_CHANNEL = 'beta'" /tmp/tarefas-192/mobile-updates-v181.js
-          grep -q "VERSION='7.5.6'" /tmp/tarefas-192/v7_5_6_patch.js
-          grep -q 'day-service-v756' /tmp/tarefas-192/v7_5_6_patch.js
-          grep -q 'v756-calendario-servicos' /tmp/tarefas-192/v7_5_6_patch.js
-          grep -q 'Próximo serviço' /tmp/tarefas-192/v7_5_6_patch.js
-          grep -q 'rodizio_usuario_id' /tmp/tarefas-192/v7_5_6_patch.js
-          grep -q 'bloco_notas_usuario' /tmp/tarefas-192/bloco_notas.js
-          grep -q 'mobile-notes-v191.js' /tmp/tarefas-192/dashboard.html
-          grep -q 'Downloads/TAREFAS' /tmp/tarefas-192/native-mobile.js
+          unzip -tq TAREFAS-1.9.3-web.zip
+          rm -rf /tmp/tarefas-193 && mkdir -p /tmp/tarefas-193
+          unzip -q TAREFAS-1.9.3-web.zip -d /tmp/tarefas-193
+          node scripts/verify-mobile-build.mjs /tmp/tarefas-193
+          grep -q '1.9.3 • WEB 7.5.6' /tmp/tarefas-193/mobile-v12.js
+          grep -q "tarefasAppBuild = '193'" /tmp/tarefas-193/mobile-preload.js
+          grep -q "APP_CHANNEL = 'beta'" /tmp/tarefas-193/mobile-updates-v181.js
+          grep -q "const WEB_VERSION = '7.5.6'" /tmp/tarefas-193/mobile-bootstrap.js
+          ! grep -q "const WEB_VERSION = '7.5.2'" /tmp/tarefas-193/mobile-bootstrap.js
+          grep -q '<small>Base web</small><strong>${WEB_VERSION}</strong>' /tmp/tarefas-193/mobile-bootstrap.js
+          grep -q "VERSION='7.5.6'" /tmp/tarefas-193/v7_5_6_patch.js
+          grep -q 'day-service-v756' /tmp/tarefas-193/v7_5_6_patch.js
+          grep -q 'v756-calendario-servicos' /tmp/tarefas-193/v7_5_6_patch.js
+          grep -q 'Próximo serviço' /tmp/tarefas-193/v7_5_6_patch.js
+          grep -q 'rodizio_usuario_id' /tmp/tarefas-193/v7_5_6_patch.js
+          grep -q 'bloco_notas_usuario' /tmp/tarefas-193/bloco_notas.js
+          grep -q 'mobile-notes-v191.js' /tmp/tarefas-193/dashboard.html
+          grep -q 'Downloads/TAREFAS' /tmp/tarefas-193/native-mobile.js
 
       - name: Upload ZIP conferido
         uses: actions/upload-artifact@v4
         with:
-          name: tarefas-android-1.9.2-beta-web-checked
-          path: TAREFAS-1.9.2-web.zip
+          name: tarefas-android-1.9.3-beta-web-checked
+          path: TAREFAS-1.9.3-web.zip
           if-no-files-found: error
 
       - name: Conferir Firebase Android
@@ -86,8 +89,8 @@ jobs:
 
       - name: Set Android app version
         run: |
-          sed -i 's/versionCode 1/versionCode 192/' android/app/build.gradle
-          sed -i 's/versionName "1.0"/versionName "1.9.2"/' android/app/build.gradle
+          sed -i 's/versionCode 1/versionCode 193/' android/app/build.gradle
+          sed -i 's/versionName "1.0"/versionName "1.9.3"/' android/app/build.gradle
 
       - name: Install stable debug signing key
         run: |
@@ -160,7 +163,7 @@ jobs:
         working-directory: android
         run: ./gradlew assembleDebug
 
-      - name: Conferência 3 - validar APK 1.9.2 beta
+      - name: Conferência 3 - validar APK 1.9.3 beta
         run: |
           set -euo pipefail
           APK='android/app/build/outputs/apk/debug/app-debug.apk'
@@ -168,37 +171,40 @@ jobs:
           python - <<'PY'
           import json
           with open('android/app/build/outputs/apk/debug/output-metadata.json',encoding='utf-8') as f: el=json.load(f)['elements'][0]
-          assert int(el['versionCode'])==192,el
-          assert str(el['versionName'])=='1.9.2',el
-          print('versionCode=192 / versionName=1.9.2 BETA OK')
+          assert int(el['versionCode'])==193,el
+          assert str(el['versionName'])=='1.9.3',el
+          print('versionCode=193 / versionName=1.9.3 BETA OK')
           PY
-          unzip -p "$APK" assets/public/mobile-bootstrap.js > /tmp/192-bootstrap.js
-          unzip -p "$APK" assets/public/mobile-v12.js > /tmp/192-ui.js
-          unzip -p "$APK" assets/public/mobile-preload.js > /tmp/192-preload.js
-          unzip -p "$APK" assets/public/mobile-updates-v181.js > /tmp/192-updates.js
-          unzip -p "$APK" assets/public/v7_5_6_patch.js > /tmp/192-web756.js
-          unzip -p "$APK" assets/public/bloco_notas.js > /tmp/192-notes.js
-          unzip -p "$APK" assets/public/native-mobile.js > /tmp/192-native.js
-          grep -q "APP_VERSION = '1.9.2'" /tmp/192-bootstrap.js
-          grep -q 'APP_BUILD = 192' /tmp/192-bootstrap.js
-          grep -q '1.9.2 • WEB 7.5.6' /tmp/192-ui.js
-          grep -q "tarefasAppBuild = '192'" /tmp/192-preload.js
-          grep -q 'APP_BUILD = 192' /tmp/192-updates.js
-          grep -q "APP_CHANNEL = 'beta'" /tmp/192-updates.js
-          grep -q "VERSION='7.5.6'" /tmp/192-web756.js
-          grep -q 'day-service-v756' /tmp/192-web756.js
-          grep -q 'v756-calendario-servicos' /tmp/192-web756.js
-          grep -q 'Próximo serviço' /tmp/192-web756.js
-          grep -q 'rodizio_usuario_id' /tmp/192-web756.js
-          grep -q 'bloco_notas_usuario' /tmp/192-notes.js
-          grep -q 'StorageAccess' /tmp/192-native.js
-          grep -q 'downloadToDownloads' /tmp/192-native.js
-          grep -q 'clearOldUpdates' /tmp/192-native.js
-          grep -q 'Downloads/TAREFAS' /tmp/192-native.js
+          unzip -p "$APK" assets/public/mobile-bootstrap.js > /tmp/193-bootstrap.js
+          unzip -p "$APK" assets/public/mobile-v12.js > /tmp/193-ui.js
+          unzip -p "$APK" assets/public/mobile-preload.js > /tmp/193-preload.js
+          unzip -p "$APK" assets/public/mobile-updates-v181.js > /tmp/193-updates.js
+          unzip -p "$APK" assets/public/v7_5_6_patch.js > /tmp/193-web756.js
+          unzip -p "$APK" assets/public/bloco_notas.js > /tmp/193-notes.js
+          unzip -p "$APK" assets/public/native-mobile.js > /tmp/193-native.js
+          grep -q "APP_VERSION = '1.9.3'" /tmp/193-bootstrap.js
+          grep -q 'APP_BUILD = 193' /tmp/193-bootstrap.js
+          grep -q "const WEB_VERSION = '7.5.6'" /tmp/193-bootstrap.js
+          ! grep -q "const WEB_VERSION = '7.5.2'" /tmp/193-bootstrap.js
+          grep -q '<small>Base web</small><strong>${WEB_VERSION}</strong>' /tmp/193-bootstrap.js
+          grep -q '1.9.3 • WEB 7.5.6' /tmp/193-ui.js
+          grep -q "tarefasAppBuild = '193'" /tmp/193-preload.js
+          grep -q 'APP_BUILD = 193' /tmp/193-updates.js
+          grep -q "APP_CHANNEL = 'beta'" /tmp/193-updates.js
+          grep -q "VERSION='7.5.6'" /tmp/193-web756.js
+          grep -q 'day-service-v756' /tmp/193-web756.js
+          grep -q 'v756-calendario-servicos' /tmp/193-web756.js
+          grep -q 'Próximo serviço' /tmp/193-web756.js
+          grep -q 'rodizio_usuario_id' /tmp/193-web756.js
+          grep -q 'bloco_notas_usuario' /tmp/193-notes.js
+          grep -q 'StorageAccess' /tmp/193-native.js
+          grep -q 'downloadToDownloads' /tmp/193-native.js
+          grep -q 'clearOldUpdates' /tmp/193-native.js
+          grep -q 'Downloads/TAREFAS' /tmp/193-native.js
           AAPT="$(find "$ANDROID_HOME/build-tools" -type f -name aapt | sort -V | tail -1)"
-          "$AAPT" dump permissions "$APK" > /tmp/192-permissions.txt
-          grep -q 'android.permission.MANAGE_EXTERNAL_STORAGE' /tmp/192-permissions.txt
-          grep -q 'android.permission.REQUEST_INSTALL_PACKAGES' /tmp/192-permissions.txt
+          "$AAPT" dump permissions "$APK" > /tmp/193-permissions.txt
+          grep -q 'android.permission.MANAGE_EXTERNAL_STORAGE' /tmp/193-permissions.txt
+          grep -q 'android.permission.REQUEST_INSTALL_PACKAGES' /tmp/193-permissions.txt
           APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)"
           "$APKSIGNER" verify --verbose --print-certs "$APK"
           sha256sum "$APK"
@@ -214,13 +220,13 @@ jobs:
           KEY_PASS="$(jq -r '.key_password' /tmp/tarefas-signing.json)"
           EXPECTED_CERT="$(jq -r '.cert_sha256' /tmp/tarefas-signing.json)"
           APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)"
-          "$APKSIGNER" sign --ks /tmp/GuerraVPN.keystore --ks-key-alias "$KEY_ALIAS" --ks-pass "pass:$STORE_PASS" --key-pass "pass:$KEY_PASS" --out TAREFAS-1.9.2.apk android/app/build/outputs/apk/debug/app-debug.apk
-          VERIFY="$($APKSIGNER verify --verbose --print-certs TAREFAS-1.9.2.apk)"
+          "$APKSIGNER" sign --ks /tmp/GuerraVPN.keystore --ks-key-alias "$KEY_ALIAS" --ks-pass "pass:$STORE_PASS" --key-pass "pass:$KEY_PASS" --out TAREFAS-1.9.3.apk android/app/build/outputs/apk/debug/app-debug.apk
+          VERIFY="$($APKSIGNER verify --verbose --print-certs TAREFAS-1.9.3.apk)"
           printf '%s\n' "$VERIFY"
           ACTUAL_CERT="$(printf '%s\n' "$VERIFY" | sed -n 's/.*certificate SHA-256 digest: //p' | head -1 | tr -d ': ' | tr '[:upper:]' '[:lower:]')"
           test "$ACTUAL_CERT" = "$EXPECTED_CERT"
           rm -f /tmp/tarefas-signing.json /tmp/GuerraVPN.keystore
-          sha256sum TAREFAS-1.9.2.apk
+          sha256sum TAREFAS-1.9.3.apk
 
       - name: Publicar APK permanente
         run: |
@@ -229,18 +235,18 @@ jobs:
           rm -rf /tmp/tarefas-releases
           git worktree add /tmp/tarefas-releases origin/app/releases
           mkdir -p /tmp/tarefas-releases/downloads
-          cp TAREFAS-1.9.2.apk /tmp/tarefas-releases/downloads/TAREFAS-1.9.2.apk
+          cp TAREFAS-1.9.3.apk /tmp/tarefas-releases/downloads/TAREFAS-1.9.3.apk
           cd /tmp/tarefas-releases
           git config user.name 'GuerraVPN Android Build'
           git config user.email '81371258+GuerraVPN@users.noreply.github.com'
-          git add downloads/TAREFAS-1.9.2.apk
+          git add downloads/TAREFAS-1.9.3.apk
           if ! git diff --cached --quiet; then
-            git commit -m 'release(android): TAREFAS 1.9.2 beta build 192'
+            git commit -m 'release(android): TAREFAS 1.9.3 beta build 193'
             git push origin HEAD:app/releases
           fi
           cd -
-          URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-1.9.2.apk'
-          LOCAL_SHA="$(sha256sum TAREFAS-1.9.2.apk | awk '{print $1}')"
+          URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-1.9.3.apk'
+          LOCAL_SHA="$(sha256sum TAREFAS-1.9.3.apk | awk '{print $1}')"
           for i in 1 2 3 4 5; do
             if curl --fail --silent --show-error -L "$URL" -o /tmp/tarefas-published.apk; then
               [ "$(sha256sum /tmp/tarefas-published.apk | awk '{print $1}')" = "$LOCAL_SHA" ] && echo 'APK beta permanente conferido.' && exit 0
@@ -253,22 +259,22 @@ jobs:
         run: |
           set -euo pipefail
           OIDC="$(curl --fail --silent --show-error -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-release" | jq -r '.value')"
-          SHA="$(sha256sum TAREFAS-1.9.2.apk | awk '{print $1}')"
-          jq -n --arg version '1.9.2' --argjson build 192 --arg channel 'beta' --arg url 'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-1.9.2.apk' --arg sha "$SHA" '{version:$version,build:$build,channel:$channel,download_url:$url,sha256:$sha}' > /tmp/release.json
+          SHA="$(sha256sum TAREFAS-1.9.3.apk | awk '{print $1}')"
+          jq -n --arg version '1.9.3' --argjson build 193 --arg channel 'beta' --arg url 'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-1.9.3.apk' --arg sha "$SHA" '{version:$version,build:$build,channel:$channel,download_url:$url,sha256:$sha}' > /tmp/release.json
           curl --fail --silent --show-error -H "Authorization: Bearer $OIDC" -H 'Content-Type: application/json' --data-binary @/tmp/release.json 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-release-publish' -o /tmp/release-result.json
           cat /tmp/release-result.json
-          jq -e '.ok == true and .version == "1.9.2" and .build == 192' /tmp/release-result.json >/dev/null
+          jq -e '.ok == true and .version == "1.9.3" and .build == 193' /tmp/release-result.json >/dev/null
 
-      - name: Upload APK 1.9.2 beta assinado
+      - name: Upload APK 1.9.3 beta assinado
         uses: actions/upload-artifact@v4
         with:
-          name: tarefas-android-1.9.2-beta-GuerraVPN
-          path: TAREFAS-1.9.2.apk
+          name: tarefas-android-1.9.3-beta-GuerraVPN
+          path: TAREFAS-1.9.3.apk
           if-no-files-found: error
 
       - name: Upload APK de conferência
         uses: actions/upload-artifact@v4
         with:
-          name: tarefas-android-1.9.2-debug-check
+          name: tarefas-android-1.9.3-debug-check
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
