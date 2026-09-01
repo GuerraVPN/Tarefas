@@ -68,9 +68,10 @@ if(!usuarioLogado?.id)location.replace('index.html');
    <div class="v7-field"><label>Escala</label><input id="serviceGroupLabel" disabled></div>
    <div class="v7-field full"><label>Marcação do serviço</label><input id="serviceMark" maxlength="8" value="SV" placeholder="Ex.: SV"></div>
    <div class="v7-field full"><label>Observação</label><textarea id="serviceNote" rows="3" maxlength="500"></textarea></div>
-   <div class="v7-field"><label>Folgas desde o último serviço</label><input id="serviceFolgas" disabled value="-"></div>
-   <div class="v7-field"><label>Próximo serviço confirmado ou previsto</label><input id="serviceNext" disabled value="-"></div>
-   <div class="v7-field full"><label>Estimativa até o próximo serviço</label><input id="serviceNextDays" disabled value="-"></div>
+   <div class="v7-field"><label>Folgas desde o último serviço confirmado</label><input id="serviceFolgas" disabled value="-"></div>
+   <div class="v7-field"><label>Próximo serviço confirmado</label><input id="serviceNext" disabled value="-"></div>
+   <div class="v7-field"><label>Próxima previsão automática</label><input id="serviceForecast" disabled value="-"></div>
+   <div class="v7-field"><label>Estimativa até a próxima previsão</label><input id="serviceNextDays" disabled value="-"></div>
    <div class="v7-field full"><div class="v72-last-change" id="serviceChangedBy">Sem alteração registrada.</div></div>
   </div>
   <div class="v7-modal-actions"><button type="button" class="v7-btn" id="markVacation">Marcar férias</button><button type="button" class="v7-btn" id="swapService" hidden>Trocar serviço</button><button type="button" class="v7-btn danger" id="removeService" hidden>Tirar serviço</button><button type="button" class="v7-btn" data-close="serviceModal">Cancelar</button><button type="submit" class="v7-btn primary">Confirmar serviço</button></div>
@@ -191,7 +192,7 @@ const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 <script src="bloco_notas.js?v=6.0"></script>
 <script src="v4_tema.js?v=6.0"></script>
 <script src="v4_ui.js?v=6.0"></script>
-<script src="pessoal_v7.js?v=7.4.7"></script>
+<script src="pessoal_v7.js?v=7.5.9"></script>
 <script src="aditamento_v74.js?v=7.4.7"></script>
 <script src="v6_2_mobile.js?v=7.4.7h2"></script>
 </body></html>
