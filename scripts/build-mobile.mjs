@@ -21,10 +21,10 @@ for (const file of ['manifest.webmanifest','service-worker.js','mobile-bootstrap
   await cp(path.join(root,'app',file),path.join(dist,file));
 }
 async function patch(rel,replacements){const file=path.join(dist,rel);let text=await readFile(file,'utf8');for(const [from,to] of replacements){if(!text.includes(from))throw new Error(`${rel}: trecho esperado não encontrado: ${from}`);text=text.split(from).join(to)}await writeFile(file,text,'utf8')}
-await patch('mobile-bootstrap.js',[["const APP_VERSION = '1.8.0';","const APP_VERSION = '1.9.7';"],['const APP_BUILD = 180;','const APP_BUILD = 197;'],["const WEB_VERSION = '7.5.2';","const WEB_VERSION = '7.5.7';"]]);
-await patch('mobile-preload.js',[["tarefasAppVersion = '1.8.0'","tarefasAppVersion = '1.9.7'"],["tarefasAppBuild = '180'","tarefasAppBuild = '197'"]]);
-await patch('mobile-v12.js',[['1.8.0 • WEB 7.5.2','1.9.7 • WEB 7.5.7']]);
-await patch('mobile-updates-v181.js',[["const APP_VERSION = '1.8.9';","const APP_VERSION = '1.9.7';"],["const APP_BUILD = 189;","const APP_BUILD = 197;"]]);
+await patch('mobile-bootstrap.js',[["const APP_VERSION = '1.8.0';","const APP_VERSION = '1.9.8';"],['const APP_BUILD = 180;','const APP_BUILD = 198;'],["const WEB_VERSION = '7.5.2';","const WEB_VERSION = '7.5.7';"]]);
+await patch('mobile-preload.js',[["tarefasAppVersion = '1.8.0'","tarefasAppVersion = '1.9.8'"],["tarefasAppBuild = '180'","tarefasAppBuild = '198'"]]);
+await patch('mobile-v12.js',[['1.8.0 • WEB 7.5.2','1.9.8 • WEB 7.5.7']]);
+await patch('mobile-updates-v181.js',[["const APP_VERSION = '1.8.9';","const APP_VERSION = '1.9.8';"],["const APP_BUILD = 189;","const APP_BUILD = 198;"]]);
 await patch('v7_5_4_patch.js',[["function usersInline(){if(page()!=='usuarios.html')return;","function usersInline(){if(page()!=='usuarios.html'||native())return;"]]);
 
 const nativeSourcePath=path.join(root,'app','native-mobile-entry.js');
@@ -33,11 +33,11 @@ const nativeNeedle="const target=await Filesystem.getUri({directory:Directory.Do
 const nativeProgress=`const target=await Filesystem.getUri({directory:Directory.Documents,path:targetPath});\n let progressHandle=null,lastBytes=0,lastTotal=0,lastAt=Date.now();\n const emitProgress=detail=>window.dispatchEvent(new CustomEvent('tarefas:update-download-progress',{detail:{url:href,filename:name,...detail}}));\n emitProgress({state:'starting',bytes:0,contentLength:0,lengthComputable:false,percent:0,speedBps:0});\n try{progressHandle=await FileTransfer.addListener('progress',progress=>{if(progress?.type!=='download'||String(progress?.url||'')!==href)return;const now=Date.now(),bytes=Math.max(0,Number(progress?.bytes||0)),contentLength=Math.max(0,Number(progress?.contentLength||0)),elapsed=Math.max((now-lastAt)/1000,.001),speedBps=Math.max(0,(bytes-lastBytes)/elapsed),lengthComputable=progress?.lengthComputable!==false&&contentLength>0,percent=lengthComputable?Math.max(0,Math.min(100,bytes/contentLength*100)):0;lastAt=now;lastBytes=bytes;if(contentLength>0)lastTotal=contentLength;emitProgress({state:'downloading',bytes,contentLength,lengthComputable,percent,speedBps})})}catch(err){console.warn('[TAREFAS UPDATE] Progresso nativo indisponível:',err)}\n try{await FileTransfer.downloadFile({url:href,path:target.uri,progress:true});emitProgress({state:'downloaded',bytes:lastTotal||lastBytes,contentLength:lastTotal||lastBytes,lengthComputable:(lastTotal||lastBytes)>0,percent:100,speedBps:0})}finally{if(progressHandle)await progressHandle.remove().catch(()=>{})}\n let installer={opened:false,error:null};if(options?.autoInstall!==false)installer=await openApkInstaller(target.uri);`;
 if(!nativeSource.includes(nativeNeedle))throw new Error('native-mobile-entry.js: ponto do FileTransfer não encontrado');
 nativeSource=nativeSource.replace(nativeNeedle,nativeProgress);
-const tempNative=path.join(root,'scripts','.native-mobile-entry-v197.mjs');
+const tempNative=path.join(root,'scripts','.native-mobile-entry-v198.mjs');
 await writeFile(tempNative,nativeSource,'utf8');
 const nativeOut=path.join(dist,'native-mobile.js');
 try{await build({entryPoints:[tempNative],outfile:nativeOut,bundle:true,minify:true,format:'iife',platform:'browser',target:['es2020'],charset:'utf8'})}finally{await rm(tempNative,{force:true})}
-await patch('native-mobile.js',[["1.8.8","1.9.7"]]);
+await patch('native-mobile.js',[["1.8.8","1.9.8"]]);
 await appendFile(nativeOut,"\n;globalThis.__TAREFAS_DOWNLOADS_PATH__='Downloads/TAREFAS';\n",'utf8');
 const htmlFiles=(await readdir(dist)).filter(name=>name.endsWith('.html'));
 for(const name of htmlFiles){
@@ -49,4 +49,4 @@ for(const name of htmlFiles){
  for(const js of ['mobile-bootstrap.js','mobile-v12.js','native-mobile.js','mobile-updates-v181.js','mobile-dashboard-v184.js','mobile-users-inline-v189.js','bloco_notas.js','mobile-notes-v191.js','mobile-v196.js'])if(!html.includes(js))html=html.replace(/<\/body>/i,`  <script src="${js}"></script>\n</body>`);
  await writeFile(file,html,'utf8');
 }
-console.log(`TAREFAS Android 1.9.7 build 197 BETA: ${htmlFiles.length} páginas preparadas sobre Web 7.5.7 com Jogos, Dinossauro e placar público`);
+console.log(`TAREFAS Android 1.9.8 build 198 BETA: ${htmlFiles.length} páginas preparadas sobre Web 7.5.7 com Jogos, nove jogos e placares públicos`);

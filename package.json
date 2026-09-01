@@ -1,8 +1,8 @@
 {
   "name": "tarefas-app",
-  "version": "1.9.7",
+  "version": "1.9.8",
   "private": true,
-  "description": "TAREFAS Android 1.9.7 build 197 beta com Jogos, Dinossauro, pontuação e placar público, mantendo a Base web 7.5.7.",
+  "description": "TAREFAS Android 1.9.8 build 198 beta com nove jogos e placares públicos, mantendo a Base web 7.5.7.",
   "scripts": {
     "build:web": "node scripts/build-mobile.mjs",
     "verify:web": "node scripts/verify-mobile-build.mjs dist",
