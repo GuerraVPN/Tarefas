@@ -1,8 +1,8 @@
 {
   "name": "tarefas-app",
-  "version": "1.9.5",
+  "version": "1.9.6",
   "private": true,
-  "description": "TAREFAS Android 1.9.5 build 195 beta com barra de progresso real no download das atualizações, incluindo porcentagem, tamanho, velocidade, tempo restante e instalação automática.",
+  "description": "TAREFAS Android 1.9.6 build 196 beta com alteração de tarefas e bloqueio de mensagens entre usuários, mantendo a Base web 7.5.7.",
   "scripts": {
     "build:web": "node scripts/build-mobile.mjs",
     "verify:web": "node scripts/verify-mobile-build.mjs dist",
