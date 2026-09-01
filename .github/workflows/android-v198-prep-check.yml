@@ -1,0 +1,53 @@
+name: Android 1.9.8 Games Prep Check
+
+on:
+  push:
+    branches: [app/android-v198-prep]
+    paths:
+      - '.github/v198_patch.py'
+      - '.github/workflows/android-v198-prep-check.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: app/android-v198-prep
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Aplicar preparação 1.9.8
+        run: python3 .github/v198_patch.py
+      - name: Validar fonte dos jogos
+        run: |
+          node --check app/games.js
+          grep -q "v1_9_8_start_game_run" app/games.js
+          grep -q "v1_9_8_submit_game_score" app/games.js
+          grep -q "v1_9_8_games_leaderboard" app/games.js
+          for game in dino snake memory game2048 minesweeper precision reflex flight hillclimb; do grep -q "$game" app/games.js; done
+          grep -q "BETA 1.9.8" app/games.html
+          grep -q "Subida Infinita" app/games.html
+      - name: Instalar dependências
+        run: npm ci
+      - name: Gerar bundle
+        run: npm run build:web
+      - name: Verificar bundle
+        run: |
+          npm run verify:web
+          node --check dist/games.js
+          grep -q "1.9.8" dist/games.html
+          grep -q "v1_9_8_submit_game_score" dist/games.js
+          grep -q "hillclimb" dist/games.js
+      - name: Commitar prévia validada
+        run: |
+          git config user.name 'GuerraVPN Android Build'
+          git config user.email '81371258+GuerraVPN@users.noreply.github.com'
+          git add app/games.js package.json package-lock.json scripts/build-mobile.mjs scripts/verify-mobile-build.mjs
+          if ! git diff --cached --quiet; then
+            git commit -m 'feat(android): completar nove jogos na beta 1.9.8'
+            git push origin HEAD:app/android-v198-prep
+          fi
