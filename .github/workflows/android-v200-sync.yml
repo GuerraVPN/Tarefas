@@ -33,7 +33,7 @@ jobs:
         run: |
           git config user.name 'GuerraVPN Android Build'
           git config user.email '81371258+GuerraVPN@users.noreply.github.com'
-          git add -- '*.html' '*.js' '*.css' '*.png' '*.jpg' '*.jpeg' '*.webp' '*.svg' '*.ico' '*.json' '*.webmanifest' '*.txt' 2>/dev/null || true
+          git add -A
           if ! git diff --cached --quiet; then
             git commit -m 'feat(android): atualizar Base Web para 7.6.0'
             git push origin HEAD:app/android-v200-prep
