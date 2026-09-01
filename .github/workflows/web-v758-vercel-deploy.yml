@@ -1,4 +1,4 @@
-name: Deploy Web 7.5.8 to Vercel
+name: Package Web 7.5.8
 
 on:
   push:
@@ -7,27 +7,22 @@ on:
       - '.github/workflows/web-v758-vercel-deploy.yml'
 
 jobs:
-  deploy:
+  package:
     runs-on: ubuntu-latest
-    env:
-      VERCEL_ORG_ID: team_qInSCrrxyaYlMDXYX0IpZA1T
-      VERCEL_PROJECT_ID: prj_h5fqgtS5VChVAznUjLFVuF3qkamO
-      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
     steps:
       - uses: actions/checkout@v4
-
-      - name: Conferir credencial Vercel
+      - name: Montar pacote estático
         run: |
-          if [ -z "$VERCEL_TOKEN" ]; then
-            echo 'VERCEL_TOKEN não cadastrado no repositório.'
-            exit 2
-          fi
-
-      - name: Instalar Vercel CLI
-        run: npm install --global vercel@latest
-
-      - name: Vincular configuração de produção
-        run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
-
-      - name: Publicar produção
-        run: vercel deploy --prod --yes --token="$VERCEL_TOKEN"
+          mkdir -p /tmp/tarefas-site
+          find . -maxdepth 1 -type f \( -name '*.html' -o -name '*.js' -o -name '*.css' -o -name '*.png' -o -name '*.txt' \) -exec cp {} /tmp/tarefas-site/ \;
+          test -s /tmp/tarefas-site/index.html
+          test -s /tmp/tarefas-site/v7_5_8_patch.js
+          grep -q "VERSION='7.5.8'" /tmp/tarefas-site/v7_5_1_version.js
+          cd /tmp/tarefas-site
+          zip -q -r "$GITHUB_WORKSPACE/tarefas-web-7.5.8.zip" .
+      - name: Upload pacote
+        uses: actions/upload-artifact@v4
+        with:
+          name: tarefas-web-7.5.8
+          path: tarefas-web-7.5.8.zip
+          if-no-files-found: error
