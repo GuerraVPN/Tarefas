@@ -1,0 +1,58 @@
+name: Android 2.0.0 Official Prep Check
+on:
+  push:
+    branches: [app/android-v200-prep]
+    paths:
+      - '.github/v200_prepare.py'
+      - '.github/workflows/android-v200-prep-check.yml'
+permissions:
+  contents: write
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: app/android-v200-prep
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Preparar 2.0.0 oficial
+        run: python3 .github/v200_prepare.py
+      - name: Validar fontes
+        run: |
+          node --check app/games.js
+          node --check games.js
+          node --check scripts/build-mobile.mjs
+          node --check scripts/verify-mobile-build.mjs
+          grep -q '"version": "2.0.0"' package.json
+          grep -q "const APP_CHANNEL = 'official'" scripts/build-mobile.mjs
+          grep -q "const WEB_VERSION = '7.6.0'" scripts/build-mobile.mjs
+          grep -q 'AudioDirector' app/games.js
+          grep -q 'setPointerCapture' app/games.js
+          grep -q "VERSION='7.6.0'" v7_5_1_version.js
+          test -s v7_6_0_patch.js
+      - name: Instalar dependências
+        run: npm ci
+      - name: Gerar bundle 2.0.0
+        run: npm run build:web
+      - name: Verificar bundle oficial
+        run: |
+          npm run verify:web
+          node --check dist/games.js
+          grep -q '2.0.0 • WEB 7.6.0' dist/mobile-v12.js
+          grep -q "APP_CHANNEL = 'official'" dist/mobile-updates-v181.js
+          grep -q "VERSION='7.6.0'" dist/v7_5_1_version.js
+          test -s dist/v7_6_0_patch.js
+          grep -q 'AudioDirector' dist/games.js
+          grep -q 'setPointerCapture' dist/games.js
+          grep -q 'v1_9_8_games_leaderboard' dist/games.js
+      - name: Commitar fonte validada
+        run: |
+          git config user.name 'GuerraVPN Android Build'
+          git config user.email '81371258+GuerraVPN@users.noreply.github.com'
+          git add package.json package-lock.json scripts/build-mobile.mjs scripts/verify-mobile-build.mjs
+          if ! git diff --cached --quiet; then
+            git commit -m 'release(android): preparar TAREFAS 2.0.0 oficial build 200'
+            git push origin HEAD:app/android-v200-prep
+          fi
