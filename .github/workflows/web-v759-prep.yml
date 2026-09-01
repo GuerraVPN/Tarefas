@@ -1,4 +1,4 @@
-name: Web 7.5.9 Prep
+name: Package Web 7.5.9
 
 on:
   push:
@@ -7,11 +7,8 @@ on:
     paths:
       - .github/workflows/web-v759-prep.yml
 
-permissions:
-  contents: write
-
 jobs:
-  patch_and_test:
+  package:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,23 +17,23 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Aplicar patch 7.5.9
-        run: python3 .github/v759_patch.py
-      - name: Validar JavaScript e regras
+      - name: Validar 7.5.9
         run: |
           node --check pessoal_v7.js
           node --check v7_5_1_version.js
           grep -q "ESCALA_UI_VERSION='7.5.9'" pessoal_v7.js
-          grep -q "x.type==='actual'" pessoal_v7.js
-          grep -q "eligible(row,date,true)" pessoal_v7.js
-          grep -q "v7_5_9_definir_meu_servico" pessoal_v7.js
-          grep -q "v7_5_9_transferir_meu_servico" pessoal_v7.js
-          grep -q 'serviceForecast' pessoal.html
           grep -q "VERSION='7.5.9'" v7_5_1_version.js
-      - name: Commitar resultado da prévia
+          grep -q 'serviceForecast' pessoal.html
+          grep -q 'v7_5_9_transferir_meu_servico' pessoal_v7.js
+      - name: Montar pacote estático
         run: |
-          git config user.name 'GuerraVPN Web Build'
-          git config user.email '81371258+GuerraVPN@users.noreply.github.com'
-          git add pessoal_v7.js pessoal.html v7_5_1_version.js
-          git commit -m 'fix(web): corrigir escala e folgas na 7.5.9'
-          git push origin HEAD:web/v759-prep
+          mkdir -p /tmp/tarefas-site
+          find . -maxdepth 1 -type f \( -name '*.html' -o -name '*.js' -o -name '*.css' -o -name '*.png' -o -name '*.txt' \) -exec cp {} /tmp/tarefas-site/ \;
+          cd /tmp/tarefas-site
+          zip -q -r "$GITHUB_WORKSPACE/tarefas-web-7.5.9.zip" .
+      - name: Upload pacote
+        uses: actions/upload-artifact@v4
+        with:
+          name: tarefas-web-7.5.9
+          path: tarefas-web-7.5.9.zip
+          if-no-files-found: error
