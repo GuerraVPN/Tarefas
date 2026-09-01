@@ -42,6 +42,9 @@
     ['Comunicação', [
       ['Central','central.html','Notificações e mensagens']
     ]],
+    ['Jogos', [
+      ['Dinossauro','games.html','Corra, marque pontos e dispute o placar']
+    ]],
     ['Gestão', [
       ['Usuários','usuarios.html','Cadastros e acessos'],
       ['Relatórios','relatorios.html','Indicadores e relatórios'],
@@ -196,11 +199,14 @@
         <div class="tm-about-feature"><span>✓</span><div><strong>Push em tempo real</strong><small>Alertas de tarefas, atualizações e serviços via Firebase Cloud Messaging.</small></div></div>
         <div class="tm-about-feature"><span>✓</span><div><strong>Sessão persistente</strong><small>Mantém o acesso do app e registra o aparelho para notificações.</small></div></div>
         <div class="tm-about-feature"><span>✓</span><div><strong>Layout Android</strong><small>Navegação, menus, formulários, tabelas e módulos adaptados ao celular.</small></div></div>
+        <div class="tm-about-feature"><span>✓</span><div><strong>Jogos</strong><small>Dinossauro com pontuação validada e placar público entre os jogadores.</small></div></div>
         <div class="tm-about-feature"><span>✓</span><div><strong>Assinatura</strong><small>Builds de distribuição assinadas com a chave GuerraVPN.</small></div></div>
       </section>
       <section class="tm-about-card">
         <h2>Novidades da ${APP_VERSION}</h2>
         <ul>
+          <li>Nova aba Jogos em beta, começando pelo Dinossauro.</li>
+          <li>Pontuação individual, recorde pessoal e placar público.</li>
           <li>Novo padrão visual aplicado a todas as áreas do app.</li>
           <li>Menu corrigido para não gerar cartões gigantes ou sobrepostos.</li>
           <li>Guias, Desrelacionamento/Baixa, Distribuição, Movimentação, Material Carga e Passagem de Carga agora abrem diretamente pelo menu.</li>

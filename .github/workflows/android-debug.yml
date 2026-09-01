@@ -3,12 +3,13 @@ name: Android Beta APK
 on:
   workflow_dispatch:
   push:
-    branches: [app/android-v1]
+    branches: [app/android-v197-prep]
     paths:
       - 'app/**'
       - 'assets/**'
       - 'scripts/**'
       - 'package.json'
+      - 'package-lock.json'
       - 'capacitor.config.ts'
       - '.github/workflows/android-debug.yml'
       - '*.html'
@@ -31,15 +32,15 @@ jobs:
           node-version: '22'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Build web bundle 1.9.6 beta
+      - name: Build web bundle 1.9.7 beta
         run: npm run build:web
 
-      - name: Conferência do bundle 1.9.6
+      - name: Conferência do bundle 1.9.7
         run: |
           npm run verify:web
-          grep -q '1.9.6 • WEB 7.5.7' dist/mobile-v12.js
+          grep -q '1.9.7 • WEB 7.5.7' dist/mobile-v12.js
           grep -q 'tarefas:update-download-progress' dist/native-mobile.js
           grep -q 'tmUpdateProgressPercent' dist/mobile-updates-v181.js
           grep -q 'progress:!0' dist/native-mobile.js
@@ -48,6 +49,10 @@ jobs:
           grep -q 'v1_9_6_set_message_block' dist/mobile-v196.js
           grep -q 'v1_9_6_send_message' dist/mobile-v196.js
           grep -q 'Este usuário bloqueou suas mensagens' dist/mobile-v196.js
+          grep -q 'v1_9_7_start_game_run' dist/games.js
+          grep -q 'v1_9_7_submit_game_score' dist/games.js
+          grep -q 'v1_9_7_games_leaderboard' dist/games.js
+          grep -q 'Dinossauro' dist/games.html
 
       - name: Conferir Firebase Android
         run: |
@@ -64,8 +69,8 @@ jobs:
 
       - name: Set Android app version
         run: |
-          sed -i 's/versionCode 1/versionCode 196/' android/app/build.gradle
-          sed -i 's/versionName "1.0"/versionName "1.9.6"/' android/app/build.gradle
+          sed -i 's/versionCode 1/versionCode 197/' android/app/build.gradle
+          sed -i 's/versionName "1.0"/versionName "1.9.7"/' android/app/build.gradle
 
       - name: Install stable debug signing key
         run: |
@@ -126,7 +131,7 @@ jobs:
         working-directory: android
         run: ./gradlew assembleDebug
 
-      - name: Validar APK 1.9.6 beta
+      - name: Validar APK 1.9.7 beta
         run: |
           set -euo pipefail
           APK='android/app/build/outputs/apk/debug/app-debug.apk'
@@ -135,18 +140,22 @@ jobs:
           python - <<'PY'
           import json
           with open('android/app/build/outputs/apk/debug/output-metadata.json',encoding='utf-8') as f: el=json.load(f)['elements'][0]
-          assert int(el['versionCode'])==196,el
-          assert str(el['versionName'])=='1.9.6',el
+          assert int(el['versionCode'])==197,el
+          assert str(el['versionName'])=='1.9.7',el
           PY
-          unzip -p "$APK" assets/public/native-mobile.js > /tmp/196-native.js
-          unzip -p "$APK" assets/public/mobile-updates-v181.js > /tmp/196-updates.js
-          unzip -p "$APK" assets/public/mobile-v196.js > /tmp/196-features.js
-          grep -q 'tarefas:update-download-progress' /tmp/196-native.js
-          grep -q 'progress:!0' /tmp/196-native.js
-          grep -q 'tmUpdateProgressBar' /tmp/196-updates.js
-          grep -q 'Alterar tarefa' /tmp/196-features.js
-          grep -q 'Bloquear mensagens deste usuário' /tmp/196-features.js
-          grep -q 'v1_9_6_send_message' /tmp/196-features.js
+          unzip -p "$APK" assets/public/native-mobile.js > /tmp/197-native.js
+          unzip -p "$APK" assets/public/mobile-updates-v181.js > /tmp/197-updates.js
+          unzip -p "$APK" assets/public/mobile-v196.js > /tmp/197-features.js
+          unzip -p "$APK" assets/public/games.js > /tmp/197-games.js
+          unzip -p "$APK" assets/public/games.html > /tmp/197-games.html
+          grep -q 'tarefas:update-download-progress' /tmp/197-native.js
+          grep -q 'progress:!0' /tmp/197-native.js
+          grep -q 'tmUpdateProgressBar' /tmp/197-updates.js
+          grep -q 'Alterar tarefa' /tmp/197-features.js
+          grep -q 'Bloquear mensagens deste usuário' /tmp/197-features.js
+          grep -q 'v1_9_6_send_message' /tmp/197-features.js
+          grep -q 'v1_9_7_submit_game_score' /tmp/197-games.js
+          grep -q 'leaderboardList' /tmp/197-games.html
 
       - name: Assinar distribuição com GuerraVPN
         run: |
@@ -159,8 +168,8 @@ jobs:
           KEY_PASS="$(jq -r '.key_password' /tmp/tarefas-signing.json)"
           EXPECTED_CERT="$(jq -r '.cert_sha256' /tmp/tarefas-signing.json)"
           APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)"
-          "$APKSIGNER" sign --ks /tmp/GuerraVPN.keystore --ks-key-alias "$KEY_ALIAS" --ks-pass "pass:$STORE_PASS" --key-pass "pass:$KEY_PASS" --out TAREFAS-1.9.6.apk android/app/build/outputs/apk/debug/app-debug.apk
-          VERIFY="$($APKSIGNER verify --verbose --print-certs TAREFAS-1.9.6.apk)"
+          "$APKSIGNER" sign --ks /tmp/GuerraVPN.keystore --ks-key-alias "$KEY_ALIAS" --ks-pass "pass:$STORE_PASS" --key-pass "pass:$KEY_PASS" --out TAREFAS-1.9.7.apk android/app/build/outputs/apk/debug/app-debug.apk
+          VERIFY="$($APKSIGNER verify --verbose --print-certs TAREFAS-1.9.7.apk)"
           printf '%s\n' "$VERIFY"
           ACTUAL_CERT="$(printf '%s\n' "$VERIFY" | sed -n 's/.*certificate SHA-256 digest: //p' | head -1 | tr -d ': ' | tr '[:upper:]' '[:lower:]')"
           test "$ACTUAL_CERT" = "$EXPECTED_CERT"
@@ -173,18 +182,18 @@ jobs:
           rm -rf /tmp/tarefas-releases
           git worktree add /tmp/tarefas-releases origin/app/releases
           mkdir -p /tmp/tarefas-releases/downloads
-          cp TAREFAS-1.9.6.apk /tmp/tarefas-releases/downloads/TAREFAS-1.9.6.apk
+          cp TAREFAS-1.9.7.apk /tmp/tarefas-releases/downloads/TAREFAS-1.9.7.apk
           cd /tmp/tarefas-releases
           git config user.name 'GuerraVPN Android Build'
           git config user.email '81371258+GuerraVPN@users.noreply.github.com'
-          git add downloads/TAREFAS-1.9.6.apk
+          git add downloads/TAREFAS-1.9.7.apk
           if ! git diff --cached --quiet; then
-            git commit -m 'release(android): TAREFAS 1.9.6 beta build 196'
+            git commit -m 'release(android): TAREFAS 1.9.7 beta build 197'
             git push origin HEAD:app/releases
           fi
           cd -
-          URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-1.9.6.apk'
-          LOCAL_SHA="$(sha256sum TAREFAS-1.9.6.apk | awk '{print $1}')"
+          URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-1.9.7.apk'
+          LOCAL_SHA="$(sha256sum TAREFAS-1.9.7.apk | awk '{print $1}')"
           for i in 1 2 3 4 5 6 7 8; do
             if curl --fail --silent --show-error -L "$URL" -o /tmp/tarefas-published.apk; then
               [ "$(sha256sum /tmp/tarefas-published.apk | awk '{print $1}')" = "$LOCAL_SHA" ] && echo 'APK beta permanente conferido.' && exit 0
@@ -197,15 +206,15 @@ jobs:
         run: |
           set -euo pipefail
           OIDC="$(curl --fail --silent --show-error -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-release" | jq -r '.value')"
-          SHA="$(sha256sum TAREFAS-1.9.6.apk | awk '{print $1}')"
-          jq -n --arg version '1.9.6' --argjson build 196 --arg channel 'beta' --arg url 'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-1.9.6.apk' --arg sha "$SHA" '{version:$version,build:$build,channel:$channel,download_url:$url,sha256:$sha}' > /tmp/release.json
+          SHA="$(sha256sum TAREFAS-1.9.7.apk | awk '{print $1}')"
+          jq -n --arg version '1.9.7' --argjson build 197 --arg channel 'beta' --arg url 'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-1.9.7.apk' --arg sha "$SHA" '{version:$version,build:$build,channel:$channel,download_url:$url,sha256:$sha}' > /tmp/release.json
           curl --fail --silent --show-error -H "Authorization: Bearer $OIDC" -H 'Content-Type: application/json' --data-binary @/tmp/release.json 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-release-publish' -o /tmp/release-result.json
           cat /tmp/release-result.json
-          jq -e '.ok == true and .version == "1.9.6" and .build == 196' /tmp/release-result.json >/dev/null
+          jq -e '.ok == true and .version == "1.9.7" and .build == 197' /tmp/release-result.json >/dev/null
 
-      - name: Upload APK 1.9.6 beta assinado
+      - name: Upload APK 1.9.7 beta assinado
         uses: actions/upload-artifact@v4
         with:
-          name: tarefas-android-1.9.6-beta-GuerraVPN
-          path: TAREFAS-1.9.6.apk
+          name: tarefas-android-1.9.7-beta-GuerraVPN
+          path: TAREFAS-1.9.7.apk
           if-no-files-found: error
