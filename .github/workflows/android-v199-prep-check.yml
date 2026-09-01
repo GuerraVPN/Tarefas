@@ -1,0 +1,60 @@
+name: Android 1.9.9 Hotfix Prep Check
+
+on:
+  push:
+    branches: [app/android-v199-prep]
+    paths:
+      - '.github/v199_hotfix.py'
+      - '.github/workflows/android-v199-prep-check.yml'
+      - 'app/games.html'
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: app/android-v199-prep
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Aplicar hotfix 1.9.9
+        run: python3 .github/v199_hotfix.py
+      - name: Validar fonte
+        run: |
+          node --check app/games.js
+          grep -q 'BETA 1.9.9' app/games.html
+          grep -q 'eyJpc3MiOiJzdXBhYmFzZSIs' app/games.html
+          grep -q 'v1_9_8_start_game_run' app/games.js
+          grep -q 'v1_9_8_games_leaderboard' app/games.js
+      - name: Instalar dependências
+        run: npm ci
+      - name: Gerar bundle
+        run: npm run build:web
+      - name: Verificar bundle
+        run: |
+          npm run verify:web
+          node --check dist/games.js
+          grep -q '1.9.9 • WEB 7.5.7' dist/mobile-v12.js
+          grep -q 'BETA 1.9.9' dist/games.html
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
+          def key(path):
+              m=re.search(r"SUPABASE_ANON_KEY\s*=\s*['\"]([^'\"]+)['\"]",Path(path).read_text(encoding='utf-8'))
+              assert m, path
+              return m.group(1)
+          assert key('dist/games.html') == key('dist/dashboard.html')
+          PY
+      - name: Commitar hotfix validado
+        run: |
+          git config user.name 'GuerraVPN Android Build'
+          git config user.email '81371258+GuerraVPN@users.noreply.github.com'
+          git add package.json package-lock.json scripts/build-mobile.mjs scripts/verify-mobile-build.mjs .github/workflows/android-debug.yml
+          if ! git diff --cached --quiet; then
+            git commit -m 'fix(android): corrigir placar e início dos jogos na 1.9.9'
+            git push origin HEAD:app/android-v199-prep
+          fi
