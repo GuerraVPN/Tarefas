@@ -1,0 +1,33 @@
+name: Deploy Web 7.5.8 to Vercel
+
+on:
+  push:
+    branches: [web/v758-deploy]
+    paths:
+      - '.github/workflows/web-v758-vercel-deploy.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_ORG_ID: team_qInSCrrxyaYlMDXYX0IpZA1T
+      VERCEL_PROJECT_ID: prj_h5fqgtS5VChVAznUjLFVuF3qkamO
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Conferir credencial Vercel
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo 'VERCEL_TOKEN não cadastrado no repositório.'
+            exit 2
+          fi
+
+      - name: Instalar Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Vincular configuração de produção
+        run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+
+      - name: Publicar produção
+        run: vercel deploy --prod --yes --token="$VERCEL_TOKEN"
