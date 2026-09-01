@@ -7,73 +7,79 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="perfis.js?v=7.4.12"></script>
   <link rel="stylesheet" href="v4_tema.css?v=6.2">
-  <link rel="stylesheet" href="games.css?v=1.9.7">
+  <link rel="stylesheet" href="games.css?v=1.9.8">
 </head>
 <body class="tm-games-body">
   <script>
     const usuarioLogado=JSON.parse(localStorage.getItem('usuarioLogado')||'null');
     if(!usuarioLogado?.id)location.replace('index.html');
     const SUPABASE_URL='https://bpvijatnsluwsgnzklrd.supabase.co';
-    const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwdmlqYXRuc2x1d3NnbnprbHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MzkxNDMsImV4cCI6MjEwMjQxNTE0M30.uvyfm9mgl6MON0v75CwfGzNz6FBqw58uzR4ZcRAOLNQ';
+    const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInJlZiI6ImJwdmlqYXRuc2x1d3NnbnprbHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MzkxNDMsImV4cCI6MjEwMjQxNTE0M30.uvyfm9mgl6MON0v75CwfGzNz6FBqw58uzR4ZcRAOLNQ';
     const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
   </script>
 
   <main class="tm-games-page">
     <section class="tm-games-hero">
       <div>
-        <span class="tm-games-beta">BETA 1.9.7</span>
+        <span class="tm-games-beta">BETA 1.9.8</span>
         <h1>Jogos</h1>
-        <p>Corra, marque pontos e dispute o topo do pelotão.</p>
+        <p>Nove jogos, recordes pessoais e placar público do TAREFAS.</p>
       </div>
       <div class="tm-games-trophy" aria-hidden="true">🏆</div>
+    </section>
+
+    <section class="tm-games-picker" id="gamePicker" aria-label="Escolher jogo">
+      <button type="button" class="active" data-game="dino"><b>🦖</b><span>Dinossauro</span></button>
+      <button type="button" data-game="snake"><b>🐍</b><span>Cobrinha</span></button>
+      <button type="button" data-game="memory"><b>🧠</b><span>Memória</span></button>
+      <button type="button" data-game="game2048"><b>2048</b><span>2048</span></button>
+      <button type="button" data-game="minesweeper"><b>💣</b><span>Campo Minado</span></button>
+      <button type="button" data-game="precision"><b>🎯</b><span>Precisão</span></button>
+      <button type="button" data-game="reflex"><b>⚡</b><span>Reflexo</span></button>
+      <button type="button" data-game="flight"><b>✈️</b><span>Voo Infinito</span></button>
+      <button type="button" data-game="hillclimb"><b>🏎️</b><span>Subida Infinita</span></button>
     </section>
 
     <section class="tm-game-card">
       <div class="tm-game-title">
         <div>
-          <span class="tm-game-kicker">PRIMEIRO JOGO</span>
-          <h2>Dinossauro</h2>
-          <p>Toque na pista ou use espaço para pular os obstáculos.</p>
+          <span class="tm-game-kicker" id="gameKicker">CORRIDA</span>
+          <h2 id="gameTitle">Dinossauro</h2>
+          <p id="gameDescription">Toque na pista para pular os obstáculos.</p>
         </div>
         <div class="tm-game-live-score" aria-live="polite">
-          <small>PONTOS</small>
-          <strong id="dinoScore">00000</strong>
+          <small id="scoreLabel">PONTOS</small>
+          <strong id="gameScore">0</strong>
         </div>
       </div>
 
-      <div class="tm-dino-stage" id="dinoStage">
-        <canvas id="dinoCanvas" role="img" aria-label="Jogo do dinossauro. Toque para pular."></canvas>
-        <div class="tm-dino-overlay" id="dinoOverlay">
-          <div class="tm-dino-mark" aria-hidden="true">🦖</div>
-          <strong id="dinoOverlayTitle">Pronto para correr?</strong>
-          <span id="dinoOverlayText">Desvie dos cactos e faça a maior pontuação.</span>
-        </div>
-      </div>
+      <div class="tm-game-stage" id="gameStage" aria-live="polite"></div>
+      <div class="tm-game-controls" id="gameControls"></div>
 
       <div class="tm-game-actions">
-        <button type="button" id="dinoStart">Jogar</button>
-        <span id="dinoStatus" role="status">Aguardando o início da partida.</span>
+        <button type="button" id="gameStart">Jogar</button>
+        <span id="gameStatus" role="status">Escolha um jogo e toque em Jogar.</span>
       </div>
       <div class="tm-game-stats">
-        <div><small>SEU RECORDE</small><strong id="dinoBest">—</strong></div>
-        <div><small>SUA POSIÇÃO</small><strong id="dinoRank">—</strong></div>
-        <div><small>VELOCIDADE</small><strong id="dinoSpeed">1,0×</strong></div>
+        <div><small>SEU RECORDE</small><strong id="gameBest">—</strong></div>
+        <div><small>SUA POSIÇÃO</small><strong id="gameRank">—</strong></div>
+        <div><small>DETALHE</small><strong id="gameDetail">—</strong></div>
       </div>
     </section>
 
     <section class="tm-leaderboard-card">
       <div class="tm-leaderboard-head">
-        <div><span>PLACAR PÚBLICO</span><h2>Melhores corredores</h2></div>
+        <div><span>PLACAR PÚBLICO</span><h2 id="leaderboardTitle">Dinossauro</h2></div>
         <button type="button" id="leaderboardRefresh" aria-label="Atualizar placar">↻</button>
       </div>
       <div id="leaderboardList" class="tm-leaderboard-list" aria-live="polite">
         <div class="tm-leaderboard-empty">Carregando o placar…</div>
       </div>
-      <p class="tm-leaderboard-note">Aparece no placar a melhor pontuação de cada jogador.</p>
+      <p class="tm-leaderboard-note">O placar mostra a melhor pontuação de cada jogador em cada jogo.</p>
     </section>
   </main>
 
   <script src="notificacoes.js?v=6.0"></script>
-  <script src="games.js?v=1.9.7"></script>
+  <script src="games.js?v=1.9.8"></script>
 </body>
 </html>
