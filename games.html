@@ -8,7 +8,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="perfis.js?v=7.4.12"></script>
   <link rel="stylesheet" href="v4_tema.css?v=6.2">
-  <link rel="stylesheet" href="games.css?v=2.0.0">
+  <link rel="stylesheet" href="games.css?v=7.6.0">
 </head>
 <body class="tm-games-body">
   <script>
@@ -20,9 +20,10 @@
   </script>
 
   <main class="tm-games-page">
+    <a class="tm-web-back" href="menu.html" aria-label="Voltar ao Quadro">← Voltar ao Quadro</a>
     <section class="tm-games-hero">
       <div class="tm-games-hero-copy">
-        <span class="tm-games-beta" id="gamesVersionLabel">JOGOS · 26º PEL PE MEC</span>
+        <span class="tm-games-beta" id="gamesVersionLabel">WEB 7.6.0 · 26º PEL PE MEC</span>
         <h1>Jogos</h1>
         <p>Nove desafios com recorde pessoal, ranking público e trilhas próprias.</p>
       </div>
@@ -48,44 +49,30 @@
 
     <section class="tm-game-card">
       <div class="tm-game-title">
-        <div class="tm-game-heading">
-          <span class="tm-game-kicker" id="gameKicker">CORRIDA</span>
-          <h2 id="gameTitle">Dinossauro</h2>
-          <p id="gameDescription">Toque na pista para pular os obstáculos.</p>
-        </div>
-        <div class="tm-game-live-score" aria-live="polite">
-          <small id="scoreLabel">PONTOS</small>
-          <strong id="gameScore">0</strong>
-        </div>
+        <div class="tm-game-heading"><span class="tm-game-kicker" id="gameKicker">CORRIDA</span><h2 id="gameTitle">Dinossauro</h2><p id="gameDescription">Toque na pista para pular os obstáculos.</p></div>
+        <div class="tm-game-live-score" aria-live="polite"><small id="scoreLabel">PONTOS</small><strong id="gameScore">0</strong></div>
       </div>
-
       <div class="tm-game-stage" id="gameStage" data-layout="canvas" aria-live="polite"></div>
       <div class="tm-game-controls" id="gameControls" aria-label="Controles do jogo"></div>
-
-      <div class="tm-game-actions">
-        <button type="button" id="gameStart">Jogar</button>
-        <span id="gameStatus" role="status">Escolha um jogo e toque em Jogar.</span>
-      </div>
-      <div class="tm-game-stats">
-        <div><small>SEU RECORDE</small><strong id="gameBest">—</strong></div>
-        <div><small>SUA POSIÇÃO</small><strong id="gameRank">—</strong></div>
-        <div><small>DETALHE</small><strong id="gameDetail">—</strong></div>
-      </div>
+      <div class="tm-game-actions"><button type="button" id="gameStart">Jogar</button><span id="gameStatus" role="status">Escolha um jogo e toque em Jogar.</span></div>
+      <div class="tm-game-stats"><div><small>SEU RECORDE</small><strong id="gameBest">—</strong></div><div><small>SUA POSIÇÃO</small><strong id="gameRank">—</strong></div><div><small>DETALHE</small><strong id="gameDetail">—</strong></div></div>
     </section>
 
     <section class="tm-leaderboard-card">
-      <div class="tm-leaderboard-head">
-        <div><span>PLACAR PÚBLICO</span><h2 id="leaderboardTitle">Dinossauro</h2></div>
-        <button type="button" id="leaderboardRefresh" aria-label="Atualizar placar">↻</button>
-      </div>
-      <div id="leaderboardList" class="tm-leaderboard-list" aria-live="polite">
-        <div class="tm-leaderboard-empty">Carregando o placar…</div>
-      </div>
+      <div class="tm-leaderboard-head"><div><span>PLACAR PÚBLICO</span><h2 id="leaderboardTitle">Dinossauro</h2></div><button type="button" id="leaderboardRefresh" aria-label="Atualizar placar">↻</button></div>
+      <div id="leaderboardList" class="tm-leaderboard-list" aria-live="polite"><div class="tm-leaderboard-empty">Carregando o placar…</div></div>
       <p class="tm-leaderboard-note">A melhor pontuação de cada jogador aparece no ranking de cada jogo.</p>
     </section>
   </main>
 
+  <script src="sistema_comum.js?v=6.0"></script>
+  <script src="auditoria.js?v=6.0"></script>
+  <script src="bloco_notas.js?v=6.0"></script>
   <script src="notificacoes.js?v=6.0"></script>
-  <script src="games.js?v=2.0.0"></script>
+  <script src="v4_ui.js?v=6.0"></script>
+  <script src="v4_tema.js?v=6.0"></script>
+  <script src="recorrencias_v4.js?v=6.0"></script>
+  <script src="games.js?v=7.6.0"></script>
+  <script src="v6_2_mobile.js?v=6.2"></script>
 </body>
 </html>
