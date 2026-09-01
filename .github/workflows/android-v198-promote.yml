@@ -1,0 +1,42 @@
+name: Prepare Android 1.9.8 Publish
+
+on:
+  push:
+    branches: [app/android-v198-prep]
+    paths:
+      - '.github/workflows/android-v198-promote.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: app/android-v198-prep
+      - name: Atualizar pipeline oficial para 1.9.8
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('.github/workflows/android-debug.yml')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('app/android-v197-prep','app/android-v198-prep')
+          s=s.replace('1.9.7','1.9.8').replace('197','198').replace('v1_9_7','v1_9_8')
+          s=s.replace("grep -q 'Dinossauro' dist/games.html", "grep -q 'Dinossauro' dist/games.html\n          grep -q 'Cobrinha' dist/games.html\n          grep -q 'Campo Minado' dist/games.html\n          grep -q 'Subida Infinita' dist/games.html\n          grep -q 'hillclimb' dist/games.js")
+          s=s.replace("grep -q 'leaderboardList' /tmp/198-games.html", "grep -q 'leaderboardList' /tmp/198-games.html\n          grep -q 'v1_9_8_start_game_run' /tmp/198-games.js\n          grep -q 'snake' /tmp/198-games.js\n          grep -q 'memory' /tmp/198-games.js\n          grep -q 'game2048' /tmp/198-games.js\n          grep -q 'minesweeper' /tmp/198-games.js\n          grep -q 'precision' /tmp/198-games.js\n          grep -q 'reflex' /tmp/198-games.js\n          grep -q 'flight' /tmp/198-games.js\n          grep -q 'hillclimb' /tmp/198-games.js")
+          p.write_text(s,encoding='utf-8')
+          PY
+          grep -q 'branches: \[app/android-v198-prep\]' .github/workflows/android-debug.yml
+          grep -q 'versionCode 198' .github/workflows/android-debug.yml
+          grep -q 'versionName "1.9.8"' .github/workflows/android-debug.yml
+          grep -q 'TAREFAS-1.9.8.apk' .github/workflows/android-debug.yml
+          grep -q 'v1_9_8_submit_game_score' .github/workflows/android-debug.yml
+      - name: Commitar pipeline
+        run: |
+          git config user.name 'GuerraVPN Android Build'
+          git config user.email '81371258+GuerraVPN@users.noreply.github.com'
+          git add .github/workflows/android-debug.yml
+          git commit -m 'ci(android): publicar beta 1.9.8 build 198'
+          git push origin HEAD:app/android-v198-prep
