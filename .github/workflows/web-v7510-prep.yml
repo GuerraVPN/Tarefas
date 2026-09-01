@@ -1,0 +1,44 @@
+name: Web 7.5.10 Prep
+
+on:
+  push:
+    branches:
+      - web/v7510-prep
+    paths:
+      - '.github/workflows/web-v7510-prep.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: web/v7510-prep
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Aplicar hotfix 7.5.10
+        run: python3 .github/v7510_fix.py
+      - name: Validar JavaScript e regras
+        run: |
+          node --check pessoal_v7.js
+          node --check v7_5_1_version.js
+          grep -q "ESCALA_UI_VERSION='7.5.10'" pessoal_v7.js
+          grep -q 'nextForecast=new Map()' pessoal_v7.js
+          grep -q 'nextConfirmedDuty=new Map()' pessoal_v7.js
+          grep -q 'rotationServices' pessoal_v7.js
+          grep -q 'x.type===.predicted.' pessoal_v7.js
+          grep -q 'prev. ${br(forecast.date)}' pessoal_v7.js
+          grep -q 'último serviço confirmado desta mesma escala' pessoal_v7.js
+          grep -q 'pessoal_v7.js?v=7.5.10' pessoal.html
+          grep -q "VERSION='7.5.10'" v7_5_1_version.js
+      - name: Commitar hotfix
+        run: |
+          git config user.name 'GuerraVPN Web Build'
+          git config user.email '81371258+GuerraVPN@users.noreply.github.com'
+          git add pessoal_v7.js pessoal.html v7_5_1_version.js
+          git commit -m 'fix(web): restaurar folgas e previsões na 7.5.10'
+          git push origin HEAD:web/v7510-prep
