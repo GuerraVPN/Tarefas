@@ -19,10 +19,14 @@ patch('app/games.js',"round++;ready=false;pad.className='tm-reflex-pad wait';","
 patch('app/games.js',"pad.onclick=()=>{if(!busy)return;if(!ready){","pad.onclick=()=>{if(!busy||locked)return;locked=true;if(!ready){")
 patch('app/games.js',"ready=true;goAt=performance.now();pad.className='tm-reflex-pad go';","ready=true;locked=false;goAt=performance.now();pad.className='tm-reflex-pad go';")
 
-# A aba passa a se chamar Jogos no menu do Android.
+# A entrada do menu passa a ser o hub Jogos.
 p=Path('app/mobile-bootstrap.js'); s=p.read_text(encoding='utf-8')
-s=s.replace("['Dinossauro','games.html','Jogo e placar público']","['Jogos','games.html','Jogos e placares públicos']")
-s=s.replace("['Dinossauro','games.html','Jogo e ranking público']","['Jogos','games.html','Jogos e placares públicos']")
+for old in [
+    "['Dinossauro','games.html','Corra, marque pontos e dispute o placar']",
+    "['Dinossauro','games.html','Jogo e placar público']",
+    "['Dinossauro','games.html','Jogo e ranking público']"
+]:
+    s=s.replace(old,"['Jogos','games.html','Nove jogos e placares públicos']")
 p.write_text(s,encoding='utf-8')
 
 # Versão 1.9.8 / build 198, ainda sobre a Base web 7.5.7 do app.
