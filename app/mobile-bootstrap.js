@@ -43,7 +43,7 @@
       ['Central','central.html','Notificações e mensagens']
     ]],
     ['Jogos', [
-      ['Dinossauro','games.html','Corra, marque pontos e dispute o placar']
+      ['Jogos','games.html','Nove jogos e placares públicos']
     ]],
     ['Gestão', [
       ['Usuários','usuarios.html','Cadastros e acessos'],
