@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#050b09">
+  <title>Jogos - TAREFAS</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="perfis.js?v=7.4.12"></script>
+  <link rel="stylesheet" href="v4_tema.css?v=6.2">
+  <link rel="stylesheet" href="games.css?v=7.6.0">
+</head>
+<body class="tm-games-body">
+  <script>
+    const usuarioLogado=JSON.parse(localStorage.getItem('usuarioLogado')||'null');
+    if(!usuarioLogado?.id)location.replace('index.html');
+    const SUPABASE_URL='https://bpvijatnsluwsgnzklrd.supabase.co';
+    const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwdmlqYXRuc2x1d3NnbnprbHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MzkxNDMsImV4cCI6MjEwMjQxNTE0M30.uvyfm9mgl6MON0v75CwfGzNz6FBqw58uzR4ZcRAOLNQ';
+    const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+  </script>
+
+  <main class="tm-games-page">
+    <a class="tm-web-back" href="menu.html" aria-label="Voltar ao Quadro">← Voltar ao Quadro</a>
+    <section class="tm-games-hero">
+      <div class="tm-games-hero-copy">
+        <span class="tm-games-beta" id="gamesVersionLabel">WEB 7.6.0 · 26º PEL PE MEC</span>
+        <h1>Jogos</h1>
+        <p>Nove desafios com recorde pessoal, ranking público e trilhas próprias.</p>
+      </div>
+      <div class="tm-games-hero-actions">
+        <button type="button" class="tm-music-toggle" id="musicToggle" aria-pressed="true" aria-label="Ativar ou desativar música"><span aria-hidden="true">🔊</span><small>MÚSICA</small></button>
+        <div class="tm-games-trophy" aria-hidden="true"><span>26</span><b>🏆</b></div>
+      </div>
+    </section>
+
+    <section class="tm-games-picker-wrap" aria-label="Jogos disponíveis">
+      <div class="tm-games-picker" id="gamePicker">
+        <button type="button" class="active" data-game="dino"><b>🦖</b><span>Dinossauro</span></button>
+        <button type="button" data-game="snake"><b>🐍</b><span>Cobrinha</span></button>
+        <button type="button" data-game="memory"><b>🧠</b><span>Memória</span></button>
+        <button type="button" data-game="game2048"><b>2048</b><span>2048</span></button>
+        <button type="button" data-game="minesweeper"><b>💣</b><span>Campo Minado</span></button>
+        <button type="button" data-game="precision"><b>🎯</b><span>Precisão</span></button>
+        <button type="button" data-game="reflex"><b>⚡</b><span>Reflexo</span></button>
+        <button type="button" data-game="flight"><b>✈️</b><span>Voo Infinito</span></button>
+        <button type="button" data-game="hillclimb"><b>🚙</b><span>Subida Infinita</span></button>
+      </div>
+    </section>
+
+    <section class="tm-game-card">
+      <div class="tm-game-title">
+        <div class="tm-game-heading"><span class="tm-game-kicker" id="gameKicker">CORRIDA</span><h2 id="gameTitle">Dinossauro</h2><p id="gameDescription">Toque na pista para pular os obstáculos.</p></div>
+        <div class="tm-game-live-score" aria-live="polite"><small id="scoreLabel">PONTOS</small><strong id="gameScore">0</strong></div>
+      </div>
+      <div class="tm-game-stage" id="gameStage" data-layout="canvas" aria-live="polite"></div>
+      <div class="tm-game-controls" id="gameControls" aria-label="Controles do jogo"></div>
+      <div class="tm-game-actions"><button type="button" id="gameStart">Jogar</button><span id="gameStatus" role="status">Escolha um jogo e toque em Jogar.</span></div>
+      <div class="tm-game-stats"><div><small>SEU RECORDE</small><strong id="gameBest">—</strong></div><div><small>SUA POSIÇÃO</small><strong id="gameRank">—</strong></div><div><small>DETALHE</small><strong id="gameDetail">—</strong></div></div>
+    </section>
+
+    <section class="tm-leaderboard-card">
+      <div class="tm-leaderboard-head"><div><span>PLACAR PÚBLICO</span><h2 id="leaderboardTitle">Dinossauro</h2></div><button type="button" id="leaderboardRefresh" aria-label="Atualizar placar">↻</button></div>
+      <div id="leaderboardList" class="tm-leaderboard-list" aria-live="polite"><div class="tm-leaderboard-empty">Carregando o placar…</div></div>
+      <p class="tm-leaderboard-note">A melhor pontuação de cada jogador aparece no ranking de cada jogo.</p>
+    </section>
+  </main>
+
+  <script src="sistema_comum.js?v=6.0"></script>
+  <script src="auditoria.js?v=6.0"></script>
+  <script src="bloco_notas.js?v=6.0"></script>
+  <script src="notificacoes.js?v=6.0"></script>
+  <script src="v4_ui.js?v=6.0"></script>
+  <script src="v4_tema.js?v=6.0"></script>
+  <script src="recorrencias_v4.js?v=6.0"></script>
+  <script src="games.js?v=7.6.0"></script>
+  <script src="v6_2_mobile.js?v=6.2"></script>
+</body>
+</html>

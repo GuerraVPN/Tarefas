@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const ESCALA_UI_VERSION='7.4.6';
+const ESCALA_UI_VERSION='7.5.10';
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
@@ -8,10 +8,10 @@ const GROUPS={sargento:'Sargentos',motorista:'Motoristas',patrulheiro:'Patrulhei
 const ORDER=['sargento','motorista','patrulheiro','permanencia','canil'];
 const WEEK=['DOM','SEG','TER','QUA','QUI','SEX','SÁB'];
 
-let user=null,canManage=false,view=new Date(),users=new Map(),externals=new Map();
+let user=null,canManage=false,canServiceSelf=false,view=new Date(),users=new Map(),externals=new Map();
 let members=[],services=[],rotationServices=[],holidays=[],online=new Set(),changes=[],vacations=[],balances=[],qualifications=[];
 let selectedQualification=null;
-let projections=new Map(),dutyDates=new Map(),nextDuty=new Map();
+let projections=new Map(),dutyDates=new Map(),nextDuty=new Map(),nextForecast=new Map(),nextConfirmedDuty=new Map();
 
 function profileId(){return user?.perfil_id?Number(user.perfil_id):null}
 function iso(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
@@ -67,17 +67,30 @@ function changedBy(item){
  return `Última alteração por ${actorName(item.atualizado_por)} em ${dt(item.atualizado_em)}.`;
 }
 function moveToBack(queue,key){const i=queue.indexOf(key);if(i>=0){queue.splice(i,1);queue.push(key)}}
-function eligible(row,date){return !vacationFor(row,date)&&!adaptationFor(row,date)}
+function confirmedNear(row,date){
+ return rotationServices.some(x=>samePerson(x,row)&&Math.abs(diffDays(x.data_servico,date))<=2);
+}
+function forecastNear(row,date){
+ const key=personKey(row);
+ for(const list of projections.values())for(const x of list){
+  const d=x?.item?.data_servico||x?.date;
+  if(x?.type==='predicted'&&x?.key===key&&d&&Math.abs(diffDays(d,date))<=2)return true;
+ }
+ return false;
+}
+function eligible(row,date,checkInterval=false){return !vacationFor(row,date)&&!adaptationFor(row,date)&&(!checkInterval||(!confirmedNear(row,date)&&!forecastNear(row,date)))}
 function inheritedAnchor(row,lane){
  const v=lane==='vermelha'?row?.heranca_vermelha_data:row?.heranca_preta_data;
  return v?{date:v,type:'inherited',lane}:null;
 }
 function previousDuty(row,g,date,lane){
- const list=dutyDates.get(g+'|'+lane+'|'+personKey(row))||[];
- const real=[...list].reverse().find(x=>x.date<date)||null;
+ const real=rotationServices
+  .filter(x=>x.grupo===g&&samePerson(x,row)&&scaleLane(x.data_servico)===lane&&x.data_servico<date)
+  .sort((a,b)=>b.data_servico.localeCompare(a.data_servico)||Number(b.id||0)-Number(a.id||0))[0]||null;
+ const actual=real?{date:real.data_servico,type:'actual',item:real,lane}:null;
  const inherited=inheritedAnchor(row,lane);
- if(inherited&&inherited.date<date&&(!real||inherited.date>real.date))return inherited;
- return real;
+ if(inherited&&inherited.date<date&&(!actual||inherited.date>actual.date))return inherited;
+ return actual;
 }
 function todayIso(){return iso(new Date())}
 
@@ -87,8 +100,11 @@ async function initUser(){
  if(window.Perfis26){try{const p=await Perfis26.carregar(supabaseClient,base);if(p?.usuario)user=p.usuario}catch(_){}}
  const r=await supabaseClient.rpc('v7_2_pode_gerenciar_pessoal',{p_usuario_id:Number(user.id),p_perfil_id:profileId()});
  canManage=!r.error&&r.data===true;
+ const rs=await supabaseClient.rpc('v7_5_9_pode_operar_escala',{p_usuario_id:Number(user.id),p_perfil_id:profileId()});
+ canServiceSelf=!rs.error&&rs.data===true;
  $('manageMembers').hidden=!canManage;$('manageHolidays').hidden=!canManage;
- if(!canManage)$('scaleInfo').insertAdjacentHTML('beforeend',' Seu perfil possui acesso somente para consulta.');
+ if(!canManage&&canServiceSelf)$('scaleInfo').insertAdjacentHTML('beforeend',' Você pode confirmar, trocar ou tirar os seus próprios serviços.');
+ else if(!canManage)$('scaleInfo').insertAdjacentHTML('beforeend',' Seu perfil possui acesso somente para consulta.');
  return true;
 }
 async function loadPeople(){
@@ -131,7 +147,7 @@ async function loadScale(){
  buildAllProjections();render();renderMembers();renderHolidays();renderChanges();renderSummary();
 }
 function buildAllProjections(){
- projections=new Map();dutyDates=new Map();nextDuty=new Map();
+ projections=new Map();dutyDates=new Map();nextDuty=new Map();nextForecast=new Map();nextConfirmedDuty=new Map();
  for(const g of ORDER){buildProjection(g,'preta');buildProjection(g,'vermelha')}
 }
 function buildProjection(g,lane){
@@ -166,7 +182,7 @@ function buildProjection(g,lane){
      actuals.forEach(a=>{const key=personKey(a);addDuty(key,date,'actual',a);moveToBack(queue,key)});
    }else{
      let selectedIndex=-1;
-     for(let i=0;i<queue.length;i++){const row=rowByKey(queue[i],g);if(row&&eligible(row,date)){selectedIndex=i;break}}
+     for(let i=0;i<queue.length;i++){const row=rowByKey(queue[i],g);if(row&&eligible(row,date,true)){selectedIndex=i;break}}
      if(selectedIndex>=0){
        const key=queue[selectedIndex],row=rowByKey(key,g);
        addDuty(key,date,'predicted',{grupo:g,data_servico:date,usuario_id:row.usuario_id||null,pessoa_externa_id:row.pessoa_externa_id||null});
@@ -178,6 +194,8 @@ function buildProjection(g,lane){
  for(const [key,list] of localDuty){
    list.sort((a,b)=>a.date.localeCompare(b.date));dutyDates.set(g+'|'+lane+'|'+key,list);
    const next=list.find(x=>x.date>=today);if(next)nextDuty.set(g+'|'+lane+'|'+key,next);
+   const confirmedNext=list.find(x=>x.date>=today&&x.type==='actual');if(confirmedNext)nextConfirmedDuty.set(g+'|'+lane+'|'+key,confirmedNext);
+   const forecast=list.find(x=>x.date>=today&&x.type==='predicted');if(forecast)nextForecast.set(g+'|'+lane+'|'+key,forecast);
  }
 }
 function dutyAt(row,g,date){const lane=scaleLane(date),list=projections.get(g+'|'+lane+'|'+date)||[];return list.find(x=>x.key===personKey(row))}
@@ -189,19 +207,26 @@ function folgaNumber(row,g,date){
 function nextMeta(row,g){
  const vac=vacations.find(v=>((row.usuario_id&&String(v.usuario_id)===String(row.usuario_id))||(row.pessoa_externa_id&&String(v.pessoa_externa_id)===String(row.pessoa_externa_id)))&&v.data_fim>=todayIso());
  if(vac&&vac.data_inicio<=todayIso()&&vac.data_fim>=todayIso())return `<span class="v721-person-meta vac">Férias até ${br(vac.data_fim)} · ADP ${br(addDays(vac.data_fim,1))}</span>`;
- const key=personKey(row),black=nextDuty.get(g+'|preta|'+key),red=nextDuty.get(g+'|vermelha|'+key),parts=[];
+ const key=personKey(row),parts=[];
  if(row.heranca_origem)parts.push(`Vaga herdada de ${row.heranca_origem}`);
- if(black)parts.push(`Preta: ${br(black.date)}${black.type==='predicted'?' prev.':''}`);
- if(red)parts.push(`Vermelha: ${br(red.date)}${red.type==='predicted'?' prev.':''}`);
- return parts.length?`<span class="v721-person-meta next">${parts.join(' · ')}</span>`:'<span class="v721-person-meta">Sem projeção — confirme um serviço em cada escala</span>';
+ for(const lane of ['preta','vermelha']){
+  const label=lane==='preta'?'Preta':'Vermelha';
+  const confirmed=nextConfirmedDuty.get(g+'|'+lane+'|'+key),forecast=nextForecast.get(g+'|'+lane+'|'+key);
+  if(confirmed&&forecast)parts.push(`${label}: conf. ${br(confirmed.date)} · prev. ${br(forecast.date)}`);
+  else if(confirmed)parts.push(`${label}: conf. ${br(confirmed.date)}`);
+  else if(forecast)parts.push(`${label}: prev. ${br(forecast.date)}`);
+ }
+ return parts.length?`<span class="v721-person-meta next">${parts.join(' · ')}</span>`:'<span class="v721-person-meta">Sem previsão — confirme um serviço inicial desta escala</span>';
 }
 function renderSummary(){
  const uniqueMembers=new Set(members.map(personKey)),uniqueOnService=new Set(services.map(personKey));
  $('sumScalePeople').textContent=uniqueMembers.size;$('sumServices').textContent=services.length;$('sumPeopleOnService').textContent=uniqueOnService.size;
- let total=0,now=todayIso();
+ let total=0;
  for(const g of ORDER)for(const row of members.filter(x=>x.grupo===g))for(const lane of ['preta','vermelha']){
-   const list=dutyDates.get(g+'|'+lane+'|'+personKey(row))||[],prev=previousDuty(row,g,addDays(now,1),lane),next=list.find(x=>x.date>now);
-   if(prev&&next)total+=countLaneDays(prev.date,next.date,lane);
+   const forecast=nextForecast.get(g+'|'+lane+'|'+personKey(row));
+   if(!forecast)continue;
+   const prev=previousDuty(row,g,forecast.date,lane);
+   if(prev)total+=countLaneDays(prev.date,forecast.date,lane);
  }
  $('sumFolgas').textContent=total;
 }
@@ -223,12 +248,13 @@ function render(){
    html+=`<tr><td><div class="v7-user">${row.usuario_id&&online.has(String(row.usuario_id))?'<i class="v7-online" title="Online"></i>':''}<span>${esc(personName(row))}${row.pessoa_externa_id?'<span class="v72-external-tag">SEM CONTA</span>':''}${nextMeta(row,g)}</span></div></td>`;
    for(const date of rg.dates){
     const actual=currentActual(row,g,date),vac=vacationFor(row,date),adapt=adaptationFor(row,date),duty=dutyAt(row,g,date);
-    let cls=['v7-day',dayClass(date),canManage?'manage':''],text='-',title=hol(date)?.nome||'';
+    const selfService=canServiceSelf&&row.usuario_id&&String(row.usuario_id)===String(user.id);
+    let cls=['v7-day',dayClass(date),(canManage||selfService)?'manage':''],text='-',title=hol(date)?.nome||'';
     if(actual){cls.push('service');text=esc(actual.marcacao||'SV');title=`Serviço confirmado · ${personName(row)} · ${br(date)}`}
     else if(vac){cls.push('vacation');text='FÉRIAS';title=`Férias · ${br(vac.data_inicio)} a ${br(vac.data_fim)}`}
     else if(adapt){cls.push('adaptation');text='ADP';title=`Dia de adaptação · serviço permitido a partir de ${br(addDays(date,1))}`}
     else if(duty?.type==='predicted'){cls.push('predicted');text='SV';title=`Próximo serviço previsto automaticamente · ${personName(row)} · ${br(date)}`}
-    else{const f=folgaNumber(row,g,date);if(f!==null&&f>0){cls.push('folga-count');text=String(f);title=`${f}º dia da ${scaleLaneName(date)} desde o último serviço desta mesma escala`}}
+    else{const f=folgaNumber(row,g,date);if(f!==null&&f>0){cls.push('folga-count');text=String(f);title=`${f}º dia da ${scaleLaneName(date)} desde o último serviço confirmado desta mesma escala`}}
     html+=`<td class="${cls.filter(Boolean).join(' ')}" data-user="${row.usuario_id||''}" data-external="${row.pessoa_externa_id||''}" data-group="${g}" data-date="${date}" title="${esc(title)}">${text}</td>`;
    }
    html+='</tr>';
@@ -236,7 +262,10 @@ function render(){
   html+='</tbody></table></div></section>';
  }
  $('scaleBoard').innerHTML=html;
- if(canManage)$('scaleBoard').querySelectorAll('[data-date]').forEach(td=>td.onclick=()=>openCell(td));
+ $('scaleBoard').querySelectorAll('[data-date]').forEach(td=>{
+  const own=canServiceSelf&&td.dataset.user&&String(td.dataset.user)===String(user.id);
+  if(canManage||own)td.onclick=()=>openCell(td);
+ });
 }
 function rowFromCell(td){return{usuario_id:Number(td.dataset.user)||null,pessoa_externa_id:Number(td.dataset.external)||null,grupo:td.dataset.group}}
 function openCell(td){
@@ -248,26 +277,37 @@ function openCell(td){
 function serviceContext(row,g,date){
  const lane=scaleLane(date),list=dutyDates.get(g+'|'+lane+'|'+personKey(row))||[];
  const prev=previousDuty(row,g,date,lane);
- const next=list.find(x=>x.date>date)||null;
- return{lane,prev,next,folgas:prev?countLaneDays(prev.date,date,lane):null,diasAte:next?countLaneDays(date,next.date,lane):null,diasCorridos:next?Math.max(0,diffDays(date,next.date)):null};
+ const nextConfirmed=list.find(x=>x.date>date&&x.type==='actual')||null;
+ const nextPredicted=list.find(x=>x.date>date&&x.type==='predicted')||null;
+ return{lane,prev,nextConfirmed,nextPredicted,folgas:prev?countLaneDays(prev.date,date,lane):null,diasAte:nextPredicted?countLaneDays(date,nextPredicted.date,lane):null,diasCorridos:nextPredicted?Math.max(0,diffDays(date,nextPredicted.date)):null};
 }
 function fillServiceContext(row,g,date,item){
  const ctx=serviceContext(row,g,date);
- $('serviceFolgas').value=ctx.prev?`${ctx.folgas} dia(s) da ${ctx.lane==='vermelha'?'Vermelha':'Preta'} · último SV ${br(ctx.prev.date)}`:'Sem serviço anterior calculado nesta escala';
- $('serviceNext').value=ctx.next?`${ctx.next.type==='predicted'?'Previsto':'Confirmado'} · ${br(ctx.next.date)}`:'Sem próximo serviço calculado';
- $('serviceNextDays').value=ctx.next?`${ctx.diasAte} dia(s) desta escala · ${ctx.diasCorridos} dia(s) corridos`:'Sem previsão';
+ $('serviceFolgas').value=ctx.prev?`${ctx.folgas} dia(s) da ${ctx.lane==='vermelha'?'Vermelha':'Preta'} · último serviço confirmado ${br(ctx.prev.date)}`:'Sem serviço confirmado anterior nesta escala';
+ $('serviceNext').value=ctx.nextConfirmed?`Confirmado · ${br(ctx.nextConfirmed.date)}`:'Sem próximo serviço confirmado';
+ $('serviceForecast').value=ctx.nextPredicted?`Previsto · ${br(ctx.nextPredicted.date)}`:'Sem previsão automática';
+ $('serviceNextDays').value=ctx.nextPredicted?`${ctx.diasAte} dia(s) desta escala · ${ctx.diasCorridos} dia(s) corridos`:'Sem previsão automática';
  $('serviceModalTitle').textContent=item?'Editar serviço':'Lançar serviço';
 }
 function openService(td){
  const row=rowFromCell(td),date=td.dataset.date,g=td.dataset.group,item=currentActual(row,g,date);
  $('serviceUserId').value=row.usuario_id||'';$('serviceExternalId').value=row.pessoa_externa_id||'';$('serviceGroup').value=g;$('serviceDate').value=date;
  $('serviceUser').value=personName(row);$('serviceDateLabel').value=br(date);$('serviceGroupLabel').value=`${GROUPS[g]} · ${scaleLaneName(date)}`;$('serviceMark').value=item?.marcacao||'SV';
- $('serviceNote').value=item?.observacao||'';fillServiceContext(row,g,date,item);$('serviceChangedBy').textContent=changedBy(item);$('removeService').hidden=!item;$('swapService').hidden=!item;modal('serviceModal');
+ $('serviceNote').value=item?.observacao||'';fillServiceContext(row,g,date,item);$('serviceChangedBy').textContent=changedBy(item);
+ const own=canServiceSelf&&row.usuario_id&&String(row.usuario_id)===String(user.id),allowed=canManage||own;
+ $('removeService').hidden=!(item&&allowed);$('swapService').hidden=!(item&&allowed);$('markVacation').hidden=!canManage;
+ const confirmBtn=$('serviceForm')?.querySelector('button[type="submit"]');if(confirmBtn)confirmBtn.hidden=!allowed;
+ $('serviceMark').disabled=!allowed;$('serviceNote').disabled=!allowed;modal('serviceModal');
 }
 async function saveService(e){
  e.preventDefault();const g=$('serviceGroup').value,uid=Number($('serviceUserId').value)||null,eid=Number($('serviceExternalId').value)||null;
  const common={p_data_servico:$('serviceDate').value,p_marcacao:$('serviceMark').value.trim()||'SV',p_observacao:$('serviceNote').value.trim()||null,p_usuario_id:Number(user.id),p_perfil_id:profileId()};
- const r=g==='canil'?await supabaseClient.rpc('v7_4_2_definir_servico_canil',{p_usuario_alvo_id:uid,p_pessoa_externa_id:eid,...common}):await supabaseClient.rpc('v7_2_3_definir_servico',{p_grupo:g,p_usuario_alvo_id:uid,p_pessoa_externa_id:eid,...common});
+ let r;
+ if(canManage)r=g==='canil'?await supabaseClient.rpc('v7_4_2_definir_servico_canil',{p_usuario_alvo_id:uid,p_pessoa_externa_id:eid,...common}):await supabaseClient.rpc('v7_2_3_definir_servico',{p_grupo:g,p_usuario_alvo_id:uid,p_pessoa_externa_id:eid,...common});
+ else{
+  if(!uid||String(uid)!==String(user.id)||eid)return alert('Você só pode operar o seu próprio serviço.');
+  r=await supabaseClient.rpc('v7_5_9_definir_meu_servico',{p_grupo:g,p_data_servico:common.p_data_servico,p_marcacao:common.p_marcacao,p_observacao:common.p_observacao,p_usuario_id:Number(user.id),p_perfil_id:profileId()});
+ }
  if(r.error)return alert(r.error.message);modal('serviceModal',false);await loadScale();
 }
 function servicePerson(){return{usuario_id:Number($('serviceUserId').value)||null,pessoa_externa_id:Number($('serviceExternalId').value)||null}}
@@ -287,7 +327,7 @@ function openSwap(){
 async function saveSwap(e){
  e.preventDefault();const value=$('swapTarget').value;if(!value)return;const [kind,id]=value.split(':'),g=$('swapGroup').value;
  const common={p_data_servico:$('swapDate').value,p_origem_usuario_id:Number($('swapSourceUserId').value)||null,p_origem_pessoa_externa_id:Number($('swapSourceExternalId').value)||null,p_destino_usuario_id:kind==='u'?Number(id):null,p_destino_pessoa_externa_id:kind==='e'?Number(id):null,p_observacao:$('swapNote').value.trim()||null,p_usuario_id:Number(user.id),p_perfil_id:profileId()};
- const r=g==='canil'?await supabaseClient.rpc('v7_4_2_transferir_servico_canil',{p_modo:'troca',...common}):await supabaseClient.rpc('v7_2_3_trocar_servico',{p_grupo:g,...common});
+ const r=canManage?(g==='canil'?await supabaseClient.rpc('v7_4_2_transferir_servico_canil',{p_modo:'troca',...common}):await supabaseClient.rpc('v7_2_3_trocar_servico',{p_grupo:g,...common})):await supabaseClient.rpc('v7_5_9_transferir_meu_servico',{p_modo:'troca',p_grupo:g,p_data_servico:common.p_data_servico,p_destino_usuario_id:common.p_destino_usuario_id,p_destino_pessoa_externa_id:common.p_destino_pessoa_externa_id,p_observacao:common.p_observacao,p_usuario_id:Number(user.id),p_perfil_id:profileId()});
  if(r.error)return alert(r.error.message);modal('swapModal',false);await loadScale();
 }
 function openReplacement(){
@@ -300,7 +340,7 @@ function openReplacement(){
 async function saveReplacement(e){
  e.preventDefault();const value=$('replaceTarget').value;if(!value)return;const [kind,id]=value.split(':'),g=$('replaceGroup').value;
  const common={p_data_servico:$('replaceDate').value,p_origem_usuario_id:Number($('replaceSourceUserId').value)||null,p_origem_pessoa_externa_id:Number($('replaceSourceExternalId').value)||null,p_destino_usuario_id:kind==='u'?Number(id):null,p_destino_pessoa_externa_id:kind==='e'?Number(id):null,p_observacao:$('replaceNote').value.trim()||null,p_usuario_id:Number(user.id),p_perfil_id:profileId()};
- const r=g==='canil'?await supabaseClient.rpc('v7_4_2_transferir_servico_canil',{p_modo:'substituicao',...common}):await supabaseClient.rpc('v7_2_3_substituir_servico',{p_grupo:g,...common});
+ const r=canManage?(g==='canil'?await supabaseClient.rpc('v7_4_2_transferir_servico_canil',{p_modo:'substituicao',...common}):await supabaseClient.rpc('v7_2_3_substituir_servico',{p_grupo:g,...common})):await supabaseClient.rpc('v7_5_9_transferir_meu_servico',{p_modo:'substituicao',p_grupo:g,p_data_servico:common.p_data_servico,p_destino_usuario_id:common.p_destino_usuario_id,p_destino_pessoa_externa_id:common.p_destino_pessoa_externa_id,p_observacao:common.p_observacao,p_usuario_id:Number(user.id),p_perfil_id:profileId()});
  if(r.error)return alert(r.error.message);modal('replaceModal',false);await loadScale();
 }
 function openVacation(row,vac=null){

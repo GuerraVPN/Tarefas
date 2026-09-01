@@ -52,17 +52,13 @@ function install(){
   c.__v751RotationInstalled=true;return true;
 }
 if(!install()){
-  // V1.6: 0 ms podia saturar o thread principal do Android WebView.
-  let attempts=0;
-  const timer=setInterval(()=>{attempts++;if(install()||attempts>=40)clearInterval(timer)},125);
-  setTimeout(()=>clearInterval(timer),5200);
+  const timer=setInterval(()=>{if(install())clearInterval(timer)},0);
+  setTimeout(()=>clearInterval(timer),5000);
 }
 })();
 
 (function(){
 'use strict';
-// No APK o shell nativo é carregado; não crie uma segunda barra/menu mobile.
-if(window.__TAREFAS_NATIVE_APP__)return;
 const MQ=window.matchMedia('(max-width: 900px)');
 let sidebar=null,bar=null,backdrop=null,toggle=null;
 function closeMenu(){document.body.classList.remove('v62-menu-open');if(toggle)toggle.setAttribute('aria-expanded','false');}
@@ -105,14 +101,14 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     add('v7_4_7_aditamento_patch.js?v=7.5.1','data-v747-aditamento-patch',function(){
      add('v6_5_patch.js?v=6.5','data-v65-loader',function(){
       add('v7_4_12_global.js?v=7.5.1','data-v7412-global',function(){
-       add('v7_5_1_version.js?v=7.5.1','data-v751-version',function(){
+       add('v7_5_1_version.js?v=7.5.11','data-v751-version',function(){
         add('v7_4_3_period.js?v=7.5.1','data-v743-period',function(){
          add('v7_4_3_pdf.js?v=7.5.1','data-v743-pdf',function(){
           add('v7_4_2_search_order.js?v=7.5.1','data-v742-search-order',function(){
            add('v7_4_2_transfer.js?v=7.5.1','data-v742-transfer',function(){
             add('v7_4_2_replace.js?v=7.5.1','data-v742-replace',function(){
              add('v7_5_service_editor.js?v=7.5.1','data-v75-service-editor',function(){
-              add('v7_5_1_about.js?v=7.5.1','data-v751-about');
+              add('v7_5_1_about.js?v=7.5.11','data-v751-about');
              });
             });
            });

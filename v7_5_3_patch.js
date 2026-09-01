@@ -42,7 +42,7 @@ function logged(){try{return JSON.parse(localStorage.getItem('usuarioLogado')||'
 function client(){try{return typeof supabaseClient!=='undefined'?supabaseClient:null}catch(_){return null}}
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
 const GROUPS={sargento:'Sargentos',motorista:'Motoristas',patrulheiro:'Patrulheiros',permanencia:'Permanência',canil:'Permanência/Canil'};
-let serviceRows=[],lastRange='',loading=false,observer=null,channel=null,applying=false;
+let serviceRows=[],lastRange='',loading=false,channel=null,lastDomSig='';
 
 function calendarRange(){
  const cells=[...document.querySelectorAll('#calendarGrid .day-cell[data-date]')];
@@ -76,36 +76,39 @@ function ensureCalendarCss(){
 }
 function ensureLegend(){
  const legend=document.querySelector('.legend');if(!legend||legend.querySelector('[data-v753-service-legend]'))return;
- const el=document.createElement('div');el.className='legend-item';el.dataset.v753ServiceLegend='1';el.innerHTML='<span class="v753-service-dot" style="width:12px;height:12px;border-radius:2px;background:var(--v4-accent,#eab308)"></span>Serviço';
+ const el=document.createElement('div');el.className='legend-item';el.dataset.v753ServiceLegend='1';el.innerHTML='<span style="width:12px;height:12px;border-radius:2px;background:var(--v4-accent,#eab308)"></span>Serviço';
  legend.insertBefore(el,legend.querySelector('.legend-spacer'));
 }
 function serviceLabel(s){return `${s.marcacao||'SV'} · ${GROUPS[s.grupo]||s.grupo||'Serviço'}`}
 function applyCalendarServices(){
- if(page!=='calendario.html'||applying)return;applying=true;
- try{
-   ensureCalendarCss();ensureLegend();
-   document.querySelectorAll('[data-v753-service-item],[data-v753-service-card]').forEach(x=>x.remove());
-   for(const s of serviceRows){
-     const cell=document.querySelector(`#calendarGrid .day-cell[data-date="${CSS.escape(String(s.data_servico))}"]`);if(!cell)continue;
-     const item=document.createElement('div');item.className='day-service-v753';item.dataset.v753ServiceItem=String(s.id);item.title='Abrir Escala de serviço';
-     item.innerHTML=`<span class="v753-service-dot"></span><span class="v753-service-title">${esc(serviceLabel(s))}</span>`;
-     item.addEventListener('click',e=>{e.stopPropagation();location.href='pessoal.html'});cell.appendChild(item);
-   }
-   const selected=document.querySelector('#calendarGrid .day-cell.selected[data-date]')?.dataset.date;
-   const list=document.getElementById('dayTasksList');
-   if(selected&&list){
-     const day=serviceRows.filter(x=>x.data_servico===selected);
-     day.forEach(s=>{const card=document.createElement('div');card.className='v753-service-card';card.dataset.v753ServiceCard=String(s.id);card.innerHTML=`<b>🛡️ ${esc(GROUPS[s.grupo]||'Serviço')}</b><small>Serviço confirmado na escala.</small>${s.observacao?`<small>${esc(s.observacao)}</small>`:''}<span class="v753-service-badge">${esc(s.marcacao||'SV')}</span>`;card.onclick=()=>location.href='pessoal.html';list.appendChild(card)});
-   }
- }finally{applying=false}
+ if(page!=='calendario.html')return;
+ ensureCalendarCss();ensureLegend();
+ document.querySelectorAll('[data-v753-service-item],[data-v753-service-card]').forEach(x=>x.remove());
+ for(const s of serviceRows){
+   const cell=document.querySelector(`#calendarGrid .day-cell[data-date="${String(s.data_servico)}"]`);if(!cell)continue;
+   const item=document.createElement('div');item.className='day-service-v753';item.dataset.v753ServiceItem=String(s.id);item.title='Abrir Escala de serviço';
+   item.innerHTML=`<span class="v753-service-dot"></span><span class="v753-service-title">${esc(serviceLabel(s))}</span>`;
+   item.addEventListener('click',e=>{e.stopPropagation();location.href='pessoal.html'});cell.appendChild(item);
+ }
+ const selected=document.querySelector('#calendarGrid .day-cell.selected[data-date]')?.dataset.date;
+ const list=document.getElementById('dayTasksList');
+ if(selected&&list){
+   serviceRows.filter(x=>x.data_servico===selected).forEach(s=>{
+     const card=document.createElement('div');card.className='v753-service-card';card.dataset.v753ServiceCard=String(s.id);
+     card.innerHTML=`<b>🛡️ ${esc(GROUPS[s.grupo]||'Serviço')}</b><small>Serviço confirmado na escala.</small>${s.observacao?`<small>${esc(s.observacao)}</small>`:''}<span class="v753-service-badge">${esc(s.marcacao||'SV')}</span>`;
+     card.onclick=()=>location.href='pessoal.html';list.appendChild(card);
+   });
+ }
+}
+function calendarDomSignature(){
+ const rg=calendarRange();if(!rg)return '';
+ const selected=document.querySelector('#calendarGrid .day-cell.selected[data-date]')?.dataset.date||'';
+ return `${rg.ini}|${rg.fim}|${selected}`;
 }
 function watchCalendar(){
  if(page!=='calendario.html')return;
- ensureCalendarCss();
- let timer=null;
- observer=new MutationObserver(()=>{clearTimeout(timer);timer=setTimeout(()=>{loadCalendarServices();applyCalendarServices()},80)});
- const root=document.getElementById('calendarGrid')?.parentElement||document.body;observer.observe(root,{childList:true,subtree:true,attributes:true,attributeFilter:['class','data-date']});
- loadCalendarServices(true);
+ ensureCalendarCss();loadCalendarServices(true);
+ setInterval(()=>{const sig=calendarDomSignature();if(!sig||sig===lastDomSig)return;lastDomSig=sig;loadCalendarServices()},350);
  try{const c=client();if(c){channel=c.channel('v753-calendario-servicos').on('postgres_changes',{event:'*',schema:'public',table:'escala_servicos'},()=>loadCalendarServices(true)).subscribe()}}catch(_){}
  window.addEventListener('focus',()=>loadCalendarServices(true));
 }
