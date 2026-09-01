@@ -7,21 +7,21 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="perfis.js?v=7.4.12"></script>
   <link rel="stylesheet" href="v4_tema.css?v=6.2">
-  <link rel="stylesheet" href="games.css?v=1.9.8">
+  <link rel="stylesheet" href="games.css?v=1.9.9">
 </head>
 <body class="tm-games-body">
   <script>
     const usuarioLogado=JSON.parse(localStorage.getItem('usuarioLogado')||'null');
     if(!usuarioLogado?.id)location.replace('index.html');
     const SUPABASE_URL='https://bpvijatnsluwsgnzklrd.supabase.co';
-    const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInJlZiI6ImJwdmlqYXRuc2x1d3NnbnprbHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MzkxNDMsImV4cCI6MjEwMjQxNTE0M30.uvyfm9mgl6MON0v75CwfGzNz6FBqw58uzR4ZcRAOLNQ';
+    const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwdmlqYXRuc2x1d3NnbnprbHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MzkxNDMsImV4cCI6MjEwMjQxNTE0M30.uvyfm9mgl6MON0v75CwfGzNz6FBqw58uzR4ZcRAOLNQ';
     const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
   </script>
 
   <main class="tm-games-page">
     <section class="tm-games-hero">
       <div>
-        <span class="tm-games-beta">BETA 1.9.8</span>
+        <span class="tm-games-beta">BETA 1.9.9</span>
         <h1>Jogos</h1>
         <p>Nove jogos, recordes pessoais e placar público do TAREFAS.</p>
       </div>
@@ -80,6 +80,6 @@
   </main>
 
   <script src="notificacoes.js?v=6.0"></script>
-  <script src="games.js?v=1.9.8"></script>
+  <script src="games.js?v=1.9.9"></script>
 </body>
 </html>
