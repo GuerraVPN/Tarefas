@@ -51,3 +51,4 @@ jobs:
             git commit -m 'feat(android): completar nove jogos na beta 1.9.8'
             git push origin HEAD:app/android-v198-prep
           fi
+# retry 2
