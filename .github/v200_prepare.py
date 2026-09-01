@@ -1,5 +1,5 @@
 from pathlib import Path
-import json,re
+import json
 
 # package.json
 p=Path('package.json'); data=json.loads(p.read_text(encoding='utf-8'))
@@ -19,8 +19,10 @@ old="await patch('mobile-updates-v181.js',[[\"const APP_VERSION = '1.8.9';\",\"c
 new="await patch('mobile-updates-v181.js',[[\"const APP_VERSION = '1.8.9';\",\"const APP_VERSION = '2.0.0';\"],[\"const APP_BUILD = 189;\",\"const APP_BUILD = 200;\"],[\"const APP_CHANNEL = 'beta';\",\"const APP_CHANNEL = 'official';\"]]);"
 if old not in s: raise SystemExit('build: mobile-updates patch não encontrado')
 s=s.replace(old,new)
-# A Base Web 7.6.0 já contém a proteção native() na v7_5_4_patch.js.
-s=re.sub(r"\nawait patch\('v7_5_4_patch\.js',\[\[\"function usersInline\(\)\{if\(page\(\)!=='usuarios\.html'\)return;\",\"function usersInline\(\)\{if\(page\(\)!=='usuarios\.html'\|\|native\(\)\)return;\"\]\]\);",'',s)
+old_guard="await patch('v7_5_4_patch.js',[[\"function usersInline(){if(page()!=='usuarios.html')return;\",\"function usersInline(){if(page()!=='usuarios.html'||native())return;\"]]);"
+new_guard="await patch('v7_5_4_patch.js',[[\"function usersInline(){\\n if(page()!=='usuarios.html')return;\",\"function usersInline(){\\n if(page()!=='usuarios.html'||native())return;\"]]);"
+if old_guard not in s: raise SystemExit('build: patch legado de usersInline não encontrado')
+s=s.replace(old_guard,new_guard)
 s=s.replace('BETA:', 'OFICIAL:').replace('placar corrigido e nove jogos','Jogos finalizados, gráficos renovados, trilhas próprias e placares públicos')
 p.write_text(s,encoding='utf-8')
 
