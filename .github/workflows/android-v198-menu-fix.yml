@@ -1,0 +1,31 @@
+name: Fix Android 1.9.8 Games Menu
+on:
+  push:
+    branches: [app/android-v198-prep]
+    paths: ['.github/workflows/android-v198-menu-fix.yml']
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: app/android-v198-prep
+      - name: Renomear entrada para Jogos
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('app/mobile-bootstrap.js');s=p.read_text(encoding='utf-8')
+          old="['Dinossauro','games.html','Corra, marque pontos e dispute o placar']"
+          if old not in s: raise SystemExit('entrada Dinossauro não encontrada')
+          p.write_text(s.replace(old,"['Jogos','games.html','Nove jogos e placares públicos']"),encoding='utf-8')
+          PY
+          grep -q "\['Jogos','games.html'" app/mobile-bootstrap.js
+      - name: Commitar
+        run: |
+          git config user.name 'GuerraVPN Android Build'
+          git config user.email '81371258+GuerraVPN@users.noreply.github.com'
+          git add app/mobile-bootstrap.js
+          git commit -m 'fix(android): exibir hub Jogos no menu da 1.9.8'
+          git push origin HEAD:app/android-v198-prep
