@@ -2,12 +2,13 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+  <meta name="theme-color" content="#050b09">
   <title>Jogos - TAREFAS</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="perfis.js?v=7.4.12"></script>
   <link rel="stylesheet" href="v4_tema.css?v=6.2">
-  <link rel="stylesheet" href="games.css?v=1.9.9">
+  <link rel="stylesheet" href="games.css?v=2.0.0">
 </head>
 <body class="tm-games-body">
   <script>
@@ -20,29 +21,34 @@
 
   <main class="tm-games-page">
     <section class="tm-games-hero">
-      <div>
-        <span class="tm-games-beta">BETA 1.9.9</span>
+      <div class="tm-games-hero-copy">
+        <span class="tm-games-beta" id="gamesVersionLabel">JOGOS · 26º PEL PE MEC</span>
         <h1>Jogos</h1>
-        <p>Nove jogos, recordes pessoais e placar público do TAREFAS.</p>
+        <p>Nove desafios com recorde pessoal, ranking público e trilhas próprias.</p>
       </div>
-      <div class="tm-games-trophy" aria-hidden="true">🏆</div>
+      <div class="tm-games-hero-actions">
+        <button type="button" class="tm-music-toggle" id="musicToggle" aria-pressed="true" aria-label="Ativar ou desativar música"><span aria-hidden="true">🔊</span><small>MÚSICA</small></button>
+        <div class="tm-games-trophy" aria-hidden="true"><span>26</span><b>🏆</b></div>
+      </div>
     </section>
 
-    <section class="tm-games-picker" id="gamePicker" aria-label="Escolher jogo">
-      <button type="button" class="active" data-game="dino"><b>🦖</b><span>Dinossauro</span></button>
-      <button type="button" data-game="snake"><b>🐍</b><span>Cobrinha</span></button>
-      <button type="button" data-game="memory"><b>🧠</b><span>Memória</span></button>
-      <button type="button" data-game="game2048"><b>2048</b><span>2048</span></button>
-      <button type="button" data-game="minesweeper"><b>💣</b><span>Campo Minado</span></button>
-      <button type="button" data-game="precision"><b>🎯</b><span>Precisão</span></button>
-      <button type="button" data-game="reflex"><b>⚡</b><span>Reflexo</span></button>
-      <button type="button" data-game="flight"><b>✈️</b><span>Voo Infinito</span></button>
-      <button type="button" data-game="hillclimb"><b>🏎️</b><span>Subida Infinita</span></button>
+    <section class="tm-games-picker-wrap" aria-label="Jogos disponíveis">
+      <div class="tm-games-picker" id="gamePicker">
+        <button type="button" class="active" data-game="dino"><b>🦖</b><span>Dinossauro</span></button>
+        <button type="button" data-game="snake"><b>🐍</b><span>Cobrinha</span></button>
+        <button type="button" data-game="memory"><b>🧠</b><span>Memória</span></button>
+        <button type="button" data-game="game2048"><b>2048</b><span>2048</span></button>
+        <button type="button" data-game="minesweeper"><b>💣</b><span>Campo Minado</span></button>
+        <button type="button" data-game="precision"><b>🎯</b><span>Precisão</span></button>
+        <button type="button" data-game="reflex"><b>⚡</b><span>Reflexo</span></button>
+        <button type="button" data-game="flight"><b>✈️</b><span>Voo Infinito</span></button>
+        <button type="button" data-game="hillclimb"><b>🚙</b><span>Subida Infinita</span></button>
+      </div>
     </section>
 
     <section class="tm-game-card">
       <div class="tm-game-title">
-        <div>
+        <div class="tm-game-heading">
           <span class="tm-game-kicker" id="gameKicker">CORRIDA</span>
           <h2 id="gameTitle">Dinossauro</h2>
           <p id="gameDescription">Toque na pista para pular os obstáculos.</p>
@@ -53,8 +59,8 @@
         </div>
       </div>
 
-      <div class="tm-game-stage" id="gameStage" aria-live="polite"></div>
-      <div class="tm-game-controls" id="gameControls"></div>
+      <div class="tm-game-stage" id="gameStage" data-layout="canvas" aria-live="polite"></div>
+      <div class="tm-game-controls" id="gameControls" aria-label="Controles do jogo"></div>
 
       <div class="tm-game-actions">
         <button type="button" id="gameStart">Jogar</button>
@@ -75,11 +81,11 @@
       <div id="leaderboardList" class="tm-leaderboard-list" aria-live="polite">
         <div class="tm-leaderboard-empty">Carregando o placar…</div>
       </div>
-      <p class="tm-leaderboard-note">O placar mostra a melhor pontuação de cada jogador em cada jogo.</p>
+      <p class="tm-leaderboard-note">A melhor pontuação de cada jogador aparece no ranking de cada jogo.</p>
     </section>
   </main>
 
   <script src="notificacoes.js?v=6.0"></script>
-  <script src="games.js?v=1.9.9"></script>
+  <script src="games.js?v=2.0.0"></script>
 </body>
 </html>
