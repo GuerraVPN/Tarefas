@@ -1,0 +1,212 @@
+name: Android 1.9.8 Beta Release
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [app/android-v198-prep]
+    paths:
+      - '.github/workflows/android-v198-release.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: app/android-v198-prep
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build web bundle 1.9.8 beta
+        run: npm run build:web
+
+      - name: Conferência do bundle 1.9.8
+        run: |
+          set -euo pipefail
+          npm run verify:web
+          node --check dist/games.js
+          grep -q '1.9.8 • WEB 7.5.7' dist/mobile-v12.js
+          grep -q 'v1_9_8_start_game_run' dist/games.js
+          grep -q 'v1_9_8_submit_game_score' dist/games.js
+          grep -q 'v1_9_8_games_leaderboard' dist/games.js
+          grep -q 'Dinossauro' dist/games.html
+          grep -q 'Cobrinha' dist/games.html
+          grep -q 'Memória' dist/games.html
+          grep -q '2048' dist/games.html
+          grep -q 'Campo Minado' dist/games.html
+          grep -q 'Precisão' dist/games.html
+          grep -q 'Reflexo' dist/games.html
+          grep -q 'Voo Infinito' dist/games.html
+          grep -q 'Subida Infinita' dist/games.html
+          for game in dino snake memory game2048 minesweeper precision reflex flight hillclimb; do grep -q "$game" dist/games.js; done
+          grep -q 'tarefas:update-download-progress' dist/native-mobile.js
+          grep -q 'Alterar tarefa' dist/mobile-v196.js
+          grep -q 'v1_9_6_send_message' dist/mobile-v196.js
+
+      - name: Conferir Firebase Android
+        run: |
+          curl --fail --silent --show-error --retry 3 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/firebase-config-v17' -o app/google-services.json
+          test -s app/google-services.json
+          grep -q 'br.com.guerravpn.tarefas.mobile' app/google-services.json
+          grep -q 'tarefas-561c8' app/google-services.json
+
+      - name: Add Android platform
+        run: npx cap add android
+
+      - name: Instalar Firebase no projeto Android
+        run: cp app/google-services.json android/app/google-services.json
+
+      - name: Set Android app version
+        run: |
+          sed -i 's/versionCode 1/versionCode 198/' android/app/build.gradle
+          sed -i 's/versionName "1.0"/versionName "1.9.8"/' android/app/build.gradle
+
+      - name: Generate Android icon assets
+        run: npm run assets:android
+
+      - name: Sync Capacitor
+        run: npx cap sync android
+
+      - name: Configurar armazenamento e plugin nativo
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('android/app/src/main/AndroidManifest.xml')
+          s=p.read_text(encoding='utf-8')
+          permissions='''    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />\n    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />\n    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />\n    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />\n'''
+          if 'android.permission.READ_EXTERNAL_STORAGE' not in s:
+              s=s.replace('<application',permissions+'    <application',1)
+          else:
+              for line,needle in [
+                ('    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />\n','android.permission.MANAGE_EXTERNAL_STORAGE'),
+                ('    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />\n','android.permission.REQUEST_INSTALL_PACKAGES')]:
+                if needle not in s:s=s.replace('<application',line+'    <application',1)
+          if 'android:requestLegacyExternalStorage' not in s:
+              s=s.replace('<application','<application android:requestLegacyExternalStorage="true"',1)
+          p.write_text(s,encoding='utf-8')
+          xml=Path('android/app/src/main/res/xml');xml.mkdir(parents=True,exist_ok=True)
+          (xml/'file_paths.xml').write_text('''<?xml version="1.0" encoding="utf-8"?>\n<paths xmlns:android="http://schemas.android.com/apk/res/android">\n  <files-path name="files" path="." />\n  <cache-path name="cache" path="." />\n  <external-files-path name="external-files" path="." />\n  <external-cache-path name="external-cache" path="." />\n  <external-path name="external" path="." />\n</paths>\n''',encoding='utf-8')
+          PY
+          JAVA_DIR='android/app/src/main/java/br/com/guerravpn/tarefas/mobile'
+          mkdir -p "$JAVA_DIR"
+          cp app/android/StorageAccessPlugin.java "$JAVA_DIR/StorageAccessPlugin.java"
+          cat > "$JAVA_DIR/MainActivity.java" <<'JAVA'
+          package br.com.guerravpn.tarefas.mobile;
+          import android.os.Bundle;
+          import com.getcapacitor.BridgeActivity;
+          public class MainActivity extends BridgeActivity {
+              @Override public void onCreate(Bundle savedInstanceState) {
+                  registerPlugin(StorageAccessPlugin.class);
+                  super.onCreate(savedInstanceState);
+              }
+          }
+          JAVA
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Build debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug
+
+      - name: Validar APK 1.9.8 beta
+        run: |
+          set -euo pipefail
+          APK='android/app/build/outputs/apk/debug/app-debug.apk'
+          test -s "$APK"
+          unzip -tq "$APK"
+          python3 - <<'PY'
+          import json
+          with open('android/app/build/outputs/apk/debug/output-metadata.json',encoding='utf-8') as f: el=json.load(f)['elements'][0]
+          assert int(el['versionCode'])==198,el
+          assert str(el['versionName'])=='1.9.8',el
+          PY
+          unzip -p "$APK" assets/public/native-mobile.js > /tmp/198-native.js
+          unzip -p "$APK" assets/public/mobile-updates-v181.js > /tmp/198-updates.js
+          unzip -p "$APK" assets/public/mobile-v196.js > /tmp/198-features.js
+          unzip -p "$APK" assets/public/games.js > /tmp/198-games.js
+          unzip -p "$APK" assets/public/games.html > /tmp/198-games.html
+          grep -q 'tarefas:update-download-progress' /tmp/198-native.js
+          grep -q 'tmUpdateProgressBar' /tmp/198-updates.js
+          grep -q 'Alterar tarefa' /tmp/198-features.js
+          grep -q 'v1_9_6_send_message' /tmp/198-features.js
+          grep -q 'v1_9_8_start_game_run' /tmp/198-games.js
+          grep -q 'v1_9_8_submit_game_score' /tmp/198-games.js
+          grep -q 'leaderboardList' /tmp/198-games.html
+          for game in dino snake memory game2048 minesweeper precision reflex flight hillclimb; do grep -q "$game" /tmp/198-games.js; done
+
+      - name: Assinar distribuição com GuerraVPN
+        run: |
+          set -euo pipefail
+          OIDC="$(curl --fail --silent --show-error -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-signing" | jq -r '.value')"
+          curl --fail --silent --show-error -H "Authorization: Bearer $OIDC" 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-signing-material' -o /tmp/tarefas-signing.json
+          jq -r '.keystore_b64' /tmp/tarefas-signing.json | base64 -d > /tmp/GuerraVPN.keystore
+          STORE_PASS="$(jq -r '.store_password' /tmp/tarefas-signing.json)"
+          KEY_ALIAS="$(jq -r '.key_alias' /tmp/tarefas-signing.json)"
+          KEY_PASS="$(jq -r '.key_password' /tmp/tarefas-signing.json)"
+          EXPECTED_CERT="$(jq -r '.cert_sha256' /tmp/tarefas-signing.json)"
+          APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)"
+          "$APKSIGNER" sign --ks /tmp/GuerraVPN.keystore --ks-key-alias "$KEY_ALIAS" --ks-pass "pass:$STORE_PASS" --key-pass "pass:$KEY_PASS" --out TAREFAS-1.9.8.apk android/app/build/outputs/apk/debug/app-debug.apk
+          VERIFY="$($APKSIGNER verify --verbose --print-certs TAREFAS-1.9.8.apk)"
+          printf '%s\n' "$VERIFY"
+          ACTUAL_CERT="$(printf '%s\n' "$VERIFY" | sed -n 's/.*certificate SHA-256 digest: //p' | head -1 | tr -d ': ' | tr '[:upper:]' '[:lower:]')"
+          test "$ACTUAL_CERT" = "$EXPECTED_CERT"
+          rm -f /tmp/tarefas-signing.json /tmp/GuerraVPN.keystore
+
+      - name: Publicar APK permanente
+        run: |
+          set -euo pipefail
+          git fetch origin app/releases
+          rm -rf /tmp/tarefas-releases
+          git worktree add /tmp/tarefas-releases origin/app/releases
+          mkdir -p /tmp/tarefas-releases/downloads
+          cp TAREFAS-1.9.8.apk /tmp/tarefas-releases/downloads/TAREFAS-1.9.8.apk
+          cd /tmp/tarefas-releases
+          git config user.name 'GuerraVPN Android Build'
+          git config user.email '81371258+GuerraVPN@users.noreply.github.com'
+          git add downloads/TAREFAS-1.9.8.apk
+          if ! git diff --cached --quiet; then
+            git commit -m 'release(android): TAREFAS 1.9.8 beta build 198'
+            git push origin HEAD:app/releases
+          fi
+          cd -
+          URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-1.9.8.apk'
+          LOCAL_SHA="$(sha256sum TAREFAS-1.9.8.apk | awk '{print $1}')"
+          for i in 1 2 3 4 5 6 7 8; do
+            if curl --fail --silent --show-error -L "$URL" -o /tmp/tarefas-published.apk; then
+              [ "$(sha256sum /tmp/tarefas-published.apk | awk '{print $1}')" = "$LOCAL_SHA" ] && echo 'APK beta permanente conferido.' && exit 0
+            fi
+            sleep 3
+          done
+          exit 1
+
+      - name: Registrar beta no servidor e disparar push
+        run: |
+          set -euo pipefail
+          OIDC="$(curl --fail --silent --show-error -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-release" | jq -r '.value')"
+          SHA="$(sha256sum TAREFAS-1.9.8.apk | awk '{print $1}')"
+          jq -n --arg version '1.9.8' --argjson build 198 --arg channel 'beta' --arg url 'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-1.9.8.apk' --arg sha "$SHA" '{version:$version,build:$build,channel:$channel,download_url:$url,sha256:$sha}' > /tmp/release.json
+          curl --fail --silent --show-error -H "Authorization: Bearer $OIDC" -H 'Content-Type: application/json' --data-binary @/tmp/release.json 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-release-publish' -o /tmp/release-result.json
+          cat /tmp/release-result.json
+          jq -e '.ok == true and .version == "1.9.8" and .build == 198' /tmp/release-result.json >/dev/null
+
+      - name: Upload APK 1.9.8 beta assinado
+        uses: actions/upload-artifact@v4
+        with:
+          name: tarefas-android-1.9.8-beta-GuerraVPN
+          path: TAREFAS-1.9.8.apk
+          if-no-files-found: error
