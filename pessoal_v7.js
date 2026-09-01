@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const ESCALA_UI_VERSION='7.5.9';
+const ESCALA_UI_VERSION='7.5.10';
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
@@ -11,7 +11,7 @@ const WEEK=['DOM','SEG','TER','QUA','QUI','SEX','SÁB'];
 let user=null,canManage=false,canServiceSelf=false,view=new Date(),users=new Map(),externals=new Map();
 let members=[],services=[],rotationServices=[],holidays=[],online=new Set(),changes=[],vacations=[],balances=[],qualifications=[];
 let selectedQualification=null;
-let projections=new Map(),dutyDates=new Map(),nextDuty=new Map();
+let projections=new Map(),dutyDates=new Map(),nextDuty=new Map(),nextForecast=new Map(),nextConfirmedDuty=new Map();
 
 function profileId(){return user?.perfil_id?Number(user.perfil_id):null}
 function iso(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
@@ -67,23 +67,30 @@ function changedBy(item){
  return `Última alteração por ${actorName(item.atualizado_por)} em ${dt(item.atualizado_em)}.`;
 }
 function moveToBack(queue,key){const i=queue.indexOf(key);if(i>=0){queue.splice(i,1);queue.push(key)}}
-function projectedNear(row,date){
+function confirmedNear(row,date){
+ return rotationServices.some(x=>samePerson(x,row)&&Math.abs(diffDays(x.data_servico,date))<=2);
+}
+function forecastNear(row,date){
  const key=personKey(row);
- if(rotationServices.some(x=>samePerson(x,row)&&Math.abs(diffDays(x.data_servico,date))<=2))return true;
- for(const list of projections.values())for(const x of list){const d=x?.item?.data_servico||x?.date;if(x?.key===key&&d&&Math.abs(diffDays(d,date))<=2)return true}
+ for(const list of projections.values())for(const x of list){
+  const d=x?.item?.data_servico||x?.date;
+  if(x?.type==='predicted'&&x?.key===key&&d&&Math.abs(diffDays(d,date))<=2)return true;
+ }
  return false;
 }
-function eligible(row,date,checkInterval=false){return !vacationFor(row,date)&&!adaptationFor(row,date)&&(!checkInterval||!projectedNear(row,date))}
+function eligible(row,date,checkInterval=false){return !vacationFor(row,date)&&!adaptationFor(row,date)&&(!checkInterval||(!confirmedNear(row,date)&&!forecastNear(row,date)))}
 function inheritedAnchor(row,lane){
  const v=lane==='vermelha'?row?.heranca_vermelha_data:row?.heranca_preta_data;
  return v?{date:v,type:'inherited',lane}:null;
 }
 function previousDuty(row,g,date,lane){
- const list=dutyDates.get(g+'|'+lane+'|'+personKey(row))||[];
- const real=[...list].reverse().find(x=>x.date<date&&x.type==='actual')||null;
+ const real=rotationServices
+  .filter(x=>x.grupo===g&&samePerson(x,row)&&scaleLane(x.data_servico)===lane&&x.data_servico<date)
+  .sort((a,b)=>b.data_servico.localeCompare(a.data_servico)||Number(b.id||0)-Number(a.id||0))[0]||null;
+ const actual=real?{date:real.data_servico,type:'actual',item:real,lane}:null;
  const inherited=inheritedAnchor(row,lane);
- if(inherited&&inherited.date<date&&(!real||inherited.date>real.date))return inherited;
- return real;
+ if(inherited&&inherited.date<date&&(!actual||inherited.date>actual.date))return inherited;
+ return actual;
 }
 function todayIso(){return iso(new Date())}
 
@@ -140,7 +147,7 @@ async function loadScale(){
  buildAllProjections();render();renderMembers();renderHolidays();renderChanges();renderSummary();
 }
 function buildAllProjections(){
- projections=new Map();dutyDates=new Map();nextDuty=new Map();
+ projections=new Map();dutyDates=new Map();nextDuty=new Map();nextForecast=new Map();nextConfirmedDuty=new Map();
  for(const g of ORDER){buildProjection(g,'preta');buildProjection(g,'vermelha')}
 }
 function buildProjection(g,lane){
@@ -187,6 +194,8 @@ function buildProjection(g,lane){
  for(const [key,list] of localDuty){
    list.sort((a,b)=>a.date.localeCompare(b.date));dutyDates.set(g+'|'+lane+'|'+key,list);
    const next=list.find(x=>x.date>=today);if(next)nextDuty.set(g+'|'+lane+'|'+key,next);
+   const confirmedNext=list.find(x=>x.date>=today&&x.type==='actual');if(confirmedNext)nextConfirmedDuty.set(g+'|'+lane+'|'+key,confirmedNext);
+   const forecast=list.find(x=>x.date>=today&&x.type==='predicted');if(forecast)nextForecast.set(g+'|'+lane+'|'+key,forecast);
  }
 }
 function dutyAt(row,g,date){const lane=scaleLane(date),list=projections.get(g+'|'+lane+'|'+date)||[];return list.find(x=>x.key===personKey(row))}
@@ -198,19 +207,26 @@ function folgaNumber(row,g,date){
 function nextMeta(row,g){
  const vac=vacations.find(v=>((row.usuario_id&&String(v.usuario_id)===String(row.usuario_id))||(row.pessoa_externa_id&&String(v.pessoa_externa_id)===String(row.pessoa_externa_id)))&&v.data_fim>=todayIso());
  if(vac&&vac.data_inicio<=todayIso()&&vac.data_fim>=todayIso())return `<span class="v721-person-meta vac">Férias até ${br(vac.data_fim)} · ADP ${br(addDays(vac.data_fim,1))}</span>`;
- const key=personKey(row),black=nextDuty.get(g+'|preta|'+key),red=nextDuty.get(g+'|vermelha|'+key),parts=[];
+ const key=personKey(row),parts=[];
  if(row.heranca_origem)parts.push(`Vaga herdada de ${row.heranca_origem}`);
- if(black)parts.push(`Preta: ${br(black.date)}${black.type==='predicted'?' prev.':''}`);
- if(red)parts.push(`Vermelha: ${br(red.date)}${red.type==='predicted'?' prev.':''}`);
- return parts.length?`<span class="v721-person-meta next">${parts.join(' · ')}</span>`:'<span class="v721-person-meta">Sem projeção — confirme um serviço em cada escala</span>';
+ for(const lane of ['preta','vermelha']){
+  const label=lane==='preta'?'Preta':'Vermelha';
+  const confirmed=nextConfirmedDuty.get(g+'|'+lane+'|'+key),forecast=nextForecast.get(g+'|'+lane+'|'+key);
+  if(confirmed&&forecast)parts.push(`${label}: conf. ${br(confirmed.date)} · prev. ${br(forecast.date)}`);
+  else if(confirmed)parts.push(`${label}: conf. ${br(confirmed.date)}`);
+  else if(forecast)parts.push(`${label}: prev. ${br(forecast.date)}`);
+ }
+ return parts.length?`<span class="v721-person-meta next">${parts.join(' · ')}</span>`:'<span class="v721-person-meta">Sem previsão — confirme um serviço inicial desta escala</span>';
 }
 function renderSummary(){
  const uniqueMembers=new Set(members.map(personKey)),uniqueOnService=new Set(services.map(personKey));
  $('sumScalePeople').textContent=uniqueMembers.size;$('sumServices').textContent=services.length;$('sumPeopleOnService').textContent=uniqueOnService.size;
- let total=0,now=todayIso();
+ let total=0;
  for(const g of ORDER)for(const row of members.filter(x=>x.grupo===g))for(const lane of ['preta','vermelha']){
-   const list=dutyDates.get(g+'|'+lane+'|'+personKey(row))||[],prev=previousDuty(row,g,addDays(now,1),lane),next=list.find(x=>x.date>now);
-   if(prev&&next)total+=countLaneDays(prev.date,next.date,lane);
+   const forecast=nextForecast.get(g+'|'+lane+'|'+personKey(row));
+   if(!forecast)continue;
+   const prev=previousDuty(row,g,forecast.date,lane);
+   if(prev)total+=countLaneDays(prev.date,forecast.date,lane);
  }
  $('sumFolgas').textContent=total;
 }
@@ -238,7 +254,7 @@ function render(){
     else if(vac){cls.push('vacation');text='FÉRIAS';title=`Férias · ${br(vac.data_inicio)} a ${br(vac.data_fim)}`}
     else if(adapt){cls.push('adaptation');text='ADP';title=`Dia de adaptação · serviço permitido a partir de ${br(addDays(date,1))}`}
     else if(duty?.type==='predicted'){cls.push('predicted');text='SV';title=`Próximo serviço previsto automaticamente · ${personName(row)} · ${br(date)}`}
-    else{const f=folgaNumber(row,g,date);if(f!==null&&f>0){cls.push('folga-count');text=String(f);title=`${f}º dia da ${scaleLaneName(date)} desde o último serviço desta mesma escala`}}
+    else{const f=folgaNumber(row,g,date);if(f!==null&&f>0){cls.push('folga-count');text=String(f);title=`${f}º dia da ${scaleLaneName(date)} desde o último serviço confirmado desta mesma escala`}}
     html+=`<td class="${cls.filter(Boolean).join(' ')}" data-user="${row.usuario_id||''}" data-external="${row.pessoa_externa_id||''}" data-group="${g}" data-date="${date}" title="${esc(title)}">${text}</td>`;
    }
    html+='</tr>';
