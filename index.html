@@ -105,6 +105,7 @@
     // ============================================================
     const SESSAO26_CHAVE = "sessao26_ultima_atividade";
     const SESSAO26_TEMPO = 30 * 60 * 1000;
+    const MENSAGENS_SESSAO_CHAVE = "tarefasPushSession17";
 
     function lerUsuarioJaLogado() {
       try {
@@ -117,6 +118,7 @@
     function encerrarSessaoLocal() {
       localStorage.removeItem("usuarioLogado");
       localStorage.removeItem(SESSAO26_CHAVE);
+      localStorage.removeItem(MENSAGENS_SESSAO_CHAVE);
     }
 
     function sessaoAindaValida() {
@@ -184,6 +186,17 @@
 
         // Verifica senha (igual ao seu código atual)
         if (data.senha === senhaDigitada) {
+          // A V7.5.8 também emite uma sessão curta/privada no backend para
+          // bloquear/desbloquear e enviar mensagens sem confiar apenas no ID do navegador.
+          const sessaoMensagens = await supabaseClient.rpc("v1_7_emitir_sessao_push", {
+            p_usuario_id: Number(data.id),
+            p_senha: senhaDigitada
+          });
+          if (sessaoMensagens.error || !sessaoMensagens.data) {
+            throw new Error("Não foi possível iniciar a sessão protegida de mensagens.");
+          }
+
+          localStorage.setItem(MENSAGENS_SESSAO_CHAVE, String(sessaoMensagens.data));
           localStorage.setItem(
             "usuarioLogado",
             JSON.stringify({
@@ -202,9 +215,11 @@
           alert(`Bem-vindo, ${data.patente} ${data.nome_guerra}!`);
           window.location.href = "dashboard.html";
         } else {
+          localStorage.removeItem(MENSAGENS_SESSAO_CHAVE);
           alert("Senha incorreta.");
         }
       } catch (err) {
+        localStorage.removeItem(MENSAGENS_SESSAO_CHAVE);
         alert("Erro ao conectar ao servidor: " + err.message);
       } finally {
         btnEntrar.disabled = false;
