@@ -1,11 +1,11 @@
 {
   "name": "tarefas-app",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "private": true,
-  "description": "TAREFAS Android 2.1.1 build 211 beta com Lavagem de Forro de Cama no Orçamentário, mantendo a Base Web 7.6.0.",
+  "description": "TAREFAS Android 2.1.2 build 212 beta com saldo PE e débito automático das lavagens, mantendo a Base Web 7.6.0.",
   "scripts": {
-    "build:web": "node scripts/build-mobile-v211.mjs",
-    "verify:web": "node scripts/verify-mobile-v211.mjs dist",
+    "build:web": "node scripts/build-mobile-v212.mjs",
+    "verify:web": "node scripts/verify-mobile-v212.mjs dist",
     "cap:add:android": "npx cap add android",
     "cap:sync": "npm run build:web && npx cap sync android",
     "assets:android": "npx @capacitor/assets generate --android --assetPath assets --iconBackgroundColor '#040808' --iconBackgroundColorDark '#040808' --splashBackgroundColor '#040808' --splashBackgroundColorDark '#040808'",
