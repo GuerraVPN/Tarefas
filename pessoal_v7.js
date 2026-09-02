@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const ESCALA_UI_VERSION='7.5.10';
+const ESCALA_UI_VERSION='7.6.1';
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
@@ -17,6 +17,7 @@ function profileId(){return user?.perfil_id?Number(user.perfil_id):null}
 function iso(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 function parseDate(s){const [y,m,d]=String(s).split('-').map(Number);return new Date(y,m-1,d)}
 function addDays(s,n){const d=parseDate(s);d.setDate(d.getDate()+n);return iso(d)}
+function adaptationDate(s){let d=addDays(s,1);while([0,6].includes(parseDate(d).getDay()))d=addDays(d,1);return d}
 function diffDays(a,b){return Math.round((parseDate(b)-parseDate(a))/86400000)}
 function br(v){return v?parseDate(v).toLocaleDateString('pt-BR'):'-'}
 function dt(v){return v?new Date(v).toLocaleString('pt-BR'):'-'}
@@ -57,7 +58,7 @@ function vacationFor(row,date){
  return vacations.find(v=>((row.usuario_id&&String(v.usuario_id)===String(row.usuario_id))||(row.pessoa_externa_id&&String(v.pessoa_externa_id)===String(row.pessoa_externa_id)))&&v.data_inicio<=date&&v.data_fim>=date);
 }
 function adaptationFor(row,date){
- return vacations.find(v=>((row.usuario_id&&String(v.usuario_id)===String(row.usuario_id))||(row.pessoa_externa_id&&String(v.pessoa_externa_id)===String(row.pessoa_externa_id)))&&addDays(v.data_fim,1)===date);
+ return vacations.find(v=>((row.usuario_id&&String(v.usuario_id)===String(row.usuario_id))||(row.pessoa_externa_id&&String(v.pessoa_externa_id)===String(row.pessoa_externa_id)))&&adaptationDate(v.data_fim)===date);
 }
 function balanceFor(row){
  return balances.find(b=>(row.usuario_id&&String(b.usuario_id)===String(row.usuario_id))||(row.pessoa_externa_id&&String(b.pessoa_externa_id)===String(row.pessoa_externa_id)));

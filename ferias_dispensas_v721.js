@@ -9,6 +9,7 @@ function pid(){return user?.perfil_id?Number(user.perfil_id):null}
 function iso(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
 function parseDate(s){const [y,m,d]=String(s).split('-').map(Number);return new Date(y,m-1,d)}
 function addDays(s,n){const d=parseDate(s);d.setDate(d.getDate()+n);return iso(d)}
+function adaptationDate(s){let d=addDays(s,1);while([0,6].includes(parseDate(d).getDay()))d=addDays(d,1);return d}
 function br(v){return v?parseDate(v).toLocaleDateString('pt-BR'):'-'}
 function dt(v){return v?new Date(v).toLocaleString('pt-BR'):'-'}
 function fmt(n){n=Number(n||0);return Number.isInteger(n)?String(n):n.toFixed(1).replace('.',',')}
@@ -19,7 +20,7 @@ function personName(x){
  const e=externals.get(String(x.pessoa_externa_id));return e?[e.patente,e.nome].filter(Boolean).join(' '):`Nome externo ${x.pessoa_externa_id}`;
 }
 function vacFor(x,date=iso(new Date())){return vacations.find(v=>personKey(v)===personKey(x)&&v.data_inicio<=date&&v.data_fim>=date)}
-function adaptFor(x,date=iso(new Date())){return vacations.find(v=>personKey(v)===personKey(x)&&addDays(v.data_fim,1)===date)}
+function adaptFor(x,date=iso(new Date())){return vacations.find(v=>personKey(v)===personKey(x)&&adaptationDate(v.data_fim)===date)}
 function historyVac(x){return vacations.filter(v=>personKey(v)===personKey(x)).sort((a,b)=>b.data_inicio.localeCompare(a.data_inicio))}
 function historyUses(x){return x.usuario_id?uses.filter(u=>String(u.usuario_id)===String(x.usuario_id)).sort((a,b)=>String(b.criado_em).localeCompare(String(a.criado_em))):[]}
 
@@ -85,7 +86,7 @@ function renderDetail(){
   <div><small>Dispensas disponíveis</small><b>${fmt(selected.dispensas_disponiveis)}</b></div>
  </div>
  <div class="v7-note"><b>Dispensas:</b> crédito manual ${fmt(selected.dispensas_credito_manual)} + missões finalizadas ${fmt(selected.dispensas_missao)} - usadas ${fmt(selected.dispensas_usadas)} = <b>${fmt(selected.dispensas_disponiveis)}</b>. Elas não interferem na Escala de Serviço.</div>
- <div style="margin-top:10px"><b style="font-size:10px">Férias</b><div class="v721-history">${vhist.length?vhist.map(v=>`<div class="v721-history-row"><div style="display:flex;justify-content:space-between;gap:8px"><b>${br(v.data_inicio)} → ${br(v.data_fim)} · ${v.dias_consumidos} dia(s)</b>${canManage?`<button class="v7-btn" data-edit-vac="${v.id}">Editar</button>`:''}</div><small>Adaptação: ${br(addDays(v.data_fim,1))}${v.observacao?' · '+esc(v.observacao):''}</small></div>`).join(''):'<div class="v7-empty">Sem férias registradas.</div>'}</div></div>
+ <div style="margin-top:10px"><b style="font-size:10px">Férias</b><div class="v721-history">${vhist.length?vhist.map(v=>`<div class="v721-history-row"><div style="display:flex;justify-content:space-between;gap:8px"><b>${br(v.data_inicio)} → ${br(v.data_fim)} · ${v.dias_consumidos} dia(s)</b>${canManage?`<button class="v7-btn" data-edit-vac="${v.id}">Editar</button>`:''}</div><small>Adaptação: ${br(adaptationDate(v.data_fim))}${v.observacao?' · '+esc(v.observacao):''}</small></div>`).join(''):'<div class="v7-empty">Sem férias registradas.</div>'}</div></div>
  ${selected.usuario_id?`<div style="margin-top:10px"><b style="font-size:10px">Dispensas utilizadas</b><div class="v721-history">${uhist.length?uhist.map(u=>`<div class="v721-history-row"><b>${u.quantidade} dispensa(s)</b><small>${(u.dias||[]).map(br).join(', ')} · ${dt(u.criado_em)}${u.observacao?' · '+esc(u.observacao):''}</small></div>`).join(''):'<div class="v7-empty">Nenhuma dispensa utilizada.</div>'}</div></div>`:''}`;
  $('fdDetail').querySelector('[data-balance]')?.addEventListener('click',openBalance);
  $('fdDetail').querySelector('[data-vacation]')?.addEventListener('click',()=>openVacation());
