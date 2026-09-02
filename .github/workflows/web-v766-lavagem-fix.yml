@@ -1,0 +1,41 @@
+name: Web 7.6.6 Lavagem Fix
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/v766_lavagem_fix.py'
+      - '.github/workflows/web-v766-lavagem-fix.yml'
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Aplicar correção 7.6.6
+        run: python3 .github/v766_lavagem_fix.py
+      - name: Validar JavaScript e marcações
+        run: |
+          set -euo pipefail
+          node --check lavanderia_financeiro_v212.js
+          node --check lavanderia_v211.js
+          node --check lavanderia_documento_v762.js
+          node --check v7_5_1_version.js
+          node --check v7_5_1_about.js
+          node --check v7_6_5_webfix.js
+          grep -q "typeof supabaseClient!=='undefined'" lavanderia_financeiro_v212.js
+          grep -q 'ORÇAMENTÁRIO · WEB 7.6.6' lavanderia_v211.js
+          grep -q 'lavanderia_financeiro_v212.js?v=7.6.6' orcamentarios.html
+          grep -q "const VERSION='7.6.6'" v7_5_1_version.js
+      - name: Publicar no main
+        run: |
+          git config user.name 'GuerraVPN Web Build'
+          git config user.email '81371258+GuerraVPN@users.noreply.github.com'
+          git add lavanderia_financeiro_v212.js lavanderia_v211.js lavanderia_documento_v762.js orcamentarios.html v6_2_mobile.js v7_5_1_version.js v7_5_1_about.js v7_6_5_webfix.js games.html games.js
+          if ! git diff --cached --quiet; then
+            git commit -m 'fix(web): corrigir saldo da Lavagem na 7.6.6'
+            git push origin HEAD:main
+          fi
