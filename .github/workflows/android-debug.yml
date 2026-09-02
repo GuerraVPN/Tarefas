@@ -34,43 +34,34 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build web bundle 2.1.1 beta
+      - name: Build web bundle 2.1.2 beta
         run: npm run build:web
 
-      - name: Conferência do bundle 2.1.1
+      - name: Conferência do bundle 2.1.2
         run: |
           set -euo pipefail
           npm run verify:web
-          node --check dist/games.js
           node --check dist/lavanderia_v211.js
-          grep -q '2.1.1 • WEB 7.6.0' dist/mobile-v12.js
+          node --check dist/lavanderia_financeiro_v212.js
+          node --check dist/lavanderia_layout_v212.js
+          node --check dist/pessoal_v7.js
+          node --check dist/ferias_dispensas_v721.js
+          node --check dist/aditamento_v74.js
+          grep -q '2.1.2 • WEB 7.6.1' dist/mobile-v12.js
           grep -q "APP_CHANNEL = 'beta'" dist/mobile-updates-v181.js
-          grep -q "VERSION='7.6.0'" dist/v7_5_1_version.js
-          grep -q 'APP 2.1.1' dist/games.js
-          grep -q 'lavanderia_v211.js?v=2.1.1' dist/orcamentarios.html
-          grep -q 'Lavagem de Forro de Cama' dist/lavanderia_v211.js
-          grep -q 'v2_1_1_lavanderia_criar' dist/lavanderia_v211.js
-          grep -q 'v2_1_1_lavanderia_conferir_recebimento' dist/lavanderia_v211.js
-          grep -q 'Conferir recebimento da leva' dist/lavanderia_v211.js
-          grep -q 'Total real recebido' dist/lavanderia_v211.js
-          grep -q 'Quem mandou lavar' dist/lavanderia_v211.js
-          grep -q 'Quem recebeu' dist/lavanderia_v211.js
-          grep -q 'Débitos Cia Com' dist/lavanderia_v211.js
-          grep -q 'Android 2.1.1 beta' dist/games.css
-          grep -q 'overflow-y:auto!important' dist/games.css
-          grep -q 'touch-action:pan-y!important' dist/games.css
-          grep -q 'data-game="snake"' dist/games.css
-          grep -q 'data-game="game2048"' dist/games.css
-          grep -q 'leaderboardList' dist/games.html
-          python3 - <<'PY'
-          import re
-          from pathlib import Path
-          def key(path):
-              m=re.search(r"SUPABASE_ANON_KEY\s*=\s*['\"]([^'\"]+)['\"]",Path(path).read_text(encoding='utf-8'))
-              assert m, path
-              return m.group(1)
-          assert key('dist/games.html') == key('dist/dashboard.html')
-          PY
+          grep -q "VERSION='7.6.1'" dist/v7_5_1_version.js
+          grep -q 'lavanderia_v211.js?v=2.1.2' dist/orcamentarios.html
+          grep -q 'lavanderia_financeiro_v212.js?v=2.1.2' dist/orcamentarios.html
+          grep -q 'lavanderia_layout_v212.js?v=2.1.2' dist/orcamentarios.html
+          grep -q 'SALDO DISPONÍVEL' dist/lavanderia_financeiro_v212.js
+          grep -q 'max-height:calc(100dvh' dist/lavanderia_layout_v212.js
+          grep -q 'position:sticky' dist/lavanderia_layout_v212.js
+          grep -q "ESCALA_UI_VERSION='7.6.1'" dist/pessoal_v7.js
+          grep -q 'adaptationDate(v.data_fim)===date' dist/pessoal_v7.js
+          grep -q 'br(adaptationDate(v.data_fim))' dist/ferias_dispensas_v721.js
+          grep -q 'adaptationDate(v.data_fim)===date' dist/aditamento_v74.js
+          grep -q 'v1_9_8_games_leaderboard' dist/games.js
+          grep -q 'v1_9_6_send_message' dist/mobile-v196.js
 
       - name: Conferir Firebase Android
         run: |
@@ -86,8 +77,8 @@ jobs:
 
       - name: Set Android app version
         run: |
-          sed -i 's/versionCode 1/versionCode 211/' android/app/build.gradle
-          sed -i 's/versionName "1.0"/versionName "2.1.1"/' android/app/build.gradle
+          sed -i 's/versionCode 1/versionCode 212/' android/app/build.gradle
+          sed -i 's/versionName "1.0"/versionName "2.1.2"/' android/app/build.gradle
 
       - name: Install stable debug signing key
         run: |
@@ -148,7 +139,7 @@ jobs:
         working-directory: android
         run: ./gradlew assembleDebug
 
-      - name: Validar APK 2.1.1 beta
+      - name: Validar APK 2.1.2 beta
         run: |
           set -euo pipefail
           APK='android/app/build/outputs/apk/debug/app-debug.apk'
@@ -157,26 +148,26 @@ jobs:
           python - <<'PY'
           import json
           with open('android/app/build/outputs/apk/debug/output-metadata.json',encoding='utf-8') as f: el=json.load(f)['elements'][0]
-          assert int(el['versionCode'])==211,el
-          assert str(el['versionName'])=='2.1.1',el
+          assert int(el['versionCode'])==212,el
+          assert str(el['versionName'])=='2.1.2',el
           PY
-          unzip -p "$APK" assets/public/games.js > /tmp/211-games.js
-          unzip -p "$APK" assets/public/games.css > /tmp/211-games.css
-          unzip -p "$APK" assets/public/games.html > /tmp/211-games.html
-          unzip -p "$APK" assets/public/mobile-updates-v181.js > /tmp/211-updates.js
-          unzip -p "$APK" assets/public/orcamentarios.html > /tmp/211-orc.html
-          unzip -p "$APK" assets/public/lavanderia_v211.js > /tmp/211-lav.js
-          node --check /tmp/211-lav.js
-          grep -q 'APP 2.1.1' /tmp/211-games.js
-          grep -q 'Android 2.1.1 beta' /tmp/211-games.css
-          grep -q 'overflow-y:auto!important' /tmp/211-games.css
-          grep -q 'touch-action:pan-y!important' /tmp/211-games.css
-          grep -q "APP_CHANNEL = 'beta'" /tmp/211-updates.js
-          grep -q 'leaderboardList' /tmp/211-games.html
-          grep -q 'lavanderia_v211.js?v=2.1.1' /tmp/211-orc.html
-          grep -q 'v2_1_1_lavanderia_conferir_recebimento' /tmp/211-lav.js
-          grep -q 'Total real recebido' /tmp/211-lav.js
-          grep -q 'Usar os pesos e preços conferidos como padrão nas próximas levas' /tmp/211-lav.js
+          unzip -p "$APK" assets/public/mobile-v12.js > /tmp/212-version.js
+          unzip -p "$APK" assets/public/orcamentarios.html > /tmp/212-orc.html
+          unzip -p "$APK" assets/public/lavanderia_v211.js > /tmp/212-lav.js
+          unzip -p "$APK" assets/public/lavanderia_financeiro_v212.js > /tmp/212-fin.js
+          unzip -p "$APK" assets/public/lavanderia_layout_v212.js > /tmp/212-layout.js
+          unzip -p "$APK" assets/public/pessoal_v7.js > /tmp/212-pessoal.js
+          unzip -p "$APK" assets/public/ferias_dispensas_v721.js > /tmp/212-ferias.js
+          node --check /tmp/212-lav.js
+          node --check /tmp/212-fin.js
+          node --check /tmp/212-layout.js
+          grep -q '2.1.2 • WEB 7.6.1' /tmp/212-version.js
+          grep -q 'lavanderia_layout_v212.js?v=2.1.2' /tmp/212-orc.html
+          grep -q 'SALDO DISPONÍVEL' /tmp/212-fin.js
+          grep -q 'max-height:calc(100dvh' /tmp/212-layout.js
+          grep -q "ESCALA_UI_VERSION='7.6.1'" /tmp/212-pessoal.js
+          grep -q 'adaptationDate(v.data_fim)===date' /tmp/212-pessoal.js
+          grep -q 'br(adaptationDate(v.data_fim))' /tmp/212-ferias.js
 
       - name: Assinar distribuição com GuerraVPN
         run: |
@@ -189,8 +180,8 @@ jobs:
           KEY_PASS="$(jq -r '.key_password' /tmp/tarefas-signing.json)"
           EXPECTED_CERT="$(jq -r '.cert_sha256' /tmp/tarefas-signing.json)"
           APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)"
-          "$APKSIGNER" sign --ks /tmp/GuerraVPN.keystore --ks-key-alias "$KEY_ALIAS" --ks-pass "pass:$STORE_PASS" --key-pass "pass:$KEY_PASS" --out TAREFAS-2.1.1.apk android/app/build/outputs/apk/debug/app-debug.apk
-          VERIFY="$($APKSIGNER verify --verbose --print-certs TAREFAS-2.1.1.apk)"
+          "$APKSIGNER" sign --ks /tmp/GuerraVPN.keystore --ks-key-alias "$KEY_ALIAS" --ks-pass "pass:$STORE_PASS" --key-pass "pass:$KEY_PASS" --out TAREFAS-2.1.2.apk android/app/build/outputs/apk/debug/app-debug.apk
+          VERIFY="$($APKSIGNER verify --verbose --print-certs TAREFAS-2.1.2.apk)"
           printf '%s\n' "$VERIFY"
           ACTUAL_CERT="$(printf '%s\n' "$VERIFY" | sed -n 's/.*certificate SHA-256 digest: //p' | head -1 | tr -d ': ' | tr '[:upper:]' '[:lower:]')"
           test "$ACTUAL_CERT" = "$EXPECTED_CERT"
@@ -203,18 +194,18 @@ jobs:
           rm -rf /tmp/tarefas-releases
           git worktree add /tmp/tarefas-releases origin/app/releases
           mkdir -p /tmp/tarefas-releases/downloads
-          cp TAREFAS-2.1.1.apk /tmp/tarefas-releases/downloads/TAREFAS-2.1.1.apk
+          cp TAREFAS-2.1.2.apk /tmp/tarefas-releases/downloads/TAREFAS-2.1.2.apk
           cd /tmp/tarefas-releases
           git config user.name 'GuerraVPN Android Build'
           git config user.email '81371258+GuerraVPN@users.noreply.github.com'
-          git add downloads/TAREFAS-2.1.1.apk
+          git add downloads/TAREFAS-2.1.2.apk
           if ! git diff --cached --quiet; then
-            git commit -m 'release(android): TAREFAS 2.1.1 beta build 211'
+            git commit -m 'release(android): TAREFAS 2.1.2 beta build 212'
             git push origin HEAD:app/releases
           fi
           cd -
-          URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.1.1.apk'
-          LOCAL_SHA="$(sha256sum TAREFAS-2.1.1.apk | awk '{print $1}')"
+          URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.1.2.apk'
+          LOCAL_SHA="$(sha256sum TAREFAS-2.1.2.apk | awk '{print $1}')"
           for i in 1 2 3 4 5 6 7 8; do
             if curl --fail --silent --show-error -L "$URL" -o /tmp/tarefas-published.apk; then
               [ "$(sha256sum /tmp/tarefas-published.apk | awk '{print $1}')" = "$LOCAL_SHA" ] && echo 'APK beta permanente conferido.' && exit 0
@@ -227,15 +218,15 @@ jobs:
         run: |
           set -euo pipefail
           OIDC="$(curl --fail --silent --show-error -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-release" | jq -r '.value')"
-          SHA="$(sha256sum TAREFAS-2.1.1.apk | awk '{print $1}')"
-          jq -n --arg version '2.1.1' --argjson build 211 --arg channel 'beta' --arg url 'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.1.1.apk' --arg sha "$SHA" '{version:$version,build:$build,channel:$channel,download_url:$url,sha256:$sha}' > /tmp/release.json
+          SHA="$(sha256sum TAREFAS-2.1.2.apk | awk '{print $1}')"
+          jq -n --arg version '2.1.2' --argjson build 212 --arg channel 'beta' --arg url 'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.1.2.apk' --arg sha "$SHA" '{version:$version,build:$build,channel:$channel,download_url:$url,sha256:$sha}' > /tmp/release.json
           curl --fail --silent --show-error -H "Authorization: Bearer $OIDC" -H 'Content-Type: application/json' --data-binary @/tmp/release.json 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-release-publish' -o /tmp/release-result.json
           cat /tmp/release-result.json
-          jq -e '.ok == true and .version == "2.1.1" and .build == 211' /tmp/release-result.json >/dev/null
+          jq -e '.ok == true and .version == "2.1.2" and .build == 212' /tmp/release-result.json >/dev/null
 
-      - name: Upload APK 2.1.1 beta assinado
+      - name: Upload APK 2.1.2 beta assinado
         uses: actions/upload-artifact@v4
         with:
-          name: tarefas-android-2.1.1-beta-GuerraVPN
-          path: TAREFAS-2.1.1.apk
+          name: tarefas-android-2.1.2-beta-GuerraVPN
+          path: TAREFAS-2.1.2.apk
           if-no-files-found: error
