@@ -37,7 +37,10 @@ new="""function winAnsi(value){
   }
   return out;
 }
-function pdfLiteral(value){return winAnsi(value).replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)').replace(/[\r\n]+/g,' ')}
+function pdfLiteral(value){
+  const clean=winAnsi(value).split(String.fromCharCode(13)).join(' ').split(String.fromCharCode(10)).join(' ');
+  let out='';for(const ch of clean){if(ch.charCodeAt(0)===92||ch==='('||ch===')')out+=String.fromCharCode(92)+ch;else out+=ch}return out;
+}
 function pdfBytes(value){const out=new Uint8Array(value.length);for(let i=0;i<value.length;i++)out[i]=value.charCodeAt(i)&255;return out}
 function buildPdf(request,items){
   const pageW=595,pageH=842,x=55,top=755,w=485,matW=355,rowH=28;
