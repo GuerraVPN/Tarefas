@@ -1,0 +1,39 @@
+name: Web 7.6.1 ADP Cleanup
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/v761_adp_cleanup.py'
+      - '.github/workflows/web-v761-adp-cleanup.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Aplicar limpeza ADP
+        run: python3 .github/v761_adp_cleanup.py
+      - name: Validar
+        run: |
+          node --check pessoal_v7.js
+          node --check ferias_dispensas_v721.js
+          node --check aditamento_v74.js
+          ! grep -q 'addDays(v.data_fim,1)' pessoal_v7.js
+          ! grep -q 'addDays(v.data_fim,1)' ferias_dispensas_v721.js
+          ! grep -q 'addDays(v.data_fim,1)' aditamento_v74.js
+          grep -q 'adaptationDate(v.data_fim)' pessoal_v7.js
+          grep -q 'adaptationDate(v.data_fim)' ferias_dispensas_v721.js
+          grep -q 'adaptationDate(v.data_fim)' aditamento_v74.js
+      - name: Commitar
+        run: |
+          git config user.name 'GuerraVPN Web Build'
+          git config user.email '81371258+GuerraVPN@users.noreply.github.com'
+          git add pessoal_v7.js ferias_dispensas_v721.js aditamento_v74.js
+          git commit -m 'fix(web): unificar ADP no próximo dia útil na 7.6.1'
+          git push origin HEAD:main
