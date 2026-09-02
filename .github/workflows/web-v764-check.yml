@@ -4,6 +4,7 @@ on:
     branches: [web/v764-prep]
     paths:
       - '.github/v764_pdf_odt.py'
+      - '.github/v764_pdf_odt_fix.py'
       - '.github/workflows/web-v764-check.yml'
 permissions:
   contents: write
@@ -16,7 +17,9 @@ jobs:
           ref: web/v764-prep
           fetch-depth: 0
       - name: Aplicar Web 7.6.4
-        run: python3 .github/v764_pdf_odt.py
+        run: |
+          python3 .github/v764_pdf_odt.py
+          python3 .github/v764_pdf_odt_fix.py
       - name: Validar
         run: |
           set -euo pipefail
