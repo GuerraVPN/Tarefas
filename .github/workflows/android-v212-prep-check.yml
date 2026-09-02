@@ -1,14 +1,17 @@
-name: Android 2.1.2 Financeiro Prep Check
+name: Android 2.1.2 Prep Check
 
 on:
   push:
     branches: [app/android-v212-prep]
     paths:
+      - 'lavanderia_layout_v212.js'
       - 'lavanderia_financeiro_v212.js'
       - 'scripts/build-mobile-v212.mjs'
       - 'scripts/verify-mobile-v212.mjs'
-      - 'package.json'
       - '.github/workflows/android-v212-prep-check.yml'
+
+permissions:
+  contents: write
 
 jobs:
   check:
@@ -17,12 +20,38 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: app/android-v212-prep
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Sincronizar Base Web 7.6.1
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          for f in pessoal_v7.js pessoal.html ferias_dispensas_v721.js ferias_dispensas.html aditamento_v74.js v7_5_1_version.js v7_5_1_about.js v6_2_mobile.js; do
+            git show "origin/main:$f" > "$f"
+          done
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          p=Path('package.json'); d=json.loads(p.read_text(encoding='utf-8'))
+          d['version']='2.1.2'
+          d['description']='TAREFAS Android 2.1.2 build 212 beta com Lavagem de Forro de Cama enquadrada, saldo PE e Base Web 7.6.1.'
+          d['scripts']['build:web']='node scripts/build-mobile-v212.mjs'
+          d['scripts']['verify:web']='node scripts/verify-mobile-v212.mjs dist'
+          p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          p=Path('package-lock.json'); s=p.read_text(encoding='utf-8')
+          s=s.replace('"version": "2.1.1"','"version": "2.1.2"',2)
+          p.write_text(s,encoding='utf-8')
+          PY
       - name: Validar JavaScript
         run: |
+          node --check lavanderia_v211.js
           node --check lavanderia_financeiro_v212.js
+          node --check lavanderia_layout_v212.js
+          node --check pessoal_v7.js
+          node --check ferias_dispensas_v721.js
+          node --check aditamento_v74.js
           node --check scripts/build-mobile-v212.mjs
           node --check scripts/verify-mobile-v212.mjs
       - name: Instalar dependências
@@ -32,6 +61,20 @@ jobs:
       - name: Validar bundle
         run: |
           npm run verify:web
-          grep -q 'lavanderia_financeiro_v212.js?v=2.1.2' dist/orcamentarios.html
-          grep -q 'SALDO DISPONÍVEL' dist/lavanderia_financeiro_v212.js
-          grep -q '2.1.2 • WEB 7.6.0' dist/mobile-v12.js
+          grep -q '2.1.2 • WEB 7.6.1' dist/mobile-v12.js
+          grep -q 'lavanderia_layout_v212.js?v=2.1.2' dist/orcamentarios.html
+          grep -q 'max-height:calc(100dvh' dist/lavanderia_layout_v212.js
+          grep -q 'position:sticky' dist/lavanderia_layout_v212.js
+          grep -q "ESCALA_UI_VERSION='7.6.1'" dist/pessoal_v7.js
+          grep -q 'adaptationDate(v.data_fim)===date' dist/pessoal_v7.js
+          grep -q 'br(adaptationDate(v.data_fim))' dist/ferias_dispensas_v721.js
+          grep -q "VERSION='7.6.1'" dist/v7_5_1_version.js
+      - name: Commitar fonte validada
+        run: |
+          git config user.name 'GuerraVPN Android Build'
+          git config user.email '81371258+GuerraVPN@users.noreply.github.com'
+          git add pessoal_v7.js pessoal.html ferias_dispensas_v721.js ferias_dispensas.html aditamento_v74.js v7_5_1_version.js v7_5_1_about.js v6_2_mobile.js package.json package-lock.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'fix(android): enquadrar lavanderia e incorporar Web 7.6.1 na 2.1.2'
+            git push origin HEAD:app/android-v212-prep
+          fi
