@@ -3,6 +3,7 @@
 if(window.__TAREFAS_V765_WEBFIX__)return;
 window.__TAREFAS_V765_WEBFIX__=true;
 const VERSION='7.6.5';
+const RELEASE={v:VERSION,title:'Navegação da Lavagem e Jogos na Web',current:true,items:['A Lavagem de Forro de Cama passa a aparecer como uma opção própria dentro de Orçamentários.','Corrigido o problema que fazia a tela da Lavagem aparecer junto das outras abas do Orçamentários.','A área Jogos volta a aparecer no menu da versão Web e abre a página com os nove jogos e placares.','Mantidas as opções ODT e PDF da versão 7.6.4 para a folha Forro de Cama para Lavar.']};
 function page(){return (location.pathname.split('/').pop()||'').toLowerCase()}
 function installCss(){
  if(document.getElementById('v765WebfixStyle'))return;
@@ -31,8 +32,19 @@ function ensureLaundryNav(){
  b.classList.toggle('active',active);
  b.onclick=e=>{e.preventDefault();e.stopPropagation();location.href='orcamentarios.html?modulo=lavanderia'};
 }
+function ensureAbout(){
+ if(page()!=='about.html'||!Array.isArray(window.versions))return;
+ window.versions.forEach(x=>{if(x)x.current=false});
+ const old=window.versions.find(x=>x?.v===VERSION);if(old)Object.assign(old,RELEASE);else window.versions.unshift({...RELEASE});
+ const sel=document.getElementById('versionSelect');
+ if(sel){
+  let opt=[...sel.options].find(o=>o.value===VERSION);if(!opt){opt=document.createElement('option');opt.value=VERSION;opt.textContent=VERSION+' — '+RELEASE.title;sel.prepend(opt)}
+  if(sel.value!==VERSION){sel.value=VERSION;sel.dispatchEvent(new Event('change'))}
+ }
+ const meta=[...document.querySelectorAll('.meta div')].find(x=>x.querySelector('small')?.textContent.includes('Versão atual'));if(meta?.querySelector('b'))meta.querySelector('b').textContent=VERSION;
+}
 function sync(){
- installCss();ensureGamesNav();ensureLaundryNav();
+ installCss();ensureGamesNav();ensureLaundryNav();ensureAbout();
  const label=document.getElementById('gamesVersionLabel');if(label)label.textContent='WEB '+VERSION+' · 26º PEL PE MEC';
 }
 function start(){sync();const obs=new MutationObserver(()=>queueMicrotask(sync));obs.observe(document.body,{subtree:true,childList:true})}
