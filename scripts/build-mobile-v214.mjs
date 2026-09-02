@@ -35,10 +35,10 @@ await patch('lavanderia_v211.js',[["ORÇAMENTÁRIO · BETA 2.1.3","ORÇAMENTÁRI
 
 const orcFile=path.join(dist,'orcamentarios.html');
 let orc=await readFile(orcFile,'utf8');
-orc=orc.replace('lavanderia_v211.js?v=2.1.3','lavanderia_v211.js?v=2.1.4');
-orc=orc.replace('lavanderia_financeiro_v212.js?v=2.1.3','lavanderia_financeiro_v212.js?v=2.1.4');
-orc=orc.replace('lavanderia_layout_v212.js?v=2.1.3','lavanderia_layout_v212.js?v=2.1.4');
-orc=orc.replace('lavanderia_documento_v762.js?v=2.1.3','lavanderia_documento_v762.js?v=2.1.4');
+for(const script of ['lavanderia_v211.js','lavanderia_financeiro_v212.js','lavanderia_layout_v212.js','lavanderia_documento_v762.js']){
+  orc=orc.replace(`${script}?v=2.1.3`,`${script}?v=2.1.4`);
+  orc=orc.replace(`${script}?v=7.6.3`,`${script}?v=2.1.4`);
+}
 await writeFile(orcFile,orc,'utf8');
 
 console.log('TAREFAS Android 2.1.4 build 214 BETA: Base Web 7.6.3, férias protegidas até ADP e ODT da Lavagem.');
