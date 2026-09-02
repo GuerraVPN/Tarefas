@@ -12,7 +12,7 @@ const checks={
  'mobile-updates-v181.js':['2.1.1','APP_BUILD = 211',"APP_CHANNEL = 'beta'"],
  'native-mobile.js':['2.1.1','tarefas:update-download-progress'],
  'orcamentarios.html':['lavanderia_v211.js?v=2.1.1'],
- 'lavanderia_v211.js':['Lavagem de Forro de Cama','v2_1_1_lavanderia_criar','v2_1_1_lavanderia_acao','v2_1_1_lavanderia_registrar_anexo','v2_1_1_lavanderia_debito_criar','v2_1_1_lavanderia_debito_quitar','Gerar folha para assinatura','Quem mandou lavar','Quem recebeu','assinatura_envio','nota_recebimento','Débitos Cia Com','O valor antigo da planilha não foi importado.'],
+ 'lavanderia_v211.js':['Lavagem de Forro de Cama','v2_1_1_lavanderia_criar','v2_1_1_lavanderia_acao','v2_1_1_lavanderia_registrar_anexo','v2_1_1_lavanderia_debito_criar','v2_1_1_lavanderia_debito_quitar','v2_1_1_lavanderia_conferir_recebimento','Gerar folha para assinatura','Quem mandou lavar','Quem recebeu','assinatura_envio','nota_recebimento','Débitos Cia Com','Conferir recebimento da leva','Total real recebido','Usar os pesos e preços conferidos como padrão nas próximas levas','quantidade_recebida','peso_unitario_recebido_kg','valor_unitario_recebido','subtotal_recebido','O valor antigo da planilha não foi importado.'],
  'games.html':['games.css?v=2.1.1','games.js?v=2.1.1'],
  'games.js':['APP 2.1.1','WEB 7.6.0','v1_9_8_games_leaderboard'],
  'mobile-v196.js':['Alterar tarefa','v1_9_6_send_message'],
@@ -22,4 +22,4 @@ for(const [rel,markers] of Object.entries(checks))if(await exists(rel)){const s=
 if(await exists('lavanderia_v211.js')){const s=await text('lavanderia_v211.js');if(s.includes('997,80')||s.includes('997.80'))errors.push('lavanderia: débito antigo não deve ser importado');}
 let total=0;for(const rel of await readdir(root)){try{const st=await stat(path.join(root,rel));if(st.isFile())total+=st.size}catch{}}
 if(total<100000)errors.push('bundle pequeno demais');
-console.log(`VERIFY 2.1.1 build 211 BETA / WEB 7.6.0: ${root}`);console.log(`Tamanho raiz: ${total} bytes`);if(errors.length){for(const e of errors)console.error('ERRO:',e);process.exit(1)}console.log('OK: 2.1.1 beta validada com Lavagem de Forro de Cama, folha de assinatura, anexos e Débitos Cia Com.');
+console.log(`VERIFY 2.1.1 build 211 BETA / WEB 7.6.0: ${root}`);console.log(`Tamanho raiz: ${total} bytes`);if(errors.length){for(const e of errors)console.error('ERRO:',e);process.exit(1)}console.log('OK: 2.1.1 beta validada com Lavagem de Forro de Cama, conferência real da leva, folha de assinatura, anexos e Débitos Cia Com.');
