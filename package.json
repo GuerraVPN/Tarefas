@@ -1,11 +1,11 @@
 {
   "name": "tarefas-app",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "private": true,
-  "description": "TAREFAS Android 2.0.0 build 200 oficial com Jogos e Base Web 7.6.0.",
+  "description": "TAREFAS Android 2.0.1 build 201 beta com correção de enquadramento e rolagem dos Jogos, mantendo a Base Web 7.6.0.",
   "scripts": {
-    "build:web": "node scripts/build-mobile.mjs",
-    "verify:web": "node scripts/verify-mobile-build.mjs dist",
+    "build:web": "node scripts/build-mobile-v201.mjs",
+    "verify:web": "node scripts/verify-mobile-v201.mjs dist",
     "cap:add:android": "npx cap add android",
     "cap:sync": "npm run build:web && npx cap sync android",
     "assets:android": "npx @capacitor/assets generate --android --assetPath assets --iconBackgroundColor '#040808' --iconBackgroundColorDark '#040808' --splashBackgroundColor '#040808' --splashBackgroundColorDark '#040808'",
