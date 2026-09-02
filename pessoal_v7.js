@@ -1,6 +1,6 @@
 (function(){
 'use strict';
-const ESCALA_UI_VERSION='7.6.1';
+const ESCALA_UI_VERSION='7.6.3';
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
@@ -57,6 +57,9 @@ function rotationActuals(g,date){return rotationServices.filter(x=>x.grupo===g&&
 function vacationFor(row,date){
  return vacations.find(v=>((row.usuario_id&&String(v.usuario_id)===String(row.usuario_id))||(row.pessoa_externa_id&&String(v.pessoa_externa_id)===String(row.pessoa_externa_id)))&&v.data_inicio<=date&&v.data_fim>=date);
 }
+function vacationProtectionFor(row,date){
+ return vacations.find(v=>((row.usuario_id&&String(v.usuario_id)===String(row.usuario_id))||(row.pessoa_externa_id&&String(v.pessoa_externa_id)===String(row.pessoa_externa_id)))&&v.data_inicio<=date&&adaptationDate(v.data_fim)>=date);
+}
 function adaptationFor(row,date){
  return vacations.find(v=>((row.usuario_id&&String(v.usuario_id)===String(row.usuario_id))||(row.pessoa_externa_id&&String(v.pessoa_externa_id)===String(row.pessoa_externa_id)))&&adaptationDate(v.data_fim)===date);
 }
@@ -79,7 +82,7 @@ function forecastNear(row,date){
  }
  return false;
 }
-function eligible(row,date,checkInterval=false){return !vacationFor(row,date)&&!adaptationFor(row,date)&&(!checkInterval||(!confirmedNear(row,date)&&!forecastNear(row,date)))}
+function eligible(row,date,checkInterval=false){return !vacationProtectionFor(row,date)&&(!checkInterval||(!confirmedNear(row,date)&&!forecastNear(row,date)))}
 function inheritedAnchor(row,lane){
  const v=lane==='vermelha'?row?.heranca_vermelha_data:row?.heranca_preta_data;
  return v?{date:v,type:'inherited',lane}:null;

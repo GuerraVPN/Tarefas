@@ -1,11 +1,11 @@
 {
   "name": "tarefas-app",
-  "version": "2.1.3",
+  "version": "2.1.4",
   "private": true,
-  "description": "TAREFAS Android 2.1.3 build 213 beta com geração ODT da Lavagem de Forro de Cama e Base Web 7.6.2.",
+  "description": "TAREFAS Android 2.1.4 build 214 beta com Base Web 7.6.3, férias protegidas até ADP e ODT da Lavagem.",
   "scripts": {
-    "build:web": "node scripts/build-mobile-v213.mjs",
-    "verify:web": "node scripts/verify-mobile-v213.mjs dist",
+    "build:web": "node scripts/build-mobile-v214.mjs",
+    "verify:web": "node scripts/verify-mobile-v214.mjs dist",
     "cap:add:android": "npx cap add android",
     "cap:sync": "npm run build:web && npx cap sync android",
     "assets:android": "npx @capacitor/assets generate --android --assetPath assets --iconBackgroundColor '#040808' --iconBackgroundColorDark '#040808' --splashBackgroundColor '#040808' --splashBackgroundColorDark '#040808'",
