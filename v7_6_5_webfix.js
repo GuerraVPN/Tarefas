@@ -3,7 +3,7 @@
 if(window.__TAREFAS_V766_WEBFIX__)return;
 window.__TAREFAS_V766_WEBFIX__=true;
 const VERSION='7.6.6';
-const RELEASE={v:VERSION,title:'Saldo da Lavagem e identificação Web corrigidos',current:true,items:['Corrigido o carregamento do financeiro da Lavagem que deixava Crédito, Gasto e Saldo Disponível em R$ 0,00 mesmo com movimentações registradas.','O painel volta a exibir o crédito do PE, os débitos já lançados e o saldo restante diretamente do Supabase.','A identificação da área Lavagem de Forro de Cama passa a mostrar WEB 7.6.6 em vez de WEB 7.6.2.','Mantidas a aba própria da Lavagem em Orçamentários, a área Jogos e a geração da folha em ODT ou PDF.']};
+const RELEASE={v:VERSION,title:'Pagamento com saldo PE e débito da Cia Com',current:true,items:['Adicionada a opção de usar o débito pendente da Cia Com como parte do pagamento das lavagens.','A lavagem pode ser paga somente pelo PE, somente pela Cia Com ou dividida entre os dois saldos.','O painel passa a mostrar o débito disponível da Cia Com e o total combinado PE + Cia Com.','O uso do débito da Cia Com reduz automaticamente o valor disponível e mantém histórico da divisão usada em cada lavagem.']};
 function page(){return (location.pathname.split('/').pop()||'').toLowerCase()}
 function installCss(){
  if(document.getElementById('v765WebfixStyle'))return;
