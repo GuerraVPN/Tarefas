@@ -1,11 +1,11 @@
 {
   "name": "tarefas-app",
-  "version": "2.1.4",
+  "version": "2.1.5",
   "private": true,
-  "description": "TAREFAS Android 2.1.4 build 214 beta com Base Web 7.6.3, férias protegidas até ADP e ODT da Lavagem.",
+  "description": "TAREFAS Android 2.1.5 build 215 beta com Base Web 7.6.4, escolha ODT/PDF e férias protegidas até ADP.",
   "scripts": {
-    "build:web": "node scripts/build-mobile-v214.mjs",
-    "verify:web": "node scripts/verify-mobile-v214.mjs dist",
+    "build:web": "node scripts/build-mobile-v215.mjs",
+    "verify:web": "node scripts/verify-mobile-v215.mjs dist",
     "cap:add:android": "npx cap add android",
     "cap:sync": "npm run build:web && npx cap sync android",
     "assets:android": "npx @capacitor/assets generate --android --assetPath assets --iconBackgroundColor '#040808' --iconBackgroundColorDark '#040808' --splashBackgroundColor '#040808' --splashBackgroundColorDark '#040808'",
