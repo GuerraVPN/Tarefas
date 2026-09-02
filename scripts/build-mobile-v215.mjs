@@ -41,4 +41,11 @@ for(const script of ['lavanderia_v211.js','lavanderia_financeiro_v212.js','lavan
 }
 await writeFile(orcFile,orc,'utf8');
 
-console.log('TAREFAS Android 2.1.5 build 215 BETA: Base Web 7.6.4, escolha ODT/PDF e correção de férias/ADP.');
+const configFile=path.join(dist,'configuracoes.html');
+let config=await readFile(configFile,'utf8');
+if(!config.includes('configuracoes_senha_v215.js')){
+  config=config.replace(/<\/body>/i,'  <script src="configuracoes_senha_v215.js?v=2.1.5"></script>\n</body>');
+}
+await writeFile(configFile,config,'utf8');
+
+console.log('TAREFAS Android 2.1.5 build 215 BETA: Base Web 7.6.4, ODT/PDF, férias/ADP e alteração de senha nas Configurações.');
