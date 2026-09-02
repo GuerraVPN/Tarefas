@@ -1,0 +1,37 @@
+name: Android 2.1.2 Financeiro Prep Check
+
+on:
+  push:
+    branches: [app/android-v212-prep]
+    paths:
+      - 'lavanderia_financeiro_v212.js'
+      - 'scripts/build-mobile-v212.mjs'
+      - 'scripts/verify-mobile-v212.mjs'
+      - 'package.json'
+      - '.github/workflows/android-v212-prep-check.yml'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: app/android-v212-prep
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validar JavaScript
+        run: |
+          node --check lavanderia_financeiro_v212.js
+          node --check scripts/build-mobile-v212.mjs
+          node --check scripts/verify-mobile-v212.mjs
+      - name: Instalar dependências
+        run: npm ci
+      - name: Gerar bundle
+        run: npm run build:web
+      - name: Validar bundle
+        run: |
+          npm run verify:web
+          grep -q 'lavanderia_financeiro_v212.js?v=2.1.2' dist/orcamentarios.html
+          grep -q 'SALDO DISPONÍVEL' dist/lavanderia_financeiro_v212.js
+          grep -q '2.1.2 • WEB 7.6.0' dist/mobile-v12.js
