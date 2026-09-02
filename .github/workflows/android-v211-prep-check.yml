@@ -1,0 +1,38 @@
+name: Android 2.1.1 Lavanderia Prep Check
+
+on:
+  push:
+    branches: [app/android-v211-prep]
+    paths:
+      - 'lavanderia_v211.js'
+      - 'scripts/build-mobile-v211.mjs'
+      - 'scripts/verify-mobile-v211.mjs'
+      - 'package.json'
+      - '.github/workflows/android-v211-prep-check.yml'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: app/android-v211-prep
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validar JavaScript
+        run: |
+          node --check lavanderia_v211.js
+          node --check scripts/build-mobile-v211.mjs
+          node --check scripts/verify-mobile-v211.mjs
+      - name: Instalar dependências
+        run: npm ci
+      - name: Gerar bundle
+        run: npm run build:web
+      - name: Validar bundle
+        run: |
+          npm run verify:web
+          node --check dist/lavanderia_v211.js
+          grep -q 'lavanderia_v211.js?v=2.1.1' dist/orcamentarios.html
+          grep -q 'Lavagem de Forro de Cama' dist/mobile-bootstrap.js
+          grep -q "APP_CHANNEL = 'beta'" dist/mobile-updates-v181.js
