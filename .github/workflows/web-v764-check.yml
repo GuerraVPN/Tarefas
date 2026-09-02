@@ -1,0 +1,42 @@
+name: Web 7.6.4 ODT PDF Check
+on:
+  push:
+    branches: [web/v764-prep]
+    paths:
+      - '.github/v764_pdf_odt.py'
+      - '.github/workflows/web-v764-check.yml'
+permissions:
+  contents: write
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: web/v764-prep
+          fetch-depth: 0
+      - name: Aplicar Web 7.6.4
+        run: python3 .github/v764_pdf_odt.py
+      - name: Validar
+        run: |
+          set -euo pipefail
+          node --check lavanderia_documento_v762.js
+          node --check v7_5_1_version.js
+          node --check v7_5_1_about.js
+          grep -q 'function buildPdf' lavanderia_documento_v762.js
+          grep -q 'application/pdf' lavanderia_documento_v762.js
+          grep -q 'Escolha o formato' lavanderia_documento_v762.js
+          grep -q 'data-format="odt"' lavanderia_documento_v762.js
+          grep -q 'data-format="pdf"' lavanderia_documento_v762.js
+          grep -q "VERSION='7.6.4'" v7_5_1_version.js
+          grep -q 'Lavagem com escolha ODT ou PDF' v7_5_1_about.js
+          grep -q 'lavanderia_documento_v762.js?v=7.6.4' orcamentarios.html
+      - name: Salvar fonte validada
+        run: |
+          git config user.name 'GuerraVPN Web Build'
+          git config user.email '81371258+GuerraVPN@users.noreply.github.com'
+          git add lavanderia_documento_v762.js orcamentarios.html games.html games.js v6_2_mobile.js v7_5_1_version.js v7_5_1_about.js
+          if ! git diff --cached --quiet; then
+            git commit -m 'feat(web): escolher ODT ou PDF na Lavagem 7.6.4'
+            git push origin HEAD:web/v764-prep
+          fi
