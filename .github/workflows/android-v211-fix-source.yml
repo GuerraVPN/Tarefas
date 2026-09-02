@@ -1,0 +1,23 @@
+name: Fix Android 2.1.1 Lavanderia Source
+on:
+  push:
+    branches: [app/android-v211-prep]
+    paths: ['.github/v211_fix_lav.py','.github/workflows/android-v211-fix-source.yml']
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: app/android-v211-prep
+      - run: python3 .github/v211_fix_lav.py
+      - run: node --check lavanderia_v211.js
+      - name: Commitar correção
+        run: |
+          git config user.name 'GuerraVPN Android Build'
+          git config user.email '81371258+GuerraVPN@users.noreply.github.com'
+          git add lavanderia_v211.js
+          git commit -m 'fix(android): corrigir recebimento na lavanderia 2.1.1'
+          git push origin HEAD:app/android-v211-prep
