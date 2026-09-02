@@ -1,0 +1,88 @@
+name: Android 2.1.3 Prep Check
+
+on:
+  push:
+    branches: [app/android-v213-prep]
+    paths:
+      - 'scripts/build-mobile-v213.mjs'
+      - 'scripts/verify-mobile-v213.mjs'
+      - '.github/workflows/android-v213-prep-check.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: app/android-v213-prep
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Sincronizar Base Web 7.6.2 e gerador ODT
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          for f in v7_5_1_version.js v7_5_1_about.js v6_2_mobile.js lavanderia_documento_v762.js; do
+            git show "origin/main:$f" > "$f"
+          done
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          p=Path('package.json'); d=json.loads(p.read_text(encoding='utf-8'))
+          d['version']='2.1.3'
+          d['description']='TAREFAS Android 2.1.3 build 213 beta com geração ODT da Lavagem de Forro de Cama e Base Web 7.6.2.'
+          d['scripts']['build:web']='node scripts/build-mobile-v213.mjs'
+          d['scripts']['verify:web']='node scripts/verify-mobile-v213.mjs dist'
+          p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          p=Path('package-lock.json'); s=p.read_text(encoding='utf-8')
+          s=s.replace('"version": "2.1.2"','"version": "2.1.3"',2)
+          p.write_text(s,encoding='utf-8')
+
+          p=Path('.github/workflows/android-debug.yml'); s=p.read_text(encoding='utf-8')
+          s=s.replace('branches: [app/android-v197-prep]','branches: [app/android-v213-prep]')
+          s=s.replace('2.1.2','2.1.3')
+          s=s.replace('versionCode 212','versionCode 213')
+          s=s.replace('==212','==213')
+          s=s.replace('build 212','build 213')
+          s=s.replace('build == 212','build == 213')
+          s=s.replace('/tmp/212-','/tmp/213-')
+          s=s.replace('--argjson build 212','--argjson build 213')
+          s=s.replace('WEB 7.6.1','WEB 7.6.2')
+          s=s.replace("VERSION='7.6.1'","VERSION='7.6.2'")
+          s=s.replace("grep -q 'lavanderia_layout_v212.js?v=2.1.3' dist/orcamentarios.html", "grep -q 'lavanderia_layout_v212.js?v=2.1.3' dist/orcamentarios.html\n          grep -q 'lavanderia_documento_v762.js?v=2.1.3' dist/orcamentarios.html\n          node --check dist/lavanderia_documento_v762.js\n          grep -q 'application/vnd.oasis.opendocument.text' dist/lavanderia_documento_v762.js")
+          s=s.replace("unzip -p \"$APK\" assets/public/lavanderia_layout_v212.js > /tmp/213-layout.js", "unzip -p \"$APK\" assets/public/lavanderia_layout_v212.js > /tmp/213-layout.js\n          unzip -p \"$APK\" assets/public/lavanderia_documento_v762.js > /tmp/213-doc.js")
+          s=s.replace("node --check /tmp/213-layout.js", "node --check /tmp/213-layout.js\n          node --check /tmp/213-doc.js")
+          s=s.replace("grep -q 'max-height:calc(100dvh' /tmp/213-layout.js", "grep -q 'max-height:calc(100dvh' /tmp/213-layout.js\n          grep -q 'application/vnd.oasis.opendocument.text' /tmp/213-doc.js")
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Validar JavaScript
+        run: |
+          node --check lavanderia_documento_v762.js
+          node --check scripts/build-mobile-v213.mjs
+          node --check scripts/verify-mobile-v213.mjs
+          node --check v7_5_1_version.js
+          node --check v7_5_1_about.js
+      - name: Instalar dependências
+        run: npm ci
+      - name: Gerar bundle
+        run: npm run build:web
+      - name: Validar bundle
+        run: |
+          npm run verify:web
+          grep -q '2.1.3 • WEB 7.6.2' dist/mobile-v12.js
+          grep -q 'lavanderia_documento_v762.js?v=2.1.3' dist/orcamentarios.html
+          grep -q 'application/vnd.oasis.opendocument.text' dist/lavanderia_documento_v762.js
+          grep -q "VERSION='7.6.2'" dist/v7_5_1_version.js
+      - name: Commitar fonte validada
+        run: |
+          git config user.name 'GuerraVPN Android Build'
+          git config user.email '81371258+GuerraVPN@users.noreply.github.com'
+          git add v7_5_1_version.js v7_5_1_about.js v6_2_mobile.js lavanderia_documento_v762.js package.json package-lock.json .github/workflows/android-debug.yml
+          if ! git diff --cached --quiet; then
+            git commit -m 'fix(android): gerar ODT da Lavagem na 2.1.3 e incorporar Web 7.6.2'
+            git push origin HEAD:app/android-v213-prep
+          fi
