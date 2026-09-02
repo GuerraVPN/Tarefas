@@ -18,6 +18,7 @@ function pad(n){return String(n).padStart(2,'0')}
 function iso(d){return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`}
 function parseDate(s){const [y,m,d]=String(s).split('-').map(Number);return new Date(y,m-1,d)}
 function addDays(s,n){const d=parseDate(s);d.setDate(d.getDate()+n);return iso(d)}
+function adaptationDate(s){let d=addDays(s,1);while([0,6].includes(parseDate(d).getDay()))d=addDays(d,1);return d}
 function fullDate(s){const d=parseDate(s);return `${pad(d.getDate())} DE ${MONTHS[d.getMonth()]} DE ${d.getFullYear()}`}
 function shortDate(s){const d=parseDate(s);return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`}
 function weekName(s){return WEEK[parseDate(s).getDay()]}
@@ -117,7 +118,7 @@ function vacationFor(context,row,date){
   return context.vacations.find(v=>((row.usuario_id&&String(v.usuario_id)===String(row.usuario_id))||(row.pessoa_externa_id&&String(v.pessoa_externa_id)===String(row.pessoa_externa_id)))&&v.data_inicio<=date&&v.data_fim>=date);
 }
 function adaptationFor(context,row,date){
-  return context.vacations.find(v=>((row.usuario_id&&String(v.usuario_id)===String(row.usuario_id))||(row.pessoa_externa_id&&String(v.pessoa_externa_id)===String(row.pessoa_externa_id)))&&addDays(v.data_fim,1)===date);
+  return context.vacations.find(v=>((row.usuario_id&&String(v.usuario_id)===String(row.usuario_id))||(row.pessoa_externa_id&&String(v.pessoa_externa_id)===String(row.pessoa_externa_id)))&&adaptationDate(v.data_fim)===date);
 }
 function eligible(context,row,date){return !vacationFor(context,row,date)&&!adaptationFor(context,row,date)}
 
