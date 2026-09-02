@@ -1,0 +1,52 @@
+name: Web 7.6.1 Fix
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/v761_patch.py'
+      - '.github/workflows/web-v761-fix.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Aplicar correções 7.6.1
+        run: python3 .github/v761_patch.py
+      - name: Validar JavaScript
+        run: |
+          node --check games.js
+          node --check pessoal_v7.js
+          node --check ferias_dispensas_v721.js
+          node --check aditamento_v74.js
+          node --check v7_5_1_version.js
+          node --check v7_5_1_about.js
+      - name: Validar correções
+        run: |
+          grep -q "VERSION='7.6.1'" v7_5_1_version.js
+          grep -q "WEB 7.6.1" games.html
+          grep -q "overflow-y:auto!important" games.css
+          grep -q "touch-action:pan-y" games.css
+          grep -q "Math.hypot(e.clientX-tapX" games.js
+          grep -q "if(window.__TAREFAS_NATIVE_APP__)" games.js
+          grep -q "function adaptationDate" pessoal_v7.js
+          grep -q "adaptationDate(v.data_fim)===date" pessoal_v7.js
+          grep -q "Adaptação:.*adaptationDate" ferias_dispensas_v721.js
+          grep -q "adaptationDate(v.data_fim)===date" aditamento_v74.js
+          grep -q "7.6.1.*Rolagem dos Jogos e retorno de férias" v7_5_1_about.js
+      - name: Commitar 7.6.1
+        run: |
+          git config user.name 'GuerraVPN Web Build'
+          git config user.email '81371258+GuerraVPN@users.noreply.github.com'
+          git add games.css games.js games.html pessoal_v7.js pessoal.html ferias_dispensas_v721.js ferias_dispensas.html aditamento_v74.js v7_5_1_version.js v7_5_1_about.js v6_2_mobile.js
+          git commit -m 'fix(web): scroll dos jogos e ADP útil na 7.6.1'
+          git push origin HEAD:main
