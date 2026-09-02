@@ -1,0 +1,42 @@
+name: Web 7.6.7 Cia Com Payment
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'lavanderia_pagamento_v767.js'
+      - '.github/v767_cia_com.py'
+      - '.github/workflows/web-v767-cia-com.yml'
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Aplicar Web 7.6.7
+        run: python3 .github/v767_cia_com.py
+      - name: Validar
+        run: |
+          set -euo pipefail
+          node --check lavanderia_pagamento_v767.js
+          node --check lavanderia_v211.js
+          node --check lavanderia_financeiro_v212.js
+          node --check v7_5_1_version.js
+          node --check v7_5_1_about.js
+          node --check v7_6_5_webfix.js
+          grep -q 'lavanderia_pagamento_v767.js?v=7.6.7' orcamentarios.html
+          grep -q 'DÉBITO CIA COM DISPONÍVEL' lavanderia_pagamento_v767.js
+          grep -q 'v2_1_1_lavanderia_definir_pagamento' lavanderia_pagamento_v767.js
+          grep -q "const VERSION='7.6.7'" v7_5_1_version.js
+      - name: Publicar no main
+        run: |
+          set -euo pipefail
+          if git diff --quiet; then exit 0; fi
+          git config user.name 'GuerraVPN Web Build'
+          git config user.email '81371258+GuerraVPN@users.noreply.github.com'
+          git add orcamentarios.html games.html lavanderia_v211.js v7_5_1_version.js v6_2_mobile.js v7_6_5_webfix.js v7_5_1_about.js
+          git commit -m 'feat(web): usar débito Cia Com nas lavagens 7.6.7'
+          git push origin HEAD:main
