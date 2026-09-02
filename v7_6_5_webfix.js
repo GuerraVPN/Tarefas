@@ -1,9 +1,9 @@
 (function(){
 'use strict';
-if(window.__TAREFAS_V765_WEBFIX__)return;
-window.__TAREFAS_V765_WEBFIX__=true;
-const VERSION='7.6.5';
-const RELEASE={v:VERSION,title:'Navegação da Lavagem e Jogos na Web',current:true,items:['A Lavagem de Forro de Cama passa a aparecer como uma opção própria dentro de Orçamentários.','Corrigido o problema que fazia a tela da Lavagem aparecer junto das outras abas do Orçamentários.','A área Jogos volta a aparecer no menu da versão Web e abre a página com os nove jogos e placares.','Mantidas as opções ODT e PDF da versão 7.6.4 para a folha Forro de Cama para Lavar.']};
+if(window.__TAREFAS_V766_WEBFIX__)return;
+window.__TAREFAS_V766_WEBFIX__=true;
+const VERSION='7.6.6';
+const RELEASE={v:VERSION,title:'Saldo da Lavagem e identificação Web corrigidos',current:true,items:['Corrigido o carregamento do financeiro da Lavagem que deixava Crédito, Gasto e Saldo Disponível em R$ 0,00 mesmo com movimentações registradas.','O painel volta a exibir o crédito do PE, os débitos já lançados e o saldo restante diretamente do Supabase.','A identificação da área Lavagem de Forro de Cama passa a mostrar WEB 7.6.6 em vez de WEB 7.6.2.','Mantidas a aba própria da Lavagem em Orçamentários, a área Jogos e a geração da folha em ODT ou PDF.']};
 function page(){return (location.pathname.split('/').pop()||'').toLowerCase()}
 function installCss(){
  if(document.getElementById('v765WebfixStyle'))return;
