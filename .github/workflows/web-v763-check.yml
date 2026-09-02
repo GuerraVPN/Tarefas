@@ -1,0 +1,35 @@
+name: Web 7.6.3 Check
+on:
+  push:
+    branches: [web/v763-prep]
+permissions:
+  contents: write
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: web/v763-prep
+          fetch-depth: 0
+      - name: Aplicar correção
+        run: python3 .github/v763_ferias_escala.py
+      - name: Validar
+        run: |
+          node --check pessoal_v7.js
+          node --check v7_5_1_version.js
+          node --check v7_5_1_about.js
+          grep -q "ESCALA_UI_VERSION='7.6.3'" pessoal_v7.js
+          grep -q 'function vacationProtectionFor' pessoal_v7.js
+          grep -q 'return !vacationProtectionFor(row,date)' pessoal_v7.js
+          grep -q "VERSION='7.6.3'" v7_5_1_version.js
+          grep -q 'pessoal_v7.js?v=7.6.3' pessoal.html
+      - name: Salvar fonte validada
+        run: |
+          git config user.name 'GuerraVPN Web Build'
+          git config user.email '81371258+GuerraVPN@users.noreply.github.com'
+          git add pessoal_v7.js pessoal.html ferias_dispensas.html v7_5_1_version.js v7_5_1_about.js v6_2_mobile.js games.html games.js orcamentarios.html
+          if ! git diff --cached --quiet; then
+            git commit -m 'fix(web): proteger fim de semana apos ferias na 7.6.3'
+            git push origin HEAD:web/v763-prep
+          fi
