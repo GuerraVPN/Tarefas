@@ -1,0 +1,54 @@
+name: Web 7.6.2 Lavanderia ODT
+
+on:
+  push:
+    branches: [web/v762-prep]
+    paths:
+      - 'lavanderia_documento_v762.js'
+      - '.github/v762_patch.py'
+      - '.github/workflows/web-v762-lavanderia.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: web/v762-prep
+          fetch-depth: 0
+      - name: Importar módulo Lavagem da base Android atual
+        run: |
+          set -euo pipefail
+          git fetch origin app/android-v212-prep
+          git show origin/app/android-v212-prep:lavanderia_v211.js > lavanderia_v211.js
+          git show origin/app/android-v212-prep:lavanderia_financeiro_v212.js > lavanderia_financeiro_v212.js
+      - name: Aplicar Web 7.6.2
+        run: python3 .github/v762_patch.py
+      - name: Validar JavaScript e integração
+        run: |
+          set -euo pipefail
+          node --check lavanderia_v211.js
+          node --check lavanderia_financeiro_v212.js
+          node --check lavanderia_documento_v762.js
+          node --check v7_5_1_version.js
+          node --check v7_5_1_about.js
+          grep -q 'lavanderia_v211.js?v=7.6.2' orcamentarios.html
+          grep -q 'lavanderia_documento_v762.js?v=7.6.2' orcamentarios.html
+          grep -q "VERSION='7.6.2'" v7_5_1_version.js
+          grep -q "const VERSION='7.6.2';" v7_5_1_about.js
+          grep -q 'application/vnd.oasis.opendocument.text' lavanderia_documento_v762.js
+          grep -q 'Quem mandou lavar' lavanderia_documento_v762.js
+          grep -q 'Quem recebeu' lavanderia_documento_v762.js
+          ! grep -q "window.open('','_blank')" lavanderia_documento_v762.js
+      - name: Commitar fonte validada
+        run: |
+          git config user.name 'GuerraVPN Web Build'
+          git config user.email '81371258+GuerraVPN@users.noreply.github.com'
+          git add lavanderia_v211.js lavanderia_financeiro_v212.js lavanderia_documento_v762.js orcamentarios.html v7_5_1_version.js v7_5_1_about.js v6_2_mobile.js games.html games.js
+          if ! git diff --cached --quiet; then
+            git commit -m 'fix(web): gerar ODT da Lavagem na 7.6.2'
+            git push origin HEAD:web/v762-prep
+          fi
