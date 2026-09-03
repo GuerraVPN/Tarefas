@@ -16,7 +16,7 @@
 <main class="main">
 <header class="topbar"><div><b>About</b><div style="font-size:10px;color:var(--v4-muted)">Informações do sistema e histórico</div></div><div></div></header>
 <section class="page">
-<div class="hero"><h2>TAREFAS — 26º Pel PE Mec</h2><p>Painel de tarefas, usuários, comunicações e fluxos administrativos.</p><div class="meta"><div><small>Versão atual</small><b>7.7.0</b></div><div><small>Criador</small><b>Sd Guerra</b></div><div><small>Organização</small><b>26º Pel PE Mec</b></div></div></div>
+<div class="hero"><h2>TAREFAS — 26º Pel PE Mec</h2><p>Painel de tarefas, usuários, comunicações e fluxos administrativos.</p><div class="meta"><div><small>Versão atual</small><b>7.7.1</b></div><div><small>Criador</small><b>Sd Guerra</b></div><div><small>Organização</small><b>26º Pel PE Mec</b></div></div></div>
 <div class="panel"><div class="picker"><div><b>Histórico de versões</b><div style="font-size:10px;color:var(--v4-muted);margin-top:3px">A versão atual fica selecionada primeiro.</div></div><select id="versionSelect"></select></div><div id="versionCard" class="version-card"></div><div class="source-note">As versões recentes possuem histórico detalhado. Registros antigos são mantidos de forma resumida quando não há manifesto técnico completo preservado.</div></div>
 </section></main>
 <script>
@@ -24,8 +24,8 @@ const SUPABASE_URL='https://bpvijatnsluwsgnzklrd.supabase.co';
 const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwdmlqYXRuc2x1d3NnbnprbHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MzkxNDMsImV4cCI6MjEwMjQxNTE0M30.uvyfm9mgl6MON0v75CwfGzNz6FBqw58uzR4ZcRAOLNQ';
 const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 </script>
-<script src="notificacoes.js?v=7.7.0"></script>
-<script src="v4_tema.js?v=7.7.0"></script>
+<script src="notificacoes.js?v=7.7.1"></script>
+<script src="v4_tema.js?v=7.7.1"></script>
 <script src="v4_ui.js?v=6.0"></script>
 <script>
 window.versions=[
@@ -58,9 +58,9 @@ sel.innerHTML=window.versions.map(x=>`<option value="${x.v}">${x.v} — ${x.titl
 sel.value='7.4.12';sel.addEventListener('change',()=>render(sel.value));render('7.4.12');
 })();
 </script>
-<script src="v7_5_1_about.js?v=7.7.0-aboutfix"></script>
-<script src="v6_2_mobile.js?v=7.7.0"></script>
-  <script src="v7_6_8_theme_fix.js?v=7.7.0"></script>
-  <script src="v7_6_9_profile_required.js?v=7.7.0"></script>
+<script src="v7_5_1_about.js?v=7.7.1"></script>
+<script src="v6_2_mobile.js?v=7.7.1"></script>
+  <script src="v7_6_8_theme_fix.js?v=7.7.1"></script>
+  <script src="v7_6_9_profile_required.js?v=7.7.1"></script>
 </body>
 </html>

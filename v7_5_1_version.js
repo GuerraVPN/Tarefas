@@ -1,8 +1,8 @@
 (function(){
 'use strict';
-if(window.__TAREFAS_V770_VERSION__)return;
-window.__TAREFAS_V770_VERSION__=true;
-const VERSION='7.7.0',BADGE='● TAREFAS v'+VERSION;
+if(window.__TAREFAS_V771_VERSION__)return;
+window.__TAREFAS_V771_VERSION__=true;
+const VERSION='7.7.1',BADGE='● TAREFAS v'+VERSION;
 let busy=false;
 function addScript(src,flag){
  if(window[flag]||document.querySelector(`script[src*="${src}"]`))return;
