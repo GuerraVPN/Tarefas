@@ -1,0 +1,44 @@
+name: Web 7.7.0 Material Carga
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'v7_7_0_material_carga.js'
+      - 'supabase_v7_7_0_material_carga.sql'
+      - '.github/v770_material_carga.py'
+      - '.github/workflows/web-v770-material-carga.yml'
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Aplicar Web 7.7.0
+        run: python3 .github/v770_material_carga.py
+      - name: Validar Web 7.7.0
+        run: |
+          set -euo pipefail
+          node --check v7_7_0_material_carga.js
+          node --check v7_5_1_version.js
+          node --check v7_5_1_about.js
+          node --check v6_2_mobile.js
+          grep -q "const VERSION='7.7.0'" v7_5_1_version.js
+          grep -q "const VERSION='7.7.0';" v7_5_1_about.js
+          grep -q "Material Carga sempre atualizado" v7_5_1_about.js
+          grep -q "v7_7_0_material_carga.js?v=7.7.0" orcamentarios.html
+          grep -q "cargaConferidoPor" v7_7_0_material_carga.js
+          grep -q "v7_7_0_registrar_documento_carga" v7_7_0_material_carga.js
+          grep -q "orc_carga_pendencias" supabase_v7_7_0_material_carga.sql
+      - name: Salvar Web 7.7.0 validada
+        run: |
+          set -euo pipefail
+          if git diff --quiet; then exit 0; fi
+          git config user.name 'GuerraVPN Web Build'
+          git config user.email '81371258+GuerraVPN@users.noreply.github.com'
+          git add '*.html' v7_5_1_version.js v7_5_1_about.js v6_2_mobile.js
+          git commit -m 'feat(web): promover Material Carga 7.7.0'
+          git push origin HEAD:main
