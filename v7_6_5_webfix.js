@@ -3,7 +3,6 @@
 if(window.__TAREFAS_V766_WEBFIX__)return;
 window.__TAREFAS_V766_WEBFIX__=true;
 const VERSION='7.6.6';
-const RELEASE={v:VERSION,title:'Pagamento com saldo PE e débito da Cia Com',current:true,items:['Adicionada a opção de usar o débito pendente da Cia Com como parte do pagamento das lavagens.','A lavagem pode ser paga somente pelo PE, somente pela Cia Com ou dividida entre os dois saldos.','O painel passa a mostrar o débito disponível da Cia Com e o total combinado PE + Cia Com.','O uso do débito da Cia Com reduz automaticamente o valor disponível e mantém histórico da divisão usada em cada lavagem.']};
 function page(){return (location.pathname.split('/').pop()||'').toLowerCase()}
 function installCss(){if(document.getElementById('v765WebfixStyle'))return;const s=document.createElement('style');s.id='v765WebfixStyle';s.textContent='#lavanderiaModule[hidden]{display:none!important}#lavanderiaModule:not([hidden]){display:block!important}';document.head.appendChild(s)}
 function ensureGamesNav(){
@@ -16,13 +15,8 @@ function ensureLaundryNav(){
  let b=sub.querySelector('[data-orc-link="lavanderia"]');if(!b){b=document.createElement('button');b.type='button';b.dataset.orcLink='lavanderia';b.textContent='Lavagem de Forro de Cama';sub.appendChild(b)}
  const active=page()==='orcamentarios.html'&&new URLSearchParams(location.search).get('modulo')==='lavanderia';b.classList.toggle('active',active);b.onclick=e=>{e.preventDefault();e.stopPropagation();location.href='orcamentarios.html?modulo=lavanderia'};
 }
-function ensureAbout(){
- if(page()!=='about.html'||!Array.isArray(window.versions))return;
- window.versions.forEach(x=>{if(x)x.current=false});const old=window.versions.find(x=>x?.v===VERSION);if(old)Object.assign(old,RELEASE);else window.versions.unshift({...RELEASE});
- const sel=document.getElementById('versionSelect');if(sel){let opt=[...sel.options].find(o=>o.value===VERSION);if(!opt){opt=document.createElement('option');opt.value=VERSION;opt.textContent=VERSION+' — '+RELEASE.title;sel.prepend(opt)}}
-}
 function sync(){
- installCss();ensureGamesNav();ensureLaundryNav();ensureAbout();
+ installCss();ensureGamesNav();ensureLaundryNav();
  const label=document.getElementById('gamesVersionLabel');if(label&&label.textContent!=='WEB 7.7.1 · 26º PEL PE MEC')label.textContent='WEB 7.7.1 · 26º PEL PE MEC';
 }
 function start(){

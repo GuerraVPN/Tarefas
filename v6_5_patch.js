@@ -4,6 +4,7 @@ if(window.__TAREFAS_V65_PATCH__)return;
 window.__TAREFAS_V65_PATCH__=true;
 
 const VERSION='6.5';
+const DISPLAY_VERSION='7.7.1';
 const ONLINE_WINDOW_MS=120000;
 const HEARTBEAT_MS=60000;
 const PRESENCE_REFRESH_MS=60000;
@@ -35,11 +36,11 @@ function renderVersion(){
   const sidebar=document.querySelector('.sidebar');
   if(sidebar&&!sidebar.querySelector('.v65-version-badge')){
     const host=sidebar.querySelector('.credit,.creditos-26pel')||sidebar;
-    const b=document.createElement('button');b.type='button';b.className='v65-version-badge';b.innerHTML=`● TAREFAS v${VERSION}`;
+    const b=document.createElement('button');b.type='button';b.className='v65-version-badge';b.innerHTML=`● TAREFAS v${DISPLAY_VERSION}`;
     b.title='Sobre esta versão';b.onclick=()=>location.assign(new URL('about.html',location.href).href);host.appendChild(b);
   }
   const brand=document.querySelector('.v62-mobile-brand');
-  if(brand&&!brand.querySelector('.v65-mobile-version')){const v=document.createElement('span');v.className='v65-mobile-version';v.textContent=`v${VERSION}`;brand.appendChild(v)}
+  if(brand&&!brand.querySelector('.v65-mobile-version')){const v=document.createElement('span');v.className='v65-mobile-version';v.textContent=`v${DISPLAY_VERSION}`;brand.appendChild(v)}
 }
 function navExtra(){
   const list=document.querySelector('.sidebar ul');if(!list)return;
