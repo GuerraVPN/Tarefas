@@ -1,11 +1,34 @@
-import { readFile, writeFile, readdir, copyFile, access } from 'node:fs/promises';
+import { readFile, writeFile, readdir, copyFile, access, mkdir, rm } from 'node:fs/promises';
 import path from 'node:path';
-
-await import('./build-mobile-v222.mjs');
+import { execFileSync } from 'node:child_process';
 
 const root=process.cwd();
 const dist=path.join(root,'dist');
 const overlay=path.join(root,'.web770');
+const web770Files=[
+  'about.html','orcamentarios.html','v4_ui.js','v6_2_mobile.js','v6_5_patch.js',
+  'v7_5_1_version.js','v7_5_1_about.js','v7_6_5_webfix.js','v7_6_8_theme_fix.js',
+  'v7_6_9_profile_required.js','v7_7_0_material_carga.js','notificacoes.js','central.js'
+];
+
+// O workflow coloca os arquivos Web 7.7.0 na raiz. Preserva o overlay e restaura
+// temporariamente a base 2.2.2 para que a cadeia histórica de patches rode intacta.
+await rm(overlay,{recursive:true,force:true});await mkdir(overlay,{recursive:true});
+for(const rel of web770Files){
+  const src=path.join(root,rel);
+  try{await access(src);await copyFile(src,path.join(overlay,rel))}catch{throw new Error(`Fonte Web 7.7.0 ausente: ${rel}`)}
+}
+const changed=execFileSync('git',['diff','--name-only','origin/app/android-v222-prep','origin/main','--'],{encoding:'utf8'}).split(/\r?\n/).filter(Boolean);
+for(const rel of changed){
+  if(rel.includes('/')||!/[.](?:html|js|css)$/i.test(rel))continue;
+  try{
+    const old=execFileSync('git',['show',`origin/app/android-v222-prep:${rel}`]);
+    await writeFile(path.join(root,rel),old);
+  }catch{}
+}
+
+await import('./build-mobile-v222.mjs');
+
 async function patch(rel,replacements){
   const file=path.join(dist,rel);
   let text=await readFile(file,'utf8');
@@ -17,11 +40,6 @@ async function patch(rel,replacements){
 }
 async function exists(p){try{await access(p);return true}catch{return false}}
 
-const web770Files=[
-  'about.html','orcamentarios.html','v4_ui.js','v6_2_mobile.js','v6_5_patch.js',
-  'v7_5_1_version.js','v7_5_1_about.js','v7_6_5_webfix.js','v7_6_8_theme_fix.js',
-  'v7_6_9_profile_required.js','v7_7_0_material_carga.js','notificacoes.js','central.js'
-];
 for(const rel of web770Files){
   const src=path.join(overlay,rel);
   if(!await exists(src))throw new Error(`Overlay Web 7.7.0 ausente: ${rel}`);
