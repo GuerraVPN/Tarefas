@@ -1,8 +1,8 @@
 {
   "name": "tarefas-app",
-  "version": "2.2.4",
+  "version": "2.2.5",
   "private": true,
-  "description": "TAREFAS Android 2.2.4 build 224 beta com Base Web 7.7.1, login protegido e build reproduzível.",
+  "description": "TAREFAS Android 2.2.5 build 225 beta com Base Web 7.7.1 e correções de desempenho em Jogos, About e Orçamentários.",
   "scripts": {
     "build:web": "node scripts/build-mobile-v224.mjs",
     "verify:web": "node scripts/verify-mobile-v224.mjs dist",
