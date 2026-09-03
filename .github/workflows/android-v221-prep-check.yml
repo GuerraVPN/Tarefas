@@ -1,0 +1,80 @@
+name: Android 2.2.1 Prep Check
+
+on:
+  push:
+    branches: [app/android-v221-prep]
+    paths:
+      - '.github/v221_notification_patch.py'
+      - 'scripts/build-mobile-v221.mjs'
+      - 'scripts/verify-mobile-v221.mjs'
+      - '.github/workflows/android-v221-prep-check.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: app/android-v221-prep
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Sincronizar Web 7.6.10 aprovada
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          for f in about.html calendario.html central.html configuracoes.html dashboard.html ferias_dispensas.html games.html help.html historico_auditoria.html index.html menu.html minhas_tarefas.html missao.html orcamentarios.html pessoal.html relatorios.html usuarios.html v4_tema.js v4_tema.css v6_2_mobile.js v7_5_1_version.js v7_5_1_about.js v7_5_4_patch.js v7_6_8_theme_fix.js v7_6_9_profile_required.js notificacoes.js central.js; do
+            git show "origin/main:$f" > "$f"
+          done
+      - name: Aplicar comportamento nativo 2.2.1
+        run: python3 .github/v221_notification_patch.py
+      - name: Definir versão beta 2.2.1
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          p=Path('package.json'); d=json.loads(p.read_text(encoding='utf-8'))
+          d['version']='2.2.1'
+          d['description']='TAREFAS Android 2.2.1 build 221 beta com Base Web 7.6.10, lembrete diário de atualização e descarte de notificações ao toque.'
+          d['scripts']['build:web']='node scripts/build-mobile-v221.mjs'
+          d['scripts']['verify:web']='node scripts/verify-mobile-v221.mjs dist'
+          p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          p=Path('package-lock.json'); d=json.loads(p.read_text(encoding='utf-8'))
+          d['version']='2.2.1'
+          if isinstance(d.get('packages'),dict) and isinstance(d['packages'].get(''),dict): d['packages']['']['version']='2.2.1'
+          p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+      - name: Instalar dependências
+        run: npm ci
+      - name: Gerar bundle
+        run: npm run build:web
+      - name: Validar bundle 2.2.1
+        run: |
+          set -euo pipefail
+          npm run verify:web
+          node --check app/native-mobile-entry.js
+          node --check dist/notificacoes.js
+          node --check dist/central.js
+          node --check dist/v7_6_9_profile_required.js
+          grep -q '2.2.1 • WEB 7.6.10' dist/mobile-v12.js
+          grep -q "APP_CHANNEL = 'beta'" dist/mobile-updates-v181.js
+          grep -q 'removeDeliveredNotifications' dist/native-mobile.js
+          grep -q 'getDeliveredNotifications' dist/native-mobile.js
+          grep -q 'TAREFAS NOTIF' dist/native-mobile.js
+          grep -q 'app_update_reminder' dist/notificacoes.js
+          grep -q 'app_update_reminder' dist/central.js
+          grep -q 'v7_6_9_profile_required.js?v=2.2.1' dist/configuracoes.html
+      - name: Salvar fonte beta validada
+        run: |
+          set -euo pipefail
+          git config user.name 'GuerraVPN Android Build'
+          git config user.email '81371258+GuerraVPN@users.noreply.github.com'
+          git add '*.html' v4_tema.js v4_tema.css v6_2_mobile.js v7_5_1_version.js v7_5_1_about.js v7_5_4_patch.js v7_6_8_theme_fix.js v7_6_9_profile_required.js notificacoes.js central.js app/native-mobile-entry.js package.json package-lock.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'release(android): preparar TAREFAS 2.2.1 beta Web 7.6.10'
+            git push origin HEAD:app/android-v221-prep
+          fi
