@@ -101,14 +101,14 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     add('v7_4_7_aditamento_patch.js?v=7.5.1','data-v747-aditamento-patch',function(){
      add('v6_5_patch.js?v=6.5','data-v65-loader',function(){
       add('v7_4_12_global.js?v=7.5.1','data-v7412-global',function(){
-       add('v7_5_1_version.js?v=7.6.11','data-v751-version',function(){
+       add('v7_5_1_version.js?v=7.7.0','data-v751-version',function(){
         add('v7_4_3_period.js?v=7.5.1','data-v743-period',function(){
          add('v7_4_3_pdf.js?v=7.5.1','data-v743-pdf',function(){
           add('v7_4_2_search_order.js?v=7.5.1','data-v742-search-order',function(){
            add('v7_4_2_transfer.js?v=7.5.1','data-v742-transfer',function(){
             add('v7_4_2_replace.js?v=7.5.1','data-v742-replace',function(){
              add('v7_5_service_editor.js?v=7.5.1','data-v75-service-editor',function(){
-              add('v7_5_1_about.js?v=7.6.11','data-v751-about');
+              add('v7_5_1_about.js?v=7.7.0','data-v751-about');
              });
             });
            });
