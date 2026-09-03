@@ -2,7 +2,7 @@
 'use strict';
 if(window.__TAREFAS_LAV_PAG_V767__)return;
 window.__TAREFAS_LAV_PAG_V767__=true;
-const VERSION='7.6.7';
+const VERSION='7.6.8';
 const $=id=>document.getElementById(id);
 const money=v=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(v)||0);
 const num=v=>Number(String(v??0).replace(',','.'))||0;
