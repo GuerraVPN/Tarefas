@@ -39,7 +39,15 @@ direct='<script src="v7_5_1_about.js?v=7.7.0-aboutfix"></script>\n'+needle
 if 'v7_5_1_about.js?v=7.7.0-aboutfix' not in s:
     if needle not in s: raise SystemExit('about.html: loader mobile não encontrado')
     s=s.replace(needle,direct,1)
+
+# 5) Corrige somente o About no desktop: o shell do v4_ui fixa a sidebar e também aplica
+# margem/largura ao .main. Como esta página já nasce em flex, o flex-grow fazia o conteúdo
+# ganhar novamente a largura da sidebar e ficar cortado à direita.
+layout_fix='@media(min-width:901px){html body.v3-shell main.main{flex:0 0 calc(100% - 238px)!important;max-width:calc(100% - 238px)!important;min-width:0!important}}'
+mobile_media='@media(max-width:900px){body{display:block}'
+if layout_fix not in s:
+    if mobile_media not in s: raise SystemExit('about.html: media query mobile não encontrada')
+    s=s.replace(mobile_media,layout_fix+mobile_media,1)
 write(p,s)
 
-# Alteração mínima neste arquivo também serve para disparar o workflow após ele existir no branch main.
-print('About 7.7.0 corrigido: navegação nativa, sem duplicação e histórico direto.')
+print('About 7.7.0 corrigido: navegação nativa, histórico direto e layout desktop sem recorte.')
