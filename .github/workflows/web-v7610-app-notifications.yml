@@ -1,0 +1,49 @@
+name: Web 7.6.10 App Notifications
+
+on:
+  push:
+    branches: [web/v7610-app-notifications]
+    paths:
+      - '.github/v7610_app_notifications.py'
+      - '.github/workflows/web-v7610-app-notifications.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: web/v7610-app-notifications
+          fetch-depth: 0
+      - name: Aplicar Web 7.6.10
+        run: python3 .github/v7610_app_notifications.py
+      - name: Validar Web 7.6.10
+        run: |
+          set -euo pipefail
+          node --check notificacoes.js
+          node --check central.js
+          node --check v7_5_4_patch.js
+          node --check v7_5_1_version.js
+          node --check v7_5_1_about.js
+          node --check v6_2_mobile.js
+          grep -q "const VERSION='7.6.10'" v7_5_1_version.js
+          grep -q "v:'7.6.10'" v7_5_1_about.js
+          grep -q "app_update_reminder" notificacoes.js
+          grep -q "app_update_reminder" central.js
+          ! grep -q "Exibir atualizações do app no site" v7_5_4_patch.js
+          grep -q "notificacoes.js?v=7.6.10" dashboard.html
+          grep -q "central.js?v=7.6.10" central.html
+          grep -q "v6_2_mobile.js?v=7.6.10" configuracoes.html
+      - name: Salvar Web 7.6.10 validada
+        run: |
+          set -euo pipefail
+          git config user.name 'GuerraVPN Web Build'
+          git config user.email '81371258+GuerraVPN@users.noreply.github.com'
+          git add '*.html' notificacoes.js central.js v7_5_4_patch.js v7_5_1_version.js v7_5_1_about.js v6_2_mobile.js
+          if ! git diff --cached --quiet; then
+            git commit -m 'feat(web): tornar atualizações Android exclusivas do app 7.6.10'
+            git push origin HEAD:web/v7610-app-notifications
+          fi
