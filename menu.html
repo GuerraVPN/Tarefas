@@ -1770,7 +1770,7 @@
                 await gravarResponsaveisFase2(tarefaSelecionadaId, responsaveisSelecionadosLocal);
 
                 // Espelho legado temporário para páginas antigas durante a transição.
-                const { error } = await supabaseClient.from('tarefas').update({
+                const { error } = await supabaseClient.from('tarefas').update({atualizado_por:Number(usuarioLogado.id),atualizado_por_perfil_id:usuarioPerfilAtual?.perfil_id?Number(usuarioPerfilAtual.perfil_id):null,
                     responsavel: valorBanco,
                     historico: historicoNovo
                 }).eq('id', tarefaSelecionadaId);
@@ -1874,7 +1874,7 @@
             try{
                 await ResponsaveisPerfis26.changeSection(supabaseClient,tarefa.id,nova,usuarioLogado.id,usuarioPerfilAtual?.perfil_id);
                 const hist=normalizarHistorico(tarefa.historico);hist.push(criarEntradaHistorico(`Seção responsável alterada de "${antiga}" para "${nova}".`));
-                const rh=await supabaseClient.from('tarefas').update({historico:hist}).eq('id',tarefa.id);if(rh.error)throw rh.error;
+                const rh=await supabaseClient.from('tarefas').update({atualizado_por:Number(usuarioLogado.id),atualizado_por_perfil_id:usuarioPerfilAtual?.perfil_id?Number(usuarioPerfilAtual.perfil_id):null,historico:hist}).eq('id',tarefa.id);if(rh.error)throw rh.error;
                 tarefa.secao=nova;tarefa.historico=hist;listaHistoricoLocal=hist.slice();renderizarHistoricoLocal();
                 alert(`Seção da tarefa alterada para ${nova}.`);
                 const id=tarefa.id;await buscarTarefasDoBanco();
@@ -2118,7 +2118,7 @@
             hist.push(criarEntradaHistorico(`Tarefa movida para "${novoStatus}".`));
 
             try {
-                const { error } = await supabaseClient.from('tarefas').update({
+                const { error } = await supabaseClient.from('tarefas').update({atualizado_por:Number(usuarioLogado.id),atualizado_por_perfil_id:usuarioPerfilAtual?.perfil_id?Number(usuarioPerfilAtual.perfil_id):null,
                     status: novoStatus,
                     andamento: novoAndamento,
                     historico: hist
@@ -2238,7 +2238,7 @@
 
         async function salvarAnexosEHistorico() {
             if (!tarefaSelecionadaId) return;
-            const { error } = await supabaseClient.from('tarefas').update({
+            const { error } = await supabaseClient.from('tarefas').update({atualizado_por:Number(usuarioLogado.id),atualizado_por_perfil_id:usuarioPerfilAtual?.perfil_id?Number(usuarioPerfilAtual.perfil_id):null,
                 arquivos: serializarArquivosParaBanco(),
                 historico: listaHistoricoLocal
             }).eq('id', tarefaSelecionadaId);
@@ -2355,7 +2355,7 @@
             }
 
             try {
-                const { error } = await supabaseClient.from('tarefas').update({
+                const { error } = await supabaseClient.from('tarefas').update({atualizado_por:Number(usuarioLogado.id),atualizado_por_perfil_id:usuarioPerfilAtual?.perfil_id?Number(usuarioPerfilAtual.perfil_id):null,
                     historico: listaHistoricoLocal,
                     status,
                     andamento
@@ -2421,7 +2421,7 @@
             if (andamentoSel !== andamentoAnterior) adicionarHistoricoLocal(`Andamento atualizado de ${andamentoAnterior}% para ${andamentoSel}%.`);
 
             try {
-                const { error } = await supabaseClient.from('tarefas').update({
+                const { error } = await supabaseClient.from('tarefas').update({atualizado_por:Number(usuarioLogado.id),atualizado_por_perfil_id:usuarioPerfilAtual?.perfil_id?Number(usuarioPerfilAtual.perfil_id):null,
                     status: statusSel,
                     andamento: andamentoSel,
                     arquivos: serializarArquivosParaBanco(),
@@ -2445,7 +2445,7 @@
 
             listaHistoricoLocal.push(criarEntradaHistorico('Tarefa marcada como concluída.'));
             try {
-                const { error } = await supabaseClient.from('tarefas').update({
+                const { error } = await supabaseClient.from('tarefas').update({atualizado_por:Number(usuarioLogado.id),atualizado_por_perfil_id:usuarioPerfilAtual?.perfil_id?Number(usuarioPerfilAtual.perfil_id):null,
                     status: 'Concluída',
                     andamento: 100,
                     historico: listaHistoricoLocal,
@@ -2497,7 +2497,7 @@
                         const tarefa = encontrarTarefa(id);
                         const hist = normalizarHistorico(tarefa?.historico);
                         hist.push(criarEntradaHistorico('Tarefa concluída em lote pelo quadro.'));
-                        const { error } = await supabaseClient.from('tarefas').update({
+                        const { error } = await supabaseClient.from('tarefas').update({atualizado_por:Number(usuarioLogado.id),atualizado_por_perfil_id:usuarioPerfilAtual?.perfil_id?Number(usuarioPerfilAtual.perfil_id):null,
                             status: 'Concluída', andamento: 100, historico: hist
                         }).eq('id', id);
                         if (error) throw error;
@@ -2864,12 +2864,12 @@
         <script src="sistema_comum.js?v=6.0"></script>
     <script src="auditoria.js?v=6.0"></script>
     <script src="bloco_notas.js?v=6.0"></script>
-    <script src="notificacoes.js?v=7.6.10"></script>
+    <script src="notificacoes.js?v=7.6.11"></script>
     <script src="v4_ui.js?v=6.0"></script>
-    <script src="v4_tema.js?v=7.6.10"></script>
+    <script src="v4_tema.js?v=7.6.11"></script>
     <script src="recorrencias_v4.js?v=6.0"></script>
-  <script src="v6_2_mobile.js?v=7.6.10"></script>
-  <script src="v7_6_8_theme_fix.js?v=7.6.10"></script>
-  <script src="v7_6_9_profile_required.js?v=7.6.10"></script>
+  <script src="v6_2_mobile.js?v=7.6.11"></script>
+  <script src="v7_6_8_theme_fix.js?v=7.6.11"></script>
+  <script src="v7_6_9_profile_required.js?v=7.6.11"></script>
 </body>
 </html>
