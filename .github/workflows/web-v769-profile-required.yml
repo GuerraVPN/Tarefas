@@ -1,0 +1,50 @@
+name: Web 7.6.9 Profile Required
+on:
+  push:
+    branches: [web/v769-profile-required]
+    paths:
+      - 'v7_6_9_profile_required.js'
+      - '.github/v769_profile_required.py'
+      - '.github/workflows/web-v769-profile-required.yml'
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: web/v769-profile-required
+          fetch-depth: 0
+      - name: Aplicar Web 7.6.9
+        run: python3 .github/v769_profile_required.py
+      - name: Validar Web 7.6.9
+        run: |
+          set -euo pipefail
+          node --check v7_6_9_profile_required.js
+          node --check v7_5_1_version.js
+          node --check v7_5_1_about.js
+          node --check v6_2_mobile.js
+          grep -q "const VERSION='7.6.9'" v7_5_1_version.js
+          grep -q "const VERSION='7.6.9';" v7_5_1_about.js
+          grep -q "Atualização cadastral obrigatória" v7_6_9_profile_required.js
+          grep -q "from('usuarios').update" v7_6_9_profile_required.js
+          grep -q "v7_5_1_version.js?v=7.6.9" v6_2_mobile.js
+          grep -q "v7_5_1_about.js?v=7.6.9" v6_2_mobile.js
+          python3 - <<'PY'
+          from pathlib import Path
+          htmls=list(Path('.').glob('*.html'))
+          assert len(htmls)==17, [p.name for p in htmls]
+          missing=[p.name for p in htmls if 'v7_6_9_profile_required.js?v=7.6.9' not in p.read_text(encoding='utf-8')]
+          assert not missing, missing
+          print('OK: cadastro obrigatório presente em 17 páginas.')
+          PY
+      - name: Salvar Web 7.6.9 validada
+        run: |
+          set -euo pipefail
+          if git diff --quiet; then exit 0; fi
+          git config user.name 'GuerraVPN Web Build'
+          git config user.email '81371258+GuerraVPN@users.noreply.github.com'
+          git add '*.html' v7_5_1_version.js v7_5_1_about.js v6_2_mobile.js
+          git commit -m 'feat(web): promover cadastro obrigatório 7.6.9'
+          git push origin HEAD:web/v769-profile-required
