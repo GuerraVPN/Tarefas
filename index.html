@@ -172,52 +172,39 @@
       btnEntrar.innerText = "Autenticando...";
 
       try {
-        // Busca usuário pelo CPF
-        const { data, error } = await supabaseClient
-          .from("usuarios")
-          .select("*")
-          .eq("cpf", cpfLimpo)
-          .single();
+        // A senha é validada exclusivamente no backend. O navegador nunca recebe
+        // nem consulta a coluna de senha da tabela de usuários.
+        const { data: autenticacao, error } = await supabaseClient.rpc(
+          "v7_7_1_autenticar_usuario",
+          { p_cpf: cpfLimpo, p_senha: senhaDigitada }
+        );
+        const data = autenticacao?.usuario;
 
-        if (error || !data) {
-          alert("CPF não cadastrado ou erro na busca.");
+        if (error) throw error;
+        if (!data || !autenticacao?.session_token) {
+          localStorage.removeItem(MENSAGENS_SESSAO_CHAVE);
+          alert("CPF ou senha inválidos.");
           return;
         }
 
-        // Verifica senha (igual ao seu código atual)
-        if (data.senha === senhaDigitada) {
-          // A V7.5.8 também emite uma sessão curta/privada no backend para
-          // bloquear/desbloquear e enviar mensagens sem confiar apenas no ID do navegador.
-          const sessaoMensagens = await supabaseClient.rpc("v1_7_emitir_sessao_push", {
-            p_usuario_id: Number(data.id),
-            p_senha: senhaDigitada
-          });
-          if (sessaoMensagens.error || !sessaoMensagens.data) {
-            throw new Error("Não foi possível iniciar a sessão protegida de mensagens.");
-          }
+        localStorage.setItem(MENSAGENS_SESSAO_CHAVE, String(autenticacao.session_token));
+        localStorage.setItem(
+          "usuarioLogado",
+          JSON.stringify({
+            id: data.id,
+            nome_completo: data.nome_completo,
+            nome_guerra: data.nome_guerra,
+            patente: data.patente,
+            secao: data.secao,
+            posicao: data.posicao,
+            cpf: data.cpf
+          })
+        );
 
-          localStorage.setItem(MENSAGENS_SESSAO_CHAVE, String(sessaoMensagens.data));
-          localStorage.setItem(
-            "usuarioLogado",
-            JSON.stringify({
-              id: data.id,
-              nome_completo: data.nome_completo,
-              nome_guerra: data.nome_guerra,
-              patente: data.patente,
-              secao: data.secao,
-              posicao: data.posicao,
-              cpf: data.cpf
-            })
-          );
+        localStorage.setItem(SESSAO26_CHAVE, String(Date.now()));
 
-          localStorage.setItem(SESSAO26_CHAVE, String(Date.now()));
-
-          alert(`Bem-vindo, ${data.patente} ${data.nome_guerra}!`);
-          window.location.href = "dashboard.html";
-        } else {
-          localStorage.removeItem(MENSAGENS_SESSAO_CHAVE);
-          alert("Senha incorreta.");
-        }
+        alert(`Bem-vindo, ${data.patente} ${data.nome_guerra}!`);
+        window.location.href = "dashboard.html";
       } catch (err) {
         localStorage.removeItem(MENSAGENS_SESSAO_CHAVE);
         alert("Erro ao conectar ao servidor: " + err.message);
@@ -230,7 +217,7 @@
     // O index é a tela de login.
     // O menu só é aberto após um login bem-sucedido.
   </script>
-  <script src="v7_6_8_theme_fix.js?v=7.6.11"></script>
-  <script src="v7_6_9_profile_required.js?v=7.6.11"></script>
+  <script src="v7_6_8_theme_fix.js?v=7.7.1"></script>
+  <script src="v7_6_9_profile_required.js?v=7.7.1"></script>
 </body>
 </html>

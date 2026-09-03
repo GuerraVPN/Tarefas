@@ -1,0 +1,7 @@
+node_modules/
+android/
+dist/
+.web*/
+*.apk
+*.keystore*
+app/google-services.json

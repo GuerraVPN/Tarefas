@@ -1,11 +1,11 @@
 {
   "name": "tarefas-app",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "private": true,
-  "description": "TAREFAS Android 2.2.3 build 223 beta com Base Web 7.7.0, Material Carga atualizado, conferência obrigatória e correção do About.",
+  "description": "TAREFAS Android 2.2.4 build 224 beta com Base Web 7.7.1, login protegido e build reproduzível.",
   "scripts": {
-    "build:web": "node scripts/build-mobile-v223.mjs",
-    "verify:web": "node scripts/verify-mobile-v223.mjs dist",
+    "build:web": "node scripts/build-mobile-v224.mjs",
+    "verify:web": "node scripts/verify-mobile-v224.mjs dist",
     "cap:add:android": "npx cap add android",
     "cap:sync": "npm run build:web && npx cap sync android",
     "assets:android": "npx @capacitor/assets generate --android --assetPath assets --iconBackgroundColor '#040808' --iconBackgroundColorDark '#040808' --splashBackgroundColor '#040808' --splashBackgroundColorDark '#040808'",
@@ -29,5 +29,10 @@
     "@capacitor/cli": "8.5.0",
     "esbuild": "^0.25.9",
     "typescript": "^5.9.2"
+  },
+  "overrides": {
+    "sharp": "0.35.4",
+    "tar": "7.5.22",
+    "uuid": "11.1.1"
   }
 }

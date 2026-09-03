@@ -3,7 +3,7 @@ name: Android Beta APK
 on:
   workflow_dispatch:
   push:
-    branches: [app/android-v197-prep]
+    branches: [app/android-v224-prep]
     paths:
       - 'app/**'
       - 'assets/**'
@@ -23,103 +23,82 @@ jobs:
       contents: write
       id-token: write
     steps:
-      - name: Checkout
+      - name: Checkout fonte 2.2.4
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '22'
 
-      - name: Install dependencies
+      - name: Instalar dependências
         run: npm ci
 
-      - name: Build web bundle 2.1.4 beta
-        run: npm run build:web
+      - name: Auditar dependências
+        run: npm audit
 
-      - name: Conferência do bundle 2.1.4
+      - name: Gerar e validar Web 7.7.1
         run: |
           set -euo pipefail
+          npm run build:web
           npm run verify:web
-          node --check dist/lavanderia_v211.js
-          node --check dist/lavanderia_financeiro_v212.js
-          node --check dist/lavanderia_layout_v212.js
-          node --check dist/lavanderia_documento_v762.js
-          node --check dist/pessoal_v7.js
-          node --check dist/ferias_dispensas_v721.js
-          node --check dist/aditamento_v74.js
-          grep -q '2.1.4 • WEB 7.6.3' dist/mobile-v12.js
-          grep -q "APP_CHANNEL = 'beta'" dist/mobile-updates-v181.js
-          grep -q "VERSION='7.6.3'" dist/v7_5_1_version.js
-          grep -q "ESCALA_UI_VERSION='7.6.3'" dist/pessoal_v7.js
-          grep -q 'function vacationProtectionFor' dist/pessoal_v7.js
-          grep -q 'return !vacationProtectionFor(row,date)' dist/pessoal_v7.js
-          grep -q 'lavanderia_v211.js?v=2.1.4' dist/orcamentarios.html
-          grep -q 'lavanderia_financeiro_v212.js?v=2.1.4' dist/orcamentarios.html
-          grep -q 'lavanderia_layout_v212.js?v=2.1.4' dist/orcamentarios.html
-          grep -q 'lavanderia_documento_v762.js?v=2.1.4' dist/orcamentarios.html
-          grep -q 'application/vnd.oasis.opendocument.text' dist/lavanderia_documento_v762.js
-          grep -q 'Quem mandou lavar' dist/lavanderia_documento_v762.js
-          grep -q 'Quem recebeu' dist/lavanderia_documento_v762.js
-          grep -q 'SALDO DISPONÍVEL' dist/lavanderia_financeiro_v212.js
-          grep -q 'max-height:calc(100dvh' dist/lavanderia_layout_v212.js
-          grep -q 'position:sticky' dist/lavanderia_layout_v212.js
-          grep -q 'adaptationDate(v.data_fim)===date' dist/pessoal_v7.js
-          grep -q 'br(adaptationDate(v.data_fim))' dist/ferias_dispensas_v721.js
-          grep -q 'adaptationDate(v.data_fim)===date' dist/aditamento_v74.js
-          grep -q 'v1_9_8_games_leaderboard' dist/games.js
-          grep -q 'v1_9_6_send_message' dist/mobile-v196.js
+          grep -q '2.2.4 • WEB 7.7.1' dist/mobile-v12.js
+          grep -q 'v7_7_1_autenticar_usuario' dist/index.html
+          grep -q 'v7_7_1_autenticar_usuario' dist/mobile-login-v17.js
 
-      - name: Conferir Firebase Android
+      - name: Baixar configuração Firebase Android
         run: |
-          curl --fail --silent --show-error --retry 3 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/firebase-config-v17' -o app/google-services.json
+          curl --fail --silent --show-error --retry 3 \
+            'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/firebase-config-v17' \
+            -o app/google-services.json
           test -s app/google-services.json
           grep -q 'br.com.guerravpn.tarefas.mobile' app/google-services.json
 
-      - name: Add Android platform
+      - name: Adicionar plataforma Android
         run: npx cap add android
 
-      - name: Instalar Firebase no projeto Android
-        run: cp app/google-services.json android/app/google-services.json
-
-      - name: Set Android app version
+      - name: Configurar versão e Firebase
         run: |
-          sed -i 's/versionCode 1/versionCode 214/' android/app/build.gradle
-          sed -i 's/versionName "1.0"/versionName "2.1.4"/' android/app/build.gradle
+          cp app/google-services.json android/app/google-services.json
+          sed -i 's/versionCode 1/versionCode 224/' android/app/build.gradle
+          sed -i 's/versionName "1.0"/versionName "2.2.4"/' android/app/build.gradle
 
-      - name: Install stable debug signing key
-        run: |
-          mkdir -p "$HOME/.android"
-          base64 -d app/tarefas-debug.keystore.b64 > "$HOME/.android/debug.keystore"
-          chmod 600 "$HOME/.android/debug.keystore"
-          keytool -list -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey >/dev/null
-
-      - name: Generate Android icon assets
+      - name: Gerar ícones Android
         run: npm run assets:android
 
-      - name: Sync Capacitor
+      - name: Sincronizar Capacitor
         run: npx cap sync android
 
-      - name: Configurar armazenamento e plugin nativo
+      - name: Configurar armazenamento nativo
         run: |
           set -euo pipefail
           python3 - <<'PY'
           from pathlib import Path
-          p=Path('android/app/src/main/AndroidManifest.xml')
-          s=p.read_text(encoding='utf-8')
-          permissions='''    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />\n    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />\n    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />\n    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />\n'''
-          if 'android.permission.READ_EXTERNAL_STORAGE' not in s:
-              s=s.replace('<application',permissions+'    <application',1)
-          else:
-              for line,needle in [
-                ('    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />\n','android.permission.MANAGE_EXTERNAL_STORAGE'),
-                ('    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />\n','android.permission.REQUEST_INSTALL_PACKAGES')]:
-                if needle not in s:s=s.replace('<application',line+'    <application',1)
-          if 'android:requestLegacyExternalStorage' not in s:
-              s=s.replace('<application','<application android:requestLegacyExternalStorage="true"',1)
-          p.write_text(s,encoding='utf-8')
-          xml=Path('android/app/src/main/res/xml');xml.mkdir(parents=True,exist_ok=True)
-          (xml/'file_paths.xml').write_text('''<?xml version="1.0" encoding="utf-8"?>\n<paths xmlns:android="http://schemas.android.com/apk/res/android">\n  <files-path name="files" path="." />\n  <cache-path name="cache" path="." />\n  <external-files-path name="external-files" path="." />\n  <external-cache-path name="external-cache" path="." />\n  <external-path name="external" path="." />\n</paths>\n''',encoding='utf-8')
+          p = Path('android/app/src/main/AndroidManifest.xml')
+          source = p.read_text(encoding='utf-8')
+          permissions = '''    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+              <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />
+              <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+              <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+          '''
+          if 'android.permission.READ_EXTERNAL_STORAGE' not in source:
+              source = source.replace('<application', permissions + '    <application', 1)
+          if 'android:requestLegacyExternalStorage' not in source:
+              source = source.replace('<application', '<application android:requestLegacyExternalStorage="true"', 1)
+          p.write_text(source, encoding='utf-8')
+          xml = Path('android/app/src/main/res/xml')
+          xml.mkdir(parents=True, exist_ok=True)
+          (xml / 'file_paths.xml').write_text('''<?xml version="1.0" encoding="utf-8"?>
+          <paths xmlns:android="http://schemas.android.com/apk/res/android">
+            <files-path name="files" path="." />
+            <cache-path name="cache" path="." />
+            <external-files-path name="external-files" path="." />
+            <external-cache-path name="external-cache" path="." />
+            <external-path name="external" path="." />
+          </paths>
+          ''', encoding='utf-8')
           PY
           JAVA_DIR='android/app/src/main/java/br/com/guerravpn/tarefas/mobile'
           mkdir -p "$JAVA_DIR"
@@ -142,11 +121,11 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      - name: Build APK
+      - name: Compilar APK
         working-directory: android
         run: ./gradlew assembleDebug
 
-      - name: Validar APK 2.1.4 beta
+      - name: Validar APK 2.2.4
         run: |
           set -euo pipefail
           APK='android/app/build/outputs/apk/debug/app-debug.apk'
@@ -154,86 +133,97 @@ jobs:
           unzip -tq "$APK"
           python3 - <<'PY'
           import json
-          with open('android/app/build/outputs/apk/debug/output-metadata.json',encoding='utf-8') as f: el=json.load(f)['elements'][0]
-          assert int(el['versionCode'])==214,el
-          assert str(el['versionName'])=='2.1.4',el
+          with open('android/app/build/outputs/apk/debug/output-metadata.json', encoding='utf-8') as f:
+              element = json.load(f)['elements'][0]
+          assert int(element['versionCode']) == 224, element
+          assert str(element['versionName']) == '2.2.4', element
           PY
-          unzip -p "$APK" assets/public/mobile-v12.js > /tmp/214-version.js
-          unzip -p "$APK" assets/public/orcamentarios.html > /tmp/214-orc.html
-          unzip -p "$APK" assets/public/lavanderia_v211.js > /tmp/214-lav.js
-          unzip -p "$APK" assets/public/lavanderia_financeiro_v212.js > /tmp/214-fin.js
-          unzip -p "$APK" assets/public/lavanderia_layout_v212.js > /tmp/214-layout.js
-          unzip -p "$APK" assets/public/lavanderia_documento_v762.js > /tmp/214-doc.js
-          unzip -p "$APK" assets/public/pessoal_v7.js > /tmp/214-pessoal.js
-          node --check /tmp/214-lav.js
-          node --check /tmp/214-fin.js
-          node --check /tmp/214-layout.js
-          node --check /tmp/214-doc.js
-          node --check /tmp/214-pessoal.js
-          grep -q '2.1.4 • WEB 7.6.3' /tmp/214-version.js
-          grep -q 'lavanderia_documento_v762.js?v=2.1.4' /tmp/214-orc.html
-          grep -q 'application/vnd.oasis.opendocument.text' /tmp/214-doc.js
-          grep -q 'function vacationProtectionFor' /tmp/214-pessoal.js
-          grep -q 'return !vacationProtectionFor(row,date)' /tmp/214-pessoal.js
+          unzip -p "$APK" assets/public/mobile-v12.js | grep -q '2.2.4 • WEB 7.7.1'
+          unzip -p "$APK" assets/public/mobile-login-v17.js | grep -q 'v7_7_1_autenticar_usuario'
+          unzip -p "$APK" assets/public/v7_5_1_version.js | grep -q "VERSION='7.7.1'"
 
-      - name: Assinar distribuição com GuerraVPN
+      - name: Assinar APK de distribuição
         run: |
           set -euo pipefail
-          OIDC="$(curl --fail --silent --show-error -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-signing" | jq -r '.value')"
-          curl --fail --silent --show-error -H "Authorization: Bearer $OIDC" 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-signing-material' -o /tmp/tarefas-signing.json
-          jq -r '.keystore_b64' /tmp/tarefas-signing.json | base64 -d > /tmp/GuerraVPN.keystore
-          STORE_PASS="$(jq -r '.store_password' /tmp/tarefas-signing.json)"
-          KEY_ALIAS="$(jq -r '.key_alias' /tmp/tarefas-signing.json)"
-          KEY_PASS="$(jq -r '.key_password' /tmp/tarefas-signing.json)"
-          EXPECTED_CERT="$(jq -r '.cert_sha256' /tmp/tarefas-signing.json)"
+          OIDC="$(curl --fail --silent --show-error \
+            -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-signing" | jq -r '.value')"
+          curl --fail --silent --show-error -H "Authorization: Bearer $OIDC" \
+            'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-signing-material' \
+            -o "$RUNNER_TEMP/tarefas-signing.json"
+          jq -r '.keystore_b64' "$RUNNER_TEMP/tarefas-signing.json" | base64 -d > "$RUNNER_TEMP/GuerraVPN.keystore"
+          STORE_PASS="$(jq -r '.store_password' "$RUNNER_TEMP/tarefas-signing.json")"
+          KEY_ALIAS="$(jq -r '.key_alias' "$RUNNER_TEMP/tarefas-signing.json")"
+          KEY_PASS="$(jq -r '.key_password' "$RUNNER_TEMP/tarefas-signing.json")"
+          EXPECTED_CERT="$(jq -r '.cert_sha256' "$RUNNER_TEMP/tarefas-signing.json")"
           APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)"
-          "$APKSIGNER" sign --ks /tmp/GuerraVPN.keystore --ks-key-alias "$KEY_ALIAS" --ks-pass "pass:$STORE_PASS" --key-pass "pass:$KEY_PASS" --out TAREFAS-2.1.4.apk android/app/build/outputs/apk/debug/app-debug.apk
-          VERIFY="$($APKSIGNER verify --verbose --print-certs TAREFAS-2.1.4.apk)"
-          printf '%s\n' "$VERIFY"
+          "$APKSIGNER" sign \
+            --ks "$RUNNER_TEMP/GuerraVPN.keystore" \
+            --ks-key-alias "$KEY_ALIAS" \
+            --ks-pass "pass:$STORE_PASS" \
+            --key-pass "pass:$KEY_PASS" \
+            --out TAREFAS-2.2.4.apk \
+            android/app/build/outputs/apk/debug/app-debug.apk
+          VERIFY="$($APKSIGNER verify --verbose --print-certs TAREFAS-2.2.4.apk)"
           ACTUAL_CERT="$(printf '%s\n' "$VERIFY" | sed -n 's/.*certificate SHA-256 digest: //p' | head -1 | tr -d ': ' | tr '[:upper:]' '[:lower:]')"
           test "$ACTUAL_CERT" = "$EXPECTED_CERT"
-          rm -f /tmp/tarefas-signing.json /tmp/GuerraVPN.keystore
+          rm -f "$RUNNER_TEMP/tarefas-signing.json" "$RUNNER_TEMP/GuerraVPN.keystore"
 
       - name: Publicar APK permanente
         run: |
           set -euo pipefail
           git fetch origin app/releases
-          rm -rf /tmp/tarefas-releases
-          git worktree add /tmp/tarefas-releases origin/app/releases
-          mkdir -p /tmp/tarefas-releases/downloads
-          cp TAREFAS-2.1.4.apk /tmp/tarefas-releases/downloads/TAREFAS-2.1.4.apk
-          cd /tmp/tarefas-releases
+          RELEASES_DIR="$RUNNER_TEMP/tarefas-releases"
+          git worktree add "$RELEASES_DIR" origin/app/releases
+          mkdir -p "$RELEASES_DIR/downloads"
+          cp TAREFAS-2.2.4.apk "$RELEASES_DIR/downloads/TAREFAS-2.2.4.apk"
+          cd "$RELEASES_DIR"
           git config user.name 'GuerraVPN Android Build'
           git config user.email '81371258+GuerraVPN@users.noreply.github.com'
-          git add downloads/TAREFAS-2.1.4.apk
+          git add downloads/TAREFAS-2.2.4.apk
           if ! git diff --cached --quiet; then
-            git commit -m 'release(android): TAREFAS 2.1.4 beta build 214'
+            git commit -m 'release(android): TAREFAS 2.2.4 beta build 224'
             git push origin HEAD:app/releases
           fi
-          cd -
-          URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.1.4.apk'
-          LOCAL_SHA="$(sha256sum TAREFAS-2.1.4.apk | awk '{print $1}')"
-          for i in 1 2 3 4 5 6 7 8; do
-            if curl --fail --silent --show-error -L "$URL" -o /tmp/tarefas-published.apk; then
-              [ "$(sha256sum /tmp/tarefas-published.apk | awk '{print $1}')" = "$LOCAL_SHA" ] && echo 'APK beta permanente conferido.' && exit 0
+          URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.2.4.apk'
+          LOCAL_SHA="$(sha256sum "$GITHUB_WORKSPACE/TAREFAS-2.2.4.apk" | awk '{print $1}')"
+          for attempt in 1 2 3 4 5 6 7 8; do
+            if curl --fail --silent --show-error -L "$URL" -o "$RUNNER_TEMP/tarefas-published.apk"; then
+              test "$(sha256sum "$RUNNER_TEMP/tarefas-published.apk" | awk '{print $1}')" = "$LOCAL_SHA" && exit 0
             fi
             sleep 3
           done
           exit 1
 
-      - name: Registrar beta no servidor e disparar push
+      - name: Registrar beta e enviar notificação
         run: |
           set -euo pipefail
-          OIDC="$(curl --fail --silent --show-error -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-release" | jq -r '.value')"
-          SHA="$(sha256sum TAREFAS-2.1.4.apk | awk '{print $1}')"
-          jq -n --arg version '2.1.4' --argjson build 214 --arg channel 'beta' --arg url 'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.1.4.apk' --arg sha "$SHA" '{version:$version,build:$build,channel:$channel,download_url:$url,sha256:$sha}' > /tmp/release.json
-          curl --fail --silent --show-error -H "Authorization: Bearer $OIDC" -H 'Content-Type: application/json' --data-binary @/tmp/release.json 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-release-publish' -o /tmp/release-result.json
-          cat /tmp/release-result.json
-          jq -e '.ok == true and .version == "2.1.4" and .build == 214' /tmp/release-result.json >/dev/null
+          OIDC="$(curl --fail --silent --show-error \
+            -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-release" | jq -r '.value')"
+          SHA="$(sha256sum TAREFAS-2.2.4.apk | awk '{print $1}')"
+          jq -n \
+            --arg version '2.2.4' \
+            --argjson build 224 \
+            --arg channel 'beta' \
+            --arg web_version '7.7.1' \
+            --arg title 'Auditoria geral, login protegido e build reproduzível' \
+            --arg url 'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.2.4.apk' \
+            --arg sha "$SHA" \
+            '{version:$version,build:$build,channel:$channel,web_version:$web_version,title:$title,changelog:["Login validado somente no backend.","Build Android reproduzível e independente de branches antigas.","Dependências sem vulnerabilidades conhecidas.","Base Web 7.7.1 validada automaticamente."],mandatory:false,download_url:$url,sha256:$sha}' \
+            > "$RUNNER_TEMP/release.json"
+          curl --fail --silent --show-error \
+            -H "Authorization: Bearer $OIDC" \
+            -H 'Content-Type: application/json' \
+            --data-binary @"$RUNNER_TEMP/release.json" \
+            'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-release-publish' \
+            -o "$RUNNER_TEMP/release-result.json"
+          jq -e '.ok == true and .version == "2.2.4" and .build == 224 and .channel == "beta"' \
+            "$RUNNER_TEMP/release-result.json" >/dev/null
 
-      - name: Upload APK 2.1.4 beta assinado
+      - name: Salvar APK assinado
         uses: actions/upload-artifact@v4
         with:
-          name: tarefas-android-2.1.4-beta-GuerraVPN
-          path: TAREFAS-2.1.4.apk
+          name: tarefas-android-2.2.4-beta-GuerraVPN
+          path: TAREFAS-2.2.4.apk
           if-no-files-found: error

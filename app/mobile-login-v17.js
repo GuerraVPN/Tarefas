@@ -27,17 +27,15 @@
     if (btn){ btn.disabled = true; btn.textContent = 'Autenticando...'; }
 
     try {
-      const { data, error } = await client.from('usuarios').select('*').eq('cpf', cpf).single();
-      if (error || !data) throw new Error('CPF não cadastrado ou erro na busca.');
-      if (data.senha !== senha) throw new Error('Senha incorreta.');
-
-      const { data: pushSession, error: pushError } = await client.rpc('v1_7_emitir_sessao_push', {
-        p_usuario_id: Number(data.id),
+      const { data: autenticacao, error } = await client.rpc('v7_7_1_autenticar_usuario', {
+        p_cpf: cpf,
         p_senha: senha
       });
-      if (pushError || !pushSession) throw new Error('Não foi possível ativar o push neste login.');
+      const data = autenticacao?.usuario;
+      if (error) throw error;
+      if (!data || !autenticacao?.session_token) throw new Error('CPF ou senha inválidos.');
 
-      localStorage.setItem(PUSH_SESSION_KEY, String(pushSession));
+      localStorage.setItem(PUSH_SESSION_KEY, String(autenticacao.session_token));
       localStorage.setItem('usuarioLogado', JSON.stringify({
         id: data.id,
         nome_completo: data.nome_completo,

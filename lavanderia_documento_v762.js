@@ -123,7 +123,7 @@ function manifestXml(){return `<?xml version="1.0" encoding="UTF-8"?>
 function metaXml(request){
   const created=new Date().toISOString();
   return `<?xml version="1.0" encoding="UTF-8"?>
-<office:document-meta xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:dc="http://purl.org/dc/elements/1.1/" office:version="1.2"><office:meta><dc:title>Forro de Cama para Lavar</dc:title><meta:generator>TAREFAS WEB 7.6.4 / Android 2.1.5</meta:generator><meta:creation-date>${xml(created)}</meta:creation-date><meta:keyword>Lavagem ${xml(request?.id??'')}</meta:keyword></office:meta></office:document-meta>`;
+<office:document-meta xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:meta="urn:oasis:names:tc:opendocument:xmlns:meta:1.0" xmlns:dc="http://purl.org/dc/elements/1.1/" office:version="1.2"><office:meta><dc:title>Forro de Cama para Lavar</dc:title><meta:generator>TAREFAS WEB 7.6.6 / Android 2.1.5</meta:generator><meta:creation-date>${xml(created)}</meta:creation-date><meta:keyword>Lavagem ${xml(request?.id??'')}</meta:keyword></office:meta></office:document-meta>`;
 }
 function buildOdt(request,items){
   const entries=[
