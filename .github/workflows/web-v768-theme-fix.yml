@@ -1,0 +1,42 @@
+name: Web 7.6.8 Theme Fix
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'v7_6_8_theme_fix.js'
+      - '.github/v768_theme_fix.py'
+      - '.github/workflows/web-v768-theme-fix.yml'
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Aplicar Web 7.6.8
+        run: python3 .github/v768_theme_fix.py
+      - name: Validar
+        run: |
+          set -euo pipefail
+          node --check v7_6_8_theme_fix.js
+          node --check v7_5_1_version.js
+          node --check v7_5_1_about.js
+          node --check v6_2_mobile.js
+          grep -q "const VERSION='7.6.8'" v7_5_1_version.js
+          grep -q "v7_6_8_theme_fix.js" v7_5_1_version.js
+          grep -q "v7_6_8_theme_fix.js?v=7.6.8" configuracoes.html
+          grep -q "v4_tema.js?v=7.6.8" configuracoes.html
+          grep -q "v6_2_mobile.js?v=7.6.8" configuracoes.html
+          grep -q "Troca de tema corrigida" v7_5_1_about.js
+      - name: Publicar no main
+        run: |
+          set -euo pipefail
+          if git diff --quiet; then exit 0; fi
+          git config user.name 'GuerraVPN Web Build'
+          git config user.email '81371258+GuerraVPN@users.noreply.github.com'
+          git add '*.html' v7_5_1_version.js v7_5_1_about.js v6_2_mobile.js games.js lavanderia_pagamento_v767.js
+          git commit -m 'fix(web): corrigir troca de temas 7.6.8'
+          git push origin HEAD:main
