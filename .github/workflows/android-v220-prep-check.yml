@@ -1,0 +1,67 @@
+name: Android 2.2.0 Prep Check
+
+on:
+  push:
+    branches: [app/android-v220-prep]
+    paths:
+      - 'scripts/build-mobile-v220.mjs'
+      - 'scripts/verify-mobile-v220.mjs'
+      - '.github/workflows/android-v220-prep-check.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: app/android-v220-prep
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Sincronizar Web 7.6.9 aprovada
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          for f in about.html calendario.html central.html configuracoes.html dashboard.html ferias_dispensas.html games.html help.html historico_auditoria.html index.html menu.html minhas_tarefas.html missao.html orcamentarios.html pessoal.html relatorios.html usuarios.html v4_tema.js v4_tema.css v6_2_mobile.js v7_5_1_version.js v7_5_1_about.js v7_6_8_theme_fix.js v7_6_9_profile_required.js; do
+            git show "origin/main:$f" > "$f"
+          done
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          p=Path('package.json'); d=json.loads(p.read_text(encoding='utf-8'))
+          d['version']='2.2.0'
+          d['description']='TAREFAS Android 2.2.0 build 220 oficial com Base Web 7.6.9 e atualização cadastral obrigatória.'
+          d['scripts']['build:web']='node scripts/build-mobile-v220.mjs'
+          d['scripts']['verify:web']='node scripts/verify-mobile-v220.mjs dist'
+          p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          p=Path('package-lock.json'); d=json.loads(p.read_text(encoding='utf-8'))
+          d['version']='2.2.0'
+          if isinstance(d.get('packages'),dict) and isinstance(d['packages'].get(''),dict): d['packages']['']['version']='2.2.0'
+          p.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
+          PY
+      - name: Instalar dependências
+        run: npm ci
+      - name: Gerar bundle
+        run: npm run build:web
+      - name: Validar bundle
+        run: |
+          set -euo pipefail
+          npm run verify:web
+          node --check dist/v7_6_9_profile_required.js
+          grep -q '2.2.0 • WEB 7.6.9' dist/mobile-v12.js
+          grep -q "APP_CHANNEL = 'official'" dist/mobile-updates-v181.js
+          grep -q 'v7_6_9_profile_required.js?v=2.2.0' dist/configuracoes.html
+          grep -q '__TAREFAS_PROFILE_REQUIRED_V769__' dist/v7_6_9_profile_required.js
+      - name: Salvar fonte validada
+        run: |
+          git config user.name 'GuerraVPN Android Build'
+          git config user.email '81371258+GuerraVPN@users.noreply.github.com'
+          git add '*.html' v4_tema.js v4_tema.css v6_2_mobile.js v7_5_1_version.js v7_5_1_about.js v7_6_8_theme_fix.js v7_6_9_profile_required.js package.json package-lock.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'release(android): preparar TAREFAS 2.2.0 Web 7.6.9'
+            git push origin HEAD:app/android-v220-prep
+          fi
