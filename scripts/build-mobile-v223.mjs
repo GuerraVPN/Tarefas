@@ -1,9 +1,11 @@
-import { readFile, writeFile, readdir } from 'node:fs/promises';
+import { readFile, writeFile, readdir, copyFile, access } from 'node:fs/promises';
 import path from 'node:path';
 
 await import('./build-mobile-v222.mjs');
 
-const dist=path.join(process.cwd(),'dist');
+const root=process.cwd();
+const dist=path.join(root,'dist');
+const overlay=path.join(root,'.web770');
 async function patch(rel,replacements){
   const file=path.join(dist,rel);
   let text=await readFile(file,'utf8');
@@ -12,6 +14,29 @@ async function patch(rel,replacements){
     text=text.split(from).join(to);
   }
   await writeFile(file,text,'utf8');
+}
+async function exists(p){try{await access(p);return true}catch{return false}}
+
+const web770Files=[
+  'about.html','orcamentarios.html','v4_ui.js','v6_2_mobile.js','v6_5_patch.js',
+  'v7_5_1_version.js','v7_5_1_about.js','v7_6_5_webfix.js','v7_6_8_theme_fix.js',
+  'v7_6_9_profile_required.js','v7_7_0_material_carga.js','notificacoes.js','central.js'
+];
+for(const rel of web770Files){
+  const src=path.join(overlay,rel);
+  if(!await exists(src))throw new Error(`Overlay Web 7.7.0 ausente: ${rel}`);
+  await copyFile(src,path.join(dist,rel));
+}
+
+const mobileCss=['mobile.css','mobile-v12.css','mobile-v16.css','mobile-v18.css','mobile-v181.css'];
+const mobileJs=['mobile-bootstrap.js','mobile-v12.js','native-mobile.js','mobile-updates-v181.js','mobile-dashboard-v184.js','mobile-users-inline-v189.js','bloco_notas.js','mobile-notes-v191.js','mobile-v196.js'];
+for(const rel of ['about.html','orcamentarios.html']){
+  const file=path.join(dist,rel);let html=await readFile(file,'utf8');
+  if(!html.includes('mobile-preload.js'))html=html.replace(/<head>/i,'<head>\n  <script src="mobile-preload.js"></script>');
+  for(const css of mobileCss)if(!html.includes(css))html=html.replace(/<\/head>/i,`  <link rel="stylesheet" href="${css}">\n</head>`);
+  if(!html.includes('manifest.webmanifest'))html=html.replace(/<\/head>/i,'  <link rel="manifest" href="manifest.webmanifest">\n  <meta name="theme-color" content="#05090b">\n</head>');
+  for(const js of mobileJs)if(!html.includes(js))html=html.replace(/<\/body>/i,`  <script src="${js}"></script>\n</body>`);
+  await writeFile(file,html,'utf8');
 }
 
 await patch('mobile-bootstrap.js',[
@@ -40,4 +65,4 @@ for(const rel of htmlFiles){
   await writeFile(file,html,'utf8');
 }
 
-console.log(`TAREFAS Android 2.2.3 build 223 BETA: Web 7.7.0, Material Carga, conferência obrigatória e About corrigido em ${htmlFiles.length} telas.`);
+console.log(`TAREFAS Android 2.2.3 build 223 BETA: base estável 2.2.2 + overlay Web 7.7.0 em ${htmlFiles.length} telas.`);
