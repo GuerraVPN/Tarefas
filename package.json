@@ -1,11 +1,11 @@
 {
   "name": "tarefas-app",
-  "version": "2.1.5",
+  "version": "2.1.6",
   "private": true,
-  "description": "TAREFAS Android 2.1.5 build 215 beta com Base Web 7.6.4, escolha ODT/PDF e férias protegidas até ADP.",
+  "description": "TAREFAS Android 2.1.6 build 216 beta com Base Web 7.6.8 e correção da troca de temas.",
   "scripts": {
-    "build:web": "node scripts/build-mobile-v215.mjs",
-    "verify:web": "node scripts/verify-mobile-v215.mjs dist",
+    "build:web": "node scripts/build-mobile-v216.mjs",
+    "verify:web": "node scripts/verify-mobile-v216.mjs dist",
     "cap:add:android": "npx cap add android",
     "cap:sync": "npm run build:web && npx cap sync android",
     "assets:android": "npx @capacitor/assets generate --android --assetPath assets --iconBackgroundColor '#040808' --iconBackgroundColorDark '#040808' --splashBackgroundColor '#040808' --splashBackgroundColorDark '#040808'",
