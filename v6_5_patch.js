@@ -46,7 +46,7 @@ function renderVersion(){
     const b=document.createElement('button');
     b.type='button';b.className='v65-version-badge';b.innerHTML=`● TAREFAS v${VERSION}`;
     b.title='Sobre esta versão';
-    b.onclick=()=>location.href='about.html';
+    b.onclick=()=>location.assign(new URL('about.html',location.href).href);
     host.appendChild(b);
   }
   const brand=document.querySelector('.v62-mobile-brand');
@@ -65,11 +65,11 @@ function navExtra(){
     list.appendChild(help);
     help.querySelector('button').onclick=()=>location.href='help.html';
   }
-  if(!list.querySelector('[data-v65-nav="about"]')){
+  if(!list.querySelector('[data-v65-nav="about"]')&&!list.querySelector('[data-url="about.html"]')){
     const about=document.createElement('li');about.className='v65-nav-extra';about.dataset.v65Nav='about';
     about.innerHTML='<button class="v6-nav-item '+((location.pathname.split('/').pop()||'')==='about.html'?'active':'')+'" data-v65-about><span class="v6-nav-icon">ⓘ</span><span class="v6-nav-label">About</span></button>';
     list.appendChild(about);
-    about.querySelector('button').onclick=()=>location.href='about.html';
+    about.querySelector('button').onclick=()=>location.assign(new URL('about.html',location.href).href);
   }
 }
 

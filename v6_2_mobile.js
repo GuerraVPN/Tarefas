@@ -99,7 +99,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   add('v7_4_12_site.js?v=7.5.1','data-v7412-site',function(){
    add('v7_4_7_mission_patch.js?v=7.5.1','data-v747-mission-patch',function(){
     add('v7_4_7_aditamento_patch.js?v=7.5.1','data-v747-aditamento-patch',function(){
-     add('v6_5_patch.js?v=6.5','data-v65-loader',function(){
+     add('v6_5_patch.js?v=7.7.0-aboutfix','data-v65-loader',function(){
       add('v7_4_12_global.js?v=7.5.1','data-v7412-global',function(){
        add('v7_5_1_version.js?v=7.7.0','data-v751-version',function(){
         add('v7_4_3_period.js?v=7.5.1','data-v743-period',function(){
