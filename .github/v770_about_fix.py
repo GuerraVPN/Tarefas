@@ -41,4 +41,5 @@ if 'v7_5_1_about.js?v=7.7.0-aboutfix' not in s:
     s=s.replace(needle,direct,1)
 write(p,s)
 
+# Alteração mínima neste arquivo também serve para disparar o workflow após ele existir no branch main.
 print('About 7.7.0 corrigido: navegação nativa, sem duplicação e histórico direto.')
