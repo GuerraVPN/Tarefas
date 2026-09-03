@@ -87,16 +87,12 @@ function notificationCards(){
 }
 function filterSiteAppUpdates(){
  if(native())return;
- const hide=!siteUpdatesEnabled();
- for(const card of notificationCards()){card.style.display=hide?'none':'';card.dataset.v754AppUpdate=hide?'hidden':'visible'}
+ for(const card of notificationCards()){card.style.display='none';card.dataset.v754AppUpdate='hidden'}
+ document.getElementById('v754SiteAppUpdates')?.remove();
 }
 function injectSiteUpdateSetting(){
- if(native()||page()!=='configuracoes.html'||document.getElementById('v754SiteAppUpdates'))return;
- const host=document.querySelector('.content .grid')||document.querySelector('.content')||document.querySelector('main');if(!host)return;
- const card=document.createElement('section');card.id='v754SiteAppUpdates';card.className='v754-setting-card';
- card.innerHTML=`<h3>Notificações de atualização do aplicativo no site</h3><p>Desative para ocultar no site os avisos de novas versões do Android. Os avisos e pushes continuam aparecendo normalmente dentro do aplicativo.</p><div class="v754-switch-row"><label for="v754SiteAppUpdatesToggle">Exibir atualizações do app no site</label><input id="v754SiteAppUpdatesToggle" type="checkbox" ${siteUpdatesEnabled()?'checked':''}></div>`;
- host.appendChild(card);
- card.querySelector('input').addEventListener('change',e=>{setSiteUpdatesEnabled(e.currentTarget.checked);filterSiteAppUpdates()});
+ if(native())return;
+ document.getElementById('v754SiteAppUpdates')?.remove();
 }
 
 function injectAppLogout(){

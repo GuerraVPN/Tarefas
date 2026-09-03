@@ -6,7 +6,9 @@ function getUser(){try{return JSON.parse(localStorage.getItem('usuarioLogado')||
 function n(v){return String(v??'')}
 function norm(v){return String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase()}
 function getClient(){try{return typeof supabaseClient!=='undefined'?supabaseClient:null}catch(_){return null}}
-function visible(row){const u=getUser();const p=u?.perfil_id??null;return row?.perfil_id==null||(p!=null&&n(row.perfil_id)===n(p))}
+function native(){return !!window.__TAREFAS_NATIVE_APP__}
+function appUpdate(row){return ['app_update','app_update_reminder'].includes(norm(row?.tipo))}
+function visible(row){const u=getUser();const p=u?.perfil_id??null;const perfil=row?.perfil_id==null||(p!=null&&n(row.perfil_id)===n(p));return perfil&&(native()||!appUpdate(row))}
 function lockKey(usuarioId,tipo,refTipo,refId,perfilAlvoId,titulo){return [usuarioId,tipo||'sistema',refTipo||'',refId||'',perfilAlvoId??'global',titulo||''].join('|')}
 function destinoNotificacao(row){
  if(row?.destino_url)return row.destino_url;

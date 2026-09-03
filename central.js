@@ -1,7 +1,7 @@
 (function(){
 'use strict';
 const $=id=>document.getElementById(id),esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));let u=null,notifs=[],filter='todas',users=[],profiles=new Map(),messages=[],otherId=null,channel=null;
-function user(){try{return JSON.parse(localStorage.getItem('usuarioLogado')||'null')}catch(_){return null}}function visible(n){return n.perfil_id==null||String(n.perfil_id)===String(u.perfil_id??'')}function time(v){const d=new Date(v),diff=(Date.now()-d)/60000;if(diff<1)return'Agora';if(diff<60)return Math.floor(diff)+' min';if(diff<1440)return Math.floor(diff/60)+' h';return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}
+function user(){try{return JSON.parse(localStorage.getItem('usuarioLogado')||'null')}catch(_){return null}}function native(){return !!window.__TAREFAS_NATIVE_APP__}function appUpdate(n){return ['app_update','app_update_reminder'].includes(String(n?.tipo||'').trim().toLowerCase())}function visible(n){const perfil=n.perfil_id==null||String(n.perfil_id)===String(u.perfil_id??'');return perfil&&(native()||!appUpdate(n))}function time(v){const d=new Date(v),diff=(Date.now()-d)/60000;if(diff<1)return'Agora';if(diff<60)return Math.floor(diff)+' min';if(diff<1440)return Math.floor(diff/60)+' h';return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})}
 function dedupeNotificacoes(lista){
   const resultado=[];
   const vistos=new Map();
