@@ -97,8 +97,38 @@ async function ensureChannel(){if(!Capacitor.isNativePlatform()||Capacitor.getPl
 async function notify({title='TAREFAS',body,id,at,extra}={}){if(!body)throw new Error('O corpo da notificação é obrigatório.');if(!await ensureLocalPermission())return false;await ensureChannel();await LocalNotifications.schedule({notifications:[{title,body,id:Number(id)||Math.max(1,Math.floor(Date.now()%2147483000)),channelId:Capacitor.getPlatform()==='android'?CHANNEL_ID:undefined,schedule:at?{at:new Date(at)}:{at:new Date(Date.now()+250)},extra:extra||{}}]});return true}
 async function registerToken(token){const value=String(token||'').trim();if(!value||value===lastToken)return false;const user=readUser(),sessionToken=localStorage.getItem(PUSH_SESSION_KEY),c=getClient();if(!user?.id||!sessionToken||!c)return false;const id=await deviceId();const {data,error}=await c.rpc('v1_7_registrar_push_device',{p_session_token:sessionToken,p_fcm_token:value,p_device_id:id,p_platform:Capacitor.getPlatform(),p_app_version:APP_VERSION,p_perfil_id:user.perfil_id==null?null:Number(user.perfil_id)});if(error||data!==true){console.warn('[TAREFAS PUSH] Falha ao registrar aparelho:',error?.message||'sessão de push inválida');return false}lastToken=value;localStorage.setItem('tarefasPushReady17','1');window.dispatchEvent(new CustomEvent('tarefas:push-status',{detail:{ready:true}}));return true}
 function destinationFrom(notification){const data=notification?.data||notification?.notification?.data||{},tipo=String(data.tipo||''),ref=String(data.referencia_id||'').trim();if(tipo==='app_update'||String(data.referencia_tipo||'')==='app_version')return `about.html?update=${encodeURIComponent(ref||'latest')}`;const href=String(data.destino_url||'central.html?tab=notificacoes').trim();if(/^https?:\/\//i.test(href))return'central.html?tab=notificacoes';return href.endsWith('.html')||href.includes('.html?')?href:'central.html?tab=notificacoes'}
+const __TAREFAS_V221_NOTIFICATION_DISMISS__=true;
 function navigateNotification(notification){const href=destinationFrom(notification);if(href)location.href=href}
-async function installPushListeners(){if(pushListenersInstalled)return;pushListenersInstalled=true;await PushNotifications.addListener('registration',async({value})=>{await registerToken(value).catch(err=>console.warn('[TAREFAS PUSH] Registro:',err))});await PushNotifications.addListener('registrationError',error=>{console.error('[TAREFAS PUSH] Firebase registration error:',error);window.dispatchEvent(new CustomEvent('tarefas:push-status',{detail:{ready:false,reason:'registration_error'}}))});await PushNotifications.addListener('pushNotificationReceived',async notification=>{window.dispatchEvent(new CustomEvent('v6:notificacoes:update'));const body=notification.body||notification.data?.mensagem||'Você recebeu uma nova notificação.';await notify({title:notification.title||'TAREFAS',body,extra:notification.data||{}}).catch(()=>{})});await PushNotifications.addListener('pushNotificationActionPerformed',action=>navigateNotification(action.notification));await LocalNotifications.addListener('localNotificationActionPerformed',action=>navigateNotification({data:action.notification?.extra||{}}))}
+function notificationMatch(delivered,opened){
+ const openedData=opened?.data||opened?.extra||{};
+ const deliveredData=delivered?.data||delivered?.extra||{};
+ const openedRemoteId=String(opened?.id||'').trim();
+ const openedDbId=String(openedData.notification_id||'').trim();
+ if(openedRemoteId&&String(delivered?.id||'').trim()===openedRemoteId)return true;
+ return !!openedDbId&&String(deliveredData.notification_id||'').trim()===openedDbId;
+}
+async function dismissPushNotification(notification){
+ try{
+  const delivered=await PushNotifications.getDeliveredNotifications();
+  const matches=(delivered?.notifications||[]).filter(item=>notificationMatch(item,notification));
+  if(matches.length)await PushNotifications.removeDeliveredNotifications({notifications:matches});
+ }catch(err){console.warn('[TAREFAS NOTIF] Falha ao remover push entregue:',err)}
+}
+async function dismissLocalNotification(notification){
+ try{
+  const delivered=await LocalNotifications.getDeliveredNotifications();
+  const id=Number(notification?.id||0);
+  const dbId=String(notification?.extra?.notification_id||'').trim();
+  const matches=(delivered?.notifications||[]).filter(item=>{
+   if(id&&Number(item?.id||0)===id)return true;
+   return !!dbId&&String(item?.extra?.notification_id||'').trim()===dbId;
+  });
+  if(matches.length)await LocalNotifications.removeDeliveredNotifications({notifications:matches});
+ }catch(err){console.warn('[TAREFAS NOTIF] Falha ao remover notificação local entregue:',err)}
+}
+async function openPushNotification(notification){await dismissPushNotification(notification);navigateNotification(notification)}
+async function openLocalNotification(notification){await dismissLocalNotification(notification);navigateNotification({data:notification?.extra||{}})}
+async function installPushListeners(){if(pushListenersInstalled)return;pushListenersInstalled=true;await PushNotifications.addListener('registration',async({value})=>{await registerToken(value).catch(err=>console.warn('[TAREFAS PUSH] Registro:',err))});await PushNotifications.addListener('registrationError',error=>{console.error('[TAREFAS PUSH] Firebase registration error:',error);window.dispatchEvent(new CustomEvent('tarefas:push-status',{detail:{ready:false,reason:'registration_error'}}))});await PushNotifications.addListener('pushNotificationReceived',async notification=>{window.dispatchEvent(new CustomEvent('v6:notificacoes:update'));const body=notification.body||notification.data?.mensagem||'Você recebeu uma nova notificação.';await notify({title:notification.title||'TAREFAS',body,extra:notification.data||{}}).catch(()=>{})});await PushNotifications.addListener('pushNotificationActionPerformed',action=>{openPushNotification(action.notification).catch(()=>navigateNotification(action.notification))});await LocalNotifications.addListener('localNotificationActionPerformed',action=>{openLocalNotification(action.notification).catch(()=>navigateNotification({data:action.notification?.extra||{}}))})}
 async function initializeRemotePush(){if(pushInitialized||!Capacitor.isNativePlatform())return false;const user=readUser();if(!user?.id)return false;const sessionToken=localStorage.getItem(PUSH_SESSION_KEY);if(!sessionToken){localStorage.removeItem('tarefasPushReady17');window.dispatchEvent(new CustomEvent('tarefas:push-status',{detail:{ready:false,reason:'login_required'}}));return false}pushInitialized=true;await ensureChannel();if(!await ensurePushPermission()){pushInitialized=false;window.dispatchEvent(new CustomEvent('tarefas:push-status',{detail:{ready:false,reason:'permission_denied'}}));return false}await installPushListeners();await PushNotifications.register();return true}
 async function unregisterCurrentDevice(){const c=getClient(),sessionToken=localStorage.getItem(PUSH_SESSION_KEY);if(!c||!sessionToken)return false;const id=await deviceId();const {data,error}=await c.rpc('v1_7_desregistrar_push_device',{p_session_token:sessionToken,p_device_id:id});if(!error&&data===true)localStorage.removeItem('tarefasPushReady17');return !error&&data===true}
 

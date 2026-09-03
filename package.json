@@ -1,11 +1,11 @@
 {
   "name": "tarefas-app",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "private": true,
-  "description": "TAREFAS Android 2.2.0 build 220 oficial com Base Web 7.6.9 e atualização cadastral obrigatória.",
+  "description": "TAREFAS Android 2.2.1 build 221 beta com Base Web 7.6.10, lembrete diário de atualização e descarte de notificações ao toque.",
   "scripts": {
-    "build:web": "node scripts/build-mobile-v220.mjs",
-    "verify:web": "node scripts/verify-mobile-v220.mjs dist",
+    "build:web": "node scripts/build-mobile-v221.mjs",
+    "verify:web": "node scripts/verify-mobile-v221.mjs dist",
     "cap:add:android": "npx cap add android",
     "cap:sync": "npm run build:web && npx cap sync android",
     "assets:android": "npx @capacitor/assets generate --android --assetPath assets --iconBackgroundColor '#040808' --iconBackgroundColorDark '#040808' --splashBackgroundColor '#040808' --splashBackgroundColorDark '#040808'",
