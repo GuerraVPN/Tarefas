@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+  <script src="mobile-preload.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Orçamentários - 26º Pel PE Mec</title>
@@ -21,6 +22,13 @@ body{display:flex;min-height:100vh}
 .credit{font-size:10px;text-align:center;line-height:1.5;border-top:1px solid rgba(255,255,255,.12);padding-top:12px;color:var(--v4-sidebar-text)}.credit b{color:var(--v4-gold)}
 @media(max-width:900px){.sidebar{display:none!important}.orc-main{margin-left:0!important;width:100%!important}}
 </style>
+  <link rel="stylesheet" href="mobile.css">
+  <link rel="stylesheet" href="mobile-v12.css">
+  <link rel="stylesheet" href="mobile-v16.css">
+  <link rel="stylesheet" href="mobile-v18.css">
+  <link rel="stylesheet" href="mobile-v181.css">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#05090b">
 </head>
 <body>
 <aside class="sidebar">
@@ -764,19 +772,28 @@ const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 <script src="notificacoes.js?v=6.0"></script>
 <script src="v4_ui.js?v=6.0"></script>
 <script src="bloco_notas.js?v=6.0"></script>
-<script src="v4_tema.js?v=7.6.9"></script>
+<script src="v4_tema.js?v=2.2.0"></script>
 <script src="guias_v6.js?v=6.3"></script>
 <script src="pedidos_v6.js?v=6.0"></script>
 <script src="movimentacoes_v6.js?v=6.0"></script>
 <script src="material_carga_v6.js?v=6.0"></script>
 <script src="passagem_carga_v6.js?v=6.0"></script>
 <script src="v6_4_patch.js?v=6.4"></script>
-  <script src="v6_2_mobile.js?v=7.6.9"></script>
+  <script src="v6_2_mobile.js?v=2.2.0"></script>
   <script src="lavanderia_v211.js?v=7.6.7"></script>
   <script src="lavanderia_financeiro_v212.js?v=7.6.7"></script>
   <script src="lavanderia_pagamento_v767.js?v=7.6.7"></script>
   <script src="lavanderia_documento_v762.js?v=7.6.7"></script>
-  <script src="v7_6_8_theme_fix.js?v=7.6.9"></script>
-  <script src="v7_6_9_profile_required.js?v=7.6.9"></script>
+  <script src="v7_6_8_theme_fix.js?v=2.2.0"></script>
+  <script src="v7_6_9_profile_required.js?v=2.2.0"></script>
+  <script src="mobile-bootstrap.js"></script>
+  <script src="mobile-v12.js"></script>
+  <script src="native-mobile.js"></script>
+  <script src="mobile-updates-v181.js"></script>
+  <script src="mobile-dashboard-v184.js"></script>
+  <script src="mobile-users-inline-v189.js"></script>
+  <script src="mobile-notes-v191.js"></script>
+  <script src="mobile-v196.js"></script>
+  <script src="lavanderia_layout_v212.js?v=2.1.5"></script>
 </body>
 </html>
