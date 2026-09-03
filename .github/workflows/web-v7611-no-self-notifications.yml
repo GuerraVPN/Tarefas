@@ -1,0 +1,52 @@
+name: Web 7.6.11 No Self Notifications
+
+on:
+  push:
+    branches: [web/v7611-no-self-notifications]
+    paths:
+      - '.github/v7611_no_self_notifications.py'
+      - '.github/workflows/web-v7611-no-self-notifications.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: web/v7611-no-self-notifications
+          fetch-depth: 0
+      - name: Aplicar Web 7.6.11
+        run: python3 .github/v7611_no_self_notifications.py
+      - name: Validar Web 7.6.11
+        run: |
+          set -euo pipefail
+          node --check v7_5_1_version.js
+          node --check v7_5_1_about.js
+          node --check v6_2_mobile.js
+          grep -q "const VERSION='7.6.11'" v7_5_1_version.js
+          grep -q "v:'7.6.11'" v7_5_1_about.js
+          grep -q "Notificações sem avisar o próprio autor" v7_5_1_about.js
+          grep -q "atualizado_por:Number(usuarioLogado.id)" menu.html
+          grep -q "atualizado_por:Number(usuarioLogado.id)" minhas_tarefas.html
+          grep -q "v6_2_mobile.js?v=7.6.11" configuracoes.html
+          python3 - <<'PY'
+          from pathlib import Path
+          for name in ['menu.html','minhas_tarefas.html']:
+              s=Path(name).read_text(encoding='utf-8')
+              assert ".from('tarefas').update({" not in s, f'{name}: update direto sem autor'
+              assert s.count('atualizado_por:Number(usuarioLogado.id)') >= 1, f'{name}: autor ausente'
+          print('OK: todas as edições diretas de tarefa carregam o autor.')
+          PY
+      - name: Salvar Web 7.6.11 validada
+        run: |
+          set -euo pipefail
+          git config user.name 'GuerraVPN Web Build'
+          git config user.email '81371258+GuerraVPN@users.noreply.github.com'
+          git add '*.html' v7_5_1_version.js v7_5_1_about.js v6_2_mobile.js
+          if ! git diff --cached --quiet; then
+            git commit -m 'feat(web): não notificar o autor da própria ação 7.6.11'
+            git push origin HEAD:web/v7611-no-self-notifications
+          fi
