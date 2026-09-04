@@ -2,6 +2,42 @@
   'use strict';
 
   const STORAGE_PREFIX = 'perfilAtivo26Pel:';
+  const SESSION_KEY = 'tarefasPushSession17';
+
+  function lerUsuarioLocal(){
+    try{return JSON.parse(localStorage.getItem('usuarioLogado')||'null')}catch{return null}
+  }
+
+  function instalarPonteSessaoSupabase(){
+    const lib=window.supabase;
+    if(!lib?.createClient || lib.__tarefasSecuritySessionBridge) return false;
+    const original=lib.createClient.bind(lib);
+    const nativeFetch=window.fetch.bind(window);
+    lib.createClient=function(url,key,options){
+      const opts={...(options||{})};
+      const globalOpts={...(opts.global||{})};
+      const upstreamFetch=globalOpts.fetch||nativeFetch;
+      globalOpts.fetch=async function(input,init){
+        const next={...(init||{})};
+        const headers=new Headers(next.headers||(input instanceof Request?input.headers:undefined));
+        const session=String(localStorage.getItem(SESSION_KEY)||'').trim();
+        if(session) headers.set('X-Tarefas-Session',session);
+        const usuario=lerUsuarioLocal();
+        if(usuario?.perfil_id!=null) headers.set('X-Tarefas-Profile',String(usuario.perfil_id));
+        next.headers=headers;
+        return upstreamFetch(input,next);
+      };
+      opts.global=globalOpts;
+      return original(url,key,opts);
+    };
+    lib.__tarefasSecuritySessionBridge=true;
+    return true;
+  }
+
+  if(!instalarPonteSessaoSupabase()){
+    let tentativas=0;
+    const timer=setInterval(()=>{tentativas++;if(instalarPonteSessaoSupabase()||tentativas>=40)clearInterval(timer)},50);
+  }
 
   function norm(v){
     return String(v ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
