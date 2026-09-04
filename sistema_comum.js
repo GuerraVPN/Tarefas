@@ -35,7 +35,8 @@
     else if(modulo==='passagem_carga')allowed.add('passagem_carga_v6.js');
     else if(modulo==='lavanderia'){
       ['lavanderia_v211.js','lavanderia_financeiro_v212.js','lavanderia_pagamento_v767.js','lavanderia_documento_v762.js'].forEach(x=>allowed.add(x));
-    }else allowed.add('pedidos_v6.js');
+    }else if(['baixas','distribuicao','pedido'].includes(modulo))allowed.add('pedidos_v6.js');
+    else if(modulo!=='relatorio')allowed.add('pedidos_v6.js');
 
     const original=document.addEventListener;
     document.addEventListener=function(type,listener,options){
@@ -46,6 +47,12 @@
       return original.call(this,type,listener,options);
     };
     original.call(document,'DOMContentLoaded',()=>{document.addEventListener=original},{once:true});
+
+    if(modulo==='relatorio'&&!document.querySelector('script[data-orc-report-light]')){
+      const s=document.createElement('script');
+      s.src='orcamentarios_relatorio_light.js?v=7.8.2-orcfix1';
+      s.defer=true;s.dataset.orcReportLight='1';document.head.appendChild(s);
+    }
 
     if(modulo==='guias'){
       original.call(document,'DOMContentLoaded',()=>setTimeout(()=>{
