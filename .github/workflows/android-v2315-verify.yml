@@ -1,0 +1,113 @@
+name: Android 2.3.15 - Verificação antes da Beta
+
+on:
+  push:
+    branches: [app/android-v2315-prep]
+    paths:
+      - 'scripts/build-mobile-v2315.mjs'
+      - 'scripts/verify-mobile-v2315.mjs'
+      - '.github/workflows/android-v2315-verify.yml'
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with: { node-version: '22' }
+
+      - name: Instalar dependencias
+        run: |
+          npm ci
+          npm install --no-save --package-lock=false --ignore-scripts jspdf@2.5.2
+
+      - name: Gerar e testar bundle 2.3.15
+        run: |
+          set -euo pipefail
+          node scripts/build-mobile-v2315.mjs
+          node scripts/verify-mobile-v2315.mjs dist
+          node scripts/test-aditamento-site-v2313.mjs dist/aditamento_v74.js
+          node scripts/test-orc-loader-v2313.mjs dist/orcamentarios-loader-v243.js
+          node scripts/test-material-carga-v2313.mjs dist/v7_7_0_material_carga.js
+          grep -q "Downloads/TAREFAS" dist/native-mobile.js
+          grep -q "Documentos/TAREFAS/Oficial" dist/native-mobile.js
+          grep -q "Documentos/TAREFAS/Beta" dist/native-mobile.js
+          ! grep -q "saveBase64WithPicker" dist/native-mobile.js
+          ! grep -q "Conceder acesso total aos arquivos" dist/mobile-updates-v181.js
+          ! grep -q "requestStorageAccess" dist/mobile-updates-v181.js
+          ! grep -q "ACTION_CREATE_DOCUMENT" app/android/StorageAccessPlugin.java
+          ! grep -q "ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION" app/android/StorageAccessPlugin.java
+          ! grep -q "ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION" app/android/StorageAccessPlugin.java
+          ! grep -q "saveBase64WithPicker" app/android/StorageAccessPlugin.java
+
+      - name: Firebase Android
+        run: |
+          curl --fail --silent --show-error --retry 3 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/firebase-config-v17' -o app/google-services.json
+          test -s app/google-services.json
+          grep -q 'br.com.guerravpn.tarefas.mobile' app/google-services.json
+
+      - name: Preparar Android
+        run: |
+          set -euo pipefail
+          npx cap add android
+          cp app/google-services.json android/app/google-services.json
+          sed -i 's/versionCode 1/versionCode 245/' android/app/build.gradle
+          sed -i 's/versionName "1.0"/versionName "2.3.15"/' android/app/build.gradle
+          npm run assets:android
+          npx cap sync android
+          JAVA_DIR='android/app/src/main/java/br/com/guerravpn/tarefas/mobile'
+          mkdir -p "$JAVA_DIR"
+          cp app/android/StorageAccessPlugin.java "$JAVA_DIR/StorageAccessPlugin.java"
+          cat > "$JAVA_DIR/MainActivity.java" <<'JAVA'
+          package br.com.guerravpn.tarefas.mobile;
+          import android.os.Bundle;
+          import com.getcapacitor.BridgeActivity;
+          public class MainActivity extends BridgeActivity {
+              @Override public void onCreate(Bundle savedInstanceState) {
+                  registerPlugin(StorageAccessPlugin.class);
+                  super.onCreate(savedInstanceState);
+              }
+          }
+          JAVA
+          ! grep -R "MANAGE_EXTERNAL_STORAGE" android/app/src/main/AndroidManifest.xml android/app/src/main || true
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Compilar APK Release de verificação
+        working-directory: android
+        run: ./gradlew assembleRelease
+
+      - name: Inspecionar APK
+        run: |
+          set -euo pipefail
+          APK='android/app/build/outputs/apk/release/app-release-unsigned.apk'
+          test -s "$APK"
+          unzip -tq "$APK"
+          python3 - <<'PY'
+          import json
+          with open('android/app/build/outputs/apk/release/output-metadata.json',encoding='utf-8') as f: e=json.load(f)['elements'][0]
+          assert int(e['versionCode'])==245,e
+          assert str(e['versionName'])=='2.3.15',e
+          PY
+          unzip -p "$APK" assets/public/native-mobile.js | grep -q '__TAREFAS_FIXED_STORAGE_V245__'
+          unzip -p "$APK" assets/public/native-mobile.js | grep -q 'Downloads/TAREFAS'
+          unzip -p "$APK" assets/public/native-mobile.js | grep -q 'Documentos/TAREFAS/Oficial'
+          unzip -p "$APK" assets/public/native-mobile.js | grep -q 'Documentos/TAREFAS/Beta'
+          if unzip -p "$APK" assets/public/native-mobile.js | grep -q 'saveBase64WithPicker'; then echo 'ERRO: Salvar como ainda empacotado'; exit 1; fi
+          unzip -p "$APK" assets/public/mobile-updates-v181.js | grep -q 'Sem permissão especial'
+          if unzip -p "$APK" assets/public/mobile-updates-v181.js | grep -q 'Conceder acesso total aos arquivos'; then echo 'ERRO: botão de acesso total ainda empacotado'; exit 1; fi
+
+      - name: Salvar APK somente para verificação
+        uses: actions/upload-artifact@v4
+        with:
+          name: tarefas-android-2.3.15-verify-build-245
+          path: android/app/build/outputs/apk/release/app-release-unsigned.apk
+          if-no-files-found: error
