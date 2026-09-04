@@ -1,11 +1,11 @@
 {
   "name": "tarefas-app",
-  "version": "2.3.2",
+  "version": "2.3.3",
   "private": true,
-  "description": "TAREFAS Android 2.3.2 build 232 beta com Base Web 7.8.2, Assistente IA com ações confirmadas por perfil e anexos na IA/chat.",
+  "description": "TAREFAS Android 2.3.3 build 233 beta com Base Web 7.8.2, correção de abertura das mensagens, anexos privados e Assistente IA com ações por perfil.",
   "scripts": {
-    "build:web": "node scripts/build-mobile-v232.mjs",
-    "verify:web": "node scripts/verify-mobile-v232.mjs dist",
+    "build:web": "node scripts/build-mobile-v233.mjs",
+    "verify:web": "node scripts/verify-mobile-v233.mjs dist",
     "cap:add:android": "npx cap add android",
     "cap:sync": "npm run build:web && npx cap sync android",
     "assets:android": "npx @capacitor/assets generate --android --assetPath assets --iconBackgroundColor '#040808' --iconBackgroundColorDark '#040808' --splashBackgroundColor '#040808' --splashBackgroundColorDark '#040808'",
