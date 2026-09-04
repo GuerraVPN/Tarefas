@@ -41,6 +41,9 @@ await patch('native-mobile.js', s => {
 
 const javaPath = path.join(root, 'app', 'android', 'StorageAccessPlugin.java');
 let java = await readFile(javaPath, 'utf8');
+if (!java.includes('import android.content.ClipData;')) {
+  java = java.replace('import android.content.ContentResolver;\n', 'import android.content.ClipData;\nimport android.content.ContentResolver;\n');
+}
 if (!java.includes('import android.provider.Settings;')) {
   java = java.replace('import android.provider.MediaStore;\n', 'import android.provider.MediaStore;\nimport android.provider.Settings;\n');
 }
@@ -61,6 +64,7 @@ const installer = `
         try {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setDataAndType(uri, "application/vnd.android.package-archive");
+            intent.setClipData(ClipData.newRawUri("tarefas-apk", uri));
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
             getContext().startActivity(intent);
             JSObject ret = new JSObject();
