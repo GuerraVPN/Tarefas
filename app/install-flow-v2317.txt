@@ -1,0 +1,1 @@
+2.3.17 build 247: installer nativo dedicado, REQUEST_INSTALL_PACKAGES, tela Permitir desta fonte quando necessario.
