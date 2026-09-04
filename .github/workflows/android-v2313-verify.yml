@@ -37,6 +37,12 @@ jobs:
           grep -q 'StorageAccess.saveBase64WithPicker' app/native-mobile-entry.js
           grep -q '__TAREFAS_SAVE_PICKER_V243__' dist/native-mobile.js
           grep -q '__ADITAMENTO_SAVE_PICKER_V243__' dist/aditamento_v74.js
+          grep -q '__TAREFAS_ORC_LOADER_V243__' dist/orcamentarios-loader-v243.js
+          grep -q '__TAREFAS_ORC_LAZY_GATE_V243_DISABLED__' dist/sistema_comum.js
+          grep -q '__TAREFAS_MATERIAL_CARGA_BASE_READY__' dist/material_carga_v6.js
+          grep -q '__TAREFAS_MATERIAL_CARGA_SERIAL_V243__' dist/v7_7_0_material_carga.js
+          test ! -e dist/orcamentarios-loader-v242.js
+          test ! -e dist/orcamentarios-loader-v241.js
           ! grep -q 'limit(10000)' dist/pedidos_v6.js
           ! grep -q 'limit(10000)' dist/movimentacoes_v6.js
           ! grep -Eq 'MutationObserver|setInterval\(' dist/v7_7_0_material_carga.js
@@ -98,7 +104,11 @@ jobs:
           unzip -p "$APK" assets/public/aditamento_v74.js | grep -q 'ADITAMENTO AO BOLETIM INTERNO'
           unzip -p "$APK" assets/public/native-mobile.js | grep -q '__TAREFAS_SAVE_PICKER_V243__'
           unzip -p "$APK" assets/public/native-mobile.js | grep -q 'saveBase64WithPicker'
-          unzip -p "$APK" assets/public/v7_7_0_material_carga.js | grep -q '__TAREFAS_MATERIAL_CARGA_EVENT_DRIVEN_V242__'
+          unzip -p "$APK" assets/public/orcamentarios-loader-v243.js | grep -q '__TAREFAS_ORC_LOADER_V243__'
+          unzip -p "$APK" assets/public/sistema_comum.js | grep -q '__TAREFAS_ORC_LAZY_GATE_V243_DISABLED__'
+          unzip -p "$APK" assets/public/material_carga_v6.js | grep -q '__TAREFAS_MATERIAL_CARGA_BASE_READY__'
+          unzip -p "$APK" assets/public/v7_7_0_material_carga.js | grep -q '__TAREFAS_MATERIAL_CARGA_SERIAL_V243__'
+          if unzip -l "$APK" | grep -q 'assets/public/orcamentarios-loader-v242.js'; then echo 'ERRO: loader 242 ainda empacotado'; exit 1; fi
           if unzip -p "$APK" assets/public/v7_7_0_material_carga.js | grep -Eq 'MutationObserver|setInterval\('; then echo 'ERRO: loop automático no Material Carga'; exit 1; fi
           if unzip -l "$APK" | grep -q 'assets/public/v7_7_2_scale_export.js'; then echo 'ERRO: exportador de escala empacotado'; exit 1; fi
 
