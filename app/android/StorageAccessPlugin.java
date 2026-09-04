@@ -1,5 +1,6 @@
 package br.com.guerravpn.tarefas.mobile;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -10,11 +11,14 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Base64;
 
+import androidx.activity.result.ActivityResult;
+
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
+import com.getcapacitor.annotation.ActivityCallback;
 import com.getcapacitor.annotation.CapacitorPlugin;
 
 import java.io.BufferedInputStream;
@@ -59,7 +63,7 @@ public class StorageAccessPlugin extends Plugin {
         } catch (Exception primary) {
             try {
                 Intent fallback = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-                fallback.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 getContext().startActivity(fallback);
             } catch (Exception err) {
                 call.reject("Não foi possível abrir a permissão de acesso total aos arquivos.", err);
@@ -78,6 +82,65 @@ public class StorageAccessPlugin extends Plugin {
         while (name.startsWith(".")) name = name.substring(1);
         if (name.isEmpty()) name = "arquivo";
         return name.length() > 160 ? name.substring(0, 160) : name;
+    }
+
+    @PluginMethod
+    public void saveBase64WithPicker(PluginCall call) {
+        final String data = call.getString("data");
+        final String filename = safeName(call.getString("filename", "arquivo"));
+        final String mimeType = call.getString("mimeType", "application/octet-stream");
+        if (data == null || data.isEmpty()) {
+            call.reject("Conteúdo do arquivo está vazio.");
+            return;
+        }
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType((mimeType == null || mimeType.isEmpty()) ? "application/octet-stream" : mimeType);
+        intent.putExtra(Intent.EXTRA_TITLE, filename);
+        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivityForResult(call, intent, "saveBase64WithPickerResult");
+    }
+
+    @ActivityCallback
+    private void saveBase64WithPickerResult(PluginCall call, ActivityResult result) {
+        if (call == null) return;
+        Intent resultData = result != null ? result.getData() : null;
+        Uri uri = resultData != null ? resultData.getData() : null;
+        if (result == null || result.getResultCode() != Activity.RESULT_OK || uri == null) {
+            JSObject ret = new JSObject();
+            ret.put("saved", false);
+            ret.put("canceled", true);
+            call.resolve(ret);
+            return;
+        }
+        final String encoded = call.getString("data");
+        final String filename = safeName(call.getString("filename", "arquivo"));
+        if (encoded == null || encoded.isEmpty()) {
+            call.reject("Conteúdo do arquivo está vazio.");
+            return;
+        }
+        final Uri targetUri = uri;
+        new Thread(() -> {
+            try {
+                byte[] bytes = Base64.decode(encoded, Base64.DEFAULT);
+                ContentResolver resolver = getContext().getContentResolver();
+                try (OutputStream out = resolver.openOutputStream(targetUri, "w")) {
+                    if (out == null) throw new IllegalStateException("Android não abriu o destino escolhido.");
+                    out.write(bytes);
+                    out.flush();
+                }
+                JSObject ret = new JSObject();
+                ret.put("saved", true);
+                ret.put("canceled", false);
+                ret.put("path", targetUri.toString());
+                ret.put("uri", targetUri.toString());
+                ret.put("filename", filename);
+                ret.put("size", bytes.length);
+                call.resolve(ret);
+            } catch (Exception err) {
+                call.reject("Falha ao salvar no local escolhido: " + err.getMessage(), err);
+            }
+        }).start();
     }
 
     private static class Target {
