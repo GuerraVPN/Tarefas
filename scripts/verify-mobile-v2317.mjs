@@ -13,11 +13,14 @@ must(bootstrap,'const APP_BUILD = 247;','mobile-bootstrap.js');
 const native=await read('native-mobile.js');
 must(native,'__TAREFAS_FIXED_STORAGE_V247__','native-mobile.js');
 must(native,'__TAREFAS_INSTALLER_NATIVE_V247__','native-mobile.js');
-must(native,'StorageAccess.installApk({uri})','native-mobile.js');
 must(native,'Downloads/TAREFAS','native-mobile.js');
 must(native,'Documentos/TAREFAS/Oficial','native-mobile.js');
 must(native,'Documentos/TAREFAS/Beta','native-mobile.js');
 reject(native,'saveBase64WithPicker','native-mobile.js');
+
+const nativeSource=await readFile(path.join(root,'app','native-mobile-entry.js'),'utf8');
+must(nativeSource,'StorageAccess.installApk({uri})','native-mobile-entry.js');
+must(nativeSource,'Permita instalar apps desta fonte','native-mobile-entry.js');
 
 const java=await readFile(path.join(root,'app','android','StorageAccessPlugin.java'),'utf8');
 must(java,'public void installApk(PluginCall call)','StorageAccessPlugin.java');
