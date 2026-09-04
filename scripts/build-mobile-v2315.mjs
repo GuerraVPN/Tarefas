@@ -17,9 +17,9 @@ const fixedBranch=` if(Capacitor.isNativePlatform()&&Capacitor.getPlatform()==='
 if(!native.includes(pickerBranch))throw new Error('native-mobile-entry.js: branch Salvar como não encontrado');
 native=native.replace(pickerBranch,fixedBranch);
 
-native=native.replace(" const targetFolder=`${UPDATES_FOLDER}/${channelFolder}`,displayFolder=`Documentos/${UPDATES_FOLDER}/${channelFolder}`;"," const targetFolder=`${UPDATES_FOLDER}/${channelFolder}`,displayFolder=`Documentos/${UPDATES_FOLDER}/${channelFolder}`;");
-native=native.replace(" await ensureLegacyFilesPermission();\n if(Capacitor.isNativePlatform()){"," if(Capacitor.isNativePlatform(){");
-native=native.replace("if(isApk)throw new Error(`Não foi possível salvar a atualização em Documentos/${UPDATES_FOLDER}/${channelFolder}: ${nativeError?.message||nativeError}`);","if(isApk)throw new Error(`Não foi possível salvar a atualização em Documentos/${UPDATES_FOLDER}/${channelFolder}: ${nativeError?.message||nativeError}`);");
+const permissionLine=" await ensureLegacyFilesPermission();\n if(Capacitor.isNativePlatform()){`";
+if(!native.includes(permissionLine))throw new Error('native-mobile-entry.js: gate de permissão legado não encontrado');
+native=native.replace(permissionLine," if(Capacitor.isNativePlatform()){`");
 
 const oldClear=`async function clearOldUpdates(){\n if(!Capacitor.isNativePlatform()||Capacitor.getPlatform()!=='android')return{ok:false,unsupported:true,deleted:0};\n return StorageAccess.clearOldUpdates({currentVersion:APP_VERSION});\n}`;
 const newClear=`async function clearOldUpdates(){\n if(!Capacitor.isNativePlatform()||Capacitor.getPlatform()!=='android')return{ok:false,unsupported:true,deleted:0,requiresAllFilesAccess:false};\n const roots=[\`${FILES_FOLDER}/Oficial\`,\`${FILES_FOLDER}/Beta\`,\`${FILES_FOLDER}/Atualização/Oficial\`,\`${FILES_FOLDER}/Atualização/Beta\`];\n let deleted=0,bytes=0;const files=[];\n for(const dir of roots){\n   let listed;try{listed=await Filesystem.readdir({directory:Directory.Documents,path:dir})}catch(_){continue}\n   for(const item of listed?.files||[]){\n     const name=typeof item==='string'?item:String(item?.name||'');if(!/\\.apk$/i.test(name))continue;\n     const filePath=\`${dir}/${name}\`;\n     try{const stat=await Filesystem.stat({directory:Directory.Documents,path:filePath});bytes+=Math.max(0,Number(stat?.size||0))}catch(_){}\n     try{await Filesystem.deleteFile({directory:Directory.Documents,path:filePath});deleted++;files.push(name)}catch(_){}\n   }\n }\n return{ok:true,requiresAllFilesAccess:false,deleted,bytes,files};\n}`;
@@ -30,7 +30,9 @@ await writeFile(nativePath,native,'utf8');
 // A tela About não deve mais consultar, pedir ou anunciar acesso total.
 const updatesPath=path.join(root,'app','mobile-updates-v181.js');
 let updates=await readFile(updatesPath,'utf8');
-updates=updates.replace("let storage={granted:false,required:false};try{storage=await window.TarefasNative?.files?.checkAllFilesAccess?.()||storage}catch(_){}return{beta:beta===true,latest:Array.isArray(latestRows)?latestRows[0]||null:latestRows||null,history:Array.isArray(history)?history:[],storage}","const storage={granted:true,required:false,fixedDirectories:true};return{beta:beta===true,latest:Array.isArray(latestRows)?latestRows[0]||null:latestRows||null,history:Array.isArray(history)?history:[],storage}");
+const oldState="let storage={granted:false,required:false};try{storage=await window.TarefasNative?.files?.checkAllFilesAccess?.()||storage}catch(_){}return{beta:beta===true,latest:Array.isArray(latestRows)?latestRows[0]||null:latestRows||null,history:Array.isArray(history)?history:[],storage}";
+if(!updates.includes(oldState))throw new Error('mobile-updates-v181.js: consulta de armazenamento antiga não encontrada');
+updates=updates.replace(oldState,"const storage={granted:true,required:false,fixedDirectories:true};return{beta:beta===true,latest:Array.isArray(latestRows)?latestRows[0]||null:latestRows||null,history:Array.isArray(history)?history:[],storage}");
 const requestRe=/  async function requestStorageAccess\(root\)\{[\s\S]*?\n  \}\n  async function cleanOldVersions/;
 if(!requestRe.test(updates))throw new Error('mobile-updates-v181.js: requestStorageAccess não encontrado');
 updates=updates.replace(requestRe,'  async function cleanOldVersions');
