@@ -32,7 +32,7 @@ async function checkAllFilesAccess(){if(!Capacitor.isNativePlatform()||Capacitor
 async function requestAllFilesAccess(){if(!Capacitor.isNativePlatform()||Capacitor.getPlatform()!=='android')return{opened:false,granted:true};return StorageAccess.requestAllFilesAccess()}
 async function ensureFilesPermission(){await ensureLegacyFilesPermission();return checkAllFilesAccess()}
 
-function sanitizeFilename(value,mime=''){let name=String(value||'').trim().replace(/[\\/:*?"<>|\u0000-\u001f]+/g,'_').replace(/^\.+/,'');if(!name)name=`TAREFAS-${new Date().toISOString().replace(/[:.]/g,'-')}`;if(!/\.[a-z0-9]{1,8}$/i.test(name)){const ext=({'application/pdf':'.pdf','text/csv':'.csv','application/json':'.json','text/plain':'.txt','image/jpeg':'.jpg','image/png':'.png','application/zip':'.zip','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':'.xlsx','application/vnd.openxmlformats-officedocument.wordprocessingml.document':'.docx','application/vnd.android.package-archive':'.apk'})[String(mime||'').split(';')[0].toLowerCase()];if(ext)name+=ext}return name.slice(0,160)}
+function sanitizeFilename(value,mime=''){let name=String(value||'').trim().replace(/[\\/:*?"<>|\u0000-\u001f]+/g,'_').replace(/^\.+/,'');if(!name)name=`TAREFAS-${new Date().toISOString().replace(/[:.]/g,'-')}`;if(!/\.[a-z0-9]{1,8}$/i.test(name)){const ext=({'application/pdf':'.pdf','text/csv':'.csv','application/json':'.json','text/plain':'.txt','image/jpeg':'.jpg','image/png':'.png','application/zip':'.zip','application/vnd.oasis.opendocument.text':'.odt','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':'.xlsx','application/vnd.openxmlformats-officedocument.wordprocessingml.document':'.docx','application/vnd.android.package-archive':'.apk'})[String(mime||'').split(';')[0].toLowerCase()];if(ext)name+=ext}return name.slice(0,160)}
 function filenameFromUrl(url){try{const parsed=new URL(url,location.href),leaf=decodeURIComponent(parsed.pathname.split('/').filter(Boolean).pop()||'');return sanitizeFilename(leaf||`TAREFAS-${Date.now()}`)}catch(_){return sanitizeFilename(`TAREFAS-${Date.now()}`)}}
 function updateChannelFolder(channel){return String(channel||'').trim().toLowerCase()==='beta'?'Beta':'Oficial'}
 function blobToBase64(blob){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onerror=()=>reject(reader.error||new Error('Falha ao ler o arquivo.'));reader.onload=()=>{const result=String(reader.result||'');resolve(result.includes(',')?result.slice(result.indexOf(',')+1):result)};reader.readAsDataURL(blob)})}
@@ -41,8 +41,10 @@ async function saveBlob(blob,filename){
  if(!(blob instanceof Blob))throw new Error('Arquivo inválido para salvar.');
  const name=sanitizeFilename(filename,blob.type),data=await blobToBase64(blob);
  if(Capacitor.isNativePlatform()&&Capacitor.getPlatform()==='android'){
-   const saved=await StorageAccess.saveBase64ToDownloads({data,filename:name,mimeType:blob.type||'application/octet-stream',subfolder:DOWNLOADS_FOLDER});
-   const info={ok:true,saved:true,shared:false,filename:name,path:saved.path||`Downloads/${DOWNLOADS_FOLDER}/${name}`,uri:saved.uri||'',mimeType:blob.type||'application/octet-stream'};
+   const saved=await StorageAccess.saveBase64WithPicker({data,filename:name,mimeType:blob.type||'application/octet-stream'});
+   if(saved?.canceled){const info={ok:false,saved:false,canceled:true,shared:false,filename:name,path:null,uri:'',mimeType:blob.type||'application/octet-stream'};window.dispatchEvent(new CustomEvent('tarefas:file-save-canceled',{detail:info}));return info}
+   if(!saved?.saved)throw new Error('O Android não confirmou o salvamento do arquivo.');
+   const info={ok:true,saved:true,canceled:false,shared:false,filename:name,path:saved.path||saved.uri||name,uri:saved.uri||'',mimeType:blob.type||'application/octet-stream',selectedByUser:true};
    window.dispatchEvent(new CustomEvent('tarefas:file-saved',{detail:info}));return info;
  }
  await ensureLegacyFilesPermission();
