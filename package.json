@@ -1,11 +1,11 @@
 {
   "name": "tarefas-app",
-  "version": "2.2.6",
+  "version": "2.2.7",
   "private": true,
-  "description": "TAREFAS Android 2.2.6 build 226 beta com Base Web 7.7.2 e exportação de escalas em PDF/ODT.",
+  "description": "TAREFAS Android 2.2.7 build 227 beta com Base Web 7.7.2 e Assistente IA em modo somente leitura.",
   "scripts": {
-    "build:web": "node scripts/build-mobile-v226.mjs",
-    "verify:web": "node scripts/verify-mobile-v226.mjs dist",
+    "build:web": "node scripts/build-mobile-v227.mjs",
+    "verify:web": "node scripts/verify-mobile-v227.mjs dist",
     "cap:add:android": "npx cap add android",
     "cap:sync": "npm run build:web && npx cap sync android",
     "assets:android": "npx @capacitor/assets generate --android --assetPath assets --iconBackgroundColor '#040808' --iconBackgroundColorDark '#040808' --splashBackgroundColor '#040808' --splashBackgroundColorDark '#040808'",
