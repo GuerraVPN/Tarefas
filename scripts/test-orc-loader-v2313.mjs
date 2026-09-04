@@ -5,12 +5,13 @@ import path from 'node:path';
 const src=await readFile(path.resolve(process.argv[2]||'dist/orcamentarios-loader-v243.js'),'utf8');
 if(!src.includes('__TAREFAS_ORC_LOADER_V243__'))throw new Error('Loader 243 ausente.');
 
+const moduleIds={relatorio:'reportModule',guias:'guiasModule',baixas:'pedidosModule',distribuicao:'pedidosModule',pedido:'pedidosModule',movimentacao:'movimentacaoModule',material_carga:'materialCargaModule',passagem_carga:'passagemCargaModule',lavanderia:'lavanderiaModule'};
 async function run(search){
  const appended=[],scripts=[];
- const ids=['reportModule','guiasModule','pedidosModule','movimentacaoModule','materialCargaModule','passagemCargaModule','lavanderiaModule'];
+ const ids=[...new Set(Object.values(moduleIds))];
  const nodes=Object.fromEntries(ids.map(id=>[id,{id,hidden:false}]));
  nodes.orcPageTitle={textContent:''};nodes.orcPageSubtitle={textContent:''};
- const buttons=['guias','baixas','distribuicao','movimentacao','material_carga','passagem_carga'].map(mod=>({dataset:{orcModule:mod},classList:{toggle(){}}}));
+ const buttons=['guias','baixas','distribuicao','movimentacao','material_carga','passagem_carga','lavanderia'].map(mod=>({dataset:{orcModule:mod},classList:{toggle(){}}}));
  const document={
    documentElement:{dataset:{}},scripts,
    getElementById:id=>nodes[id]||null,
@@ -21,25 +22,32 @@ async function run(search){
  const sandbox={console,document,URL,URLSearchParams,queueMicrotask,location:{pathname:'/orcamentarios.html',search},setTimeout,clearTimeout};sandbox.window=sandbox;
  vm.createContext(sandbox);vm.runInContext(src,sandbox,{filename:'orcamentarios-loader-v243.js'});
  await new Promise(r=>setTimeout(r,0));
- return{appended,nodes,dataset:document.documentElement.dataset,active:sandbox.__TAREFAS_ORC_ACTIVE_MODULE__};
+ const files=appended.map(x=>new URL(x.src,'https://app.local/').pathname.split('/').pop());
+ return{files,nodes,dataset:document.documentElement.dataset,active:sandbox.__TAREFAS_ORC_ACTIVE_MODULE__};
 }
 
-const mat=await run('?modulo=material_carga');
-const matFiles=mat.appended.map(x=>new URL(x.src,'https://app.local/').pathname.split('/').pop());
-if(mat.active!=='material_carga')throw new Error('Material Carga não foi definido como módulo ativo.');
-if(JSON.stringify(matFiles)!==JSON.stringify(['material_carga_v6.js','v7_7_0_material_carga.js']))throw new Error('Material Carga carregou scripts errados: '+matFiles.join(','));
-if(mat.nodes.materialCargaModule.hidden)throw new Error('Material Carga ficou oculto.');
-for(const id of ['reportModule','guiasModule','pedidosModule','movimentacaoModule','passagemCargaModule','lavanderiaModule'])if(!mat.nodes[id].hidden)throw new Error(id+' deveria estar oculto no Material Carga.');
+const cases=[
+ {search:'',mod:'relatorio',files:['orcamentarios_relatorio_light.js']},
+ {search:'?modulo=guias',mod:'guias',files:['guias_v6.js']},
+ {search:'?modulo=baixas',mod:'baixas',files:['pedidos_v6.js']},
+ {search:'?modulo=distribuicao',mod:'distribuicao',files:['pedidos_v6.js']},
+ {search:'?pedido=7',mod:'pedido',files:['pedidos_v6.js']},
+ {search:'?modulo=movimentacao',mod:'movimentacao',files:['movimentacoes_v6.js']},
+ {search:'?movimentacao=11',mod:'movimentacao',files:['movimentacoes_v6.js']},
+ {search:'?modulo=material_carga',mod:'material_carga',files:['material_carga_v6.js','v7_7_0_material_carga.js']},
+ {search:'?modulo=passagem_carga',mod:'passagem_carga',files:['passagem_carga_v6.js']},
+ {search:'?passagem=2',mod:'passagem_carga',files:['passagem_carga_v6.js']},
+ {search:'?modulo=lavanderia',mod:'lavanderia',files:['lavanderia_v211.js','lavanderia_financeiro_v212.js','lavanderia_pagamento_v767.js','lavanderia_documento_v762.js']}
+];
 
-const rel=await run('');
-const relFiles=rel.appended.map(x=>new URL(x.src,'https://app.local/').pathname.split('/').pop());
-if(rel.active!=='relatorio')throw new Error('Relatório não foi definido como padrão.');
-if(JSON.stringify(relFiles)!==JSON.stringify(['orcamentarios_relatorio_light.js']))throw new Error('Relatório carregou mais de um script: '+relFiles.join(','));
-if(rel.nodes.reportModule.hidden)throw new Error('Relatório ficou oculto.');
+for(const c of cases){
+ const r=await run(c.search);
+ if(r.active!==c.mod)throw new Error(`${c.search||'relatorio'}: ativo ${r.active}, esperado ${c.mod}`);
+ if(JSON.stringify(r.files)!==JSON.stringify(c.files))throw new Error(`${c.mod}: scripts ${r.files.join(',')}, esperado ${c.files.join(',')}`);
+ const activeId=moduleIds[c.mod];
+ if(r.nodes[activeId]?.hidden)throw new Error(`${c.mod}: módulo ativo ficou oculto.`);
+ for(const id of new Set(Object.values(moduleIds)))if(id!==activeId&&!r.nodes[id].hidden)throw new Error(`${c.mod}: ${id} deveria estar oculto.`);
+ if(r.dataset.orc243Loaded!==c.mod)throw new Error(`${c.mod}: marcador de carregamento não foi aplicado.`);
+}
 
-const guias=await run('?modulo=guias');
-const guiaFiles=guias.appended.map(x=>new URL(x.src,'https://app.local/').pathname.split('/').pop());
-if(JSON.stringify(guiaFiles)!==JSON.stringify(['guias_v6.js']))throw new Error('Guias carregou scripts errados: '+guiaFiles.join(','));
-if(guias.nodes.guiasModule.hidden)throw new Error('Guias ficou oculto.');
-
-console.log('OK: loader 243 carrega somente o módulo ativo — Relatório 1 script, Guias 1 script, Material Carga 2 scripts.');
+console.log(`OK: loader 243 validou ${cases.length} rotas do Orçamentários, carregando somente os scripts do módulo ativo.`);
