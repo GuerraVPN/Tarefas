@@ -1,4 +1,4 @@
-name: Android 2.3.9 Beta - Schema e Lavanderia
+name: Android 2.3.9 Beta - Final
 
 on:
   workflow_dispatch:
@@ -52,15 +52,19 @@ jobs:
       - name: Gerar e validar App 2.3.9
         run: |
           set -euo pipefail
-          node scripts/build-mobile-v239-final.mjs
-          node scripts/verify-mobile-v239-final.mjs dist
+          node scripts/build-mobile-v239-post.mjs
+          node scripts/verify-mobile-v239-post.mjs dist
           grep -q '2.3.9 • WEB 7.8.2' dist/mobile-v12.js
           grep -q '__TAREFAS_ANDROID_239_SCHEMA_CHECK__' dist/mobile-schema-v239.js
+          grep -q '__TAREFAS_ANDROID_239_AI_SCHEMA_HINTS__' dist/mobile-ai-schema-v239.js
           grep -q '__TAREFAS_ANDROID_239_LAV_CIA_DEDUPE__' dist/mobile-lavanderia-v239.js
+          grep -q 'ADITAMENTO_ODT' dist/aditamento_v74.js
+          grep -q 'Gerar ODT' dist/aditamento_v74.js
+          test ! -e dist/v7_7_2_scale_export.js
           grep -q '__TAREFAS_ANDROID_238_AI_AUTO_FILE__' dist/mobile-ai-auto-file-v238.js
           grep -q '__TAREFAS_ANDROID_237_AI_TOOLS__' dist/mobile-ai-tools-v237.js
           grep -q '__TAREFAS_ANDROID_237_MISSION_DEDUPE__' dist/missao_v74.js
-          ! grep -q 'GEMINI_API_KEY\|OPENAI_API_KEY\|SUPABASE_SERVICE_ROLE_KEY\|sk-proj-' dist/mobile-ai-v230.js dist/mobile-ai-tools-v237.js dist/mobile-ai-auto-file-v238.js dist/mobile-schema-v239.js dist/mobile-lavanderia-v239.js
+          ! grep -q 'GEMINI_API_KEY\|OPENAI_API_KEY\|SUPABASE_SERVICE_ROLE_KEY\|sk-proj-' dist/mobile-ai-v230.js dist/mobile-ai-tools-v237.js dist/mobile-ai-auto-file-v238.js dist/mobile-schema-v239.js dist/mobile-ai-schema-v239.js dist/mobile-lavanderia-v239.js
 
       - name: Firebase Android
         run: |
@@ -128,7 +132,10 @@ jobs:
           test "$("$APKANALYZER" manifest debuggable "$APK" | tr -d '\r\n')" = 'false'
           unzip -p "$APK" assets/public/mobile-v12.js | grep -q '2.3.9 • WEB 7.8.2'
           unzip -p "$APK" assets/public/mobile-schema-v239.js | grep -q '__TAREFAS_ANDROID_239_SCHEMA_CHECK__'
+          unzip -p "$APK" assets/public/mobile-ai-schema-v239.js | grep -q '__TAREFAS_ANDROID_239_AI_SCHEMA_HINTS__'
           unzip -p "$APK" assets/public/mobile-lavanderia-v239.js | grep -q '__TAREFAS_ANDROID_239_LAV_CIA_DEDUPE__'
+          unzip -p "$APK" assets/public/aditamento_v74.js | grep -q 'ADITAMENTO_ODT'
+          if unzip -l "$APK" | grep -q 'assets/public/v7_7_2_scale_export.js'; then echo 'Gerar escala ainda presente no APK'; exit 1; fi
 
       - name: Alinhar e assinar APK GuerraVPN
         run: |
@@ -165,13 +172,13 @@ jobs:
           set -euo pipefail
           OIDC="$(curl --fail --silent --show-error -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-release" | jq -r '.value')"
           SHA="$(sha256sum TAREFAS-2.3.9.apk | awk '{print $1}')"
-          jq -n --arg version '2.3.9' --argjson build 239 --arg channel 'beta' --arg web_version '7.8.2' --arg title 'TAREFAS 2.3.9 Beta — Schema, cargas e Lavanderia' --arg url 'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.3.9.apk' --arg sha "$SHA" '{version:$version,build:$build,channel:$channel,web_version:$web_version,title:$title,changelog:["🧩 app_versions alinhado com a coluna version e compatibilidade com version_name.","🔎 Verificação automática do schema esperado na inicialização do aplicativo.","📦 Consultas de depósitos, desrelacionamentos e passagens de carga alinhadas aos campos reais do sistema.","🎯 Missão #15 saneada sem texto duplicado.","✅ Tarefas #6880 e #5108 encerradas.","💰 Removida a duplicação visual do valor disponível em Débito Cia Com.","📄 Recursos de IA e geração automática de arquivos da 2.3.8 preservados."],mandatory:false,download_url:$url,sha256:$sha}' > "$RUNNER_TEMP/release.json"
+          jq -n --arg version '2.3.9' --argjson build 239 --arg channel 'beta' --arg web_version '7.8.2' --arg title 'TAREFAS 2.3.9 Beta — Schema, IA, cargas e documentos' --arg url 'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.3.9.apk' --arg sha "$SHA" '{version:$version,build:$build,channel:$channel,web_version:$web_version,title:$title,changelog:["🧩 app_versions alinhado com version e compatibilidade com version_name.","🔎 Verificação automática do schema esperado na inicialização.","🤖 IA alinhada aos campos reais de pedidos, guias, depósitos, desrelacionamentos e passagens de carga.","📦 Consultas antigas de orçamento receberam aliases de compatibilidade para não quebrarem.","🎯 Missão #15 saneada sem texto duplicado.","✅ Tarefas #6880 e #5108 encerradas.","💰 Removida a duplicação visual do valor disponível em Débito Cia Com.","🗑️ Removido o antigo recurso Gerar escala.","📄 Gerar aditamento agora permite PDF ou ODT editável.","📎 Recursos de IA e geração automática de arquivos da 2.3.8 preservados."],mandatory:false,download_url:$url,sha256:$sha}' > "$RUNNER_TEMP/release.json"
           CODE="$(curl --silent --show-error -o "$RUNNER_TEMP/result.json" -w '%{http_code}' -H "Authorization: Bearer $OIDC" -H 'Content-Type: application/json' --data-binary @"$RUNNER_TEMP/release.json" 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-release-publish')"
           cat "$RUNNER_TEMP/result.json"; test "$CODE" = '200'; jq -e '.ok == true and .version == "2.3.9" and .build == 239 and .channel == "beta"' "$RUNNER_TEMP/result.json" >/dev/null
 
       - name: Salvar APK beta assinado
         uses: actions/upload-artifact@v4
         with:
-          name: tarefas-android-2.3.9-beta-schema-lavanderia-GuerraVPN
+          name: tarefas-android-2.3.9-beta-final-GuerraVPN
           path: TAREFAS-2.3.9.apk
           if-no-files-found: error
