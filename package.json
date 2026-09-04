@@ -1,11 +1,11 @@
 {
   "name": "tarefas-app",
-  "version": "2.3.6",
+  "version": "2.3.7",
   "private": true,
-  "description": "TAREFAS Android 2.3.6 build 236 beta com Base Web 7.8.2 e chat autoajustável pela geometria real do shell móvel.",
+  "description": "TAREFAS Android 2.3.7 build 237 beta com Base Web 7.8.2, cópia de respostas e geração de arquivos pela IA.",
   "scripts": {
-    "build:web": "node scripts/build-mobile-v236.mjs",
-    "verify:web": "node scripts/verify-mobile-v236.mjs dist",
+    "build:web": "node scripts/build-mobile-v237.mjs",
+    "verify:web": "node scripts/verify-mobile-v237.mjs dist",
     "cap:add:android": "npx cap add android",
     "cap:sync": "npm run build:web && npx cap sync android",
     "assets:android": "npx @capacitor/assets generate --android --assetPath assets --iconBackgroundColor '#040808' --iconBackgroundColorDark '#040808' --splashBackgroundColor '#040808' --splashBackgroundColorDark '#040808'",
