@@ -1,11 +1,11 @@
 {
   "name": "tarefas-app",
-  "version": "2.3.3",
+  "version": "2.3.4",
   "private": true,
-  "description": "TAREFAS Android 2.3.3 build 233 beta com Base Web 7.8.2, correção de abertura das mensagens, anexos privados e Assistente IA com ações por perfil.",
+  "description": "TAREFAS Android 2.3.4 build 234 beta com Base Web 7.8.2, correção do compositor do chat e integração da Central ao chat privado.",
   "scripts": {
-    "build:web": "node scripts/build-mobile-v233.mjs",
-    "verify:web": "node scripts/verify-mobile-v233.mjs dist",
+    "build:web": "node scripts/build-mobile-v234.mjs",
+    "verify:web": "node scripts/verify-mobile-v234.mjs dist",
     "cap:add:android": "npx cap add android",
     "cap:sync": "npm run build:web && npx cap sync android",
     "assets:android": "npx @capacitor/assets generate --android --assetPath assets --iconBackgroundColor '#040808' --iconBackgroundColorDark '#040808' --splashBackgroundColor '#040808' --splashBackgroundColorDark '#040808'",
