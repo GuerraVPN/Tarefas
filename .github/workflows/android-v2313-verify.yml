@@ -31,7 +31,8 @@ jobs:
           node scripts/verify-mobile-v2313.mjs dist
           node scripts/test-aditamento-v2312.mjs dist/aditamento_v74.js
           node scripts/test-aditamento-ui-v2312.mjs dist/aditamento_v74.js
-          node scripts/test-material-carga-v2312.mjs dist/v7_7_0_material_carga.js
+          node scripts/test-orc-loader-v2313.mjs dist/orcamentarios-loader-v243.js
+          node scripts/test-material-carga-v2313.mjs dist/v7_7_0_material_carga.js
           grep -q 'Intent.ACTION_CREATE_DOCUMENT' app/android/StorageAccessPlugin.java
           grep -q 'saveBase64WithPickerResult' app/android/StorageAccessPlugin.java
           grep -q 'StorageAccess.saveBase64WithPicker' app/native-mobile-entry.js
