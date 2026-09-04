@@ -1,9 +1,9 @@
-name: Android 2.3.0 Official Release
+name: Android 2.3.1 Security Hotfix
 
 on:
   workflow_dispatch:
   push:
-    branches: [app/android-v230-prep]
+    branches: [app/android-v231-prep]
     paths:
       - 'app/**'
       - 'assets/**'
@@ -23,7 +23,7 @@ jobs:
       contents: write
       id-token: write
     steps:
-      - name: Checkout fonte 2.3.0
+      - name: Checkout fonte 2.3.1
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -46,16 +46,15 @@ jobs:
           test "$HTTP_CODE" = '401'
           jq -e '.error == "session_required"' "$RUNNER_TEMP/ai-auth.json" >/dev/null
 
-      - name: Gerar e validar App 2.3.0 / Web 7.8.0
+      - name: Gerar e validar App 2.3.1 / Web 7.8.1
         run: |
           set -euo pipefail
-          npm run build:web
-          npm run verify:web
-          grep -q '2.3.0 • WEB 7.8.0' dist/mobile-v12.js
-          grep -q '__TAREFAS_ANDROID_230_AI__' dist/mobile-ai-v230.js
-          grep -q 'OFICIAL 2.3.0 · somente leitura' dist/mobile-ai-v230.js
-          grep -q '__TAREFAS_V780_VERSION__' dist/v7_5_1_version.js
-          grep -q 'Assistente IA chega ao TAREFAS' dist/v7_8_0_about.js
+          node scripts/build-mobile-v231.mjs
+          node scripts/verify-mobile-v231.mjs dist
+          grep -q '2.3.1 • WEB 7.8.1' dist/mobile-v12.js
+          grep -q 'X-Tarefas-Session' dist/perfis.js
+          grep -q 'X-Tarefas-Profile' dist/perfis.js
+          grep -q '__tarefasSecuritySessionBridge' dist/perfis.js
           ! grep -q 'GEMINI_API_KEY\|OPENAI_API_KEY\|sk-proj-' dist/mobile-ai-v230.js
 
       - name: Baixar configuração Firebase Android
@@ -70,8 +69,8 @@ jobs:
       - name: Configurar versão e Firebase
         run: |
           cp app/google-services.json android/app/google-services.json
-          sed -i 's/versionCode 1/versionCode 230/' android/app/build.gradle
-          sed -i 's/versionName "1.0"/versionName "2.3.0"/' android/app/build.gradle
+          sed -i 's/versionCode 1/versionCode 231/' android/app/build.gradle
+          sed -i 's/versionName "1.0"/versionName "2.3.1"/' android/app/build.gradle
 
       - name: Gerar ícones Android
         run: npm run assets:android
@@ -118,7 +117,7 @@ jobs:
         working-directory: android
         run: ./gradlew assembleRelease
 
-      - name: Validar APK Release 2.3.0
+      - name: Validar APK Release 2.3.1
         run: |
           set -euo pipefail
           APK='android/app/build/outputs/apk/release/app-release-unsigned.apk'
@@ -127,17 +126,16 @@ jobs:
           python3 - <<'PY'
           import json
           with open('android/app/build/outputs/apk/release/output-metadata.json',encoding='utf-8') as f: el=json.load(f)['elements'][0]
-          assert int(el['versionCode'])==230,el
-          assert str(el['versionName'])=='2.3.0',el
+          assert int(el['versionCode'])==231,el
+          assert str(el['versionName'])=='2.3.1',el
           PY
           APKANALYZER="$(find "$ANDROID_HOME" -type f -name apkanalyzer | head -1)"
           test -n "$APKANALYZER"
           test "$("$APKANALYZER" manifest debuggable "$APK" | tr -d '\r\n')" = 'false'
-          unzip -p "$APK" assets/public/mobile-v12.js | grep -q '2.3.0 • WEB 7.8.0'
-          unzip -p "$APK" assets/public/mobile-ai-v230.js | grep -q '__TAREFAS_ANDROID_230_AI__'
-          unzip -p "$APK" assets/public/mobile-ai-v230.js | grep -q '/functions/v1/tarefas-ai'
-          unzip -p "$APK" assets/public/v7_5_1_version.js | grep -q "VERSION='7.8.0'"
-          ! unzip -l "$APK" | grep -q 'assets/public/mobile-ai-v228.js'
+          unzip -p "$APK" assets/public/mobile-v12.js | grep -q '2.3.1 • WEB 7.8.1'
+          unzip -p "$APK" assets/public/perfis.js | grep -q 'X-Tarefas-Session'
+          unzip -p "$APK" assets/public/perfis.js | grep -q 'X-Tarefas-Profile'
+          unzip -p "$APK" assets/public/v7_5_1_version.js | grep -q "VERSION='7.8.1'"
 
       - name: Alinhar e assinar APK GuerraVPN
         run: |
@@ -151,13 +149,12 @@ jobs:
           EXPECTED_CERT="$(jq -r '.cert_sha256' "$RUNNER_TEMP/tarefas-signing.json")"
           APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)"
           ZIPALIGN="$(find "$ANDROID_HOME/build-tools" -type f -name zipalign | sort -V | tail -1)"
-          "$ZIPALIGN" -p -f 4 android/app/build/outputs/apk/release/app-release-unsigned.apk "$RUNNER_TEMP/TAREFAS-2.3.0-aligned.apk"
-          "$APKSIGNER" sign --ks "$RUNNER_TEMP/GuerraVPN.keystore" --ks-key-alias "$KEY_ALIAS" --ks-pass "pass:$STORE_PASS" --key-pass "pass:$KEY_PASS" --out TAREFAS-2.3.0.apk "$RUNNER_TEMP/TAREFAS-2.3.0-aligned.apk"
-          VERIFY="$($APKSIGNER verify --verbose --print-certs TAREFAS-2.3.0.apk)"
-          printf '%s\n' "$VERIFY"
+          "$ZIPALIGN" -p -f 4 android/app/build/outputs/apk/release/app-release-unsigned.apk "$RUNNER_TEMP/TAREFAS-2.3.1-aligned.apk"
+          "$APKSIGNER" sign --ks "$RUNNER_TEMP/GuerraVPN.keystore" --ks-key-alias "$KEY_ALIAS" --ks-pass "pass:$STORE_PASS" --key-pass "pass:$KEY_PASS" --out TAREFAS-2.3.1.apk "$RUNNER_TEMP/TAREFAS-2.3.1-aligned.apk"
+          VERIFY="$($APKSIGNER verify --verbose --print-certs TAREFAS-2.3.1.apk)"
           ACTUAL_CERT="$(printf '%s\n' "$VERIFY" | sed -n 's/.*certificate SHA-256 digest: //p' | head -1 | tr -d ': ' | tr '[:upper:]' '[:lower:]')"
           test "$ACTUAL_CERT" = "$EXPECTED_CERT"
-          rm -f "$RUNNER_TEMP/tarefas-signing.json" "$RUNNER_TEMP/GuerraVPN.keystore" "$RUNNER_TEMP/TAREFAS-2.3.0-aligned.apk"
+          rm -f "$RUNNER_TEMP/tarefas-signing.json" "$RUNNER_TEMP/GuerraVPN.keystore" "$RUNNER_TEMP/TAREFAS-2.3.1-aligned.apk"
 
       - name: Publicar APK permanente
         run: |
@@ -166,30 +163,30 @@ jobs:
           RELEASES_DIR="$RUNNER_TEMP/tarefas-releases"
           git worktree add "$RELEASES_DIR" origin/app/releases
           mkdir -p "$RELEASES_DIR/downloads"
-          cp TAREFAS-2.3.0.apk "$RELEASES_DIR/downloads/TAREFAS-2.3.0.apk"
+          cp TAREFAS-2.3.1.apk "$RELEASES_DIR/downloads/TAREFAS-2.3.1.apk"
           cd "$RELEASES_DIR"
           git config user.name 'GuerraVPN Android Build'
           git config user.email '81371258+GuerraVPN@users.noreply.github.com'
-          git add downloads/TAREFAS-2.3.0.apk
-          if ! git diff --cached --quiet; then git commit -m 'release(android): TAREFAS 2.3.0 official build 230';git push origin HEAD:app/releases;fi
-          URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.3.0.apk'
-          LOCAL_SHA="$(sha256sum "$GITHUB_WORKSPACE/TAREFAS-2.3.0.apk" | awk '{print $1}')"
+          git add downloads/TAREFAS-2.3.1.apk
+          if ! git diff --cached --quiet; then git commit -m 'release(android): TAREFAS 2.3.1 security hotfix build 231';git push origin HEAD:app/releases;fi
+          URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.3.1.apk'
+          LOCAL_SHA="$(sha256sum "$GITHUB_WORKSPACE/TAREFAS-2.3.1.apk" | awk '{print $1}')"
           for attempt in 1 2 3 4 5 6 7 8;do if curl --fail --silent --show-error -L "$URL" -o "$RUNNER_TEMP/tarefas-published.apk";then test "$(sha256sum "$RUNNER_TEMP/tarefas-published.apk" | awk '{print $1}')" = "$LOCAL_SHA" && exit 0;fi;sleep 3;done
           exit 1
 
-      - name: Registrar oficial e anunciar Assistente IA
+      - name: Registrar hotfix oficial obrigatório
         run: |
           set -euo pipefail
           OIDC="$(curl --fail --silent --show-error -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-release" | jq -r '.value')"
-          SHA="$(sha256sum TAREFAS-2.3.0.apk | awk '{print $1}')"
-          jq -n --arg version '2.3.0' --argjson build 230 --arg channel 'official' --arg web_version '7.8.0' --arg title 'TAREFAS 2.3.0 — Assistente IA' --arg url 'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.3.0.apk' --arg sha "$SHA" '{version:$version,build:$build,channel:$channel,web_version:$web_version,title:$title,changelog:["✨ Novo Assistente IA oficial no TAREFAS: faça perguntas e peça ajuda com textos diretamente pelo balão IA.","A IA usa a sessão do TAREFAS e a chave do provedor permanece protegida no backend, fora do APK.","Adicionada proteção contra excesso de mensagens para preservar a cota gratuita da IA.","A IA permanece em modo somente leitura nesta primeira versão oficial e ainda não altera dados internos.","Consolida as correções das betas 2.2.x, incluindo Material Carga, estabilidade, notificações e exportações PDF/ODT.","Base Web atualizada para 7.8.0."],mandatory:false,download_url:$url,sha256:$sha}' > "$RUNNER_TEMP/release.json"
+          SHA="$(sha256sum TAREFAS-2.3.1.apk | awk '{print $1}')"
+          jq -n --arg version '2.3.1' --argjson build 231 --arg channel 'official' --arg web_version '7.8.1' --arg title 'TAREFAS 2.3.1 — Segurança de acesso' --arg url 'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.3.1.apk' --arg sha "$SHA" '{version:$version,build:$build,channel:$channel,web_version:$web_version,title:$title,changelog:["🔒 Hotfix de segurança: toda comunicação com o banco agora identifica a sessão e o perfil ativo do TAREFAS.","Preparação para Row Level Security (RLS) em todos os módulos sem quebrar o fluxo atual.","Bloqueio de consultas anônimas diretas aos dados internos.","Mantém o Assistente IA e todos os recursos da 2.3.0."],mandatory:true,download_url:$url,sha256:$sha}' > "$RUNNER_TEMP/release.json"
           curl --fail --silent --show-error -H "Authorization: Bearer $OIDC" -H 'Content-Type: application/json' --data-binary @"$RUNNER_TEMP/release.json" 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-release-publish' -o "$RUNNER_TEMP/release-result.json"
           cat "$RUNNER_TEMP/release-result.json"
-          jq -e '.ok == true and .version == "2.3.0" and .build == 230 and .channel == "official"' "$RUNNER_TEMP/release-result.json" >/dev/null
+          jq -e '.ok == true and .version == "2.3.1" and .build == 231 and .channel == "official"' "$RUNNER_TEMP/release-result.json" >/dev/null
 
       - name: Salvar APK oficial assinado
         uses: actions/upload-artifact@v4
         with:
-          name: tarefas-android-2.3.0-official-GuerraVPN
-          path: TAREFAS-2.3.0.apk
+          name: tarefas-android-2.3.1-security-GuerraVPN
+          path: TAREFAS-2.3.1.apk
           if-no-files-found: error
