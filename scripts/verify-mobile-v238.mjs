@@ -12,7 +12,7 @@ const markers={
 'mobile-v12.js':['2.3.8 • WEB 7.8.2'],
 'mobile-updates-v181.js':["const APP_VERSION = '2.3.8'",'const APP_BUILD = 238',"const APP_CHANNEL = 'beta'"],
 'mobile-ai-tools-v237.js':['__TAREFAS_ANDROID_237_AI_TOOLS__','📋 Copiar','📄 Arquivo','docxBlob','odtBlob','pdfBlob'],
-'mobile-ai-auto-file-v238.js':['__TAREFAS_ANDROID_238_AI_AUTO_FILE__','requestedFormat','isFileRequest','Pedido de arquivo detectado','BETA 2.3.8','mobile-ai-auto-file-v238'],
+'mobile-ai-auto-file-v238.js':['__TAREFAS_ANDROID_238_AI_AUTO_FILE__','requestedFormat','isFileRequest','Pedido de arquivo detectado','BETA 2.3.8'],
 'missao_v74.js':['__TAREFAS_ANDROID_237_MISSION_DEDUPE__'],
 'mobile-chat-fit-v236.js':['__TAREFAS_ANDROID_236_CHAT_REAL_AUTOFIT__','.tm-app-header','.tm-bottom-nav','visualViewport']};
 for(const[r,ms]of Object.entries(markers))if(await exists(r)){const s=await text(r);for(const m of ms)if(!s.includes(m))errors.push(`${r}: marcador ausente: ${m}`);for(const secret of ['GEMINI_API_KEY','OPENAI_API_KEY','SUPABASE_SERVICE_ROLE_KEY','sk-proj-'])if(s.includes(secret))errors.push(`${r}: segredo proibido: ${secret}`)}
