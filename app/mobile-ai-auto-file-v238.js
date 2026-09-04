@@ -3,7 +3,7 @@
 const MARK='__TAREFAS_ANDROID_238_AI_AUTO_FILE__';
 if(window[MARK])return;window[MARK]=true;
 const LABEL={pdf:'PDF',docx:'DOCX',odt:'ODT',txt:'TXT',md:'Markdown',csv:'CSV',json:'JSON',html:'HTML'};
-const FILE_WORD=/(arquivo|documento|relat[oó]rio|planilha|pdf|docx|word|odt|libreoffice|txt|texto|markdown|\bmd\b|csv|json|html)/i;
+const FILE_WORD=/(arquivo|documento|relat[oó]rio|planilha|pdf|docx|word|odt|libreoffice|txt|markdown|\bmd\b|csv|json|html)/i;
 const MAKE_WORD=/(gere|gerar|gera|crie|criar|cria|monte|montar|fa[cç]a|produza|produzir|exporte|exportar|salve|salvar|transforme|converter|converta)/i;
 let pending=null;
 const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
@@ -12,11 +12,11 @@ function requestedFormat(text){
  if(/\b(docx|word)\b/.test(s))return'docx';
  if(/\b(odt|libreoffice)\b/.test(s))return'odt';
  if(/\bpdf\b/.test(s))return'pdf';
- if(/\bcsv\b/.test(s))return'csv';
+ if(/\b(csv|planilha)\b/.test(s))return'csv';
  if(/\bjson\b/.test(s))return'json';
  if(/\bhtml?\b/.test(s))return'html';
  if(/\b(markdown|md)\b/.test(s))return'md';
- if(/\b(txt|texto)\b/.test(s))return'txt';
+ if(/\btxt\b/.test(s))return'txt';
  return'pdf';
 }
 function isFileRequest(text){return MAKE_WORD.test(String(text||''))&&FILE_WORD.test(String(text||''))}
@@ -56,7 +56,7 @@ document.addEventListener('submit',ev=>{
  pending={format:requestedFormat(text),at:Date.now(),prompt:text};setTimeout(tryGenerate,50);
 },true);
 new MutationObserver(()=>{if(pending)tryGenerate()}).observe(document.body,{childList:true,subtree:true});
-window.addEventListener('tarefas:file-saved',ev=>{const row=document.querySelector('.ai230-panel .ai230-row.model[data-ai238-file-done="1"]:last-of-type');const card=row?.querySelector('.ai238-auto-file');if(!card)return;const d=ev?.detail||{};if(d?.saved){card.textContent=`✅ ${d.path||`Downloads/TAREFAS/${d.filename||'arquivo'}`}`;card.classList.add('ok')}});
+window.addEventListener('tarefas:file-saved',ev=>{const rows=[...document.querySelectorAll('.ai230-panel .ai230-row.model[data-ai238-file-done="1"]')],row=rows.at(-1);const card=row?.querySelector('.ai238-auto-file');if(!card)return;const d=ev?.detail||{};if(d?.saved){card.textContent=`✅ ${d.path||`Downloads/TAREFAS/${d.filename||'arquivo'}`}`;card.classList.add('ok')}});
 function refreshBadge(){const span=document.querySelector('.ai230-title span');if(span)span.textContent='BETA 2.3.8 · leitura + ações + anexos + arquivos automáticos'}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',refreshBadge,{once:true});else refreshBadge();
 })();
