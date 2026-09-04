@@ -1,0 +1,110 @@
+name: Android 2.3.13 - Verificação antes da Beta
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [app/android-v2313-prep]
+    paths:
+      - '.github/workflows/android-v2313-verify.yml'
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with: { node-version: '22' }
+
+      - name: Instalar dependencias
+        run: |
+          npm ci
+          npm install --no-save --package-lock=false --ignore-scripts jspdf@2.5.2
+
+      - name: Testar bundle 2.3.13
+        run: |
+          set -euo pipefail
+          node scripts/build-mobile-v2313.mjs
+          node scripts/verify-mobile-v2313.mjs dist
+          node scripts/test-aditamento-v2312.mjs dist/aditamento_v74.js
+          node scripts/test-aditamento-ui-v2312.mjs dist/aditamento_v74.js
+          node scripts/test-material-carga-v2312.mjs dist/v7_7_0_material_carga.js
+          grep -q 'Intent.ACTION_CREATE_DOCUMENT' app/android/StorageAccessPlugin.java
+          grep -q 'saveBase64WithPickerResult' app/android/StorageAccessPlugin.java
+          grep -q 'StorageAccess.saveBase64WithPicker' app/native-mobile-entry.js
+          grep -q '__TAREFAS_SAVE_PICKER_V243__' dist/native-mobile.js
+          grep -q '__ADITAMENTO_SAVE_PICKER_V243__' dist/aditamento_v74.js
+          ! grep -q 'limit(10000)' dist/pedidos_v6.js
+          ! grep -q 'limit(10000)' dist/movimentacoes_v6.js
+          ! grep -Eq 'MutationObserver|setInterval\(' dist/v7_7_0_material_carga.js
+          test ! -e dist/v7_7_2_scale_export.js
+
+      - name: Firebase Android
+        run: |
+          curl --fail --silent --show-error --retry 3 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/firebase-config-v17' -o app/google-services.json
+          test -s app/google-services.json
+          grep -q 'br.com.guerravpn.tarefas.mobile' app/google-services.json
+
+      - name: Preparar Android
+        run: |
+          set -euo pipefail
+          npx cap add android
+          cp app/google-services.json android/app/google-services.json
+          sed -i 's/versionCode 1/versionCode 243/' android/app/build.gradle
+          sed -i 's/versionName "1.0"/versionName "2.3.13"/' android/app/build.gradle
+          npm run assets:android
+          npx cap sync android
+          JAVA_DIR='android/app/src/main/java/br/com/guerravpn/tarefas/mobile'
+          mkdir -p "$JAVA_DIR"
+          cp app/android/StorageAccessPlugin.java "$JAVA_DIR/StorageAccessPlugin.java"
+          cat > "$JAVA_DIR/MainActivity.java" <<'JAVA'
+          package br.com.guerravpn.tarefas.mobile;
+          import android.os.Bundle;
+          import com.getcapacitor.BridgeActivity;
+          public class MainActivity extends BridgeActivity {
+              @Override public void onCreate(Bundle savedInstanceState) {
+                  registerPlugin(StorageAccessPlugin.class);
+                  super.onCreate(savedInstanceState);
+              }
+          }
+          JAVA
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Compilar APK Release de verificação
+        working-directory: android
+        run: ./gradlew assembleRelease
+
+      - name: Inspecionar APK de verificação
+        run: |
+          set -euo pipefail
+          APK='android/app/build/outputs/apk/release/app-release-unsigned.apk'
+          test -s "$APK"
+          unzip -tq "$APK"
+          python3 - <<'PY'
+          import json
+          with open('android/app/build/outputs/apk/release/output-metadata.json',encoding='utf-8') as f: e=json.load(f)['elements'][0]
+          assert int(e['versionCode'])==243,e
+          assert str(e['versionName'])=='2.3.13',e
+          PY
+          unzip -p "$APK" assets/public/aditamento_v74.js | grep -q '__ADITAMENTO_SAVE_PICKER_V243__'
+          unzip -p "$APK" assets/public/aditamento_v74.js | grep -q 'ADITAMENTO AO BOLETIM INTERNO'
+          unzip -p "$APK" assets/public/native-mobile.js | grep -q '__TAREFAS_SAVE_PICKER_V243__'
+          unzip -p "$APK" assets/public/native-mobile.js | grep -q 'saveBase64WithPicker'
+          unzip -p "$APK" assets/public/v7_7_0_material_carga.js | grep -q '__TAREFAS_MATERIAL_CARGA_EVENT_DRIVEN_V242__'
+          if unzip -p "$APK" assets/public/v7_7_0_material_carga.js | grep -Eq 'MutationObserver|setInterval\('; then echo 'ERRO: loop automático no Material Carga'; exit 1; fi
+          if unzip -l "$APK" | grep -q 'assets/public/v7_7_2_scale_export.js'; then echo 'ERRO: exportador de escala empacotado'; exit 1; fi
+
+      - name: Salvar APK somente para verificação
+        uses: actions/upload-artifact@v4
+        with:
+          name: tarefas-android-2.3.13-verify-build-243
+          path: android/app/build/outputs/apk/release/app-release-unsigned.apk
+          if-no-files-found: error
