@@ -1,0 +1,1 @@
+Preparação da beta 2.3.17 build 247 para corrigir abertura do instalador Android.
