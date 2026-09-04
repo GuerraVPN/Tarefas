@@ -21,15 +21,33 @@ await rep('mobile-preload.js',"tarefasAppBuild = '242'","tarefasAppBuild = '243'
 await rep('mobile-updates-v181.js','const APP_BUILD = 242;','const APP_BUILD = 243;');
 await rep('mobile-schema-v239.js','build:242','build:243',{required:false});
 
-// Aditamento: o bridge Android agora abre ACTION_CREATE_DOCUMENT (Salvar como).
+// Aditamento: mantém a montagem e o doc.save() exatamente no fluxo do site.
+// A única diferença é que downloads blob: são capturados pelo bridge 243 e enviados
+// ao ACTION_CREATE_DOCUMENT (Salvar como) do Android.
 await patch('aditamento_v74.js',s=>{
-  s=s.replace('const __ADITAMENTO_NATIVE_SAVE_V242__=true;','const __ADITAMENTO_NATIVE_SAVE_V242__=true;const __ADITAMENTO_SAVE_PICKER_V243__=true;');
-  const old="    const r=await window.TarefasNative.files.saveBlob(blob,filename);\n    if(r?.ok||r?.saved||r?.shared||r?.path)return r||{ok:true,saved:true,path:filename};";
-  const next="    const r=await window.TarefasNative.files.saveBlob(blob,filename);\n    if(r?.canceled)throw new Error('Salvamento cancelado pelo usuário.');\n    if(r?.ok||r?.saved||r?.shared||r?.path)return r||{ok:true,saved:true,path:filename};";
-  if(!s.includes(old))throw new Error('aditamento_v74.js: bridge de salvamento esperado não encontrado');
-  s=s.replace(old,next).replaceAll('[ADITAMENTO 242]','[ADITAMENTO 243]');
+  s=s.replace('const __ADITAMENTO_NATIVE_SAVE_V242__=true;','const __ADITAMENTO_NATIVE_SAVE_V242__=true;const __ADITAMENTO_SAVE_PICKER_V243__=true;const __ADITAMENTO_SITE_PDF_FLOW_V243__=true;');
+  const oldBridge="    const r=await window.TarefasNative.files.saveBlob(blob,filename);\n    if(r?.ok||r?.saved||r?.shared||r?.path)return r||{ok:true,saved:true,path:filename};";
+  const nextBridge="    const r=await window.TarefasNative.files.saveBlob(blob,filename);\n    if(r?.canceled)throw new Error('Salvamento cancelado pelo usuário.');\n    if(r?.ok||r?.saved||r?.shared||r?.path)return r||{ok:true,saved:true,path:filename};";
+  if(!s.includes(oldBridge))throw new Error('aditamento_v74.js: bridge de salvamento esperado não encontrado');
+  s=s.replace(oldBridge,nextBridge).replaceAll('[ADITAMENTO 242]','[ADITAMENTO 243]');
+
+  const mobilePdf=`    const saved=await saveAditamentoBlob(doc.output('blob'),filename);\n    console.info('[ADITAMENTO 243] PDF salvo',saved?.path||filename);`;
+  const sitePdf=`    window.__TAREFAS_LAST_BLOB_SAVE_PROMISE__=null;\n    let siteSaveError=null;\n    try{doc.save(filename)}catch(saveError){siteSaveError=saveError}\n    if(siteSaveError){\n      console.warn('doc.save falhou; usando fallback de Blob.',siteSaveError);\n      const blob=doc.output('blob'),url=URL.createObjectURL(blob),a=document.createElement('a');\n      a.href=url;a.download=filename;a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();\n      setTimeout(()=>URL.revokeObjectURL(url),60000);\n    }\n    const pendingSave=window.__TAREFAS_LAST_BLOB_SAVE_PROMISE__;\n    if(pendingSave){const saved=await pendingSave;if(saved?.canceled)throw new Error('Salvamento cancelado pelo usuário.');}\n    console.info('[ADITAMENTO 243] PDF gerado pelo fluxo do site e encaminhado ao Salvar como',filename);`;
+  if(!s.includes(mobilePdf))throw new Error('aditamento_v74.js: saída PDF móvel 2.3.12 não encontrada');
+  s=s.replace(mobilePdf,sitePdf);
   return s;
 });
+
+// Bridge para FileSaver/jsPDF: captura blob: antes do downloader Android antigo.
+await copyFile(path.join(root,'app','mobile-blob-save-v243.js'),path.join(dist,'mobile-blob-save-v243.js'));
+for(const name of (await readdir(dist)).filter(x=>x.endsWith('.html'))){
+  await patch(name,s=>{
+    if(s.includes('mobile-blob-save-v243.js'))return s;
+    const tag='<script src="mobile-blob-save-v243.js?v=2.3.13-b243"></script>';
+    if(s.includes('<script src="native-mobile.js"></script>'))return s.replace('<script src="native-mobile.js"></script>',`<script src="native-mobile.js"></script>\n  ${tag}`);
+    return s.replace(/<\/body>/i,`  ${tag}\n</body>`);
+  });
+}
 
 // Um único dono do lazy-load no Orçamentários. O gate antigo do sistema_comum
 // interceptava DOMContentLoaded e também podia carregar o relatório em paralelo.
@@ -70,4 +88,4 @@ await patch('v7_7_0_material_carga.js',s=>{
 // Marca o bundle nativo aprovado para o seletor de destino.
 await appendFile(path.join(dist,'native-mobile.js'),"\n;globalThis.__TAREFAS_SAVE_PICKER_V243__=true;\n",'utf8');
 
-console.log('TAREFAS Android 2.3.13 build 243 BETA: Salvar como nativo, loader único do Orçamentários e Material Carga serializado.');
+console.log('TAREFAS Android 2.3.13 build 243 BETA: PDF igual ao site + Salvar como nativo, loader único do Orçamentários e Material Carga serializado.');
