@@ -8,11 +8,15 @@ const text=r=>readFile(path.join(root,r),'utf8');
 const req=(s,m,c)=>{if(!s.includes(m))errors.push(`${c}: marcador ausente: ${m}`)};
 const forbid=(s,m,c)=>{if(s.includes(m))errors.push(`${c}: conteúdo proibido: ${m}`)};
 
-for(const r of ['mobile-bootstrap.js','mobile-preload.js','native-mobile.js','aditamento_v74.js','pessoal.html','jspdf.umd.min.js','orcamentarios.html','orcamentarios-loader-v243.js','sistema_comum.js','pedidos_v6.js','movimentacoes_v6.js','material_carga_v6.js','v7_7_0_material_carga.js'])if(!await exists(r))errors.push(`arquivo ausente: ${r}`);
+for(const r of ['mobile-bootstrap.js','mobile-preload.js','native-mobile.js','mobile-blob-save-v243.js','aditamento_v74.js','pessoal.html','jspdf.umd.min.js','orcamentarios.html','orcamentarios-loader-v243.js','sistema_comum.js','pedidos_v6.js','movimentacoes_v6.js','material_carga_v6.js','v7_7_0_material_carga.js'])if(!await exists(r))errors.push(`arquivo ausente: ${r}`);
 
 if(await exists('mobile-bootstrap.js')){const s=await text('mobile-bootstrap.js');req(s,"const APP_VERSION = '2.3.13'",'bootstrap');req(s,'const APP_BUILD = 243','bootstrap')}
 if(await exists('mobile-preload.js')){const s=await text('mobile-preload.js');req(s,"tarefasAppVersion = '2.3.13'",'preload');req(s,"tarefasAppBuild = '243'",'preload')}
 if(await exists('native-mobile.js')){const s=await text('native-mobile.js');req(s,'__TAREFAS_SAVE_PICKER_V243__','native bundle');req(s,'saveBase64WithPicker','native bundle')}
+if(await exists('mobile-blob-save-v243.js')){
+ const s=await text('mobile-blob-save-v243.js');
+ for(const m of ['__TAREFAS_BLOB_SAVE_PICKER_V243__','startsWith(\'blob:\')','__TAREFAS_LAST_BLOB_SAVE_PROMISE__','stopImmediatePropagation','TarefasNative?.files?.saveBlob'])req(s,m,'blob save bridge');
+}
 
 const nativeSource=await readFile(path.join(repo,'app','native-mobile-entry.js'),'utf8');
 req(nativeSource,'StorageAccess.saveBase64WithPicker','native source');
@@ -24,11 +28,15 @@ forbid(androidPickerBlock,'saveBase64ToDownloads','native saveBlob android');
 const java=await readFile(path.join(repo,'app','android','StorageAccessPlugin.java'),'utf8');
 for(const m of ['Intent.ACTION_CREATE_DOCUMENT','Intent.CATEGORY_OPENABLE','Intent.EXTRA_TITLE','@ActivityCallback','saveBase64WithPickerResult','resolver.openOutputStream(targetUri, "w")'])req(java,m,'StorageAccessPlugin');
 
-if(await exists('pessoal.html')){const s=await text('pessoal.html');req(s,'jspdf.umd.min.js?v=2.3.13-b243','pessoal');req(s,'aditamento_v74.js?v=2.3.13-b243','pessoal');forbid(s,'cdn.jsdelivr.net/npm/jspdf','pessoal')}
+if(await exists('pessoal.html')){
+ const s=await text('pessoal.html');
+ for(const m of ['jspdf.umd.min.js?v=2.3.13-b243','aditamento_v74.js?v=2.3.13-b243','mobile-blob-save-v243.js?v=2.3.13-b243'])req(s,m,'pessoal');
+ forbid(s,'cdn.jsdelivr.net/npm/jspdf','pessoal');
+}
 if(await exists('aditamento_v74.js')){
  const s=await text('aditamento_v74.js');
- for(const m of ['ADITAMENTO AO BOLETIM INTERNO','ADITAMENTO_ODT','generatePdf','generateOdt','__ADITAMENTO_NATIVE_SAVE_V242__','__ADITAMENTO_SAVE_PICKER_V243__',"saveAditamentoBlob(doc.output('blob'),filename)","sc.src='jspdf.umd.min.js?v=2.3.13-b243'","Salvamento cancelado pelo usuário."])req(s,m,'aditamento');
- for(const m of ['doc.save(filename)','ESCALA DE SERVIÇO','ESCALA DE MISSÃO','cdn.jsdelivr.net/npm/jspdf'])forbid(s,m,'aditamento');
+ for(const m of ['ADITAMENTO AO BOLETIM INTERNO','ADITAMENTO_ODT','generatePdf','generateOdt','__ADITAMENTO_SAVE_PICKER_V243__','__ADITAMENTO_SITE_PDF_FLOW_V243__','doc.save(filename)','__TAREFAS_LAST_BLOB_SAVE_PROMISE__',"sc.src='jspdf.umd.min.js?v=2.3.13-b243'","Salvamento cancelado pelo usuário."])req(s,m,'aditamento');
+ for(const m of ['ESCALA DE SERVIÇO','ESCALA DE MISSÃO','cdn.jsdelivr.net/npm/jspdf'])forbid(s,m,'aditamento');
 }
 if(await exists('v7_7_2_scale_export.js'))errors.push('exportador de escala ainda empacotado');
 
@@ -61,8 +69,8 @@ if(await exists('v7_7_0_material_carga.js')){
  for(const m of ['MutationObserver','setInterval('])forbid(s,m,'material carga');
 }
 
-for(const r of ['aditamento_v74.js','orcamentarios-loader-v243.js','sistema_comum.js','v7_7_0_material_carga.js','material_carga_v6.js','pedidos_v6.js','movimentacoes_v6.js','native-mobile.js'])if(await exists(r)){
+for(const r of ['aditamento_v74.js','mobile-blob-save-v243.js','orcamentarios-loader-v243.js','sistema_comum.js','v7_7_0_material_carga.js','material_carga_v6.js','pedidos_v6.js','movimentacoes_v6.js','native-mobile.js'])if(await exists(r)){
  const x=spawnSync(process.execPath,['--check',path.join(root,r)],{encoding:'utf8'});if(x.status!==0)errors.push(`${r}: JavaScript inválido: ${x.stderr.trim()}`)
 }
 if(errors.length){for(const e of errors)console.error('ERRO: '+e);process.exit(1)}
-console.log('OK: 2.3.13 build 243 — Salvar como nativo, Aditamento PDF/ODT, loader único do Orçamentários e Material Carga serializado.');
+console.log('OK: 2.3.13 build 243 — PDF usa o mesmo doc.save do site e blobs vão ao Salvar como nativo; Orçamentários com loader único e Material Carga serializado.');
