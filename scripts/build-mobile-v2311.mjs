@@ -18,8 +18,8 @@ await rep('mobile-preload.js',"tarefasAppBuild = '240'","tarefasAppBuild = '241'
 await rep('mobile-updates-v181.js','const APP_BUILD = 240;','const APP_BUILD = 241;');
 await rep('mobile-schema-v239.js','build:240','build:241',{required:false});
 
-// ADITAMENTO: o app deve usar exclusivamente o gerador oficial de aditamento.
-// Bloqueia também eventual JS de escala que tenha ficado em cache no WebView.
+// ADITAMENTO: usa exclusivamente o gerador oficial de aditamento.
+// Também bloqueia eventual JS antigo de escala que tenha ficado em cache no WebView.
 for(const page of ['pessoal.html','missao.html']){
   await patch(page,s=>{
     if(!s.includes('__BLOCK_V772_SCALE_CACHE__'))s=s.replace(/<head>/i,'<head>\n<script>/*__BLOCK_V772_SCALE_CACHE__*/window.__TAREFAS_V772_SCALE_EXPORT__=true;<\/script>');
@@ -33,6 +33,15 @@ await patch('v7_5_1_version.js',s=>s
   .replaceAll("addScript('v7_7_2_scale_export.js','__TAREFAS_V772_SCALE_EXPORT__');",'')
   .replaceAll('addScript("v7_7_2_scale_export.js","__TAREFAS_V772_SCALE_EXPORT__");',''));
 try{await unlink(path.join(dist,'v7_7_2_scale_export.js'))}catch(_){}
+
+// O pipeline antigo parte de snapshots históricos. Para a correção de performance,
+// sobrescreve no dist os módulos Orçamentários com as fontes atuais deste branch.
+const orcSources=[
+ 'pedidos_v6.js','movimentacoes_v6.js','guias_v6.js','material_carga_v6.js',
+ 'v7_7_0_material_carga.js','passagem_carga_v6.js',
+ 'lavanderia_v211.js','lavanderia_financeiro_v212.js','lavanderia_pagamento_v767.js','lavanderia_documento_v762.js'
+];
+for(const f of orcSources)await copyFile(path.join(root,f),path.join(dist,f));
 
 // ORÇAMENTÁRIOS: remove os módulos estáticos do HTML. O loader 241 traz somente o módulo aberto.
 await copyFile(path.join(root,'app','orcamentarios-loader-v241.js'),path.join(dist,'orcamentarios-loader-v241.js'));
@@ -70,7 +79,11 @@ await patch('passagem_carga_v6.js',s=>s.replace(".order('data_passagem',{ascendi
 
 // Material Carga 7.7.0: observer só dentro do módulo e polling bem mais leve.
 await patch('v7_7_0_material_carga.js',s=>{
-  s=s.replace("const obs=new MutationObserver(()=>queueMicrotask(renderAll));obs.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['hidden','class']});","const host=$('materialCargaModule');if(host){let queued=false;const obs=new MutationObserver(()=>{if(queued)return;queued=true;queueMicrotask(()=>{queued=false;renderAll()})});obs.observe(host,{subtree:true,childList:true,attributes:true,attributeFilter:['hidden','class']})}");
+  const beforeObserver="const obs=new MutationObserver(()=>queueMicrotask(renderAll));obs.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['hidden','class']});";
+  const scopedObserver="const host=$('materialCargaModule');if(host){let queued=false;const obs=new MutationObserver(()=>{if(queued)return;queued=true;queueMicrotask(()=>{queued=false;renderAll()})});obs.observe(host,{subtree:true,childList:true,attributes:true,attributeFilter:['hidden','class']})}";
+  if(!s.includes(beforeObserver))throw new Error('v7_7_0_material_carga.js: observer global esperado não encontrado');
+  s=s.replace(beforeObserver,scopedObserver);
+  if(!s.includes('setInterval(refresh,60000);'))throw new Error('v7_7_0_material_carga.js: polling de 60s esperado não encontrado');
   s=s.replace('setInterval(refresh,60000);',"setInterval(()=>{if(!document.hidden)refresh()},300000);");
   return s;
 });
