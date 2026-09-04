@@ -1,11 +1,11 @@
 {
   "name": "tarefas-app",
-  "version": "2.3.4",
+  "version": "2.3.5",
   "private": true,
-  "description": "TAREFAS Android 2.3.4 build 234 beta com Base Web 7.8.2, correção do compositor do chat e integração da Central ao chat privado.",
+  "description": "TAREFAS Android 2.3.5 build 235 beta com Base Web 7.8.2 e chat autoajustável por viewport, teclado, rotação e safe area.",
   "scripts": {
-    "build:web": "node scripts/build-mobile-v234.mjs",
-    "verify:web": "node scripts/verify-mobile-v234.mjs dist",
+    "build:web": "node scripts/build-mobile-v235.mjs",
+    "verify:web": "node scripts/verify-mobile-v235.mjs dist",
     "cap:add:android": "npx cap add android",
     "cap:sync": "npm run build:web && npx cap sync android",
     "assets:android": "npx @capacitor/assets generate --android --assetPath assets --iconBackgroundColor '#040808' --iconBackgroundColorDark '#040808' --splashBackgroundColor '#040808' --splashBackgroundColorDark '#040808'",
