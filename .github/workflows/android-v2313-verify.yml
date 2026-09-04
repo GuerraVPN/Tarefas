@@ -6,6 +6,13 @@ on:
     branches: [app/android-v2313-prep]
     paths:
       - '.github/workflows/android-v2313-verify.yml'
+      - 'scripts/build-mobile-v2313.mjs'
+      - 'scripts/verify-mobile-v2313.mjs'
+      - 'scripts/test-orc-loader-v2313.mjs'
+      - 'scripts/test-material-carga-v2313.mjs'
+      - 'app/orcamentarios-loader-v243.js'
+      - 'app/native-mobile-entry.js'
+      - 'app/android/StorageAccessPlugin.java'
 
 jobs:
   verify:
