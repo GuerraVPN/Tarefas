@@ -191,3 +191,5 @@ jobs:
           name: tarefas-android-2.3.17-beta-build-247
           path: TAREFAS-2.3.17.apk
           if-no-files-found: error
+
+# retry: instalador aplicado no fonte antes do bundle
