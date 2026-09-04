@@ -63,7 +63,7 @@ public class StorageAccessPlugin extends Plugin {
         } catch (Exception primary) {
             try {
                 Intent fallback = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                fallback.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 getContext().startActivity(fallback);
             } catch (Exception err) {
                 call.reject("Não foi possível abrir a permissão de acesso total aos arquivos.", err);
