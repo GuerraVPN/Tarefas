@@ -1,11 +1,11 @@
 {
   "name": "tarefas-app",
-  "version": "2.2.8",
+  "version": "2.3.0",
   "private": true,
-  "description": "TAREFAS Android 2.2.8 build 228 beta com Base Web 7.7.2 e correções de conexão/posição do Assistente IA.",
+  "description": "TAREFAS Android 2.3.0 build 230 oficial com Base Web 7.8.0 e Assistente IA.",
   "scripts": {
-    "build:web": "node scripts/build-mobile-v228.mjs",
-    "verify:web": "node scripts/verify-mobile-v228.mjs dist",
+    "build:web": "node scripts/build-mobile-v230.mjs",
+    "verify:web": "node scripts/verify-mobile-v230.mjs dist",
     "cap:add:android": "npx cap add android",
     "cap:sync": "npm run build:web && npx cap sync android",
     "assets:android": "npx @capacitor/assets generate --android --assetPath assets --iconBackgroundColor '#040808' --iconBackgroundColorDark '#040808' --splashBackgroundColor '#040808' --splashBackgroundColorDark '#040808'",
