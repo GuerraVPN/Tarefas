@@ -1,0 +1,4 @@
+TAREFAS 2.3.10 Beta / build 240
+- Orçamentários com lazy-load real e relatório leve.
+- Gerar escala removido.
+- Gerar aditamento com PDF ou ODT.
