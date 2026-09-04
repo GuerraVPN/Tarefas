@@ -1,0 +1,177 @@
+name: Android 2.3.9 Beta - Schema e Lavanderia
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [app/android-v239-prep]
+    paths:
+      - 'app/**'
+      - 'assets/**'
+      - 'scripts/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'capacitor.config.ts'
+      - '.github/workflows/android-v239-beta.yml'
+      - '*.html'
+      - '*.js'
+      - '*.css'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Checkout fonte 2.3.9 Beta
+        uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with: { node-version: '22' }
+
+      - name: Instalar e auditar dependências
+        run: |
+          npm ci
+          npm audit
+
+      - name: Validar backends
+        run: |
+          set -euo pipefail
+          AI_CODE="$(curl --silent --show-error -o "$RUNNER_TEMP/ai.json" -w '%{http_code}' -X POST -H 'Content-Type: application/json' --data '{"prompt":"teste"}' 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/tarefas-ai')"
+          test "$AI_CODE" = '401'
+          jq -e '.error == "session_required"' "$RUNNER_TEMP/ai.json" >/dev/null
+          AIF_CODE="$(curl --silent --show-error -o "$RUNNER_TEMP/aif.json" -w '%{http_code}' -X POST -H 'Content-Type: application/json' --data '{"prompt":"teste"}' 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/tarefas-ai-files')"
+          test "$AIF_CODE" = '401'
+          jq -e '.error == "session_required"' "$RUNNER_TEMP/aif.json" >/dev/null
+          CHAT_CODE="$(curl --silent --show-error -o "$RUNNER_TEMP/chat.json" -w '%{http_code}' 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/tarefas-chat-files?partner=1')"
+          test "$CHAT_CODE" = '401'
+          jq -e '.error == "session_required"' "$RUNNER_TEMP/chat.json" >/dev/null
+
+      - name: Gerar e validar App 2.3.9
+        run: |
+          set -euo pipefail
+          node scripts/build-mobile-v239-final.mjs
+          node scripts/verify-mobile-v239-final.mjs dist
+          grep -q '2.3.9 • WEB 7.8.2' dist/mobile-v12.js
+          grep -q '__TAREFAS_ANDROID_239_SCHEMA_CHECK__' dist/mobile-schema-v239.js
+          grep -q '__TAREFAS_ANDROID_239_LAV_CIA_DEDUPE__' dist/mobile-lavanderia-v239.js
+          grep -q '__TAREFAS_ANDROID_238_AI_AUTO_FILE__' dist/mobile-ai-auto-file-v238.js
+          grep -q '__TAREFAS_ANDROID_237_AI_TOOLS__' dist/mobile-ai-tools-v237.js
+          grep -q '__TAREFAS_ANDROID_237_MISSION_DEDUPE__' dist/missao_v74.js
+          ! grep -q 'GEMINI_API_KEY\|OPENAI_API_KEY\|SUPABASE_SERVICE_ROLE_KEY\|sk-proj-' dist/mobile-ai-v230.js dist/mobile-ai-tools-v237.js dist/mobile-ai-auto-file-v238.js dist/mobile-schema-v239.js dist/mobile-lavanderia-v239.js
+
+      - name: Firebase Android
+        run: |
+          curl --fail --silent --show-error --retry 3 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/firebase-config-v17' -o app/google-services.json
+          test -s app/google-services.json
+          grep -q 'br.com.guerravpn.tarefas.mobile' app/google-services.json
+
+      - name: Preparar Android
+        run: |
+          npx cap add android
+          cp app/google-services.json android/app/google-services.json
+          sed -i 's/versionCode 1/versionCode 239/' android/app/build.gradle
+          sed -i 's/versionName "1.0"/versionName "2.3.9"/' android/app/build.gradle
+          npm run assets:android
+          npx cap sync android
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('android/app/src/main/AndroidManifest.xml')
+          s=p.read_text(encoding='utf-8')
+          permissions='''    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />\n    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />\n    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />\n    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />\n'''
+          if 'android.permission.READ_EXTERNAL_STORAGE' not in s:s=s.replace('<application',permissions+'    <application',1)
+          if 'android:requestLegacyExternalStorage' not in s:s=s.replace('<application','<application android:requestLegacyExternalStorage="true"',1)
+          p.write_text(s,encoding='utf-8')
+          xml=Path('android/app/src/main/res/xml');xml.mkdir(parents=True,exist_ok=True)
+          (xml/'file_paths.xml').write_text('''<?xml version="1.0" encoding="utf-8"?>\n<paths xmlns:android="http://schemas.android.com/apk/res/android">\n  <files-path name="files" path="." />\n  <cache-path name="cache" path="." />\n  <external-files-path name="external-files" path="." />\n  <external-cache-path name="external-cache" path="." />\n  <external-path name="external" path="." />\n</paths>\n''',encoding='utf-8')
+          PY
+          JAVA_DIR='android/app/src/main/java/br/com/guerravpn/tarefas/mobile'
+          mkdir -p "$JAVA_DIR"
+          cp app/android/StorageAccessPlugin.java "$JAVA_DIR/StorageAccessPlugin.java"
+          cat > "$JAVA_DIR/MainActivity.java" <<'JAVA'
+          package br.com.guerravpn.tarefas.mobile;
+          import android.os.Bundle;
+          import com.getcapacitor.BridgeActivity;
+          public class MainActivity extends BridgeActivity {
+              @Override public void onCreate(Bundle savedInstanceState) {
+                  registerPlugin(StorageAccessPlugin.class);
+                  super.onCreate(savedInstanceState);
+              }
+          }
+          JAVA
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Compilar APK Release
+        working-directory: android
+        run: ./gradlew assembleRelease
+
+      - name: Validar APK Release 2.3.9 Beta
+        run: |
+          set -euo pipefail
+          APK='android/app/build/outputs/apk/release/app-release-unsigned.apk'
+          test -s "$APK"
+          unzip -tq "$APK"
+          python3 - <<'PY'
+          import json
+          with open('android/app/build/outputs/apk/release/output-metadata.json',encoding='utf-8') as f: el=json.load(f)['elements'][0]
+          assert int(el['versionCode'])==239,el
+          assert str(el['versionName'])=='2.3.9',el
+          PY
+          APKANALYZER="$(find "$ANDROID_HOME" -type f -name apkanalyzer | head -1)"
+          test "$("$APKANALYZER" manifest debuggable "$APK" | tr -d '\r\n')" = 'false'
+          unzip -p "$APK" assets/public/mobile-v12.js | grep -q '2.3.9 • WEB 7.8.2'
+          unzip -p "$APK" assets/public/mobile-schema-v239.js | grep -q '__TAREFAS_ANDROID_239_SCHEMA_CHECK__'
+          unzip -p "$APK" assets/public/mobile-lavanderia-v239.js | grep -q '__TAREFAS_ANDROID_239_LAV_CIA_DEDUPE__'
+
+      - name: Alinhar e assinar APK GuerraVPN
+        run: |
+          set -euo pipefail
+          OIDC="$(curl --fail --silent --show-error -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-signing" | jq -r '.value')"
+          curl --fail --silent --show-error -H "Authorization: Bearer $OIDC" 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-signing-material' -o "$RUNNER_TEMP/signing.json"
+          jq -r '.keystore_b64' "$RUNNER_TEMP/signing.json" | base64 -d > "$RUNNER_TEMP/GuerraVPN.keystore"
+          STORE_PASS="$(jq -r '.store_password' "$RUNNER_TEMP/signing.json")"; KEY_ALIAS="$(jq -r '.key_alias' "$RUNNER_TEMP/signing.json")"; KEY_PASS="$(jq -r '.key_password' "$RUNNER_TEMP/signing.json")"; EXPECTED_CERT="$(jq -r '.cert_sha256' "$RUNNER_TEMP/signing.json")"
+          APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)"; ZIPALIGN="$(find "$ANDROID_HOME/build-tools" -type f -name zipalign | sort -V | tail -1)"
+          "$ZIPALIGN" -p -f 4 android/app/build/outputs/apk/release/app-release-unsigned.apk "$RUNNER_TEMP/TAREFAS-2.3.9-aligned.apk"
+          "$APKSIGNER" sign --ks "$RUNNER_TEMP/GuerraVPN.keystore" --ks-key-alias "$KEY_ALIAS" --ks-pass "pass:$STORE_PASS" --key-pass "pass:$KEY_PASS" --out TAREFAS-2.3.9.apk "$RUNNER_TEMP/TAREFAS-2.3.9-aligned.apk"
+          ACTUAL_CERT="$($APKSIGNER verify --verbose --print-certs TAREFAS-2.3.9.apk | sed -n 's/.*certificate SHA-256 digest: //p' | head -1 | tr -d ': ' | tr '[:upper:]' '[:lower:]')"
+          test "$ACTUAL_CERT" = "$EXPECTED_CERT"
+
+      - name: Publicar APK beta permanente
+        run: |
+          set -euo pipefail
+          git fetch origin app/releases
+          RELEASES_DIR="$RUNNER_TEMP/tarefas-releases"
+          git worktree add "$RELEASES_DIR" origin/app/releases
+          mkdir -p "$RELEASES_DIR/downloads"
+          cp TAREFAS-2.3.9.apk "$RELEASES_DIR/downloads/TAREFAS-2.3.9.apk"
+          cd "$RELEASES_DIR"
+          git config user.name 'GuerraVPN Android Build'; git config user.email '81371258+GuerraVPN@users.noreply.github.com'
+          git add -A downloads/
+          if ! git diff --cached --quiet; then git commit -m 'release(android): TAREFAS 2.3.9 beta build 239'; git push origin HEAD:app/releases; fi
+          URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.3.9.apk'
+          LOCAL_SHA="$(sha256sum "$GITHUB_WORKSPACE/TAREFAS-2.3.9.apk" | awk '{print $1}')"
+          for attempt in 1 2 3 4 5 6 7 8; do if curl --fail --silent --show-error -L "$URL" -o "$RUNNER_TEMP/published.apk"; then test "$(sha256sum "$RUNNER_TEMP/published.apk" | awk '{print $1}')" = "$LOCAL_SHA" && exit 0; fi; sleep 3; done
+          exit 1
+
+      - name: Registrar beta 2.3.9
+        run: |
+          set -euo pipefail
+          OIDC="$(curl --fail --silent --show-error -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-release" | jq -r '.value')"
+          SHA="$(sha256sum TAREFAS-2.3.9.apk | awk '{print $1}')"
+          jq -n --arg version '2.3.9' --argjson build 239 --arg channel 'beta' --arg web_version '7.8.2' --arg title 'TAREFAS 2.3.9 Beta — Schema, cargas e Lavanderia' --arg url 'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.3.9.apk' --arg sha "$SHA" '{version:$version,build:$build,channel:$channel,web_version:$web_version,title:$title,changelog:["🧩 app_versions alinhado com a coluna version e compatibilidade com version_name.","🔎 Verificação automática do schema esperado na inicialização do aplicativo.","📦 Consultas de depósitos, desrelacionamentos e passagens de carga alinhadas aos campos reais do sistema.","🎯 Missão #15 saneada sem texto duplicado.","✅ Tarefas #6880 e #5108 encerradas.","💰 Removida a duplicação visual do valor disponível em Débito Cia Com.","📄 Recursos de IA e geração automática de arquivos da 2.3.8 preservados."],mandatory:false,download_url:$url,sha256:$sha}' > "$RUNNER_TEMP/release.json"
+          CODE="$(curl --silent --show-error -o "$RUNNER_TEMP/result.json" -w '%{http_code}' -H "Authorization: Bearer $OIDC" -H 'Content-Type: application/json' --data-binary @"$RUNNER_TEMP/release.json" 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-release-publish')"
+          cat "$RUNNER_TEMP/result.json"; test "$CODE" = '200'; jq -e '.ok == true and .version == "2.3.9" and .build == 239 and .channel == "beta"' "$RUNNER_TEMP/result.json" >/dev/null
+
+      - name: Salvar APK beta assinado
+        uses: actions/upload-artifact@v4
+        with:
+          name: tarefas-android-2.3.9-beta-schema-lavanderia-GuerraVPN
+          path: TAREFAS-2.3.9.apk
+          if-no-files-found: error
