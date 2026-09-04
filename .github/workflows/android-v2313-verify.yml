@@ -8,8 +8,11 @@ on:
       - '.github/workflows/android-v2313-verify.yml'
       - 'scripts/build-mobile-v2313.mjs'
       - 'scripts/verify-mobile-v2313.mjs'
+      - 'scripts/test-aditamento-site-v2313.mjs'
+      - 'scripts/test-blob-save-v2313.mjs'
       - 'scripts/test-orc-loader-v2313.mjs'
       - 'scripts/test-material-carga-v2313.mjs'
+      - 'app/mobile-blob-save-v243.js'
       - 'app/orcamentarios-loader-v243.js'
       - 'app/native-mobile-entry.js'
       - 'app/android/StorageAccessPlugin.java'
@@ -36,15 +39,17 @@ jobs:
           set -euo pipefail
           node scripts/build-mobile-v2313.mjs
           node scripts/verify-mobile-v2313.mjs dist
-          node scripts/test-aditamento-v2312.mjs dist/aditamento_v74.js
-          node scripts/test-aditamento-ui-v2312.mjs dist/aditamento_v74.js
+          node scripts/test-aditamento-site-v2313.mjs dist/aditamento_v74.js
+          node scripts/test-blob-save-v2313.mjs dist/mobile-blob-save-v243.js
           node scripts/test-orc-loader-v2313.mjs dist/orcamentarios-loader-v243.js
           node scripts/test-material-carga-v2313.mjs dist/v7_7_0_material_carga.js
           grep -q 'Intent.ACTION_CREATE_DOCUMENT' app/android/StorageAccessPlugin.java
           grep -q 'saveBase64WithPickerResult' app/android/StorageAccessPlugin.java
           grep -q 'StorageAccess.saveBase64WithPicker' app/native-mobile-entry.js
           grep -q '__TAREFAS_SAVE_PICKER_V243__' dist/native-mobile.js
-          grep -q '__ADITAMENTO_SAVE_PICKER_V243__' dist/aditamento_v74.js
+          grep -q '__TAREFAS_BLOB_SAVE_PICKER_V243__' dist/mobile-blob-save-v243.js
+          grep -q '__ADITAMENTO_SITE_PDF_FLOW_V243__' dist/aditamento_v74.js
+          grep -q 'doc.save(filename)' dist/aditamento_v74.js
           grep -q '__TAREFAS_ORC_LOADER_V243__' dist/orcamentarios-loader-v243.js
           grep -q '__TAREFAS_ORC_LAZY_GATE_V243_DISABLED__' dist/sistema_comum.js
           grep -q '__TAREFAS_MATERIAL_CARGA_BASE_READY__' dist/material_carga_v6.js
@@ -108,8 +113,11 @@ jobs:
           assert int(e['versionCode'])==243,e
           assert str(e['versionName'])=='2.3.13',e
           PY
-          unzip -p "$APK" assets/public/aditamento_v74.js | grep -q '__ADITAMENTO_SAVE_PICKER_V243__'
+          unzip -p "$APK" assets/public/aditamento_v74.js | grep -q '__ADITAMENTO_SITE_PDF_FLOW_V243__'
+          unzip -p "$APK" assets/public/aditamento_v74.js | grep -q 'doc.save(filename)'
           unzip -p "$APK" assets/public/aditamento_v74.js | grep -q 'ADITAMENTO AO BOLETIM INTERNO'
+          unzip -p "$APK" assets/public/mobile-blob-save-v243.js | grep -q '__TAREFAS_BLOB_SAVE_PICKER_V243__'
+          unzip -p "$APK" assets/public/mobile-blob-save-v243.js | grep -q '__TAREFAS_LAST_BLOB_SAVE_PROMISE__'
           unzip -p "$APK" assets/public/native-mobile.js | grep -q '__TAREFAS_SAVE_PICKER_V243__'
           unzip -p "$APK" assets/public/native-mobile.js | grep -q 'saveBase64WithPicker'
           unzip -p "$APK" assets/public/orcamentarios-loader-v243.js | grep -q '__TAREFAS_ORC_LOADER_V243__'
