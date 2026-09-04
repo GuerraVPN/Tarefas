@@ -4,6 +4,15 @@ import { pathToFileURL } from 'node:url';
 
 const root = process.cwd();
 
+// Troca o fluxo do instalador no fonte antes do esbuild/minificação.
+const nativeSourcePath = path.join(root,'app','native-mobile-entry.js');
+let nativeSource = await readFile(nativeSourcePath,'utf8');
+const oldInstaller = "async function openApkInstaller(uri){try{await FileOpener.openFile({path:uri,mimeType:'application/vnd.android.package-archive'});return{opened:true,error:null}}catch(err){console.warn('[TAREFAS UPDATE] Não foi possível abrir o instalador Android:',err);return{opened:false,error:String(err?.message||err||'Falha ao abrir instalador')}}}";
+const newInstaller = "async function openApkInstaller(uri){try{const result=await StorageAccess.installApk({uri});if(result?.opened)return{opened:true,error:null};const message=result?.permissionDenied?'Permita instalar apps desta fonte para o TAREFAS e tente novamente.':(result?.error||'O Android não abriu o instalador.');return{opened:false,error:String(message)}}catch(err){console.warn('[TAREFAS UPDATE] Instalador nativo falhou:',err);try{await FileOpener.openFile({path:uri,mimeType:'application/vnd.android.package-archive'});return{opened:true,error:null}}catch(fallback){return{opened:false,error:String(fallback?.message||err?.message||fallback||err||'Falha ao abrir instalador')}}}}";
+if(!nativeSource.includes(oldInstaller)) throw new Error('native-mobile-entry.js: openApkInstaller antigo não encontrado');
+nativeSource=nativeSource.replace(oldInstaller,newInstaller);
+await writeFile(nativeSourcePath,nativeSource,'utf8');
+
 await import(pathToFileURL(path.resolve('scripts/build-mobile-v2316.mjs')).href + '?v=2317');
 
 const dist = path.join(root, 'dist');
@@ -31,14 +40,7 @@ await patch('mobile-preload.js', s => s.replace("tarefasAppBuild = '246'", "tare
 await patch('mobile-updates-v181.js', s => s.replace('const APP_BUILD = 246;', 'const APP_BUILD = 247;'));
 await patch('mobile-schema-v239.js', s => s.replace('build:246', 'build:247'));
 
-// Troca o FileOpener genérico por um instalador APK nativo dedicado.
-await patch('native-mobile.js', s => {
-  const old = "async function openApkInstaller(uri){try{await FileOpener.openFile({path:uri,mimeType:'application/vnd.android.package-archive'});return{opened:true,error:null}}catch(err){console.warn('[TAREFAS UPDATE] Não foi possível abrir o instalador Android:',err);return{opened:false,error:String(err?.message||err||'Falha ao abrir instalador')}}}";
-  const neu = "async function openApkInstaller(uri){try{const result=await StorageAccess.installApk({uri});if(result?.opened)return{opened:true,error:null};const message=result?.permissionDenied?'Permita instalar apps desta fonte para o TAREFAS e tente novamente.':(result?.error||'O Android não abriu o instalador.');return{opened:false,error:String(message)}}catch(err){console.warn('[TAREFAS UPDATE] Instalador nativo falhou:',err);try{await FileOpener.openFile({path:uri,mimeType:'application/vnd.android.package-archive'});return{opened:true,error:null}}catch(fallback){return{opened:false,error:String(fallback?.message||err?.message||fallback||err||'Falha ao abrir instalador')}}}}";
-  if (!s.includes(old)) throw new Error('native-mobile.js: openApkInstaller antigo não encontrado');
-  return s.replace(old, neu);
-});
-
+// Acrescenta instalador nativo ao plugin Java já higienizado pela 2.3.15/2.3.16.
 const javaPath = path.join(root, 'app', 'android', 'StorageAccessPlugin.java');
 let java = await readFile(javaPath, 'utf8');
 if (!java.includes('import android.content.ClipData;')) {
