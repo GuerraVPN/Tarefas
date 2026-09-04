@@ -1,0 +1,5 @@
+TAREFAS 2.3.12 Beta / build 242
+- Gerar aditamento PDF/ODT com salvamento nativo validado.
+- jsPDF embarcado no APK para não depender de CDN/WebView.
+- Material Carga/Depósitos sem MutationObserver recursivo e sem polling automático.
+- Atualização do Material Carga somente por abertura, troca de aba, seleção e retorno ao app.
