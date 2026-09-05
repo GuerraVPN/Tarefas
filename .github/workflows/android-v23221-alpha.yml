@@ -7,6 +7,7 @@ on:
     paths:
       - 'app/mobile-alpha-v23221-core.js'
       - 'app/mobile-alpha-v23221.js'
+      - 'app/mobile-alpha-v23221-tabs.js'
       - 'app/release-v23221.txt'
       - 'scripts/build-mobile-v23221.mjs'
       - 'scripts/simulate-mobile-v23221.mjs'
@@ -38,6 +39,7 @@ jobs:
           set -euo pipefail
           node --check app/mobile-alpha-v23221-core.js
           node --check app/mobile-alpha-v23221.js
+          node --check app/mobile-alpha-v23221-tabs.js
           node --check scripts/build-mobile-v23221.mjs
           node --check scripts/simulate-mobile-v23221.mjs
           node --check scripts/verify-mobile-v23221.mjs
@@ -49,10 +51,12 @@ jobs:
           node scripts/build-mobile-v23221.mjs
           node --check dist/mobile-alpha-v23221-core.js
           node --check dist/mobile-alpha-v23221.js
+          node --check dist/mobile-alpha-v23221-tabs.js
           node --check dist/mobile-ai-v230.js
           node --check dist/native-mobile.js
           node --check dist/notificacoes.js
           node --check dist/central.js
+          node --check dist/dashboard.js
 
       - name: Conferencia 1 de 3 - estrutura regressao e permissoes
         run: |
@@ -61,6 +65,8 @@ jobs:
           grep -q 'destructiveConfirmation:true' dist/mobile-ai-v230.js
           grep -q 'noPrivilegeElevation:true' dist/mobile-ai-v230.js
           grep -q 'credencial removida' dist/mobile-alpha-v23221-core.js
+          grep -q '__TAREFAS_ALPHA_TABS_V264__' dist/mobile-alpha-v23221-tabs.js
+          grep -q '__TAREFAS_DASHBOARD_NULL_GUARD_V264__' dist/dashboard.js
           ! grep -R -E 'sk-[A-Za-z0-9_-]{20,}|service_role|SUPABASE_SERVICE_ROLE_KEY' app/mobile-alpha-v23221*.js dist/mobile-alpha-v23221*.js
 
       - name: Firebase Android
@@ -147,12 +153,15 @@ jobs:
           unzip -p "$APK" assets/public/mobile-bootstrap.js | grep -q '__TAREFAS_ALPHA_23221__'
           unzip -p "$APK" assets/public/mobile-alpha-v23221-core.js | grep -q 'groupedNotifications'
           unzip -p "$APK" assets/public/mobile-alpha-v23221.js | grep -q 'TarefasAlpha23221'
+          unzip -p "$APK" assets/public/mobile-alpha-v23221-tabs.js | grep -q '__TAREFAS_ALPHA_TABS_V264__'
+          unzip -p "$APK" assets/public/mobile-alpha-v23221-tabs.js | grep -q 'data-tab="ferramentas"'
+          unzip -p "$APK" assets/public/dashboard.js | grep -q '__TAREFAS_DASHBOARD_NULL_GUARD_V264__'
           unzip -p "$APK" assets/public/mobile-ai-v230.js | grep -q '__TAREFAS_AI_ALPHA_TOOLS_V264__'
           unzip -p "$APK" assets/public/native-mobile.js | grep -q '__TAREFAS_NATIVE_ALPHA_23221__'
           unzip -p "$APK" assets/public/native-mobile.js | grep -q '__TAREFAS_TASK_ATTACHMENTS_V261__'
           unzip -p "$APK" assets/public/mobile-biometric-v23211.js | grep -q '__TAREFAS_BIOMETRIC_V258__'
           unzip -p "$APK" classes.dex | strings | grep -q 'TarefasBiometricPlugin'
-          echo 'CONFERENCIA 2/3 OK: APK build 264, versao 2.3.22.1 e recursos compilados conferidos.'
+          echo 'CONFERENCIA 2/3 OK: APK build 264, versao 2.3.22.1, abas da Central e Dashboard protegido conferidos.'
 
       - name: Assinar APK GuerraVPN
         run: |
@@ -191,13 +200,13 @@ jobs:
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/alpha-package/app" "$RUNNER_TEMP/alpha-package/scripts" "$RUNNER_TEMP/alpha-package/manifest"
           cp TAREFAS-2.3.22.1.apk TAREFAS-2.3.22.1.apk.sha256 "$RUNNER_TEMP/alpha-package/"
-          cp app/release-v23221.txt app/mobile-alpha-v23221-core.js app/mobile-alpha-v23221.js "$RUNNER_TEMP/alpha-package/app/"
+          cp app/release-v23221.txt app/mobile-alpha-v23221-core.js app/mobile-alpha-v23221.js app/mobile-alpha-v23221-tabs.js "$RUNNER_TEMP/alpha-package/app/"
           cp scripts/build-mobile-v23221.mjs scripts/simulate-mobile-v23221.mjs scripts/verify-mobile-v23221.mjs "$RUNNER_TEMP/alpha-package/scripts/"
           cp dist/ALPHA_2_3_22_1.json "$RUNNER_TEMP/alpha-package/manifest/"
           cat > "$RUNNER_TEMP/alpha-package/CONFERENCIAS.txt" <<'TXT'
           TAREFAS 2.3.22.1 Alpha build 264
-          CONFERENCIA 1/3: estrutura, regressao, permissoes e recursos OK
-          CONFERENCIA 2/3: APK, versionCode/versionName e assets compilados OK
+          CONFERENCIA 1/3: estrutura, regressao, permissoes, abas e recursos OK
+          CONFERENCIA 2/3: APK, versionCode/versionName, abas da Central e Dashboard protegido OK
           CONFERENCIA 3/3: assinatura GuerraVPN, SHA-256 e integridade final OK
           TXT
           (cd "$RUNNER_TEMP/alpha-package" && zip -qr "$GITHUB_WORKSPACE/TAREFAS-2.3.22.1-alpha-build-264.zip" .)
@@ -231,7 +240,7 @@ jobs:
           set -euo pipefail
           OIDC="$(curl --fail --silent --show-error -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-release" | jq -r '.value')"
           SHA="$(sha256sum TAREFAS-2.3.22.1.apk | awk '{print $1}')"
-          jq -n --arg version '2.3.22.1' --argjson build 264 --arg channel 'alpha' --arg web_version '7.8.2' --arg title 'TAREFAS 2.3.22.1 Alpha — Central de Notificações 2.0 e ferramentas' --arg url 'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.3.22.1.apk' --arg sha "$SHA" '{version:$version,build:$build,channel:$channel,web_version:$web_version,title:$title,changelog:["🔔 Central de Notificações 2.0 com seleção múltipla, exclusão em massa e gesto de deslizar.","📦 Atualizações do aplicativo agrupadas em um único item com quantidade de novas versões.","🔕 Filtros por categoria, silenciamento e retenção opcional de 30/60/90 dias, preservando itens fixados.","⭐ Favoritos/atalhos e filtros salvos.","📥 Central de Downloads com histórico dos arquivos salvos.","📡 Fila offline com retentativa e indicador de sincronização.","⚡ Ações rápidas, fixação, soneca e lembretes.","🧯 Central de Erros com sanitização de padrões de credencial.","🔢 Contadores separados por categoria.","🤖 IA com contexto e comandos das ferramentas da Alpha; ações destrutivas exigem confirmação.","🔐 Mantidas biometria, correções de arquivos/configurações e as permissões reais do perfil ativo, sem elevação de privilégios."],mandatory:false,download_url:$url,sha256:$sha}' > "$RUNNER_TEMP/release.json"
+          jq -n --arg version '2.3.22.1' --argjson build 264 --arg channel 'alpha' --arg web_version '7.8.2' --arg title 'TAREFAS 2.3.22.1 Alpha — Central 2.0 em abas e ferramentas' --arg url 'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.3.22.1.apk' --arg sha "$SHA" '{version:$version,build:$build,channel:$channel,web_version:$web_version,title:$title,changelog:["🔔 Central de Notificações 2.0 com seleção múltipla, exclusão em massa e gesto de deslizar.","🧭 Central reorganizada em abas: Notificações 2.0, Mensagens, Downloads, Favoritos e Ferramentas.","📥 Central de Downloads transformada em aba própria.","⭐ Favoritos transformados em aba própria.","🧰 Ferramentas reúne Salvar filtro atual, filtros salvos, Fila offline, sincronização e Central de Erros.","📱 Painel legado corrigido para respeitar cabeçalho, safe area e barra inferior.","🛡️ Dashboard protegido contra o erro Cannot set properties of null ao atualizar componentes removidos/indisponíveis.","📦 Atualizações do aplicativo agrupadas em um único item com quantidade de novas versões.","🔕 Filtros por categoria, silenciamento e retenção opcional de 30/60/90 dias, preservando itens fixados.","📡 Fila offline com retentativa e indicador de sincronização.","⚡ Ações rápidas, fixação, soneca e lembretes.","🧯 Central de Erros com sanitização de padrões de credencial.","🔢 Contadores separados por categoria.","🤖 IA com contexto e comandos das ferramentas da Alpha; ações destrutivas exigem confirmação.","🔐 Mantidas biometria, correções de arquivos/configurações e as permissões reais do perfil ativo, sem elevação de privilégios."],mandatory:false,download_url:$url,sha256:$sha}' > "$RUNNER_TEMP/release.json"
           CODE="$(curl --silent --show-error -o "$RUNNER_TEMP/result.json" -w '%{http_code}' -H "Authorization: Bearer $OIDC" -H 'Content-Type: application/json' --data-binary @"$RUNNER_TEMP/release.json" 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-release-publish')"
           cat "$RUNNER_TEMP/result.json"
           test "$CODE" = '200'
