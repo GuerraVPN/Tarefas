@@ -20,6 +20,10 @@ function replaceRequired(source, before, after, label) {
   if (!source.includes(before)) throw new Error(`2.3.21: trecho ausente: ${label}`);
   return source.replace(before, after);
 }
+function replacePattern(source, pattern, after, label) {
+  if (!pattern.test(source)) throw new Error(`2.3.21: padrão ausente: ${label}`);
+  return source.replace(pattern, after);
+}
 
 for (const name of await readdir(dist)) {
   if (!/\.(?:html|js|css|webmanifest)$/i.test(name)) continue;
@@ -35,21 +39,21 @@ await patchFile('mobile-schema-v239.js', source => source.replace('build:256', '
 await patchFile('mobile-updates-v181.js', source => {
   source = source.replace('const APP_BUILD = 256;', 'const APP_BUILD = 257;');
 
-  const oldState = "  async function loadState(){const token=sessionToken();const [beta,latestRows,history]=await Promise.all([rpc('v1_8_get_beta_updates',{p_session_token:token}).catch(()=>false),rpc('v1_8_latest_app_version',{p_session_token:token}),rpc('v1_8_app_version_history',{p_session_token:token})]);let storage={granted:false,required:false};try{storage=await window.TarefasNative?.files?.checkAllFilesAccess?.()||storage}catch(_){}return{beta:beta===true,latest:Array.isArray(latestRows)?latestRows[0]||null:latestRows||null,history:Array.isArray(history)?history:[],storage}}";
   const newState = "  async function loadState(){const token=sessionToken();const [beta,alphaRows,latestRows,history]=await Promise.all([rpc('v1_8_get_beta_updates',{p_session_token:token}).catch(()=>false),rpc('v2_3_21_alpha_context',{p_session_token:token}).catch(()=>null),rpc('v1_8_latest_app_version',{p_session_token:token}),rpc('v1_8_app_version_history',{p_session_token:token})]);const alpha=Array.isArray(alphaRows)?alphaRows[0]||{}:alphaRows||{};let storage={granted:false,required:false};try{storage=await window.TarefasNative?.files?.checkAllFilesAccess?.()||storage}catch(_){}return{beta:beta===true,alphaEligible:alpha.eligible===true,alpha:alpha.receive_alpha===true,latest:Array.isArray(latestRows)?latestRows[0]||null:latestRows||null,history:Array.isArray(history)?history:[],storage}}";
-  source = replaceRequired(source, oldState, newState, 'estado do atualizador');
+  source = replacePattern(source, /  async function loadState\(\)\{[^\n]*\}(?=\n  async function saveBeta)/, newState, 'estado do atualizador');
 
-  const betaSave = "  async function saveBeta(enabled){const token=sessionToken();if(!token)throw new Error('Faça login novamente para alterar o canal de atualizações.');const ok=await rpc('v1_8_set_beta_updates',{p_session_token:token,p_receive_beta:!!enabled});if(ok!==true)throw new Error('Não foi possível salvar a preferência de versões beta.');return true}";
+  const betaSaveMatch = /  async function saveBeta\(enabled\)\{[^\n]*\}/;
+  const betaSave = source.match(betaSaveMatch)?.[0];
+  if (!betaSave) throw new Error('2.3.21: padrão ausente: gravação beta');
   const alphaSave = betaSave + "\n  async function saveAlpha(enabled){const token=sessionToken();if(!token)throw new Error('Faça login novamente para alterar o canal de atualizações.');const ok=await rpc('v2_3_21_set_alpha_updates',{p_session_token:token,p_receive_alpha:!!enabled});if(ok!==true)throw new Error('Somente administradores e moderadores podem receber versões alpha.');return true}";
-  source = replaceRequired(source, betaSave, alphaSave, 'gravação da preferência alpha');
+  source = replacePattern(source, betaSaveMatch, alphaSave, 'gravação da preferência alpha');
 
-  const oldHistory = "  function renderHistory(rows){if(!rows.length)return'<div class=\"tm-update-empty\">Nenhuma versão publicada neste canal.</div>';return rows.map(v=>{const channel=v.channel==='beta'?'BETA':'OFICIAL',current=Number(v.build)===APP_BUILD?'<span class=\"tm-update-current\">INSTALADA</span>':'';return`<article class=\"tm-update-history-item\"><div class=\"tm-update-history-head\"><div><strong>${esc(v.version_name)}</strong><small>Build ${esc(v.build)} • ${esc(v.web_version||'')}</small></div><div><span class=\"tm-update-channel ${v.channel==='beta'?'beta':''}\">${channel}</span>${current}</div></div><h4>${esc(v.title||'Atualização')}</h4><ul>${listItems(v.changelog)}</ul></article>`}).join('')}";
   const newHistory = "  function channelLabel(value){return value==='alpha'?'ALPHA':value==='beta'?'BETA':'OFICIAL'}\n  function channelClass(value){return value==='alpha'?'alpha':value==='beta'?'beta':''}\n  function renderHistory(rows){if(!rows.length)return'<div class=\"tm-update-empty\">Nenhuma versão publicada neste canal.</div>';return rows.map(v=>{const channel=channelLabel(v.channel),current=Number(v.build)===APP_BUILD?'<span class=\"tm-update-current\">INSTALADA</span>':'';return`<article class=\"tm-update-history-item\"><div class=\"tm-update-history-head\"><div><strong>${esc(v.version_name)}</strong><small>Build ${esc(v.build)} • ${esc(v.web_version||'')}</small></div><div><span class=\"tm-update-channel ${channelClass(v.channel)}\">${channel}</span>${current}</div></div><h4>${esc(v.title||'Atualização')}</h4><ul>${listItems(v.changelog)}</ul></article>`}).join('')}";
-  source = replaceRequired(source, oldHistory, newHistory, 'rótulos alpha no histórico');
+  source = replacePattern(source, /  function renderHistory\(rows\)\{[^\n]*\}/, newHistory, 'rótulos alpha no histórico');
 
-  source = replaceRequired(
+  source = replacePattern(
     source,
-    "    const latest=state.latest,newer=latest&&Number(latest.build)>APP_BUILD,latestBadge=latest?.channel==='beta'?'BETA':'OFICIAL';",
+    /    const latest=state\.latest,[^\n]+;/,
     "    const latest=state.latest,newer=latest&&Number(latest.build)>APP_BUILD,latestBadge=channelLabel(latest?.channel);",
     'rótulo da versão mais recente'
   );
@@ -65,16 +69,18 @@ await patchFile('mobile-updates-v181.js', source => {
   source = replaceRequired(source, storageStart, alphaCard, 'cartão Receber versões alpha');
   source = source.replace('Alpha ou Oficial.', 'Alpha, Beta ou Oficial.').replace('Beta ou Oficial.', 'Alpha, Beta ou Oficial.');
 
-  const betaListener = "    document.getElementById('tmBetaUpdates')?.addEventListener('change',async event=>{const input=event.currentTarget;input.disabled=true;try{await saveBeta(input.checked);await refresh(root)}catch(err){input.checked=!input.checked;alert(err?.message||err)}finally{input.disabled=false}});";
+  const betaListenerMatch = /    document\.getElementById\('tmBetaUpdates'\)\?\.addEventListener\('change',[^\n]+/;
+  const betaListener = source.match(betaListenerMatch)?.[0];
+  if (!betaListener) throw new Error('2.3.21: padrão ausente: evento beta');
   const alphaListener = betaListener + "\n    document.getElementById('tmAlphaUpdates')?.addEventListener('change',async event=>{const input=event.currentTarget;input.disabled=true;try{await saveAlpha(input.checked);await refresh(root)}catch(err){input.checked=!input.checked;alert(err?.message||err)}finally{input.disabled=false}});";
-  source = replaceRequired(source, betaListener, alphaListener, 'evento do botão alpha');
+  source = replacePattern(source, betaListenerMatch, alphaListener, 'evento do botão alpha');
 
   return source + "\n;globalThis.__TAREFAS_ALPHA_UPDATES_V257__={version:'2.3.21',build:257,serverAuthorized:true,roles:['admin','moderator']};\n";
 });
 
-await patchFile('native-mobile.js', source => replaceRequired(
+await patchFile('native-mobile.js', source => replacePattern(
   source,
-  "function updateChannelFolder(channel){return String(channel||'').trim().toLowerCase()==='beta'?'Beta':'Oficial'}",
+  /function updateChannelFolder\(channel\)\{[^\n]*\}/,
   "function updateChannelFolder(channel){const value=String(channel||'').trim().toLowerCase();return value==='alpha'?'Alpha':value==='beta'?'Beta':'Oficial'}",
   'pasta de download Alpha'
 ));
