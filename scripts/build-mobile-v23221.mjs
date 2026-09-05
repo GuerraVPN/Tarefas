@@ -55,10 +55,9 @@ await appendFile(path.join(dist,'mobile-ai-v230.js'),`\n;globalThis.__TAREFAS_AI
 
 await patchFile('native-mobile.js',source=>{
   source=source.replace("const APP_VERSION = '2.3.22';",`const APP_VERSION = '${VERSION}';`);
-  const target="pushNotificationReceived',async notification=>{window.dispatchEvent(new CustomEvent('v6:notificacoes:update'))";
-  const replacement="pushNotificationReceived',async notification=>{if(globalThis.TarefasAlpha23221?.isCategoryMuted?.(notification?.data?.tipo))return;window.dispatchEvent(new CustomEvent('v6:notificacoes:update'))";
-  if(!source.includes(target))throw new Error('2.3.22.1: listener de push não encontrado para silêncio por categoria');
-  return source.replace(target,replacement);
+  const rx=/(addListener\([\"']pushNotificationReceived[\"'],\s*async\s+notification=>\{)/;
+  if(!rx.test(source))throw new Error('2.3.22.1: listener de push não encontrado para silêncio por categoria');
+  return source.replace(rx,`$1if(globalThis.TarefasAlpha23221?.isCategoryMuted?.(notification?.data?.tipo))return;`);
 });
 await appendFile(path.join(dist,'native-mobile.js'),`\n;globalThis.__TAREFAS_NATIVE_ALPHA_23221__={version:'${VERSION}',build:${BUILD},categoryMute:true};\n`,'utf8');
 
