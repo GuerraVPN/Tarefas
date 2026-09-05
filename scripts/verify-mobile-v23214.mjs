@@ -38,10 +38,10 @@ for (const marker of [
   'FileOpener',
   'blob:',
   'data:',
-  'downloadDocumentToDownloads'
+  'Não foi possível ler o anexo local'
 ]) requireText(native, marker, 'native-mobile.js');
 
-// Valida o comportamento sem depender dos nomes internos reescritos pelo bundler.
+// Marcadores funcionais do fluxo novo, sem depender de nomes internos reescritos pelo bundler.
 requireText(native, 'saveToDownloads:true', 'native-mobile.js');
 requireText(native, 'autoOpen:true', 'native-mobile.js');
 
