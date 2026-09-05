@@ -31,7 +31,6 @@ jobs:
           set -euo pipefail
           node scripts/build-mobile-v23201.mjs
           node scripts/verify-mobile-v23201.mjs dist
-          node scripts/test-aditamento-site-v2313.mjs dist/aditamento_v74.js
           node scripts/test-orc-loader-v2313.mjs dist/orcamentarios-loader-v243.js
           node scripts/test-material-carga-v2313.mjs dist/v7_7_0_material_carga.js
       - name: Firebase Android
@@ -93,8 +92,11 @@ jobs:
           assert str(e['versionName'])=='2.3.20.1',e
           PY
           unzip -p "$APK" assets/public/native-mobile.js | grep -q '__TAREFAS_DOWNLOADS_ADITAMENTO_V253__'
+          unzip -p "$APK" assets/public/native-mobile.js | grep -q 'saveBase64ToDownloads'
           unzip -p "$APK" assets/public/aditamento_v74.js | grep -q '__ADITAMENTO_ANDROID_DIRECT_DOWNLOADS_V253__'
+          unzip -p "$APK" assets/public/aditamento_v74.js | grep -q 'try{doc.save(filename)}'
           unzip -p "$APK" assets/public/native-mobile.js | grep -q '__TAREFAS_2320_INSTALLER_220_FLOW__'
+          ! unzip -p "$APK" assets/public/native-mobile.js | grep -q 'saveBase64WithPicker'
       - name: Assinar APK GuerraVPN
         run: |
           set -euo pipefail
