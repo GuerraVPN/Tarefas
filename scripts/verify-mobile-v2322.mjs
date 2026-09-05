@@ -16,13 +16,15 @@ for (const marker of [
   'const APP_BUILD = 263;',
   '__TAREFAS_BETA_2322__',
   "channel:'beta'",
+  'alphasConsolidated',
+  "'2.3.21.1'",
+  "'2.3.21.5'",
   'Beta 2.3.22 — estabilidade, segurança, arquivos, notificações e IA.',
   'Novidades da 2.3.22 Beta',
   'Tarefas pela IA para Auxiliar',
   'Arquivos e downloads',
   'Sem elevação de privilégios',
-  'Downloads/TAREFAS',
-  'Alphas 2.3.21.1 a 2.3.21.5'
+  'Downloads/TAREFAS'
 ]) requireText(bootstrap, marker, 'mobile-bootstrap.js');
 
 const preload = await readDist('mobile-preload.js');
