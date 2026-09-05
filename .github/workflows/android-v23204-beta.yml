@@ -1,0 +1,176 @@
+name: Android 2.3.20.4 Beta - ODT igual ao PDF
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [app/android-v23204-prep]
+    paths:
+      - 'scripts/build-mobile-v23204.mjs'
+      - 'scripts/verify-mobile-v23204.mjs'
+      - 'scripts/test-aditamento-v23204.mjs'
+      - '.github/workflows/android-v23204-beta.yml'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Instalar dependências
+        run: |
+          npm ci
+          npm install --no-save --package-lock=false --ignore-scripts jspdf@2.5.2
+
+      - name: Gerar e testar Aditamento
+        run: |
+          set -euo pipefail
+          node scripts/build-mobile-v23204.mjs
+          node scripts/verify-mobile-v23204.mjs dist
+          node scripts/test-aditamento-v23204.mjs dist
+          node --check dist/aditamento_v74.js
+          node --check dist/v7_4_7_aditamento_patch.js
+
+      - name: Firebase Android
+        run: |
+          curl --fail --silent --show-error --retry 3 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/firebase-config-v17' -o app/google-services.json
+          test -s app/google-services.json
+
+      - name: Preparar Android SDK 36
+        run: |
+          set -euo pipefail
+          npx cap add android
+          cp app/google-services.json android/app/google-services.json
+          sed -i 's/versionCode 1/versionCode 256/' android/app/build.gradle
+          sed -i 's/versionName "1.0"/versionName "2.3.20.4"/' android/app/build.gradle
+          npm run assets:android
+          npx cap sync android
+          JAVA_DIR='android/app/src/main/java/br/com/guerravpn/tarefas/mobile'
+          mkdir -p "$JAVA_DIR"
+          cp app/android/StorageAccessPlugin.java "$JAVA_DIR/StorageAccessPlugin.java"
+          cat > "$JAVA_DIR/MainActivity.java" <<'JAVA'
+          package br.com.guerravpn.tarefas.mobile;
+          import android.os.Bundle;
+          import com.getcapacitor.BridgeActivity;
+          public class MainActivity extends BridgeActivity {
+              @Override public void onCreate(Bundle savedInstanceState) {
+                  registerPlugin(StorageAccessPlugin.class);
+                  super.onCreate(savedInstanceState);
+              }
+          }
+          JAVA
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('android/app/src/main/AndroidManifest.xml')
+          s=p.read_text(encoding='utf-8')
+          if 'android.permission.REQUEST_INSTALL_PACKAGES' not in s:
+              s=s.replace('<application','    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />\n    <application',1)
+          if 'android.permission.WRITE_EXTERNAL_STORAGE' not in s:
+              s=s.replace('<application','    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />\n    <application',1)
+          p.write_text(s,encoding='utf-8')
+          PY
+          grep -q 'compileSdkVersion = 36' android/variables.gradle
+          grep -q 'targetSdkVersion = 36' android/variables.gradle
+          grep -q 'minSdkVersion = 24' android/variables.gradle
+          grep -q 'WRITE_EXTERNAL_STORAGE.*maxSdkVersion="28"' android/app/src/main/AndroidManifest.xml
+          ! grep -R -q 'MANAGE_EXTERNAL_STORAGE' android/app/src/main
+          grep -q 'MediaStore.Downloads.EXTERNAL_CONTENT_URI' "$JAVA_DIR/StorageAccessPlugin.java"
+          ! grep -q 'MediaStore.Files.getContentUri' "$JAVA_DIR/StorageAccessPlugin.java"
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Compilar APK Release
+        working-directory: android
+        run: ./gradlew assembleRelease
+
+      - name: Inspecionar APK
+        run: |
+          set -euo pipefail
+          APK='android/app/build/outputs/apk/release/app-release-unsigned.apk'
+          test -s "$APK"
+          unzip -tq "$APK"
+          python3 - <<'PY'
+          import json
+          with open('android/app/build/outputs/apk/release/output-metadata.json',encoding='utf-8') as f:e=json.load(f)['elements'][0]
+          assert int(e['versionCode'])==256,e
+          assert str(e['versionName'])=='2.3.20.4',e
+          PY
+          unzip -p "$APK" assets/public/aditamento_v74.js | grep -q '__TAREFAS_ADITAMENTO_EXPORT_OWNER_V256__'
+          unzip -p "$APK" assets/public/aditamento_v74.js | grep -q '__ADITAMENTO_ANDROID_DOWNLOADS_V256__'
+          unzip -p "$APK" assets/public/aditamento_v74.js | grep -q '__ADITAMENTO_ODT_PDF_LAYOUT_V256__'
+          unzip -p "$APK" assets/public/aditamento_v74.js | grep -q 'Pictures/brasao.png'
+          unzip -p "$APK" assets/public/aditamento_v74.js | grep -q '1.5pt double #0f172a'
+          unzip -p "$APK" assets/public/v7_4_7_aditamento_patch.js | grep -q '__TAREFAS_ADITAMENTO_EXPORT_OWNER_V256__'
+          unzip -p "$APK" assets/public/native-mobile.js | grep -q '__TAREFAS_ADITAMENTO_DOWNLOADS_V256__'
+          unzip -p "$APK" assets/public/native-mobile.js | grep -q 'saveBase64ToDownloads'
+          if unzip -p "$APK" assets/public/native-mobile.js | grep -q 'saveBase64ToDocuments'; then exit 1; fi
+
+      - name: Assinar APK GuerraVPN
+        run: |
+          set -euo pipefail
+          OIDC="$(curl --fail --silent --show-error -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-signing" | jq -r '.value')"
+          curl --fail --silent --show-error -H "Authorization: Bearer $OIDC" 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-signing-material' -o "$RUNNER_TEMP/signing.json"
+          jq -r '.keystore_b64' "$RUNNER_TEMP/signing.json" | base64 -d > "$RUNNER_TEMP/GuerraVPN.keystore"
+          STORE_PASS="$(jq -r '.store_password' "$RUNNER_TEMP/signing.json")"
+          KEY_ALIAS="$(jq -r '.key_alias' "$RUNNER_TEMP/signing.json")"
+          KEY_PASS="$(jq -r '.key_password' "$RUNNER_TEMP/signing.json")"
+          EXPECTED_CERT="$(jq -r '.cert_sha256' "$RUNNER_TEMP/signing.json")"
+          APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)"
+          ZIPALIGN="$(find "$ANDROID_HOME/build-tools" -type f -name zipalign | sort -V | tail -1)"
+          "$ZIPALIGN" -p -f 4 android/app/build/outputs/apk/release/app-release-unsigned.apk "$RUNNER_TEMP/TAREFAS-2.3.20.4-aligned.apk"
+          "$APKSIGNER" sign --ks "$RUNNER_TEMP/GuerraVPN.keystore" --ks-key-alias "$KEY_ALIAS" --ks-pass "pass:$STORE_PASS" --key-pass "pass:$KEY_PASS" --out TAREFAS-2.3.20.4.apk "$RUNNER_TEMP/TAREFAS-2.3.20.4-aligned.apk"
+          ACTUAL_CERT="$($APKSIGNER verify --verbose --print-certs TAREFAS-2.3.20.4.apk | sed -n 's/.*certificate SHA-256 digest: //p' | head -1 | tr -d ': ' | tr '[:upper:]' '[:lower:]')"
+          test "$ACTUAL_CERT" = "$EXPECTED_CERT"
+          sha256sum TAREFAS-2.3.20.4.apk | tee TAREFAS-2.3.20.4.apk.sha256
+
+      - name: Publicar APK beta permanente
+        run: |
+          set -euo pipefail
+          git fetch origin app/releases
+          RELEASES_DIR="$RUNNER_TEMP/tarefas-releases"
+          git worktree add "$RELEASES_DIR" origin/app/releases
+          mkdir -p "$RELEASES_DIR/downloads"
+          cp TAREFAS-2.3.20.4.apk "$RELEASES_DIR/downloads/TAREFAS-2.3.20.4.apk"
+          cp TAREFAS-2.3.20.4.apk.sha256 "$RELEASES_DIR/downloads/TAREFAS-2.3.20.4.apk.sha256"
+          cd "$RELEASES_DIR"
+          git config user.name 'GuerraVPN Android Build'
+          git config user.email '81371258+GuerraVPN@users.noreply.github.com'
+          git add downloads/TAREFAS-2.3.20.4.apk downloads/TAREFAS-2.3.20.4.apk.sha256
+          if ! git diff --cached --quiet; then git commit -m 'release(android): TAREFAS 2.3.20.4 beta build 256'; git push origin HEAD:app/releases; fi
+          URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.3.20.4.apk'
+          LOCAL_SHA="$(sha256sum "$GITHUB_WORKSPACE/TAREFAS-2.3.20.4.apk" | awk '{print $1}')"
+          for attempt in 1 2 3 4 5 6 7 8; do
+            if curl --fail --silent --show-error -L "$URL" -o "$RUNNER_TEMP/published.apk" && test "$(sha256sum "$RUNNER_TEMP/published.apk" | awk '{print $1}')" = "$LOCAL_SHA"; then exit 0; fi
+            sleep 3
+          done
+          exit 1
+
+      - name: Registrar beta e avisar aparelhos
+        run: |
+          set -euo pipefail
+          OIDC="$(curl --fail --silent --show-error -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-release" | jq -r '.value')"
+          SHA="$(sha256sum TAREFAS-2.3.20.4.apk | awk '{print $1}')"
+          jq -n --arg version '2.3.20.4' --argjson build 256 --arg channel 'beta' --arg web_version '7.8.2' --arg title 'TAREFAS 2.3.20.4 Beta — ODT igual ao PDF' --arg url 'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.3.20.4.apk' --arg sha "$SHA" '{version:$version,build:$build,channel:$channel,web_version:$web_version,title:$title,changelog:["📝 O Aditamento em ODT agora reproduz o mesmo layout visual do PDF.","🛡️ Inclui o brasão do Exército dentro do arquivo ODT.","📐 Mantém moldura dupla, margens, larguras das colunas, cabeçalho cinza e alturas das linhas.","✍️ Continua totalmente editável no Word e no LibreOffice.","💾 PDF e ODT continuam salvos diretamente em Downloads/TAREFAS.","🤖 Compatível do Android 7 ao Android 16, incluindo Android 15."],mandatory:false,download_url:$url,sha256:$sha}' > "$RUNNER_TEMP/release.json"
+          CODE="$(curl --silent --show-error -o "$RUNNER_TEMP/result.json" -w '%{http_code}' -H "Authorization: Bearer $OIDC" -H 'Content-Type: application/json' --data-binary @"$RUNNER_TEMP/release.json" 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-release-publish')"
+          cat "$RUNNER_TEMP/result.json"
+          test "$CODE" = '200'
+          jq -e '.ok == true and .version == "2.3.20.4" and .build == 256 and .channel == "beta"' "$RUNNER_TEMP/result.json" >/dev/null
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tarefas-android-2.3.20.4-beta-build-256
+          path: |
+            TAREFAS-2.3.20.4.apk
+            TAREFAS-2.3.20.4.apk.sha256
+          if-no-files-found: error
