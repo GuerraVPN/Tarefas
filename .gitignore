@@ -1,5 +1,7 @@
 node_modules/
 android/
+!app/android/
+!app/android/*.java
 dist/
 .web*/
 *.apk

@@ -9,6 +9,7 @@ import { Preferences } from '@capacitor/preferences';
 import { Share } from '@capacitor/share';
 
 const StorageAccess = registerPlugin('StorageAccess');
+const TarefasBiometric = registerPlugin('TarefasBiometric');
 const CHANNEL_ID = 'tarefas-geral';
 const PUSH_SESSION_KEY = 'tarefasPushSession17';
 const DEVICE_ID_KEY = 'tarefasDeviceId17';
@@ -137,6 +138,7 @@ async function unregisterCurrentDevice(){const c=getClient(),sessionToken=localS
 window.TarefasNative=Object.freeze({
  notifications:{ensurePermission:async()=>(await ensureLocalPermission())&&(await ensurePushPermission()),notify,registerPush:initializeRemotePush,unregisterPush:unregisterCurrentDevice,isPushReady:()=>localStorage.getItem('tarefasPushReady17')==='1'},
  files:{ensurePermission:ensureFilesPermission,checkAllFilesAccess,requestAllFilesAccess,clearOldUpdates,saveBlob,downloadUrl,folder:`Downloads/${DOWNLOADS_FOLDER}`,updatesFolder:`Documentos/${UPDATES_FOLDER}`},
+ biometric:TarefasBiometric,
  isNative:Capacitor.isNativePlatform(),platform:Capacitor.getPlatform(),appVersion:APP_VERSION
 });
 window.addEventListener('DOMContentLoaded',()=>{installFileBridge();initializeRemotePush().catch(err=>{pushInitialized=false;console.warn('[TAREFAS PUSH] Inicialização:',err)})});
