@@ -23,7 +23,7 @@ Pacote isolado para o TAREFAS Android 2.3.20.3 (build 255).
 - `scripts/build-mobile-v23203.mjs`
 - `scripts/verify-mobile-v23203.mjs`
 - `scripts/test-aditamento-v23203.mjs`
-- `.github/workflows/android-v23203-aditamento-check.yml`
+- `.github/workflows/android-v23203-beta.yml`
 
 ## Teste local
 
