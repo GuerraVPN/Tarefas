@@ -41,7 +41,6 @@ for (const marker of [
   'data?.valid !== true',
   'biometric.authenticate()',
   'biometric.clear()',
-  'tarefasBiometricClearPending258',
   "page() !== 'configuracoes.html'"
 ]) requireText(biometric, marker, 'mobile-biometric-v23211.js');
 rejectText(biometric, 'p_senha', 'mobile-biometric-v23211.js');
@@ -83,13 +82,9 @@ for (const htmlName of ['index.html', 'configuracoes.html', 'dashboard.html']) {
   requireText(html, 'mobile-biometric-v23211.js?v=2.3.21.1-b258', htmlName);
 }
 
-const logout = await readDist('v7_5_4_patch.js');
-requireText(logout, "TarefasNative?.biometric?.clear?.()", 'v7_5_4_patch.js');
-requireText(logout, 'tarefasBiometricClearPending258', 'v7_5_4_patch.js');
-
 const packageJson = JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8'));
 if (packageJson.dependencies?.['@capacitor/android'] !== '8.5.0') {
   throw new Error('Capacitor Android 8.5.0 esperado.');
 }
 
-console.log('OK 2.3.21.1 build 258: biometria forte, Keystore, servidor, tela de login, Configurações e limpeza no logout validados.');
+console.log('OK 2.3.21.1 build 258: biometria forte, Keystore, servidor, tela de login, Configurações e remoção explícita validados.');

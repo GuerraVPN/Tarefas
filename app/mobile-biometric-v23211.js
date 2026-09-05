@@ -6,7 +6,6 @@
   const SESSION_KEY = 'tarefasPushSession17';
   const USER_KEY = 'usuarioLogado';
   const ACTIVITY_KEY = 'sessao26_ultima_atividade';
-  const CLEAR_PENDING_KEY = 'tarefasBiometricClearPending258';
   let settingsRendering = false;
   const page = () => (location.pathname.split('/').pop() || 'index.html').toLowerCase();
   const api = () => window.TarefasNative?.biometric || null;
@@ -94,10 +93,6 @@
     const form = document.getElementById('formLogin');
     if (!form) return;
     injectCss();
-    if (localStorage.getItem(CLEAR_PENDING_KEY) === '1') {
-      await api()?.clear?.().catch(() => {});
-      localStorage.removeItem(CLEAR_PENDING_KEY);
-    }
     const state = await status();
     if (!state.available) {
       if (state.reason === 'not_enrolled') {
@@ -203,22 +198,6 @@
     }
   }
 
-  function isLogoutTarget(target) {
-    const element = target instanceof Element ? target.closest('button,a,.logout,.btn-sair-sidebar') : null;
-    if (!element) return false;
-    if (element.matches('.v754-logout')) return false;
-    if (element.matches('.logout,.btn-sair-sidebar,[data-v3-logout],#btnSair,#btnSairSessao,#logoutBtn')) return true;
-    const text = String(element.textContent || '').toLowerCase();
-    const onclick = String(element.getAttribute?.('onclick') || '').toLowerCase();
-    return /^\s*(?:➔\s*)?(?:sair|logout)(?:\s+(?:da conta|da sessão))?\s*$/.test(text) || onclick.includes('logout');
-  }
-
-  function clearOnLogout(event) {
-    if (!isLogoutTarget(event.target)) return;
-    localStorage.setItem(CLEAR_PENDING_KEY, '1');
-    api()?.clear?.().then(() => localStorage.removeItem(CLEAR_PENDING_KEY)).catch(() => {});
-  }
-
   function start() {
     initLogin().catch(() => {});
     renderSettingsCard().catch(() => {});
@@ -226,7 +205,6 @@
       const observer = new MutationObserver(() => renderSettingsCard().catch(() => {}));
       observer.observe(document.body, { childList: true, subtree: true });
     }
-    document.addEventListener('click', clearOnLogout, true);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start, { once: true });

@@ -111,13 +111,6 @@ await patchFile('mobile-login-v17.js', source => {
   return replaceRequired(source, before, after, 'gancho após login com senha');
 });
 
-await patchFile('v7_5_4_patch.js', source => replaceRequired(
-  source,
-  "  if(!confirm('Deseja sair da sua conta neste aparelho?'))return;\n  try{await window.TarefasNative?.notifications?.unregisterPush?.()}catch(_){}",
-  "  if(!confirm('Deseja sair da sua conta neste aparelho?'))return;\n  localStorage.setItem('tarefasBiometricClearPending258','1');\n  try{await window.TarefasNative?.biometric?.clear?.();localStorage.removeItem('tarefasBiometricClearPending258')}catch(_){}\n  try{await window.TarefasNative?.notifications?.unregisterPush?.()}catch(_){}",
-  'limpeza biométrica no logout confirmado'
-));
-
 await copyFile(
   path.join(root, 'app', 'mobile-biometric-v23211.js'),
   path.join(dist, 'mobile-biometric-v23211.js')
@@ -141,4 +134,4 @@ await appendFile(
   'utf8'
 );
 
-console.log('TAREFAS Android 2.3.21.1 build 258 ALPHA: login biométrico protegido pelo Android Keystore.');
+console.log('TAREFAS Android 2.3.21.1 build 258 ALPHA: login biométrico protegido pelo Android Keystore e reutilizável após sair.');
