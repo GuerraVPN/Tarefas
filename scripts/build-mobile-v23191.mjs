@@ -7,6 +7,10 @@ const root=process.cwd();
 // Base 2.3.16 preserva os diretórios atuais da linha 2.3 (Documentos/TAREFAS/Beta|Oficial e Downloads/TAREFAS)
 // e ainda usa FileTransfer -> Filesystem.getUri -> FileOpener.openFile para APKs.
 // Build 251 reservado para validar esse hotfix antes de qualquer publicação.
+const nativeSource=await readFile(path.join(root,'app','native-mobile-entry.js'),'utf8');
+if(!nativeSource.includes("FileOpener.openFile({path:uri,mimeType:'application/vnd.android.package-archive'})")) throw new Error('2.3.19.1: fluxo FileOpener da 2.2.0 ausente no fonte');
+if(nativeSource.includes('StorageAccess.installApk')) throw new Error('2.3.19.1: instalador Java novo ainda presente no fonte');
+
 await import(pathToFileURL(path.resolve('scripts/build-mobile-v2316.mjs')).href+'?v=23191');
 const dist=path.join(root,'dist');
 async function patch(rel,fn){const p=path.join(dist,rel);let s=await readFile(p,'utf8');s=fn(s);await writeFile(p,s,'utf8');}
@@ -26,9 +30,7 @@ await patch('mobile-updates-v181.js',s=>s.replace('const APP_BUILD = 246;','cons
 await patch('mobile-schema-v239.js',s=>s.replace('build:246','build:251'));
 
 const native=await readFile(path.join(dist,'native-mobile.js'),'utf8');
-if(!native.includes('FileOpener.openFile')) throw new Error('2.3.19.1: FileOpener ausente');
-if(!native.includes('application/vnd.android.package-archive')) throw new Error('2.3.19.1: MIME APK ausente');
-if(native.includes('StorageAccess.installApk')) throw new Error('2.3.19.1: instalador Java novo ainda presente');
+if(!native.includes('application/vnd.android.package-archive')) throw new Error('2.3.19.1: MIME APK ausente no bundle');
 if(native.includes('__TAREFAS_INSTALLER_CACHE_')) throw new Error('2.3.19.1: instalador por cache ainda presente');
 
 await appendFile(path.join(dist,'native-mobile.js'),'\n;globalThis.__TAREFAS_23191_INSTALLER_220_FLOW__=true;\n','utf8');
