@@ -55,7 +55,7 @@ for (const marker of [
   'application/vnd.oasis.opendocument.text',
   'confirmedOnScreen',
   'openedAfterSave',
-  "rpc('v2_3_21_2_mark_notification_read'",
+  'v2_3_21_2_mark_notification_read',
   'notification_id=',
   'TarefasBiometric',
   '__TAREFAS_BIOMETRIC_NATIVE_V258__'
