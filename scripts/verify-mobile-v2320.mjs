@@ -1,0 +1,20 @@
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
+const root=process.cwd(),dist=path.resolve(process.argv[2]||'dist');
+const read=rel=>readFile(path.join(dist,rel),'utf8');
+const must=(t,n,l)=>{if(!t.includes(n))throw new Error(`${l}: marcador ausente: ${n}`)};
+const reject=(t,n,l)=>{if(t.includes(n))throw new Error(`${l}: marcador proibido: ${n}`)};
+
+const boot=await read('mobile-bootstrap.js');
+must(boot,'2.3.20','mobile-bootstrap.js');must(boot,'const APP_BUILD = 251;','mobile-bootstrap.js');
+const native=await read('native-mobile.js');
+must(native,'FileOpener.openFile','native-mobile.js');
+must(native,'application/vnd.android.package-archive','native-mobile.js');
+must(native,'Documentos/TAREFAS/Beta','native-mobile.js');
+must(native,'Downloads/TAREFAS','native-mobile.js');
+must(native,'__TAREFAS_2320_INSTALLER_220_FLOW__','native-mobile.js');
+reject(native,'StorageAccess.installApk','native-mobile.js');reject(native,'__TAREFAS_INSTALLER_CACHE_','native-mobile.js');reject(native,'saveBase64WithPicker','native-mobile.js');
+const java=await readFile(path.join(root,'app','android','StorageAccessPlugin.java'),'utf8');
+reject(java,'public void installApk(PluginCall call)','StorageAccessPlugin.java');reject(java,'stageApk(Uri source)','StorageAccessPlugin.java');reject(java,'ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION','StorageAccessPlugin.java');reject(java,'ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION','StorageAccessPlugin.java');
+const adit=await read('aditamento_v74.js');must(adit,'ADITAMENTO AO BOLETIM INTERNO','aditamento_v74.js');
+console.log('OK 2.3.20 build 251: instalação voltou ao FileOpener da 2.2.0; diretórios atuais preservados.');
