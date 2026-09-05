@@ -7,7 +7,7 @@ await import(pathToFileURL(path.resolve('scripts/build-mobile-v2320.mjs')).href+
 const dist=path.join(root,'dist');
 async function patch(rel,fn){const p=path.join(dist,rel);let s=await readFile(p,'utf8');const before=s;s=fn(s);if(s===before)console.warn(`[2.3.20.1] sem alteração em ${rel}`);await writeFile(p,s,'utf8');}
 
-// 2.3.20.1 / build 253.
+// 2.3.20.1 / build 253. Hotfix final de Downloads do Aditamento.
 for(const name of await readdir(dist)){
   if(!/\.(?:html|js|css|webmanifest)$/i.test(name))continue;
   const p=path.join(dist,name);let s=await readFile(p,'utf8');
