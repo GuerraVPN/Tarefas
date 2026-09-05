@@ -6,7 +6,16 @@ const must=(t,n,l)=>{if(!t.includes(n))throw new Error(`${l}: marcador ausente: 
 const reject=(t,n,l)=>{if(t.includes(n))throw new Error(`${l}: marcador proibido: ${n}`)};
 
 const boot=await read('mobile-bootstrap.js');must(boot,'2.3.18','mobile-bootstrap.js');must(boot,'const APP_BUILD = 248;','mobile-bootstrap.js');
-const native=await read('native-mobile.js');must(native,'__TAREFAS_INSTALLER_NATIVE_V248__','native-mobile.js');must(native,'__TAREFAS_INSTALLER_TEST_V248__','native-mobile.js');must(native,'Documentos/TAREFAS/Beta','native-mobile.js');must(native,'Downloads/TAREFAS','native-mobile.js');reject(native,'saveBase64WithPicker','native-mobile.js');
-const java=await readFile(path.join(root,'app','android','StorageAccessPlugin.java'),'utf8');must(java,'public void installApk(PluginCall call)','StorageAccessPlugin.java');must(java,'Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES','StorageAccessPlugin.java');must(java,'canRequestPackageInstalls()','StorageAccessPlugin.java');must(java,'FileProvider.getUriForFile','StorageAccessPlugin.java');reject(java,'ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION','StorageAccessPlugin.java');reject(java,'ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION','StorageAccessPlugin.java');
+const native=await read('native-mobile.js');must(native,'__TAREFAS_INSTALLER_NATIVE_V248__','native-mobile.js');must(native,'__TAREFAS_INSTALLER_TEST_V248__','native-mobile.js');must(native,'__TAREFAS_INSTALLER_CACHE_V248__','native-mobile.js');must(native,'Documentos/TAREFAS/Beta','native-mobile.js');must(native,'Downloads/TAREFAS','native-mobile.js');reject(native,'saveBase64WithPicker','native-mobile.js');
+const java=await readFile(path.join(root,'app','android','StorageAccessPlugin.java'),'utf8');
+must(java,'public void installApk(PluginCall call)','StorageAccessPlugin.java');
+must(java,'launchStagedInstaller','StorageAccessPlugin.java');
+must(java,'stageApk(Uri source)','StorageAccessPlugin.java');
+must(java,'getPackageArchiveInfo','StorageAccessPlugin.java');
+must(java,'getCacheDir()','StorageAccessPlugin.java');
+must(java,'FileProvider.getUriForFile','StorageAccessPlugin.java');
+must(java,'Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES','StorageAccessPlugin.java');
+must(java,'canRequestPackageInstalls()','StorageAccessPlugin.java');
+reject(java,'ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION','StorageAccessPlugin.java');reject(java,'ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION','StorageAccessPlugin.java');
 const adit=await read('aditamento_v74.js');must(adit,'ADITAMENTO AO BOLETIM INTERNO','aditamento_v74.js');
-console.log('OK 2.3.18 build 248: mesma base 2.3.17, teste do instalador nativo.');
+console.log('OK 2.3.18 build 248: APK validado e entregue ao instalador via cache privado + FileProvider.');
