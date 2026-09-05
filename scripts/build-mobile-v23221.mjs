@@ -3,9 +3,16 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 const root=process.cwd();
+const VERSION='2.3.22.1',BUILD=264;
+const nativeEntry=path.join(root,'app/native-mobile-entry.js');
+let nativeEntrySource=await readFile(nativeEntry,'utf8');
+const nativeListenerRx=/(await\s+PushNotifications\.addListener\(['"]pushNotificationReceived['"],\s*async\s+notification=>\{)/;
+if(!nativeListenerRx.test(nativeEntrySource))throw new Error('2.3.22.1: listener nativo de push não encontrado na fonte');
+nativeEntrySource=nativeEntrySource.replace(/const APP_VERSION = '[^']+';/,`const APP_VERSION = '${VERSION}';`);
+nativeEntrySource=nativeEntrySource.replace(nativeListenerRx,`$1if(globalThis.TarefasAlpha23221?.isCategoryMuted?.(notification?.data?.tipo))return;`);
+await writeFile(nativeEntry,nativeEntrySource,'utf8');
 await import(pathToFileURL(path.resolve('scripts/build-mobile-v2322.mjs')).href+'?v=23221');
 const dist=path.join(root,'dist');
-const VERSION='2.3.22.1',BUILD=264;
 
 async function patchFile(rel,transform,{required=true}={}){
   const file=path.join(dist,rel),before=await readFile(file,'utf8'),after=transform(before);
@@ -53,12 +60,6 @@ await patchFile('mobile-ai-v230.js',source=>{
 });
 await appendFile(path.join(dist,'mobile-ai-v230.js'),`\n;globalThis.__TAREFAS_AI_ALPHA_TOOLS_V264__={version:'${VERSION}',build:${BUILD},localContext:true,localCommands:true,destructiveConfirmation:true,noPrivilegeElevation:true};\n`,'utf8');
 
-await patchFile('native-mobile.js',source=>{
-  source=source.replace("const APP_VERSION = '2.3.22';",`const APP_VERSION = '${VERSION}';`);
-  const rx=/(addListener\([\"']pushNotificationReceived[\"'],\s*async\s+notification=>\{)/;
-  if(!rx.test(source))throw new Error('2.3.22.1: listener de push não encontrado para silêncio por categoria');
-  return source.replace(rx,`$1if(globalThis.TarefasAlpha23221?.isCategoryMuted?.(notification?.data?.tipo))return;`);
-});
 await appendFile(path.join(dist,'native-mobile.js'),`\n;globalThis.__TAREFAS_NATIVE_ALPHA_23221__={version:'${VERSION}',build:${BUILD},categoryMute:true};\n`,'utf8');
 
 await appendFile(path.join(dist,'mobile-bootstrap.js'),`\n;globalThis.__TAREFAS_ALPHA_23221__={version:'${VERSION}',build:${BUILD},channel:'alpha',base:'2.3.22',features:['notifications2','favorites','downloads','offlineQueue','syncIndicator','savedFilters','quickActions','errorCenter','pin','snooze','separateCounters','aiAccess']};\n`,'utf8');
