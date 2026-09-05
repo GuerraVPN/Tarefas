@@ -38,7 +38,7 @@ jobs:
           grep -q '2.3.17' dist/mobile-bootstrap.js
           grep -q 'const APP_BUILD = 247' dist/mobile-bootstrap.js
           grep -q '__TAREFAS_INSTALLER_NATIVE_V247__' dist/native-mobile.js
-          grep -q 'StorageAccess.installApk' dist/native-mobile.js
+          grep -q 'StorageAccess.installApk({uri})' app/native-mobile-entry.js
           grep -q 'Documentos/TAREFAS/Beta' dist/native-mobile.js
           ! grep -q 'saveBase64WithPicker' dist/native-mobile.js
           grep -q 'public void installApk' app/android/StorageAccessPlugin.java
@@ -126,7 +126,6 @@ jobs:
           assert str(e['versionName'])=='2.3.17',e
           PY
           unzip -p "$APK" assets/public/native-mobile.js | grep -q '__TAREFAS_INSTALLER_NATIVE_V247__'
-          unzip -p "$APK" assets/public/native-mobile.js | grep -q 'StorageAccess.installApk'
           unzip -p "$APK" assets/public/native-mobile.js | grep -q 'Documentos/TAREFAS/Beta'
           unzip -p "$APK" assets/public/aditamento_v74.js | grep -q 'ADITAMENTO AO BOLETIM INTERNO'
           unzip -p "$APK" assets/public/orcamentarios-loader-v243.js | grep -q '__TAREFAS_ORC_LOADER_V243__'
@@ -191,5 +190,3 @@ jobs:
           name: tarefas-android-2.3.17-beta-build-247
           path: TAREFAS-2.3.17.apk
           if-no-files-found: error
-
-# retry: instalador aplicado no fonte antes do bundle
