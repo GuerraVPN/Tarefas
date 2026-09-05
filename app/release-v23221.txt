@@ -1,0 +1,21 @@
+TAREFAS 2.3.22.1 ALPHA — build 264
+Base: 2.3.22 Beta build 263 · Web 7.8.2
+
+Novidades principais:
+- Central de Notificações 2.0 com seleção múltipla, apagar selecionadas, apagar todas, apagar lidas e deslizar para excluir com desfazer.
+- Filtros por categoria e contadores separados para não lidas, tarefas, mensagens, versões, escala e sistema.
+- Notificações de versão agrupadas em “Atualizações do aplicativo — N novas”.
+- Silenciamento por categoria e retenção opcional de 30/60/90 dias; itens fixados são preservados.
+- Favoritos/atalhos e filtros salvos.
+- Central de Downloads com histórico e reabertura quando a origem estiver disponível.
+- Fila offline para ações compatíveis da Central 2.0, com indicador de sincronização e retentativa automática.
+- Ações rápidas, fixação de itens importantes, soneca e lembretes locais.
+- Central de Erros com sanitização de padrões de credencial e histórico local.
+- IA com contexto das ferramentas da Alpha e comandos locais; exclusões/limpezas continuam exigindo confirmação.
+- Mantidas biometria, correções de Configurações, downloads/abertura de arquivos, anexos data:/blob: e permissões reais do perfil ativo.
+
+Segurança:
+- A Alpha não eleva privilégios do usuário.
+- A fila offline guarda ações sem credenciais.
+- A Central de Erros remove padrões aparentes de token/chave antes de persistir localmente.
+- Comandos destrutivos da IA exigem confirmação explícita no aparelho.
