@@ -142,3 +142,5 @@ $$;
 
 revoke all on function public.v2_3_21_2_mark_notification_read(text,bigint) from public;
 grant execute on function public.v2_3_21_2_mark_notification_read(text,bigint) to anon, authenticated;
+
+-- Workflow da Alpha 2.3.21.2 registrado; alteração sem efeito funcional para disparar o CI do build 259.
