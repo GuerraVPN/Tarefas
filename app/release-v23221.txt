@@ -2,15 +2,20 @@ TAREFAS 2.3.22.1 ALPHA — build 264
 Base: 2.3.22 Beta build 263 · Web 7.8.2
 
 Novidades principais:
-- Central de Notificações 2.0 com seleção múltipla, apagar selecionadas, apagar todas, apagar lidas e deslizar para excluir com desfazer.
+- Central de Notificações 2.0 com seleção múltipla, apagar selecionadas, apagar todas, apagar lidas e deslizar para excluir.
+- A Central foi reorganizada em abas: Notificações 2.0, Mensagens, Downloads, Favoritos e Ferramentas.
+- Central de Downloads agora é uma aba própria com histórico dos arquivos salvos.
+- Favoritos agora têm aba própria, com abertura e remoção de atalhos.
+- A aba Ferramentas reúne Salvar filtro atual, filtros salvos, Fila offline, sincronização e Central de Erros.
+- O botão flutuante da Alpha passa a abrir Central > Ferramentas, evitando o painel sobreposto no celular.
+- O painel legado da Alpha foi ajustado para respeitar cabeçalho, safe area e barra inferior quando ainda for chamado.
 - Filtros por categoria e contadores separados para não lidas, tarefas, mensagens, versões, escala e sistema.
 - Notificações de versão agrupadas em “Atualizações do aplicativo — N novas”.
 - Silenciamento por categoria e retenção opcional de 30/60/90 dias; itens fixados são preservados.
-- Favoritos/atalhos e filtros salvos.
-- Central de Downloads com histórico e reabertura quando a origem estiver disponível.
 - Fila offline para ações compatíveis da Central 2.0, com indicador de sincronização e retentativa automática.
 - Ações rápidas, fixação de itens importantes, soneca e lembretes locais.
 - Central de Erros com sanitização de padrões de credencial e histórico local.
+- Dashboard protegido contra tentativa de alterar textContent/innerHTML de elementos removidos ou ainda não disponíveis, evitando o unhandledrejection “Cannot set properties of null”.
 - IA com contexto das ferramentas da Alpha e comandos locais; exclusões/limpezas continuam exigindo confirmação.
 - Mantidas biometria, correções de Configurações, downloads/abertura de arquivos, anexos data:/blob: e permissões reais do perfil ativo.
 
