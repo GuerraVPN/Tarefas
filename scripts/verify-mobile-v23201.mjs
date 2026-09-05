@@ -6,7 +6,21 @@ const must=(t,n,l)=>{if(!t.includes(n))throw new Error(`${l}: marcador ausente: 
 const reject=(t,n,l)=>{if(t.includes(n))throw new Error(`${l}: marcador proibido: ${n}`)};
 
 const boot=await read('mobile-bootstrap.js');must(boot,'2.3.20.1','mobile-bootstrap.js');must(boot,'const APP_BUILD = 253;','mobile-bootstrap.js');
-const native=await read('native-mobile.js');must(native,'__TAREFAS_2320_INSTALLER_220_FLOW__','native-mobile.js');must(native,'__TAREFAS_DOWNLOADS_ADITAMENTO_V253__','native-mobile.js');must(native,'Downloads/TAREFAS','native-mobile.js');reject(native,'__TAREFAS_INSTALLER_CACHE_','native-mobile.js');
-const adit=await read('aditamento_v74.js');must(adit,'__ADITAMENTO_ANDROID_DIRECT_DOWNLOADS_V253__','aditamento_v74.js');must(adit,"saveAditamentoBlob(doc.output('blob'),filename)",'aditamento_v74.js');must(adit,'ADITAMENTO AO BOLETIM INTERNO','aditamento_v74.js');
-const java=await readFile(path.join(root,'app','android','StorageAccessPlugin.java'),'utf8');must(java,'Android não publicou o arquivo em Downloads.','StorageAccessPlugin.java');must(java,'Arquivo salvo ficou com 0 bytes.','StorageAccessPlugin.java');must(java,'MediaStore.Downloads.IS_PENDING, 0','StorageAccessPlugin.java');reject(java,'public void installApk(PluginCall call)','StorageAccessPlugin.java');reject(java,'stageApk(Uri source)','StorageAccessPlugin.java');
-console.log('OK 2.3.20.1 build 253: Aditamento direto em Downloads/TAREFAS com confirmação real do MediaStore e instalador 2.2.0 preservado.');
+const native=await read('native-mobile.js');
+must(native,'__TAREFAS_2320_INSTALLER_220_FLOW__','native-mobile.js');
+must(native,'__TAREFAS_DOWNLOADS_ADITAMENTO_V253__','native-mobile.js');
+must(native,'Downloads/TAREFAS','native-mobile.js');
+must(native,'saveBase64ToDownloads','native-mobile.js');
+reject(native,'saveBase64WithPicker','native-mobile.js');
+reject(native,'__TAREFAS_INSTALLER_CACHE_','native-mobile.js');
+const adit=await read('aditamento_v74.js');
+must(adit,'__ADITAMENTO_ANDROID_DIRECT_DOWNLOADS_V253__','aditamento_v74.js');
+must(adit,"saveAditamentoBlob(doc.output('blob'),filename)",'aditamento_v74.js');
+must(adit,'try{doc.save(filename)}','aditamento_v74.js');
+must(adit,'ADITAMENTO AO BOLETIM INTERNO','aditamento_v74.js');
+const java=await readFile(path.join(root,'app','android','StorageAccessPlugin.java'),'utf8');
+must(java,'Android não publicou o arquivo em Downloads.','StorageAccessPlugin.java');
+must(java,'Arquivo salvo ficou com 0 bytes.','StorageAccessPlugin.java');
+must(java,'MediaStore.Downloads.IS_PENDING, 0','StorageAccessPlugin.java');
+reject(java,'public void installApk(PluginCall call)','StorageAccessPlugin.java');reject(java,'stageApk(Uri source)','StorageAccessPlugin.java');
+console.log('OK 2.3.20.1 build 253: Android salva Aditamento direto em Downloads/TAREFAS, site mantém doc.save e MediaStore confirma arquivo visível.');
