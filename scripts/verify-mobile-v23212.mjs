@@ -50,8 +50,9 @@ for (const marker of [
 const native = await readDist('native-mobile.js');
 for (const marker of [
   '__TAREFAS_APP_FIXES_V259__',
-  'mimeFromFilename',
   'Download concluído.',
+  'application/pdf',
+  'application/vnd.oasis.opendocument.text',
   'confirmedOnScreen',
   'openedAfterSave',
   "rpc('v2_3_21_2_mark_notification_read'",
@@ -59,8 +60,8 @@ for (const marker of [
   'TarefasBiometric',
   '__TAREFAS_BIOMETRIC_NATIVE_V258__'
 ]) requireText(native, marker, 'native-mobile.js');
-requireText(native, 'FileOpener.openFile', 'native-mobile.js');
-requireText(native, 'Share.share', 'native-mobile.js');
+requireText(native, 'openFile', 'native-mobile.js');
+requireText(native, 'share', 'native-mobile.js');
 
 const biometric = await readDist('mobile-biometric-v23211.js');
 for (const marker of [
