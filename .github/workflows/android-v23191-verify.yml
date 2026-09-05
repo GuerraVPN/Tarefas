@@ -26,6 +26,8 @@ jobs:
       - name: Gerar e validar 2.3.19.1
         run: |
           set -euo pipefail
+          grep -q "FileOpener.openFile({path:uri,mimeType:'application/vnd.android.package-archive'})" app/native-mobile-entry.js
+          ! grep -q 'StorageAccess.installApk' app/native-mobile-entry.js
           node scripts/build-mobile-v23191.mjs
           node scripts/verify-mobile-v23191.mjs dist
           node scripts/test-aditamento-site-v2313.mjs dist/aditamento_v74.js
@@ -33,10 +35,9 @@ jobs:
           node scripts/test-material-carga-v2313.mjs dist/v7_7_0_material_carga.js
           grep -q '2.3.19.1' dist/mobile-bootstrap.js
           grep -q 'const APP_BUILD = 251' dist/mobile-bootstrap.js
-          grep -q 'FileOpener.openFile' dist/native-mobile.js
           grep -q 'application/vnd.android.package-archive' dist/native-mobile.js
           grep -q '__TAREFAS_23191_INSTALLER_220_FLOW__' dist/native-mobile.js
-          ! grep -q 'StorageAccess.installApk' dist/native-mobile.js
+          ! grep -q '__TAREFAS_INSTALLER_CACHE_' dist/native-mobile.js
       - name: Firebase Android
         run: |
           curl --fail --silent --show-error --retry 3 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/firebase-config-v17' -o app/google-services.json
@@ -86,7 +87,7 @@ jobs:
           PY
           unzip -p "$APK" assets/public/native-mobile.js | grep -q '__TAREFAS_23191_INSTALLER_220_FLOW__'
           unzip -p "$APK" assets/public/native-mobile.js | grep -q 'application/vnd.android.package-archive'
-          ! unzip -p "$APK" assets/public/native-mobile.js | grep -q 'StorageAccess.installApk'
+          ! unzip -p "$APK" assets/public/native-mobile.js | grep -q '__TAREFAS_INSTALLER_CACHE_'
       - name: Salvar APK de verificação
         uses: actions/upload-artifact@v4
         with:
