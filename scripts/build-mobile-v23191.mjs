@@ -6,6 +6,7 @@ const root=process.cwd();
 // Hotfix 2.3.19.1: volta somente o instalador para o fluxo comprovado da 2.2.0.
 // Base 2.3.16 preserva os diretórios atuais da linha 2.3 (Documentos/TAREFAS/Beta|Oficial e Downloads/TAREFAS)
 // e ainda usa FileTransfer -> Filesystem.getUri -> FileOpener.openFile para APKs.
+// Build 251 reservado para validar esse hotfix antes de qualquer publicação.
 await import(pathToFileURL(path.resolve('scripts/build-mobile-v2316.mjs')).href+'?v=23191');
 const dist=path.join(root,'dist');
 async function patch(rel,fn){const p=path.join(dist,rel);let s=await readFile(p,'utf8');s=fn(s);await writeFile(p,s,'utf8');}
