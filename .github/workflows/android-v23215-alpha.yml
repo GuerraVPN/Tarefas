@@ -1,0 +1,193 @@
+name: Android 2.3.21.5 Alpha - Tarefas IA Auxiliar
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [app/android-v23215-prep]
+    paths:
+      - 'scripts/build-mobile-v23215.mjs'
+      - 'scripts/verify-mobile-v23215.mjs'
+      - 'supabase_v2_3_21_5_ai_auxiliar_task_creation.sql'
+      - '.github/workflows/android-v23215-alpha.yml'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Instalar dependencias
+        run: |
+          npm ci
+          npm install --no-save --package-lock=false --ignore-scripts jspdf@2.5.2
+
+      - name: Gerar e testar 2.3.21.5
+        run: |
+          set -euo pipefail
+          node --check scripts/build-mobile-v23215.mjs
+          node --check scripts/verify-mobile-v23215.mjs
+          node scripts/build-mobile-v23215.mjs
+          node scripts/verify-mobile-v23215.mjs dist
+          node --check dist/mobile-login-v17.js
+          node --check dist/mobile-biometric-v23211.js
+          node --check dist/native-mobile.js
+          node --check dist/notificacoes.js
+          node --check dist/central.js
+          node --check dist/mobile-ai-v230.js
+
+      - name: Firebase Android
+        run: |
+          curl --fail --silent --show-error --retry 3 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/firebase-config-v17' -o app/google-services.json
+          test -s app/google-services.json
+
+      - name: Preparar Android SDK 36
+        run: |
+          set -euo pipefail
+          npx cap add android
+          cp app/google-services.json android/app/google-services.json
+          sed -i 's/versionCode 1/versionCode 262/' android/app/build.gradle
+          sed -i 's/versionName "1.0"/versionName "2.3.21.5"/' android/app/build.gradle
+          npm run assets:android
+          npx cap sync android
+          JAVA_DIR='android/app/src/main/java/br/com/guerravpn/tarefas/mobile'
+          mkdir -p "$JAVA_DIR"
+          cp app/android/StorageAccessPlugin.java "$JAVA_DIR/StorageAccessPlugin.java"
+          cp app/android/TarefasBiometricPlugin.java "$JAVA_DIR/TarefasBiometricPlugin.java"
+          cat > "$JAVA_DIR/MainActivity.java" <<'JAVA'
+          package br.com.guerravpn.tarefas.mobile;
+          import android.os.Bundle;
+          import com.getcapacitor.BridgeActivity;
+          public class MainActivity extends BridgeActivity {
+              @Override public void onCreate(Bundle savedInstanceState) {
+                  registerPlugin(StorageAccessPlugin.class);
+                  registerPlugin(TarefasBiometricPlugin.class);
+                  super.onCreate(savedInstanceState);
+              }
+          }
+          JAVA
+          python3 - <<'PY'
+          from pathlib import Path
+          gradle = Path('android/app/build.gradle')
+          source = gradle.read_text(encoding='utf-8')
+          dep = 'implementation "androidx.biometric:biometric:1.1.0"'
+          if dep not in source:
+              source = source.replace('dependencies {', f'dependencies {{\n    {dep}', 1)
+          gradle.write_text(source, encoding='utf-8')
+          manifest = Path('android/app/src/main/AndroidManifest.xml')
+          source = manifest.read_text(encoding='utf-8')
+          permissions = [
+              '<uses-permission android:name="android.permission.USE_BIOMETRIC" />',
+              '<uses-permission android:name="android.permission.USE_FINGERPRINT" />',
+              '<uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />',
+              '<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />',
+          ]
+          for permission in permissions:
+              if permission not in source:
+                  source = source.replace('<application', f'    {permission}\n    <application', 1)
+          manifest.write_text(source, encoding='utf-8')
+          PY
+          grep -q 'compileSdkVersion = 36' android/variables.gradle
+          grep -q 'targetSdkVersion = 36' android/variables.gradle
+          grep -q 'minSdkVersion = 24' android/variables.gradle
+          grep -q 'androidx.biometric:biometric:1.1.0' android/app/build.gradle
+          grep -q 'registerPlugin(TarefasBiometricPlugin.class)' "$JAVA_DIR/MainActivity.java"
+          ! grep -R -q 'MANAGE_EXTERNAL_STORAGE' android/app/src/main
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Compilar APK Release
+        working-directory: android
+        run: ./gradlew assembleRelease
+
+      - name: Inspecionar APK
+        run: |
+          set -euo pipefail
+          APK='android/app/build/outputs/apk/release/app-release-unsigned.apk'
+          test -s "$APK"
+          unzip -tq "$APK"
+          python3 - <<'PY'
+          import json
+          with open('android/app/build/outputs/apk/release/output-metadata.json',encoding='utf-8') as f:
+              element=json.load(f)['elements'][0]
+          assert int(element['versionCode']) == 262, element
+          assert str(element['versionName']) == '2.3.21.5', element
+          PY
+          unzip -p "$APK" assets/public/mobile-ai-v230.js | grep -q '__TAREFAS_AI_AUXILIAR_TASKS_V262__'
+          unzip -p "$APK" assets/public/mobile-ai-v230.js | grep -q 'noPrivilegeElevation:true'
+          unzip -p "$APK" assets/public/native-mobile.js | grep -q '__TAREFAS_TASK_ATTACHMENTS_V261__'
+          unzip -p "$APK" assets/public/native-mobile.js | grep -q '__TAREFAS_NOTIFICATION_CLEANUP_V260__'
+          unzip -p "$APK" assets/public/native-mobile.js | grep -q '__TAREFAS_APP_FIXES_V259__'
+          unzip -p "$APK" assets/public/configuracoes.html | grep -q '__TAREFAS_CONFIG_RPC_V259__'
+          unzip -p "$APK" assets/public/mobile-biometric-v23211.js | grep -q '__TAREFAS_BIOMETRIC_V258__'
+          unzip -p "$APK" classes.dex | strings | grep -q 'TarefasBiometricPlugin'
+
+      - name: Assinar APK GuerraVPN
+        run: |
+          set -euo pipefail
+          OIDC="$(curl --fail --silent --show-error -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-signing" | jq -r '.value')"
+          curl --fail --silent --show-error -H "Authorization: Bearer $OIDC" 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-signing-material' -o "$RUNNER_TEMP/signing.json"
+          jq -r '.keystore_b64' "$RUNNER_TEMP/signing.json" | base64 -d > "$RUNNER_TEMP/GuerraVPN.keystore"
+          STORE_PASS="$(jq -r '.store_password' "$RUNNER_TEMP/signing.json")"
+          KEY_ALIAS="$(jq -r '.key_alias' "$RUNNER_TEMP/signing.json")"
+          KEY_PASS="$(jq -r '.key_password' "$RUNNER_TEMP/signing.json")"
+          EXPECTED_CERT="$(jq -r '.cert_sha256' "$RUNNER_TEMP/signing.json")"
+          APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)"
+          ZIPALIGN="$(find "$ANDROID_HOME/build-tools" -type f -name zipalign | sort -V | tail -1)"
+          "$ZIPALIGN" -p -f 4 android/app/build/outputs/apk/release/app-release-unsigned.apk "$RUNNER_TEMP/TAREFAS-2.3.21.5-aligned.apk"
+          "$APKSIGNER" sign --ks "$RUNNER_TEMP/GuerraVPN.keystore" --ks-key-alias "$KEY_ALIAS" --ks-pass "pass:$STORE_PASS" --key-pass "pass:$KEY_PASS" --out TAREFAS-2.3.21.5.apk "$RUNNER_TEMP/TAREFAS-2.3.21.5-aligned.apk"
+          ACTUAL_CERT="$("$APKSIGNER" verify --verbose --print-certs TAREFAS-2.3.21.5.apk | sed -n 's/.*certificate SHA-256 digest: //p' | head -1 | tr -d ': ' | tr '[:upper:]' '[:lower:]')"
+          test "$ACTUAL_CERT" = "$EXPECTED_CERT"
+          sha256sum TAREFAS-2.3.21.5.apk | tee TAREFAS-2.3.21.5.apk.sha256
+
+      - name: Publicar APK alpha permanente
+        run: |
+          set -euo pipefail
+          git fetch origin app/releases
+          RELEASES_DIR="$RUNNER_TEMP/tarefas-releases"
+          git worktree add "$RELEASES_DIR" origin/app/releases
+          mkdir -p "$RELEASES_DIR/downloads"
+          cp TAREFAS-2.3.21.5.apk "$RELEASES_DIR/downloads/TAREFAS-2.3.21.5.apk"
+          cp TAREFAS-2.3.21.5.apk.sha256 "$RELEASES_DIR/downloads/TAREFAS-2.3.21.5.apk.sha256"
+          cd "$RELEASES_DIR"
+          git config user.name 'GuerraVPN Android Build'
+          git config user.email '81371258+GuerraVPN@users.noreply.github.com'
+          git add downloads/TAREFAS-2.3.21.5.apk downloads/TAREFAS-2.3.21.5.apk.sha256
+          if ! git diff --cached --quiet; then git commit -m 'release(android): TAREFAS 2.3.21.5 alpha build 262'; git push origin HEAD:app/releases; fi
+          URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.3.21.5.apk'
+          LOCAL_SHA="$(sha256sum "$GITHUB_WORKSPACE/TAREFAS-2.3.21.5.apk" | awk '{print $1}')"
+          for attempt in 1 2 3 4 5 6 7 8; do
+            if curl --fail --silent --show-error -L "$URL" -o "$RUNNER_TEMP/published.apk" && test "$(sha256sum "$RUNNER_TEMP/published.apk" | awk '{print $1}')" = "$LOCAL_SHA"; then exit 0; fi
+            sleep 3
+          done
+          exit 1
+
+      - name: Registrar alpha e avisar optantes
+        run: |
+          set -euo pipefail
+          OIDC="$(curl --fail --silent --show-error -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-release" | jq -r '.value')"
+          SHA="$(sha256sum TAREFAS-2.3.21.5.apk | awk '{print $1}')"
+          jq -n --arg version '2.3.21.5' --argjson build 262 --arg channel 'alpha' --arg web_version '7.8.2' --arg title 'TAREFAS 2.3.21.5 Alpha — Tarefas pela IA para Auxiliar' --arg url 'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.3.21.5.apk' --arg sha "$SHA" '{version:$version,build:$build,channel:$channel,web_version:$web_version,title:$title,changelog:["🤖 Corrigida a criação de tarefas pela IA para perfis Auxiliar, respeitando a seção e o perfil ativo.","🔐 Nenhuma permissão de Admin, Chefe ou Comandante é concedida; a autorização existente do perfil continua sendo revalidada.","#️⃣ Se a IA não enviar o código obrigatório da tarefa, o sistema gera automaticamente o padrão #1234 usado pelo formulário normal.","👥 Quando a IA cria a tarefa e em seguida vincula um responsável, o vínculo usa com segurança a tarefa recém-criada pelo mesmo usuário/perfil.","🧭 Erros de integridade do banco deixam de ser apresentados como se fossem falta de permissão.","🧪 Mantidas as correções de anexos, notificações, Configurações, downloads e biometria das Alphas anteriores."],mandatory:false,download_url:$url,sha256:$sha}' > "$RUNNER_TEMP/release.json"
+          CODE="$(curl --silent --show-error -o "$RUNNER_TEMP/result.json" -w '%{http_code}' -H "Authorization: Bearer $OIDC" -H 'Content-Type: application/json' --data-binary @"$RUNNER_TEMP/release.json" 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-release-publish')"
+          cat "$RUNNER_TEMP/result.json"
+          test "$CODE" = '200'
+          jq -e '.ok == true and .version == "2.3.21.5" and .build == 262 and .channel == "alpha"' "$RUNNER_TEMP/result.json" >/dev/null
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tarefas-android-2.3.21.5-alpha-build-262
+          path: |
+            TAREFAS-2.3.21.5.apk
+            TAREFAS-2.3.21.5.apk.sha256
+          if-no-files-found: error
