@@ -37,12 +37,13 @@ for (const marker of [
   'Downloads/TAREFAS',
   'FileOpener',
   'blob:',
-  'data:'
+  'data:',
+  'downloadDocumentToDownloads'
 ]) requireText(native, marker, 'native-mobile.js');
 
-// O fluxo data/blob deve ser tratado antes do download HTTP nativo.
-requireText(native, 'response.blob()', 'native-mobile.js');
-requireText(native, 'downloadDocumentToDownloads', 'native-mobile.js');
+// Valida o comportamento sem depender dos nomes internos reescritos pelo bundler.
+requireText(native, 'saveToDownloads:true', 'native-mobile.js');
+requireText(native, 'autoOpen:true', 'native-mobile.js');
 
 const minhas = await readDist('minhas_tarefas.html');
 for (const marker of [
