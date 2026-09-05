@@ -6,6 +6,15 @@ const root = process.cwd();
 
 // 2.3.21 / build 257: preserva todas as correções da 2.3.20.4 e adiciona
 // o canal alpha opcional, exclusivamente para administradores e moderadores.
+const nativeEntryFile = path.join(root, 'app', 'native-mobile-entry.js');
+const nativeEntryBefore = await readFile(nativeEntryFile, 'utf8');
+const nativeEntryAfter = nativeEntryBefore.replace(
+  "function updateChannelFolder(channel){return String(channel||'').trim().toLowerCase()==='beta'?'Beta':'Oficial'}",
+  "function updateChannelFolder(channel){const value=String(channel||'').trim().toLowerCase();return value==='alpha'?'Alpha':value==='beta'?'Beta':'Oficial'}"
+);
+if (nativeEntryAfter === nativeEntryBefore) throw new Error('2.3.21: função da pasta de atualização não encontrada no fonte nativo');
+await writeFile(nativeEntryFile, nativeEntryAfter, 'utf8');
+
 await import(pathToFileURL(path.resolve('scripts/build-mobile-v23204.mjs')).href + '?v=2321');
 
 const dist = path.join(root, 'dist');
@@ -78,12 +87,11 @@ await patchFile('mobile-updates-v181.js', source => {
   return source + "\n;globalThis.__TAREFAS_ALPHA_UPDATES_V257__={version:'2.3.21',build:257,serverAuthorized:true,roles:['admin','moderator']};\n";
 });
 
-await patchFile('native-mobile.js', source => replacePattern(
-  source,
-  /function updateChannelFolder\(channel\)\{[^\n]*\}/,
-  "function updateChannelFolder(channel){const value=String(channel||'').trim().toLowerCase();return value==='alpha'?'Alpha':value==='beta'?'Beta':'Oficial'}",
-  'pasta de download Alpha'
-));
+await appendFile(
+  path.join(dist, 'native-mobile.js'),
+  "\n;globalThis.__TAREFAS_ALPHA_DOWNLOAD_FOLDER_V257__='Alpha';\n",
+  'utf8'
+);
 
 await appendFile(
   path.join(dist, 'mobile-v181.css'),

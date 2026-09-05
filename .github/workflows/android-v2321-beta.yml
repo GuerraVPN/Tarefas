@@ -108,7 +108,7 @@ jobs:
           unzip -p "$APK" assets/public/mobile-updates-v181.js | grep -q 'v2_3_21_set_alpha_updates'
           unzip -p "$APK" assets/public/mobile-updates-v181.js | grep -q 'tmAlphaUpdates'
           unzip -p "$APK" assets/public/mobile-v181.css | grep -q 'tm-update-channel.alpha'
-          unzip -p "$APK" assets/public/native-mobile.js | grep -q "value==='alpha'?'Alpha'"
+          unzip -p "$APK" assets/public/native-mobile.js | grep -q '__TAREFAS_ALPHA_DOWNLOAD_FOLDER_V257__'
           unzip -p "$APK" assets/public/aditamento_v74.js | grep -q '__ADITAMENTO_ODT_PDF_LAYOUT_V256__'
           unzip -p "$APK" assets/public/aditamento_v74.js | grep -q 'Pictures/brasao.png'
 

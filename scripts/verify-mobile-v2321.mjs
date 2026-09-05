@@ -31,9 +31,12 @@ for (const marker of [
 rejectText(updates, "norm(user.secao)==='admin'", 'mobile-updates-v181.js');
 
 const native = await readDist('native-mobile.js');
-requireText(native, "value==='alpha'?'Alpha'", 'native-mobile.js');
+requireText(native, '__TAREFAS_ALPHA_DOWNLOAD_FOLDER_V257__', 'native-mobile.js');
 requireText(native, '__TAREFAS_ADITAMENTO_DOWNLOADS_V256__', 'native-mobile.js');
 requireText(native, '__TAREFAS_ADITAMENTO_ODT_PDF_LAYOUT_V256__', 'native-mobile.js');
+
+const nativeSource = await readFile(path.join(root, 'app', 'native-mobile-entry.js'), 'utf8');
+requireText(nativeSource, "value==='alpha'?'Alpha'", 'app/native-mobile-entry.js');
 
 const css = await readDist('mobile-v181.css');
 requireText(css, '.tm-update-channel.alpha', 'mobile-v181.css');
