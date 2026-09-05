@@ -38,10 +38,11 @@ jobs:
           grep -q '2.3.18' dist/mobile-bootstrap.js
           grep -q 'const APP_BUILD = 248' dist/mobile-bootstrap.js
           grep -q '__TAREFAS_INSTALLER_NATIVE_V248__' dist/native-mobile.js
-          grep -q '__TAREFAS_INSTALLER_TEST_V248__' dist/native-mobile.js
+          grep -q '__TAREFAS_INSTALLER_CACHE_V248__' dist/native-mobile.js
           grep -q 'Documentos/TAREFAS/Beta' dist/native-mobile.js
-          grep -q 'public void installApk' app/android/StorageAccessPlugin.java
-          grep -q 'ACTION_MANAGE_UNKNOWN_APP_SOURCES' app/android/StorageAccessPlugin.java
+          grep -q 'stageApk(Uri source)' app/android/StorageAccessPlugin.java
+          grep -q 'getPackageArchiveInfo' app/android/StorageAccessPlugin.java
+          grep -q 'getCacheDir()' app/android/StorageAccessPlugin.java
           grep -q 'FileProvider.getUriForFile' app/android/StorageAccessPlugin.java
 
       - name: Firebase Android
@@ -77,6 +78,7 @@ jobs:
           cat > android/app/src/main/res/xml/tarefas_file_paths.xml <<'XML'
           <?xml version="1.0" encoding="utf-8"?>
           <paths xmlns:android="http://schemas.android.com/apk/res/android">
+              <cache-path name="tarefas_apk_cache" path="apk-installer/" />
               <external-path name="tarefas_external" path="." />
           </paths>
           XML
@@ -93,6 +95,8 @@ jobs:
           PY
           grep -q 'REQUEST_INSTALL_PACKAGES' android/app/src/main/AndroidManifest.xml
           grep -q 'tarefas.fileprovider' android/app/src/main/AndroidManifest.xml
+          grep -q 'cache-path' android/app/src/main/res/xml/tarefas_file_paths.xml
+          grep -q 'apk-installer/' android/app/src/main/res/xml/tarefas_file_paths.xml
           ! grep -R -q 'MANAGE_EXTERNAL_STORAGE' android/app/src/main
 
       - name: Setup Java
@@ -118,9 +122,10 @@ jobs:
           assert str(e['versionName'])=='2.3.18',e
           PY
           unzip -p "$APK" assets/public/native-mobile.js | grep -q '__TAREFAS_INSTALLER_NATIVE_V248__'
-          unzip -p "$APK" assets/public/native-mobile.js | grep -q '__TAREFAS_INSTALLER_TEST_V248__'
+          unzip -p "$APK" assets/public/native-mobile.js | grep -q '__TAREFAS_INSTALLER_CACHE_V248__'
           unzip -p "$APK" assets/public/native-mobile.js | grep -q 'Documentos/TAREFAS/Beta'
           grep -R -q 'REQUEST_INSTALL_PACKAGES' android/app/build/intermediates/merged_manifests || grep -q 'REQUEST_INSTALL_PACKAGES' android/app/src/main/AndroidManifest.xml
+          grep -q 'cache-path' android/app/src/main/res/xml/tarefas_file_paths.xml
 
       - name: Assinar APK GuerraVPN
         run: |
@@ -151,7 +156,7 @@ jobs:
           git config user.name 'GuerraVPN Android Build'
           git config user.email '81371258+GuerraVPN@users.noreply.github.com'
           git add downloads/TAREFAS-2.3.18.apk
-          if ! git diff --cached --quiet; then git commit -m 'release(android): TAREFAS 2.3.18 beta build 248'; git push origin HEAD:app/releases; fi
+          if ! git diff --cached --quiet; then git commit -m 'release(android): corrigir instalador TAREFAS 2.3.18 build 248'; git push origin HEAD:app/releases; fi
           URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.3.18.apk'
           LOCAL_SHA="$(sha256sum "$GITHUB_WORKSPACE/TAREFAS-2.3.18.apk" | awk '{print $1}')"
           for attempt in 1 2 3 4 5 6 7 8; do
@@ -165,7 +170,7 @@ jobs:
           set -euo pipefail
           OIDC="$(curl --fail --silent --show-error -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-release" | jq -r '.value')"
           SHA="$(sha256sum TAREFAS-2.3.18.apk | awk '{print $1}')"
-          jq -n --arg version '2.3.18' --argjson build 248 --arg channel 'beta' --arg web_version '7.8.2' --arg title 'TAREFAS 2.3.18 Beta — Teste do instalador' --arg url 'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.3.18.apk' --arg sha "$SHA" '{version:$version,build:$build,channel:$channel,web_version:$web_version,title:$title,changelog:["🧪 Versão de teste sem mudanças funcionais para validar a instalação automática.","📲 Deve ser baixada pela 2.3.17 e abrir o instalador nativo do Android.","🔐 Se necessário, o Android pode pedir Permitir desta fonte uma única vez.","📁 APK beta permanece em Documentos/TAREFAS/Beta."],mandatory:false,download_url:$url,sha256:$sha}' > "$RUNNER_TEMP/release.json"
+          jq -n --arg version '2.3.18' --argjson build 248 --arg channel 'beta' --arg web_version '7.8.2' --arg title 'TAREFAS 2.3.18 Beta — Instalador corrigido' --arg url 'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.3.18.apk' --arg sha "$SHA" '{version:$version,build:$build,channel:$channel,web_version:$web_version,title:$title,changelog:["🛠 Corrigida a entrega do APK ao instalador do Android.","📦 O APK baixado é copiado para o cache privado do TAREFAS antes da instalação.","✅ O pacote é validado nativamente antes de abrir o Package Installer.","🔗 O instalador recebe um content URI do FileProvider do próprio TAREFAS.","📁 Beta permanece em Documentos/TAREFAS/Beta."],mandatory:false,download_url:$url,sha256:$sha}' > "$RUNNER_TEMP/release.json"
           CODE="$(curl --silent --show-error -o "$RUNNER_TEMP/result.json" -w '%{http_code}' -H "Authorization: Bearer $OIDC" -H 'Content-Type: application/json' --data-binary @"$RUNNER_TEMP/release.json" 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-release-publish')"
           cat "$RUNNER_TEMP/result.json"
           test "$CODE" = '200'
@@ -174,6 +179,6 @@ jobs:
       - name: Salvar APK assinado
         uses: actions/upload-artifact@v4
         with:
-          name: tarefas-android-2.3.18-beta-build-248
+          name: tarefas-android-2.3.18-beta-build-248-fixed-installer
           path: TAREFAS-2.3.18.apk
           if-no-files-found: error
