@@ -1,0 +1,175 @@
+name: Android 2.3.20 Beta - Teste FileOpener 2.2.0
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [app/android-v2320-prep]
+    paths:
+      - '.github/workflows/android-v2320-beta.yml'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Checkout 2.3.20
+        uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with: { node-version: '22' }
+
+      - name: Instalar dependencias
+        run: |
+          npm ci
+          npm install --no-save --package-lock=false --ignore-scripts jspdf@2.5.2
+
+      - name: Gerar e validar 2.3.20
+        run: |
+          set -euo pipefail
+          grep -q "FileOpener.openFile({path:uri,mimeType:'application/vnd.android.package-archive'})" app/native-mobile-entry.js
+          ! grep -q 'StorageAccess.installApk' app/native-mobile-entry.js
+          node scripts/build-mobile-v2320.mjs
+          node scripts/verify-mobile-v2320.mjs dist
+          node scripts/test-aditamento-site-v2313.mjs dist/aditamento_v74.js
+          node scripts/test-orc-loader-v2313.mjs dist/orcamentarios-loader-v243.js
+          node scripts/test-material-carga-v2313.mjs dist/v7_7_0_material_carga.js
+          grep -q '2.3.20' dist/mobile-bootstrap.js
+          grep -q 'const APP_BUILD = 252' dist/mobile-bootstrap.js
+          grep -q '__TAREFAS_2320_INSTALLER_220_FLOW__' dist/native-mobile.js
+          grep -q '__TAREFAS_2320_UPDATE_TEST__' dist/native-mobile.js
+          ! grep -q '__TAREFAS_INSTALLER_CACHE_' dist/native-mobile.js
+
+      - name: Firebase Android
+        run: |
+          curl --fail --silent --show-error --retry 3 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/firebase-config-v17' -o app/google-services.json
+          test -s app/google-services.json
+          grep -q 'br.com.guerravpn.tarefas.mobile' app/google-services.json
+
+      - name: Preparar Android
+        run: |
+          set -euo pipefail
+          npx cap add android
+          cp app/google-services.json android/app/google-services.json
+          sed -i 's/versionCode 1/versionCode 252/' android/app/build.gradle
+          sed -i 's/versionName "1.0"/versionName "2.3.20"/' android/app/build.gradle
+          npm run assets:android
+          npx cap sync android
+          JAVA_DIR='android/app/src/main/java/br/com/guerravpn/tarefas/mobile'
+          mkdir -p "$JAVA_DIR"
+          cp app/android/StorageAccessPlugin.java "$JAVA_DIR/StorageAccessPlugin.java"
+          cat > "$JAVA_DIR/MainActivity.java" <<'JAVA'
+          package br.com.guerravpn.tarefas.mobile;
+          import android.os.Bundle;
+          import com.getcapacitor.BridgeActivity;
+          public class MainActivity extends BridgeActivity {
+              @Override public void onCreate(Bundle savedInstanceState) {
+                  registerPlugin(StorageAccessPlugin.class);
+                  super.onCreate(savedInstanceState);
+              }
+          }
+          JAVA
+          mkdir -p android/app/src/main/res/xml
+          cat > android/app/src/main/res/xml/file_paths.xml <<'XML'
+          <?xml version="1.0" encoding="utf-8"?>
+          <paths xmlns:android="http://schemas.android.com/apk/res/android">
+            <files-path name="files" path="." />
+            <cache-path name="cache" path="." />
+            <external-files-path name="external-files" path="." />
+            <external-cache-path name="external-cache" path="." />
+            <external-path name="external" path="." />
+          </paths>
+          XML
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('android/app/src/main/AndroidManifest.xml')
+          s=p.read_text(encoding='utf-8')
+          if 'android.permission.REQUEST_INSTALL_PACKAGES' not in s:
+              s=s.replace('<application','    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />\n    <application',1)
+          p.write_text(s,encoding='utf-8')
+          PY
+          grep -q 'REQUEST_INSTALL_PACKAGES' android/app/src/main/AndroidManifest.xml
+          test -s android/app/src/main/res/xml/file_paths.xml
+          ! grep -R -q 'MANAGE_EXTERNAL_STORAGE' android/app/src/main
+          ! grep -R -q 'tarefas.fileprovider' android/app/src/main
+          ! grep -R -q 'apk-installer/' android/app/src/main
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Compilar APK Release
+        working-directory: android
+        run: ./gradlew assembleRelease
+
+      - name: Inspecionar APK
+        run: |
+          set -euo pipefail
+          APK='android/app/build/outputs/apk/release/app-release-unsigned.apk'
+          test -s "$APK"
+          unzip -tq "$APK"
+          python3 - <<'PY'
+          import json
+          with open('android/app/build/outputs/apk/release/output-metadata.json',encoding='utf-8') as f:e=json.load(f)['elements'][0]
+          assert int(e['versionCode'])==252,e
+          assert str(e['versionName'])=='2.3.20',e
+          PY
+          unzip -p "$APK" assets/public/native-mobile.js | grep -q '__TAREFAS_2320_INSTALLER_220_FLOW__'
+          unzip -p "$APK" assets/public/native-mobile.js | grep -q '__TAREFAS_2320_UPDATE_TEST__'
+          unzip -p "$APK" assets/public/native-mobile.js | grep -q 'application/vnd.android.package-archive'
+          ! unzip -p "$APK" assets/public/native-mobile.js | grep -q '__TAREFAS_INSTALLER_CACHE_'
+          grep -R -q 'REQUEST_INSTALL_PACKAGES' android/app/build/intermediates/merged_manifests || grep -q 'REQUEST_INSTALL_PACKAGES' android/app/src/main/AndroidManifest.xml
+
+      - name: Assinar APK GuerraVPN
+        run: |
+          set -euo pipefail
+          OIDC="$(curl --fail --silent --show-error -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-signing" | jq -r '.value')"
+          curl --fail --silent --show-error -H "Authorization: Bearer $OIDC" 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-signing-material' -o "$RUNNER_TEMP/signing.json"
+          jq -r '.keystore_b64' "$RUNNER_TEMP/signing.json" | base64 -d > "$RUNNER_TEMP/GuerraVPN.keystore"
+          STORE_PASS="$(jq -r '.store_password' "$RUNNER_TEMP/signing.json")"
+          KEY_ALIAS="$(jq -r '.key_alias' "$RUNNER_TEMP/signing.json")"
+          KEY_PASS="$(jq -r '.key_password' "$RUNNER_TEMP/signing.json")"
+          EXPECTED_CERT="$(jq -r '.cert_sha256' "$RUNNER_TEMP/signing.json")"
+          APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)"
+          ZIPALIGN="$(find "$ANDROID_HOME/build-tools" -type f -name zipalign | sort -V | tail -1)"
+          "$ZIPALIGN" -p -f 4 android/app/build/outputs/apk/release/app-release-unsigned.apk "$RUNNER_TEMP/TAREFAS-2.3.20-aligned.apk"
+          "$APKSIGNER" sign --ks "$RUNNER_TEMP/GuerraVPN.keystore" --ks-key-alias "$KEY_ALIAS" --ks-pass "pass:$STORE_PASS" --key-pass "pass:$KEY_PASS" --out TAREFAS-2.3.20.apk "$RUNNER_TEMP/TAREFAS-2.3.20-aligned.apk"
+          ACTUAL_CERT="$($APKSIGNER verify --verbose --print-certs TAREFAS-2.3.20.apk | sed -n 's/.*certificate SHA-256 digest: //p' | head -1 | tr -d ': ' | tr '[:upper:]' '[:lower:]')"
+          test "$ACTUAL_CERT" = "$EXPECTED_CERT"
+          sha256sum TAREFAS-2.3.20.apk | tee TAREFAS-2.3.20.apk.sha256
+
+      - name: Publicar APK beta permanente
+        run: |
+          set -euo pipefail
+          git fetch origin app/releases
+          RELEASES_DIR="$RUNNER_TEMP/tarefas-releases"
+          git worktree add "$RELEASES_DIR" origin/app/releases
+          mkdir -p "$RELEASES_DIR/downloads"
+          cp TAREFAS-2.3.20.apk "$RELEASES_DIR/downloads/TAREFAS-2.3.20.apk"
+          cp TAREFAS-2.3.20.apk.sha256 "$RELEASES_DIR/downloads/TAREFAS-2.3.20.apk.sha256"
+          cd "$RELEASES_DIR"
+          git config user.name 'GuerraVPN Android Build'
+          git config user.email '81371258+GuerraVPN@users.noreply.github.com'
+          git add downloads/TAREFAS-2.3.20.apk downloads/TAREFAS-2.3.20.apk.sha256
+          if ! git diff --cached --quiet; then git commit -m 'release(android): TAREFAS 2.3.20 beta build 252'; git push origin HEAD:app/releases; fi
+          URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.3.20.apk'
+          LOCAL_SHA="$(sha256sum "$GITHUB_WORKSPACE/TAREFAS-2.3.20.apk" | awk '{print $1}')"
+          for attempt in 1 2 3 4 5 6 7 8; do
+            if curl --fail --silent --show-error -L "$URL" -o "$RUNNER_TEMP/published.apk" && test "$(sha256sum "$RUNNER_TEMP/published.apk" | awk '{print $1}')" = "$LOCAL_SHA"; then exit 0; fi
+            sleep 3
+          done
+          exit 1
+
+      - name: Salvar APK assinado
+        uses: actions/upload-artifact@v4
+        with:
+          name: tarefas-android-2.3.20-beta-build-252
+          path: |
+            TAREFAS-2.3.20.apk
+            TAREFAS-2.3.20.apk.sha256
+          if-no-files-found: error
