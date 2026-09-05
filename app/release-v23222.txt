@@ -1,0 +1,20 @@
+TAREFAS 2.3.22.2 ALPHA — build 265
+Base: 2.3.22.1 Alpha build 264 · Web 7.8.2
+
+Objetivo desta Alpha:
+- Consolidar a reorganização da Central em abas reais.
+- Corrigir o encaixe da interface em telas móveis e respeitar cabeçalho, barra inferior e safe areas.
+- Manter Notificações 2.0 na Central.
+- Transformar Downloads e Favoritos em abas próprias.
+- Concentrar Salvar filtro atual, filtros salvos, fila offline, sincronização e Central de Erros em Ferramentas.
+- Preservar os dados e preferências criados na 2.3.22.1.
+- Manter o guard contra elementos DOM nulos no Dashboard.
+- Manter IA com acesso às ferramentas da Alpha, sem elevação de privilégios e com confirmação para ações destrutivas.
+
+Testes previstos:
+- Simulações funcionais da 2.3.22.1 repetidas integralmente.
+- Teste específico das 5 abas da Central.
+- Regressão de biometria, notificações, downloads, anexos, configurações e IA.
+- Conferência 1/3: estrutura, versão, permissões, recursos e regressões.
+- Conferência 2/3: APK compilado, versionCode/versionName e assets internos.
+- Conferência 3/3: assinatura GuerraVPN, SHA-256 e integridade final.
