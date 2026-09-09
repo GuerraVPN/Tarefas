@@ -55,7 +55,7 @@ function ensureAboutVersion(){
  if(Array.isArray(versions)){
    versions.forEach(x=>{if(x)x.current=false});
    const old=versions.find(x=>x.v===VERSION);if(old)Object.assign(old,release);else versions.unshift(release);
-   const sel=document.getElementById('versionSelect');if(sel){sel.innerHTML=versions.map(x=>`<option value="${x.v}">${x.v} — ${x.title}</option>`).join('');if(sel.value!==VERSION){sel.value=VERSION;sel.dispatchEvent(new Event('change'))}}
+   const sel=document.getElementById('versionSelect');if(sel){sel.innerHTML=versions.map(x=>`<option value="${x.v}">${x.v} — ${x.title}</option>`).join('');sel.value=VERSION;sel.dispatchEvent(new Event('change'))}
  }
  const meta=[...document.querySelectorAll('.meta div')].find(x=>x.querySelector('small')?.textContent.includes('Versão atual'));
  if(meta?.querySelector('b')&&meta.querySelector('b').textContent!==VERSION)meta.querySelector('b').textContent=VERSION;
