@@ -8,7 +8,7 @@ let user=null,isSupport=false,isAdmin=false,tickets=[],selected=null,messages=[]
 
 function logged(){try{return JSON.parse(localStorage.getItem('usuarioLogado')||'null')}catch(_){return null}}
 function profileId(){return user?.perfil_id?Number(user.perfil_id):null}
-function uname(id){const u=users.get(String(id));return u?[u.patente,u.nome_guerra].filter(Boolean).join(' '):`Usuário ${id||'-'}`}
+function uname(id){if(String(id)==='ia_suporte')return 'Assistente IA';const u=users.get(String(id));return u?[u.patente,u.nome_guerra].filter(Boolean).join(' '):`Usuário ${id||'-'}`}
 function statusLabel(s){return({aberto:'Aberto',em_analise:'Em análise',aguardando_usuario:'Aguardando usuário',resolvido:'Resolvido',fechado:'Fechado'}[s]||s)}
 function priLabel(s){return({baixa:'Baixa',media:'Média',alta:'Alta',critica:'Crítica'}[s]||s)}
 function catLabel(s){return({bug:'Bug / erro',falha:'Falha do sistema',melhoria:'Melhoria / sugestão',acesso:'Acesso / permissão',outro:'Outro'}[s]||s)}
