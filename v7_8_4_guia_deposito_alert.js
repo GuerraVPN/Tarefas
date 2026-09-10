@@ -1,0 +1,16 @@
+(function(){
+'use strict';
+if(window.__TAREFAS_V784_GUIA_DEPOSITO_ALERT__)return;
+window.__TAREFAS_V784_GUIA_DEPOSITO_ALERT__=true;
+const $=id=>document.getElementById(id);
+let busy=false,lastSignature='';
+function client(){try{return typeof supabaseClient!=='undefined'?supabaseClient:null}catch(_){return null}}
+function tipo(){return document.querySelector('[data-carga-tipo].active')?.dataset.cargaTipo||'dependencia'}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+function ensureBanner(){const host=$('materialCargaModule');if(!host)return null;let b=$('v784DepositoPendencia');if(!b){b=document.createElement('div');b.id='v784DepositoPendencia';b.style.cssText='display:none;margin:0 0 12px;padding:12px 14px;border:1px solid #dc2626;border-radius:12px;background:#3b1111;color:#fee2e2;font-size:12px;line-height:1.45';const tabs=$('cargaTabs');if(tabs?.parentNode)tabs.parentNode.insertBefore(b,tabs.nextSibling);else host.prepend(b)}return b}
+function openRef(ref){const card=[...document.querySelectorAll('#cargaRefList [data-carga-ref]')].find(x=>x.dataset.cargaRef===ref);if(card){card.click();card.scrollIntoView({behavior:'smooth',block:'center'});return true}return false}
+async function refresh(){if(busy||tipo()!=='deposito')return;const c=client();if(!c)return;busy=true;try{const r=await c.from('orc_carga_pendencias').select('id,referencia,origem_tipo,origem_numero,descricao,criada_em').eq('tipo_referencia','deposito').eq('status','pendente').order('criada_em',{ascending:false});if(r.error)return;const rows=r.data||[],banner=ensureBanner();if(!banner)return;if(!rows.length){banner.style.display='none';banner.innerHTML='';lastSignature='';return}const refs=[...new Set(rows.map(x=>x.referencia).filter(Boolean))],guias=rows.filter(x=>x.origem_tipo==='guia');banner.style.display='block';banner.innerHTML=`<b>⚠ ${refs.length} depósito(s) precisam de atualização</b><br>${refs.map(rf=>{const itens=rows.filter(x=>x.referencia===rf);const origens=itens.map(x=>x.origem_numero||x.origem_tipo||'processo').join(', ');return `${esc(rf)} — ${esc(origens)}`}).join('<br>')}`;const sig=rows.map(x=>x.id).sort((a,b)=>a-b).join(',');if(sig!==lastSignature){lastSignature=sig;const key='v784DepositAlert:'+sig;if(!sessionStorage.getItem(key)){sessionStorage.setItem(key,'1');const origemTxt=guias.length?`\nGuia(s): ${guias.map(x=>x.origem_numero||'#'+x.id).join(', ')}`:'';setTimeout(()=>{if(confirm(`Há ${refs.length} depósito(s) com relação pendente de atualização após alteração de carga:\n\n${refs.join('\n')}${origemTxt}\n\nDeseja abrir o primeiro depósito pendente agora?`))openRef(refs[0])},100)}}}finally{busy=false}}
+function bind(){document.addEventListener('click',e=>{const t=e.target.closest('[data-carga-tipo]');if(t?.dataset.cargaTipo==='deposito')setTimeout(refresh,180);if(e.target.closest('#btnCargaRetry'))setTimeout(refresh,500)},true);window.addEventListener('focus',refresh);document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()})}
+function start(){ensureBanner();bind();setTimeout(refresh,500);setInterval(()=>{if(tipo()==='deposito')refresh()},30000)}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
+})();
