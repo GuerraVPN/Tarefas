@@ -1,0 +1,12 @@
+TAREFAS 2.3.22.3 Alpha — build 266
+
+Correções desta Alpha:
+- Ferramentas, Favoritos, Downloads e Mensagens deixam de aparecer como opções internas da Central de Notificações.
+- As cinco áreas passam a ser tratadas como seções próprias do aplicativo: Notificações, Mensagens, Downloads, Favoritos e Ferramentas.
+- Corrigido o clique em Downloads, Favoritos e Ferramentas que permanecia exibindo a Central de Notificações.
+- Cada seção agora atualiza título, descrição e conteúdo conforme a opção escolhida.
+- Adicionados atalhos diretos no menu móvel para cada seção.
+- Corrigida a identificação da versão para 2.3.22.3 Alpha, build 266, em cabeçalho, Sobre, preload, atualizador e runtime Alpha.
+- Canal de atualização mantido explicitamente como alpha.
+
+Base: 2.3.22.2 Alpha.
