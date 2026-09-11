@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "br.com.guerravpn.crediflow"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "br.com.guerravpn.crediflow"
