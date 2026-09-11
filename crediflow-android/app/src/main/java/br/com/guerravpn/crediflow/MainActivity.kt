@@ -201,7 +201,7 @@ private fun WelcomeScreen(
         }
 
         Spacer(Modifier.height(24.dp))
-        Text("CREDIFLOW · v0.2 build 2", fontSize = 11.sp, color = Muted, fontWeight = FontWeight.Bold)
+        Text("CREDIFLOW · v0.3 build 3", fontSize = 11.sp, color = Muted, fontWeight = FontWeight.Bold)
         Text("Crédito com clareza do início ao fim.", fontSize = 34.sp, lineHeight = 38.sp, fontWeight = FontWeight.Black)
         Spacer(Modifier.height(28.dp))
 
@@ -1185,6 +1185,7 @@ private fun AdminDetailScreen(
     var maxInstallments by remember { mutableStateOf("1") }
     var tier by remember { mutableStateOf("A") }
     var notes by remember { mutableStateOf("") }
+    var activationResult by remember { mutableStateOf<ActivationCodeResult?>(null) }
 
     val correctionOptions = linkedMapOf(
         "full_name" to "Nome completo",
@@ -1208,7 +1209,13 @@ private fun AdminDetailScreen(
         loading = true
         scope.launch {
             try {
-                detail = SupabaseApi.adminDetail(token, app.id)
+                val loaded = SupabaseApi.adminDetail(token, app.id)
+                detail = loaded
+                val current = loaded.application
+                limit = current.approvedLimit?.let { String.format(Locale("pt", "BR"), "%.2f", it) } ?: ""
+                rate = current.approvedMonthlyRate?.let { String.format(Locale("pt", "BR"), "%.2f", it * 100.0) } ?: ""
+                maxInstallments = current.approvedMaxInstallments?.toString() ?: "1"
+                tier = current.approvedRiskTier?.takeIf { it.isNotBlank() } ?: "A"
                 error = null
             } catch (e: Exception) {
                 error = friendly(e)
@@ -1219,11 +1226,8 @@ private fun AdminDetailScreen(
     }
 
     fun openEmail(mail: CorrectionMail) {
-        val intent = Intent(Intent.ACTION_SENDTO).apply {
-            data = Uri.parse("mailto:${mail.recipient}")
-            putExtra(Intent.EXTRA_SUBJECT, mail.subject)
-            putExtra(Intent.EXTRA_TEXT, mail.body)
-        }
+        val mailto = "mailto:${Uri.encode(mail.recipient)}?subject=${Uri.encode(mail.subject)}&body=${Uri.encode(mail.body)}"
+        val intent = Intent(Intent.ACTION_SENDTO, Uri.parse(mailto))
         try {
             context.startActivity(intent)
         } catch (_: Exception) {
@@ -1412,10 +1416,11 @@ private fun AdminDetailScreen(
                                 session?.accessToken ?: return@launch,
                                 app.id
                             )
+                            activationResult = result
                             val mail = CorrectionMail(
                                 result.email,
                                 "CrediFlow — código de acesso",
-                                "Seu cadastro CrediFlow foi aprovado.\n\nCódigo de acesso: ${result.code}\n\nO código expira em 15 minutos. Abra o aplicativo, toque em “Acompanhar minha análise” e crie sua senha."
+                                "Olá! Seu cadastro CrediFlow foi aprovado.\n\nCódigo de acesso: ${result.code}\n\nEste código expira em 15 minutos. Abra o CrediFlow, toque em “Acompanhar minha análise”, informe o código e crie sua senha.\n\nSe você não solicitou este cadastro, ignore esta mensagem."
                             )
                             openEmail(mail)
                         } catch (e: Exception) {
@@ -1428,6 +1433,27 @@ private fun AdminDetailScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Gerar código e preparar e-mail")
+            }
+
+            activationResult?.let { generated ->
+                Success(
+                    "Código gerado: ${generated.code}",
+                    "Envie este código para ${generated.email}. Ele expira em 15 minutos. Se o e-mail não preencher sozinho, toque no botão abaixo para abrir novamente."
+                )
+                OutlinedButton(
+                    onClick = {
+                        openEmail(
+                            CorrectionMail(
+                                generated.email,
+                                "CrediFlow — código de acesso",
+                                "Olá! Seu cadastro CrediFlow foi aprovado.\n\nCódigo de acesso: ${generated.code}\n\nEste código expira em 15 minutos. Abra o CrediFlow, toque em “Acompanhar minha análise”, informe o código e crie sua senha.\n\nSe você não solicitou este cadastro, ignore esta mensagem."
+                            )
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Abrir e-mail preenchido novamente")
+                }
             }
         }
 
