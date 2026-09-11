@@ -1,0 +1,31 @@
+name: CrediFlow apply v0.2 build 2 patch
+
+on:
+  push:
+    branches:
+      - crediflow-v0.2-build2
+    paths:
+      - "crediflow-android/patch_v02b2_inputs.py"
+      - ".github/workflows/crediflow-apply-patch.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: crediflow-v0.2-build2
+      - name: Apply patch
+        run: python3 crediflow-android/patch_v02b2_inputs.py
+      - name: Commit patched source
+        run: |
+          git config user.name "CrediFlow CI"
+          git config user.email "actions@users.noreply.github.com"
+          git add crediflow-android/app/src/main/java/br/com/guerravpn/crediflow/Api.kt crediflow-android/app/src/main/java/br/com/guerravpn/crediflow/MainActivity.kt
+          git diff --cached --quiet && exit 0
+          git commit -m "CrediFlow 0.2 build 2: CPF phone CEP and currency fixes"
+          git push origin HEAD:crediflow-v0.2-build2
