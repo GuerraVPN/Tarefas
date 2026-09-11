@@ -32,13 +32,32 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "9.6.0"
+      - name: Restore stable CrediFlow debug signer
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: crediflow-debug-signer-v1
+      - name: Create stable debug signer when missing
+        run: |
+          mkdir -p ~/.android
+          if [ ! -f ~/.android/debug.keystore ]; then
+            keytool -genkeypair -v \
+              -keystore ~/.android/debug.keystore \
+              -storepass android \
+              -alias androiddebugkey \
+              -keypass android \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -dname "CN=CrediFlow Debug,O=GuerraVPN,C=BR"
+          fi
       - name: Build debug APK
         run: gradle -p crediflow-android :app:assembleDebug --stacktrace
       - name: Rename APK
-        run: cp crediflow-android/app/build/outputs/apk/debug/app-debug.apk CrediFlow-v0.2-build2-debug.apk
+        run: cp crediflow-android/app/build/outputs/apk/debug/app-debug.apk CrediFlow-v0.2-build2-stable-debug.apk
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: CrediFlow-v0.2-build2-debug
-          path: CrediFlow-v0.2-build2-debug.apk
+          name: CrediFlow-v0.2-build2-stable-debug
+          path: CrediFlow-v0.2-build2-stable-debug.apk
           if-no-files-found: error
