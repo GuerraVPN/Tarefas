@@ -1,0 +1,95 @@
+name: CrediFlow v0.5 build 5
+
+on:
+  push:
+    branches:
+      - crediflow-v0.5-build5
+    paths:
+      - "crediflow-android/**"
+      - "tools/crediflow_v05_patch.py"
+      - ".github/workflows/crediflow-v05-build.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: crediflow-v0.5-build5
+
+      - name: Apply v0.5 build 5 patch
+        run: python3 tools/crediflow_v05_patch.py
+
+      - name: Commit versioned source
+        run: |
+          git config user.name "CrediFlow CI"
+          git config user.email "actions@users.noreply.github.com"
+          git add crediflow-android
+          git diff --cached --quiet || git commit -m "CrediFlow 0.5 build 5: resumable tracking and fixed package"
+          git push origin HEAD:crediflow-v0.5-build5
+
+      - name: Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android 36
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Gradle 9.6
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "9.6.0"
+
+      - name: Restore stable CrediFlow signer
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: crediflow-debug-signer-v1
+
+      - name: Create stable signer when missing
+        run: |
+          mkdir -p ~/.android
+          if [ ! -f ~/.android/debug.keystore ]; then
+            keytool -genkeypair -v \
+              -keystore ~/.android/debug.keystore \
+              -storepass android \
+              -alias androiddebugkey \
+              -keypass android \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -dname "CN=CrediFlow Debug,O=GuerraVPN,C=BR"
+          fi
+
+      - name: Build APK
+        run: gradle -p crediflow-android :app:assembleDebug --stacktrace
+
+      - name: Verify package version and signature
+        run: |
+          APK=crediflow-android/app/build/outputs/apk/debug/app-debug.apk
+          BADGING=$(${ANDROID_HOME}/build-tools/36.0.0/aapt dump badging "$APK" | head -n 1)
+          echo "$BADGING"
+          echo "$BADGING" | grep -q "name='com.guerravpn.crediflow'" || { echo "Unexpected package"; exit 1; }
+          echo "$BADGING" | grep -q "versionCode='5'" || { echo "Unexpected versionCode"; exit 1; }
+          echo "$BADGING" | grep -q "versionName='0.5-debug'" || { echo "Unexpected versionName"; exit 1; }
+          ${ANDROID_HOME}/build-tools/36.0.0/apksigner verify --print-certs "$APK"
+
+      - name: Rename APK
+        run: cp crediflow-android/app/build/outputs/apk/debug/app-debug.apk CrediFlow-v0.5-build5-com.guerravpn.crediflow.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: CrediFlow-v0.5-build5-com.guerravpn.crediflow
+          path: CrediFlow-v0.5-build5-com.guerravpn.crediflow.apk
+          if-no-files-found: error
