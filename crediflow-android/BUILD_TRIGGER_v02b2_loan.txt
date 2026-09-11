@@ -1,0 +1,1 @@
+Build complete loan request + manual Pix admin flow with stable debug signer.
