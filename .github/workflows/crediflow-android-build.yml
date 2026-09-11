@@ -1,9 +1,9 @@
-name: CrediFlow Android v0.1 build 1
+name: CrediFlow Android v0.2 build 2
 
 on:
   push:
     branches:
-      - crediflow-v0.1-build1
+      - crediflow-v0.2-build2
     paths:
       - "crediflow-android/**"
       - ".github/workflows/crediflow-android-build.yml"
@@ -35,10 +35,10 @@ jobs:
       - name: Build debug APK
         run: gradle -p crediflow-android :app:assembleDebug --stacktrace
       - name: Rename APK
-        run: cp crediflow-android/app/build/outputs/apk/debug/app-debug.apk CrediFlow-v0.1-build1-debug.apk
+        run: cp crediflow-android/app/build/outputs/apk/debug/app-debug.apk CrediFlow-v0.2-build2-debug.apk
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: CrediFlow-v0.1-build1-debug
-          path: CrediFlow-v0.1-build1-debug.apk
+          name: CrediFlow-v0.2-build2-debug
+          path: CrediFlow-v0.2-build2-debug.apk
           if-no-files-found: error
