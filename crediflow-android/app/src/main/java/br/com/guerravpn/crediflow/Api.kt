@@ -31,6 +31,15 @@ data class ApplicationStatus(
     val documentStatus: Map<String, String>
 )
 
+data class PublicApplicationStatus(
+    val found: Boolean,
+    val status: String?,
+    val step: Int,
+    val title: String,
+    val message: String,
+    val updatedAt: String?
+)
+
 data class AdminApplication(
     val id: String,
     val status: String,
@@ -380,6 +389,24 @@ object SupabaseApi {
             verificationScore = if (j.isNull("verification_score")) null else j.optInt("verification_score"),
             verificationLevel = if (j.isNull("verification_level")) null else j.optString("verification_level"),
             documentStatus = docs
+        )
+    }
+
+    suspend fun trackApplication(email: String): PublicApplicationStatus {
+        val r = JSONObject(
+            request(
+                "POST",
+                "/functions/v1/public-application-status",
+                JSONObject().put("email", email.trim().lowercase())
+            )
+        )
+        return PublicApplicationStatus(
+            found = r.optBoolean("found", false),
+            status = if (r.isNull("status")) null else r.optString("status"),
+            step = r.optInt("step", 0),
+            title = r.optString("title", "Acompanhamento"),
+            message = r.optString("message", "Não foi possível obter o andamento."),
+            updatedAt = if (r.isNull("updatedAt")) null else r.optString("updatedAt")
         )
     }
 

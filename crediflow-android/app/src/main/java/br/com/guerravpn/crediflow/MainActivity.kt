@@ -43,7 +43,7 @@ private val Danger = Color(0xFFFF6B7B)
 private val Warning = Color(0xFFFFCC66)
 
 private enum class Screen {
-    WELCOME, REGISTER, DOCUMENTS, ANALYSIS, CORRECTION, ACTIVATE, LOGIN, HOME, LOAN_REQUEST, ADMIN, ADMIN_DETAIL
+    WELCOME, TRACK, REGISTER, DOCUMENTS, ANALYSIS, CORRECTION, ACTIVATE, LOGIN, HOME, LOAN_REQUEST, ADMIN, ADMIN_DETAIL
 }
 
 class MainActivity : ComponentActivity() {
@@ -92,7 +92,12 @@ private fun CrediFlowApp() {
                 hasAnalysis = store.pendingApplication() != null,
                 onRegister = { screen = Screen.REGISTER },
                 onLogin = { screen = Screen.LOGIN },
+                onTrack = { screen = Screen.TRACK },
                 onAnalysis = { screen = Screen.ANALYSIS }
+            )
+
+            Screen.TRACK -> TrackApplicationScreen(
+                onBack = { screen = Screen.WELCOME }
             )
 
             Screen.REGISTER -> RegisterScreen(
@@ -187,6 +192,7 @@ private fun WelcomeScreen(
     hasAnalysis: Boolean,
     onRegister: () -> Unit,
     onLogin: () -> Unit,
+    onTrack: () -> Unit,
     onAnalysis: () -> Unit
 ) {
     Column(
@@ -201,23 +207,102 @@ private fun WelcomeScreen(
         }
 
         Spacer(Modifier.height(24.dp))
-        Text("CREDIFLOW · v0.3 build 3", fontSize = 11.sp, color = Muted, fontWeight = FontWeight.Bold)
+        Text("CREDIFLOW · v0.4 build 4", fontSize = 11.sp, color = Muted, fontWeight = FontWeight.Bold)
         Text("Crédito com clareza do início ao fim.", fontSize = 34.sp, lineHeight = 38.sp, fontWeight = FontWeight.Black)
         Spacer(Modifier.height(28.dp))
 
         Primary("Criar cadastro", onRegister)
         Spacer(Modifier.height(10.dp))
         Secondary("Entrar na minha conta", onLogin)
+        Spacer(Modifier.height(10.dp))
+        Secondary("Acompanhar solicitação", onTrack)
 
         if (hasAnalysis) {
             TextButton(onClick = onAnalysis, modifier = Modifier.fillMaxWidth()) {
-                Text("Acompanhar minha análise")
+                Text("Continuar solicitação neste aparelho")
             }
         }
 
         Spacer(Modifier.height(16.dp))
         Text(
             "Fluxo atual: cadastro + documentos + análise manual. Open Finance está desativado por enquanto.",
+            color = Muted,
+            fontSize = 12.sp,
+            lineHeight = 17.sp
+        )
+    }
+}
+
+@Composable
+private fun TrackApplicationScreen(onBack: () -> Unit) {
+    val scope = rememberCoroutineScope()
+    var email by remember { mutableStateOf("") }
+    var loading by remember { mutableStateOf(false) }
+    var result by remember { mutableStateOf<PublicApplicationStatus?>(null) }
+    var error by remember { mutableStateOf<String?>(null) }
+
+    Page("Acompanhar solicitação", "Consulte pelo mesmo e-mail usado no cadastro.", onBack) {
+        Field("E-mail", email, KeyboardType.Email) {
+            email = it.trimStart().take(254)
+            result = null
+            error = null
+        }
+
+        Button(
+            enabled = !loading && email.contains("@") && email.contains("."),
+            onClick = {
+                loading = true
+                error = null
+                result = null
+                scope.launch {
+                    try {
+                        result = SupabaseApi.trackApplication(email)
+                    } catch (e: Exception) {
+                        error = friendly(e)
+                    } finally {
+                        loading = false
+                    }
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            if (loading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp),
+                    strokeWidth = 2.dp,
+                    color = Bg
+                )
+            } else {
+                Text("Consultar andamento")
+            }
+        }
+
+        result?.let { s ->
+            Spacer(Modifier.height(14.dp))
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Panel2)
+            ) {
+                Column(Modifier.fillMaxWidth().padding(18.dp)) {
+                    Text(s.title, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                    Spacer(Modifier.height(6.dp))
+                    if (s.found && s.step > 0) {
+                        Text("Etapa ${s.step} de 5", color = Blue, fontWeight = FontWeight.Bold)
+                        Spacer(Modifier.height(6.dp))
+                    }
+                    Text(s.message, color = Muted, lineHeight = 20.sp)
+                    if (!s.updatedAt.isNullOrBlank()) {
+                        Spacer(Modifier.height(8.dp))
+                        Text("Última atualização registrada no sistema.", color = Muted, fontSize = 12.sp)
+                    }
+                }
+            }
+        }
+
+        error?.let { ErrorBox(it) }
+        Spacer(Modifier.height(8.dp))
+        Text(
+            "Por segurança, esta consulta mostra somente o andamento geral. Dados pessoais, documentos, renda e limite não aparecem aqui.",
             color = Muted,
             fontSize = 12.sp,
             lineHeight = 17.sp
