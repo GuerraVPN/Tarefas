@@ -30,6 +30,7 @@ import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.text.NumberFormat
 import java.time.LocalDate
+import java.time.ZoneId
 import java.util.Locale
 
 private val Bg = Color(0xFF07101E)
@@ -252,8 +253,34 @@ private fun RegisterScreen(onBack: () -> Unit, onCreated: (String, String, Strin
             today.monthValue - 1,
             today.dayOfMonth
         ).apply {
-            datePicker.maxDate = System.currentTimeMillis() - 18L * 365L * 24L * 60L * 60L * 1000L
+            datePicker.maxDate = today.minusYears(18)
+                .atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
         }.show()
+    }
+
+    var cepLookupRunning by remember { mutableStateOf(false) }
+    LaunchedEffect(cep.filter(Char::isDigit)) {
+        val digits = cep.filter(Char::isDigit)
+        if (digits.length == 8) {
+            cepLookupRunning = true
+            try {
+                val address = SupabaseApi.lookupCep(digits)
+                if (address != null) {
+                    if (address.street.isNotBlank()) street = address.street
+                    if (address.neighborhood.isNotBlank()) neighborhood = address.neighborhood
+                    if (address.city.isNotBlank()) city = address.city
+                    if (address.state.isNotBlank()) state = address.state
+                    if (complement.isBlank() && address.complement.isNotBlank()) complement = address.complement
+                    if (error == "CEP não encontrado." || error == "Não foi possível consultar o CEP agora.") error = null
+                } else {
+                    error = "CEP não encontrado. Confira o número ou preencha o endereço manualmente."
+                }
+            } catch (_: Exception) {
+                error = "Não foi possível consultar o CEP agora. Você pode preencher o endereço manualmente."
+            } finally {
+                cepLookupRunning = false
+            }
+        }
     }
 
     Page("Seu cadastro", "Preencha os dados para iniciar a análise.", onBack) {
@@ -264,8 +291,8 @@ private fun RegisterScreen(onBack: () -> Unit, onCreated: (String, String, Strin
 
         Field("Nome completo", name) { name = it }
         Field("E-mail", email, KeyboardType.Email) { email = it }
-        Field("CPF", cpf, KeyboardType.Number) { cpf = it.filter(Char::isDigit).take(11) }
-        Field("Celular", phone, KeyboardType.Phone) { phone = it }
+        Field("CPF", cpf, KeyboardType.Number) { cpf = formatCpfInput(it) }
+        Field("Celular", phone, KeyboardType.Phone) { phone = formatPhoneInput(it) }
 
         Text("Data de nascimento", color = Muted, fontSize = 12.sp)
         OutlinedButton(onClick = { pickBirthDate() }, modifier = Modifier.fillMaxWidth()) {
@@ -273,17 +300,18 @@ private fun RegisterScreen(onBack: () -> Unit, onCreated: (String, String, Strin
         }
 
         Section("Endereço")
+        Field("CEP", cep, KeyboardType.Number) { cep = formatCepInput(it) }
+        if (cepLookupRunning) Text("Buscando endereço pelo CEP...", color = Muted, fontSize = 11.sp)
         Field("Rua / avenida", street) { street = it }
         Field("Número", number) { number = it }
         Field("Complemento", complement) { complement = it }
         Field("Bairro", neighborhood) { neighborhood = it }
         Field("Cidade", city) { city = it }
         Field("UF", state) { state = it.uppercase().take(2) }
-        Field("CEP", cep, KeyboardType.Number) { cep = it.filter(Char::isDigit).take(8) }
 
         Section("Dados para análise")
         Field("Profissão / ocupação", occupation) { occupation = it }
-        Field("Renda mensal aproximada", income, KeyboardType.Decimal) { income = it }
+        MoneyField("Renda mensal aproximada", income) { income = it }
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             Checkbox(consent, { consent = it })
@@ -301,8 +329,14 @@ private fun RegisterScreen(onBack: () -> Unit, onCreated: (String, String, Strin
             onClick = {
                 if (listOf(name, email, cpf, phone, birth, street, number, neighborhood, city, state, cep).any { it.isBlank() }) {
                     error = "Preencha os campos obrigatórios."
+                } else if (!isValidCpf(cpf)) {
+                    error = "CPF inválido. Confira os números informados."
+                } else if (phone.filter(Char::isDigit).length !in 10..11) {
+                    error = "Informe um telefone com DDD."
+                } else if (cep.filter(Char::isDigit).length != 8) {
+                    error = "Informe um CEP válido."
                 } else {
-                    val inc = income.replace(",", ".").toDoubleOrNull()
+                    val inc = moneyToDouble(income)
                     if (inc == null || inc < 0) {
                         error = "Informe uma renda válida."
                     } else {
@@ -605,7 +639,10 @@ private fun CorrectionScreen(
             now.year - 18,
             now.monthValue - 1,
             now.dayOfMonth
-        ).show()
+        ).apply {
+            datePicker.maxDate = now.minusYears(18)
+                .atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        }.show()
     }
 
     val docLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -630,6 +667,20 @@ private fun CorrectionScreen(
     }
 
     LaunchedEffect(pending?.first) { refresh() }
+    LaunchedEffect(cep.filter(Char::isDigit)) {
+        val digits = cep.filter(Char::isDigit)
+        if (digits.length == 8) {
+            try {
+                SupabaseApi.lookupCep(digits)?.let { address ->
+                    if (address.street.isNotBlank()) street = address.street
+                    if (address.neighborhood.isNotBlank()) neighborhood = address.neighborhood
+                    if (address.city.isNotBlank()) city = address.city
+                    if (address.state.isNotBlank()) state = address.state
+                    if (complement.isBlank() && address.complement.isNotBlank()) complement = address.complement
+                }
+            } catch (_: Exception) { }
+        }
+    }
 
     Page("Atualizar cadastro", "Corrija somente o que foi solicitado.", onBack) {
         val p = pending
@@ -645,8 +696,8 @@ private fun CorrectionScreen(
 
         if ("full_name" in fields) Field("Nome completo", fullName) { fullName = it }
         if ("email" in fields) Field("E-mail", email, KeyboardType.Email) { email = it }
-        if ("cpf" in fields) Field("CPF", cpf, KeyboardType.Number) { cpf = it.filter(Char::isDigit).take(11) }
-        if ("phone" in fields) Field("Celular", phone, KeyboardType.Phone) { phone = it }
+        if ("cpf" in fields) Field("CPF", cpf, KeyboardType.Number) { cpf = formatCpfInput(it) }
+        if ("phone" in fields) Field("Celular", phone, KeyboardType.Phone) { phone = formatPhoneInput(it) }
 
         if ("birth_date" in fields) {
             Text("Data de nascimento", color = Muted, fontSize = 12.sp)
@@ -656,17 +707,17 @@ private fun CorrectionScreen(
         }
 
         if ("occupation" in fields) Field("Profissão / ocupação", occupation) { occupation = it }
-        if ("monthly_income" in fields) Field("Renda mensal", income, KeyboardType.Decimal) { income = it }
+        if ("monthly_income" in fields) MoneyField("Renda mensal", income) { income = it }
 
         if ("address" in fields) {
             Section("Endereço")
+            Field("CEP", cep, KeyboardType.Number) { cep = formatCepInput(it) }
             Field("Rua / avenida", street) { street = it }
             Field("Número", number) { number = it }
             Field("Complemento", complement) { complement = it }
             Field("Bairro", neighborhood) { neighborhood = it }
             Field("Cidade", city) { city = it }
             Field("UF", state) { state = it.uppercase().take(2) }
-            Field("CEP", cep, KeyboardType.Number) { cep = it.filter(Char::isDigit).take(8) }
         }
 
         if ("identity_front" in fields) {
@@ -702,7 +753,7 @@ private fun CorrectionScreen(
                     if ("phone" in fields && phone.isNotBlank()) updates.put("phone", phone)
                     if ("birth_date" in fields && birth.isNotBlank()) updates.put("birth_date", birth)
                     if ("occupation" in fields) updates.put("occupation", occupation)
-                    if ("monthly_income" in fields && income.isNotBlank()) updates.put("monthly_income", income.replace(",", ".").toDoubleOrNull())
+                    if ("monthly_income" in fields && income.isNotBlank()) updates.put("monthly_income", moneyToDouble(income))
                     if ("address" in fields) {
                         updates.put(
                             "address",
@@ -1022,7 +1073,7 @@ private fun AdminDetailScreen(
 
         Section("Cadastro")
         Two("CPF", maskCpf(app.cpf), "Nascimento", displayDate(app.birthDate))
-        Two("Telefone", app.phone, "Cidade", "${app.city}/${app.state}")
+        Two("Telefone", formatPhoneInput(app.phone), "Cidade", "${app.city}/${app.state}")
         Two("Ocupação", app.occupation.ifBlank { "—" }, "Renda", app.monthlyIncome?.let(::brl) ?: "—")
 
         d?.verificationScore?.let {
@@ -1106,7 +1157,7 @@ private fun AdminDetailScreen(
         }
 
         Section("Decisão manual")
-        Field("Limite aprovado (R$)", limit, KeyboardType.Decimal) { limit = it }
+        MoneyField("Limite aprovado", limit) { limit = it }
         Field("Taxa mensal (%)", rate, KeyboardType.Decimal) { rate = it }
         Field("Máximo de parcelas", maxInstallments, KeyboardType.Number) { maxInstallments = it.filter(Char::isDigit).take(2) }
         Field("Faixa interna (A/B/C/D)", tier) { tier = it.uppercase().take(1) }
@@ -1114,7 +1165,7 @@ private fun AdminDetailScreen(
         Button(
             enabled = !loading && limit.isNotBlank() && rate.isNotBlank(),
             onClick = {
-                val l = limit.replace(",", ".").toDoubleOrNull()
+                val l = moneyToDouble(limit)
                 val r = rate.replace(",", ".").toDoubleOrNull()
                 val m = maxInstallments.toIntOrNull()
                 if (l == null || r == null || m == null || l <= 0 || r < 0 || m < 1) {
@@ -1335,6 +1386,22 @@ private fun Field(
 }
 
 @Composable
+private fun MoneyField(label: String, value: String, onChange: (String) -> Unit) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = { raw ->
+            val cleaned = raw.filter { it.isDigit() || it == ',' || it == '.' }.take(14)
+            onChange(cleaned)
+        },
+        label = { Text(label) },
+        prefix = { Text("R$ ") },
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+    )
+}
+
+@Composable
 private fun PassField(label: String, value: String, onChange: (String) -> Unit) {
     OutlinedTextField(
         value = value,
@@ -1470,6 +1537,50 @@ private fun displayDate(iso: String): String {
 private fun maskCpf(cpf: String): String {
     val d = cpf.filter(Char::isDigit)
     return if (d.length == 11) "***.${d.substring(3, 6)}.${d.substring(6, 9)}-**" else cpf
+}
+
+private fun formatCpfInput(value: String): String {
+    val d = value.filter(Char::isDigit).take(11)
+    return when {
+        d.length <= 3 -> d
+        d.length <= 6 -> "${d.substring(0,3)}.${d.substring(3)}"
+        d.length <= 9 -> "${d.substring(0,3)}.${d.substring(3,6)}.${d.substring(6)}"
+        else -> "${d.substring(0,3)}.${d.substring(3,6)}.${d.substring(6,9)}-${d.substring(9)}"
+    }
+}
+
+private fun formatPhoneInput(value: String): String {
+    val d = value.filter(Char::isDigit).take(11)
+    if (d.isEmpty()) return ""
+    return when {
+        d.length <= 2 -> "($d"
+        d.length <= 6 -> "(${d.substring(0,2)}) ${d.substring(2)}"
+        d.length <= 10 -> "(${d.substring(0,2)}) ${d.substring(2,6)}-${d.substring(6)}"
+        else -> "(${d.substring(0,2)}) ${d.substring(2,7)}-${d.substring(7)}"
+    }
+}
+
+private fun formatCepInput(value: String): String {
+    val d = value.filter(Char::isDigit).take(8)
+    return if (d.length <= 5) d else "${d.substring(0,5)}-${d.substring(5)}"
+}
+
+private fun moneyToDouble(value: String): Double? {
+    val normalized = value.trim().replace("R$", "").replace(" ", "").replace(",", ".")
+    return normalized.toDoubleOrNull()
+}
+
+private fun isValidCpf(value: String): Boolean {
+    val d = value.filter(Char::isDigit)
+    if (d.length != 11 || d.all { it == d.first() }) return false
+    fun digit(base: Int): Int {
+        var sum = 0
+        var weight = base + 1
+        for (i in 0 until base) sum += (d[i] - '0') * weight--
+        val r = (sum * 10) % 11
+        return if (r == 10) 0 else r
+    }
+    return digit(9) == (d[9] - '0') && digit(10) == (d[10] - '0')
 }
 
 private fun verificationLabel(level: String?): String = when (level) {

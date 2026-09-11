@@ -79,6 +79,14 @@ data class CorrectionMail(
     val body: String
 )
 
+data class CepAddress(
+    val street: String,
+    val neighborhood: String,
+    val city: String,
+    val state: String,
+    val complement: String
+)
+
 data class LoanSummary(
     val id: String,
     val principal: Double,
@@ -237,6 +245,32 @@ object SupabaseApi {
             role = meta.optString("role", "client"),
             activationRequired = meta.optBoolean("activation_required", false)
         )
+    }
+
+    suspend fun lookupCep(cep: String): CepAddress? = withContext(Dispatchers.IO) {
+        val digits = cep.filter(Char::isDigit)
+        if (digits.length != 8) return@withContext null
+        val c = URL("https://viacep.com.br/ws/$digits/json/").openConnection() as HttpURLConnection
+        try {
+            c.requestMethod = "GET"
+            c.connectTimeout = 8_000
+            c.readTimeout = 10_000
+            c.setRequestProperty("Accept", "application/json")
+            val code = c.responseCode
+            if (code !in 200..299) return@withContext null
+            val text = c.inputStream.bufferedReader().use { it.readText() }
+            val j = JSONObject(text)
+            if (j.optBoolean("erro", false)) return@withContext null
+            CepAddress(
+                street = j.optString("logradouro"),
+                neighborhood = j.optString("bairro"),
+                city = j.optString("localidade"),
+                state = j.optString("uf"),
+                complement = j.optString("complemento")
+            )
+        } finally {
+            c.disconnect()
+        }
     }
 
     suspend fun submitApplication(
