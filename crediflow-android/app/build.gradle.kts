@@ -10,7 +10,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "br.com.guerravpn.crediflow"
+        applicationId = "com.guerravpn.crediflow"
         minSdk = 26
         targetSdk = 36
         versionCode = 4
@@ -42,7 +42,6 @@ android {
 
     buildTypes {
         debug {
-            applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
         }
         release {
