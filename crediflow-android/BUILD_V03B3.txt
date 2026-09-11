@@ -1,0 +1,2 @@
+CrediFlow v0.3 build 3
+Admin fixes: preload approved values, show activation code, prefill manual email.
