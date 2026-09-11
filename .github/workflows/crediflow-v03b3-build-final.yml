@@ -1,0 +1,60 @@
+name: CrediFlow v0.3 build 3 final APK
+
+on:
+  push:
+    branches:
+      - crediflow-v0.3-build3
+    paths:
+      - ".github/workflows/crediflow-v03b3-build-final.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: crediflow-v0.3-build3
+      - name: Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Install Android 36
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+      - name: Gradle 9.6
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "9.6.0"
+      - name: Restore stable CrediFlow debug signer
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: crediflow-debug-signer-v1
+      - name: Create stable debug signer when missing
+        run: |
+          mkdir -p ~/.android
+          if [ ! -f ~/.android/debug.keystore ]; then
+            keytool -genkeypair -v \
+              -keystore ~/.android/debug.keystore \
+              -storepass android \
+              -alias androiddebugkey \
+              -keypass android \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -dname "CN=CrediFlow Debug,O=GuerraVPN,C=BR"
+          fi
+      - name: Build APK
+        run: gradle -p crediflow-android :app:assembleDebug --stacktrace
+      - name: Rename APK
+        run: cp crediflow-android/app/build/outputs/apk/debug/app-debug.apk CrediFlow-v0.3-build3-stable-debug.apk
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: CrediFlow-v0.3-build3-stable-debug
+          path: CrediFlow-v0.3-build3-stable-debug.apk
+          if-no-files-found: error
