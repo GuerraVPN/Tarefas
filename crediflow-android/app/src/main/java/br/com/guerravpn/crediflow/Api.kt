@@ -96,6 +96,41 @@ data class LoanSummary(
     val requestedAt: String
 )
 
+data class LoanPreview(
+    val available: Double,
+    val amount: Double,
+    val monthlyRate: Double,
+    val installments: Int,
+    val installmentValue: Double,
+    val total: Double,
+    val contractVersion: String,
+    val contractBody: String
+)
+
+data class LoanRequestResult(
+    val loanId: String,
+    val status: String,
+    val contractNumber: String,
+    val total: Double
+)
+
+data class AdminLoanRequest(
+    val id: String,
+    val fullName: String,
+    val email: String,
+    val principal: Double,
+    val totalAmount: Double,
+    val monthlyRate: Double,
+    val installments: Int,
+    val status: String,
+    val requestedAt: String,
+    val pixType: String,
+    val pixMasked: String,
+    val pixValue: String,
+    val contractNumber: String,
+    val readingChoice: String
+)
+
 data class ClientHome(
     val fullName: String,
     val email: String,
@@ -550,6 +585,102 @@ object SupabaseApi {
             recipient = r.optString("recipient"),
             subject = r.optString("subject"),
             body = r.optString("body")
+        )
+    }
+
+    suspend fun previewLoan(access: String, amount: Double, installments: Int): LoanPreview {
+        val r = JSONObject(
+            request(
+                "POST",
+                "/functions/v1/client-loan-preview",
+                JSONObject().put("amount", amount).put("installments", installments),
+                access
+            )
+        )
+        return LoanPreview(
+            available = r.optDouble("available"),
+            amount = r.optDouble("amount"),
+            monthlyRate = r.optDouble("monthlyRate"),
+            installments = r.optInt("installments"),
+            installmentValue = r.optDouble("installmentValue"),
+            total = r.optDouble("total"),
+            contractVersion = r.optString("contractVersion"),
+            contractBody = r.optString("contractBody")
+        )
+    }
+
+    suspend fun submitLoanRequest(
+        access: String,
+        amount: Double,
+        installments: Int,
+        pixKeyType: String,
+        pixKey: String,
+        readingChoice: String
+    ): LoanRequestResult {
+        val r = JSONObject(
+            request(
+                "POST",
+                "/functions/v1/client-loan-request",
+                JSONObject()
+                    .put("amount", amount)
+                    .put("installments", installments)
+                    .put("pixKeyType", pixKeyType)
+                    .put("pixKey", pixKey)
+                    .put("repaymentMethod", "pix")
+                    .put("readingChoice", readingChoice),
+                access
+            )
+        )
+        return LoanRequestResult(
+            loanId = r.optString("loanId"),
+            status = r.optString("status"),
+            contractNumber = r.optString("contractNumber"),
+            total = r.optDouble("total")
+        )
+    }
+
+    suspend fun listAdminLoanRequests(access: String): List<AdminLoanRequest> {
+        val root = JSONObject(request("GET", "/functions/v1/admin-loan-requests", accessToken = access))
+        val a = root.optJSONArray("items") ?: JSONArray()
+        return (0 until a.length()).map { i ->
+            val j = a.getJSONObject(i)
+            val p = j.optJSONObject("profile") ?: JSONObject()
+            val pix = j.optJSONObject("pix") ?: JSONObject()
+            val c = j.optJSONObject("contract") ?: JSONObject()
+            AdminLoanRequest(
+                id = j.optString("id"),
+                fullName = p.optString("full_name", "Cliente"),
+                email = p.optString("email"),
+                principal = j.optDouble("principal"),
+                totalAmount = j.optDouble("total_amount"),
+                monthlyRate = j.optDouble("monthly_interest_rate"),
+                installments = j.optInt("installments_count"),
+                status = j.optString("status"),
+                requestedAt = j.optString("requested_at"),
+                pixType = pix.optString("key_type"),
+                pixMasked = pix.optString("key_masked"),
+                pixValue = pix.optString("key_value"),
+                contractNumber = c.optString("contract_number"),
+                readingChoice = c.optString("reading_choice")
+            )
+        }
+    }
+
+    suspend fun confirmManualDisbursement(access: String, loanId: String, note: String) {
+        request(
+            "POST",
+            "/functions/v1/admin-confirm-disbursement",
+            JSONObject().put("loanId", loanId).put("note", note),
+            access
+        )
+    }
+
+    suspend fun rejectLoanRequest(access: String, loanId: String, note: String) {
+        request(
+            "POST",
+            "/functions/v1/admin-reject-loan-request",
+            JSONObject().put("loanId", loanId).put("note", note),
+            access
         )
     }
 
