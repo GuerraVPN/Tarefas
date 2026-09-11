@@ -222,7 +222,7 @@ private fun WelcomeScreen(
         }
 
         Spacer(Modifier.height(24.dp))
-        Text("CREDIFLOW · v0.4 build 4", fontSize = 11.sp, color = Muted, fontWeight = FontWeight.Bold)
+        Text("CREDIFLOW · v0.5 build 5", fontSize = 11.sp, color = Muted, fontWeight = FontWeight.Bold)
         Text("Crédito com clareza do início ao fim.", fontSize = 34.sp, lineHeight = 38.sp, fontWeight = FontWeight.Black)
         Spacer(Modifier.height(28.dp))
 

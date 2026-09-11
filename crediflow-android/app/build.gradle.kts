@@ -13,8 +13,8 @@ android {
         applicationId = "com.guerravpn.crediflow"
         minSdk = 26
         targetSdk = 36
-        versionCode = 4
-        versionName = "0.4"
+        versionCode = 5
+        versionName = "0.5"
 
         buildConfigField("String", "SUPABASE_URL", "\"https://xvhbydoslqmnjjsnyvus.supabase.co\"")
         buildConfigField("String", "SUPABASE_PUBLISHABLE_KEY", "\"sb_publishable_uFIWm1dNBbbJqoxuy5aBLQ_QqtSJeya\"")
