@@ -6,15 +6,15 @@ plugins {
 }
 
 android {
-    namespace = "br.com.guerravpn.crediflow"
+    namespace = "br.com.guerravpn.crediflow.app"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "br.com.guerravpn.crediflow"
+        applicationId = "br.com.guerravpn.crediflow.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 6
-        versionName = "0.6"
+        versionCode = 7
+        versionName = "0.7"
 
         buildConfigField("String", "SUPABASE_URL", "\"https://xvhbydoslqmnjjsnyvus.supabase.co\"")
         buildConfigField("String", "SUPABASE_PUBLISHABLE_KEY", "\"sb_publishable_uFIWm1dNBbbJqoxuy5aBLQ_QqtSJeya\"")
@@ -42,8 +42,8 @@ android {
 
     buildTypes {
         debug {
-            applicationIdSuffix = ".debug"
-            versionNameSuffix = "-debug"
+            // Mantemos o mesmo applicationId e versionName da versão exibida no sistema.
+            // A build de teste continua assinada com a chave debug do Android.
         }
         release {
             isMinifyEnabled = false
