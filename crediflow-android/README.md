@@ -1,4 +1,4 @@
-# CrediFlow Android — v0.6 build 6
+# CrediFlow Android — v0.7
 
 Aplicativo Android nativo em Kotlin + Jetpack Compose conectado ao projeto Supabase `xvhbydoslqmnjjsnyvus`.
 
@@ -8,18 +8,16 @@ Cadastro completo → Open Finance → Análise → aprovação manual no Admin 
 
 A decisão de crédito continua manual: limite, taxa e número máximo de parcelas são informados pelo administrador. O aplicativo não calcula sozinho quem deve receber crédito.
 
-## Novidades da 0.6
+## Correções e novidades da 0.7
 
-- Tema oficial **Professional**, em azul corporativo, aplicado à nova Activity da 0.6.
-- Nova área **Perfil e segurança**.
-- Cliente pode alterar o **nome de exibição** (como quer ser chamado).
-- Cliente pode trocar a **foto de perfil**; imagens ficam no bucket `profile-avatars`, limitadas a 5 MB e JPEG/PNG/WebP.
-- Cliente pode alterar a **senha** usando o Supabase Auth.
-- Campos de identidade ficam bloqueados para edição direta: nome civil e CPF, além dos dados verificados exibidos na tela.
-- O banco só concede UPDATE ao cliente nas colunas `display_name` e `avatar_path`; não é apenas um bloqueio visual.
-- Alterações de nome/foto geram registros em `audit_log`.
-- Alteração de senha registra evento de segurança sem armazenar a senha.
-- Painel Admin ganhou a tela **Histórico de auditoria**, com usuário, ação e data/hora.
+- Novo package/applicationId: `br.com.guerravpn.crediflow.app`, separado das builds antigas para evitar conflito de instalação.
+- Versão do Android exibida somente como **0.7**, sem `-debug` e sem `build` no `versionName`.
+- Ícone do CrediFlow configurado como launcher icon adaptativo e round icon.
+- Botão **Acompanhar solicitação** restaurado na tela inicial e mantido visível.
+- Tema oficial **Professional** mantido.
+- Área **Perfil e segurança** mantida com nome de exibição, foto de perfil e alteração de senha.
+- Campos de identidade permanecem bloqueados para edição direta.
+- Histórico de auditoria do Admin mantido.
 - A solicitação de empréstimo continua limitada ao valor já aprovado e não simula uma transferência real.
 
 ## Integrações ainda pendentes
@@ -32,4 +30,4 @@ Para OTP real para clientes externos, configure SMTP customizado no Supabase Aut
 
 A configuração release está preparada para usar o mesmo certificado do Tarefas: alias `alias`, SHA-256 `B0:22:A5:42:DD:8E:D9:5F:8F:7C:C5:DA:3F:EF:CC:5A:1B:5E:2A:A1:58:ED:E0:14:2C:71:09:FB:F7:4A:43:B5`. O keystore e as senhas nunca são commitados.
 
-A APK gerada automaticamente pelo workflow atual é **debug**, destinada a testes da 0.6.
+A APK gerada automaticamente pelo workflow atual é de teste da versão 0.7.
