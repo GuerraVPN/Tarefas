@@ -84,7 +84,7 @@ private fun V06App() {
 
     Surface(modifier = Modifier.fillMaxSize(), color = PBg) {
         when (screen) {
-            V06Screen.WELCOME -> V06Welcome(
+            V06Screen.WELCOME -> V08Welcome(
                 hasAnalysis = store.pendingApplication() != null,
                 onRegister = { screen = V06Screen.REGISTER },
                 onLogin = { screen = V06Screen.LOGIN },
@@ -97,7 +97,7 @@ private fun V06App() {
                     screen = V06Screen.ANALYSIS
                 }
             )
-            V06Screen.ANALYSIS -> V06Analysis(
+            V06Screen.ANALYSIS -> V08Analysis(
                 pending = store.pendingApplication(),
                 onBack = { screen = V06Screen.WELCOME },
                 onActivation = { screen = V06Screen.ACTIVATE }
@@ -143,7 +143,7 @@ private fun V06App() {
                     store.clearSession(); session = null; screen = V06Screen.WELCOME
                 }
             )
-            V06Screen.LOAN -> V06Loan(session) { screen = V06Screen.HOME }
+            V06Screen.LOAN -> V08Loan(session) { screen = V06Screen.HOME }
             V06Screen.PROFILE -> V06Profile(
                 session = session,
                 onBack = { screen = V06Screen.HOME },
@@ -151,7 +151,7 @@ private fun V06App() {
                     store.clearSession(); session = null; screen = V06Screen.WELCOME
                 }
             )
-            V06Screen.ADMIN -> V06Admin(
+            V06Screen.ADMIN -> V08Admin(
                 session = session,
                 onSelect = { selectedApplication = it; screen = V06Screen.ADMIN_DETAIL },
                 onAudit = { screen = V06Screen.ADMIN_AUDIT },
@@ -159,7 +159,7 @@ private fun V06App() {
                     store.clearSession(); session = null; screen = V06Screen.WELCOME
                 }
             )
-            V06Screen.ADMIN_DETAIL -> V06AdminDetail(
+            V06Screen.ADMIN_DETAIL -> V08AdminDetail(
                 session = session,
                 application = selectedApplication,
                 onBack = { screen = V06Screen.ADMIN },
@@ -790,7 +790,7 @@ private fun V06Page(title:String,subtitle:String,onBack:(()->Unit)?,content:@Com
         Spacer(Modifier.height(28.dp))
         HorizontalDivider(color = PSurfaceAlt)
         Spacer(Modifier.height(10.dp))
-        Text("CrediFlow · 0.7 · Professional", color = PMuted, fontSize = 10.sp)
+        Text("CrediFlow · 0.8 · Professional", color = PMuted, fontSize = 10.sp)
     }
 }
 
