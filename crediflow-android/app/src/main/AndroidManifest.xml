@@ -5,11 +5,12 @@
         android:allowBackup="false"
         android:fullBackupContent="false"
         android:usesCleartextTraffic="false"
-        android:icon="@drawable/ic_crediflow"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:label="CrediFlow"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivityV06"
+            android:name="br.com.guerravpn.crediflow.MainActivityV06"
             android:exported="true"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -18,7 +19,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name="br.com.guerravpn.crediflow.MainActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
     </application>
