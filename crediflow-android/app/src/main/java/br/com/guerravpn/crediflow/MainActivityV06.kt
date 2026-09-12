@@ -181,15 +181,13 @@ private fun V06Welcome(hasAnalysis:Boolean,onRegister:()->Unit,onLogin:()->Unit,
         Text("CREDIFLOW", color = PBlueSoft, fontSize = 12.sp, fontWeight = FontWeight.Bold)
         Text("Crédito simples, análise clara.", color = PText, fontSize = 34.sp, lineHeight = 39.sp, fontWeight = FontWeight.Black)
         Spacer(Modifier.height(10.dp))
-        Text("Versão 0.6 · build 6", color = PMuted, fontSize = 13.sp)
+        Text("Versão 0.7", color = PMuted, fontSize = 13.sp)
         Spacer(Modifier.height(30.dp))
         V06Primary("Criar cadastro", onRegister)
         Spacer(Modifier.height(10.dp))
         V06Secondary("Entrar na minha conta", onLogin)
-        if (hasAnalysis) {
-            TextButton(onClick = onAnalysis, modifier = Modifier.fillMaxWidth()) {
-                Text("Acompanhar minha análise")
-            }
+        TextButton(onClick = onAnalysis, modifier = Modifier.fillMaxWidth()) {
+            Text("Acompanhar solicitação")
         }
         Spacer(Modifier.height(18.dp))
         V06Info("Fluxo da conta", "Cadastro → Open Finance → análise manual → aprovação → código por e-mail → criação de senha.")
@@ -490,7 +488,7 @@ private fun V06Loan(session:Session?,onBack:()->Unit) {
             modifier = Modifier.fillMaxWidth().height(52.dp)
         ) { Text("Continuar") }
         if (reachedSummary) {
-            V06Info("Pronto para integração", "A 0.6 monta a solicitação, mas a liberação Pix real continua bloqueada até conectar o parceiro financeiro autorizado.")
+            V06Info("Pronto para integração", "A 0.7 monta a solicitação, mas a liberação Pix real continua bloqueada até conectar o parceiro financeiro autorizado.")
         }
     }
 }
@@ -792,7 +790,7 @@ private fun V06Page(title:String,subtitle:String,onBack:(()->Unit)?,content:@Com
         Spacer(Modifier.height(28.dp))
         HorizontalDivider(color = PSurfaceAlt)
         Spacer(Modifier.height(10.dp))
-        Text("CrediFlow · 0.6 build 6 · Professional", color = PMuted, fontSize = 10.sp)
+        Text("CrediFlow · 0.7 · Professional", color = PMuted, fontSize = 10.sp)
     }
 }
 
