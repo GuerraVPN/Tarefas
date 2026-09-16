@@ -1,0 +1,69 @@
+name: CrediFlow Beta195 clean build
+
+on:
+  push:
+    branches: [crediflow-beta195-build]
+    paths:
+      - '.github/workflows/crediflow-beta195-build.yml'
+      - 'crediflow-build/patch_beta195.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: crediflow-beta195-build
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Restore stable base
+        run: |
+          cat crediflow-build/base.part00 crediflow-build/base.part01 crediflow-build/base.part02 crediflow-build/base.part03 crediflow-build/base.part04 crediflow-build/base.part05 crediflow-build/base.part06 crediflow-build/base.part07 | base64 -d > /tmp/base.apk
+          echo '3d13bfb2e55c9d9719f19f6769701a28e438566574022bb4cd4d7220197a46c0  /tmp/base.apk' | sha256sum -c -
+      - name: Decode
+        run: |
+          curl -fL --retry 3 -o /tmp/apktool.jar https://github.com/iBotPeaches/Apktool/releases/download/v3.0.3/apktool_3.0.3.jar
+          echo 'dbf930b076c6b9be08d57c449cacefc3bdd6b71ebd59b3066fc0e1f5b14f9423  /tmp/apktool.jar' | sha256sum -c -
+          java -jar /tmp/apktool.jar d -f /tmp/base.apk -o /tmp/app
+      - name: Apply Beta195 updater fix
+        run: python crediflow-build/patch_beta195.py
+      - name: Build and verify
+        run: |
+          java -jar /tmp/apktool.jar b /tmp/app -o /tmp/CrediFlow-v1.9.5-beta-build195-unsigned.apk
+          unzip -t /tmp/CrediFlow-v1.9.5-beta-build195-unsigned.apk
+          grep -q 'versionCode: 195' /tmp/app/apktool.yml
+          grep -q 'versionName: 1.9.5' /tmp/app/apktool.yml
+          grep -q 'UpdateActivity' /tmp/app/AndroidManifest.xml
+          grep -Fq 'Atualizações' $(find /tmp/app -name MainActivityV06.smali)
+          UPDATE=$(find /tmp/app -name UpdateActivity.smali)
+          grep -Fq 'Atualizações' "$UPDATE"
+          grep -Fq 'CrediFlow 1.9.5 Beta · build 195' "$UPDATE"
+          grep -Fq 'loadDataWithBaseURL' "$UPDATE"
+          ! grep -Fq '\\u00e7' "$UPDATE"
+          ! grep -Fq '\\u00f5' "$UPDATE"
+          mkdir -p /tmp/qa
+          unzip -p /tmp/CrediFlow-v1.9.5-beta-build195-unsigned.apk classes3.dex > /tmp/qa/classes3.dex
+          sha256sum /tmp/CrediFlow-v1.9.5-beta-build195-unsigned.apk /tmp/qa/classes3.dex > /tmp/qa/hashes.txt
+          printf '%s\n' \
+            'OK clean_apktool_rebuild' \
+            'OK version_195' \
+            'OK update_activity_declared' \
+            'OK accented_strings_are_native_utf8' \
+            'OK webview_uses_loadDataWithBaseURL' \
+            'OK updater_html_is_local' \
+            'OK remote_access_is_manifest_json_only' > /tmp/qa/QA.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CrediFlow-v1.9.5-beta-build195-unsigned
+          path: |
+            /tmp/CrediFlow-v1.9.5-beta-build195-unsigned.apk
+            /tmp/qa/QA.txt
+            /tmp/qa/hashes.txt
+          if-no-files-found: error
+          retention-days: 7
