@@ -21,9 +21,14 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+      - name: Diagnose base chunks
+        run: |
+          sha256sum crediflow-build/base.part00 crediflow-build/base.part01 crediflow-build/base.part02 crediflow-build/base.part03 crediflow-build/base.part04 crediflow-build/base.part05 crediflow-build/base.part06 crediflow-build/base.part07
       - name: Restore and verify stable APK
         run: |
           cat crediflow-build/base.part00 crediflow-build/base.part01 crediflow-build/base.part02 crediflow-build/base.part03 crediflow-build/base.part04 crediflow-build/base.part05 crediflow-build/base.part06 crediflow-build/base.part07 | base64 -d > /tmp/crediflow-1.9.apk
+          stat -c '%s' /tmp/crediflow-1.9.apk
+          sha256sum /tmp/crediflow-1.9.apk
           test "$(stat -c '%s' /tmp/crediflow-1.9.apk)" = "70612"
           echo '3d13bfb2e55c9d9719f19f6769701a28e438566574022bb4cd4d7220197a46c0  /tmp/crediflow-1.9.apk' | sha256sum -c -
       - name: Download verified Apktool
