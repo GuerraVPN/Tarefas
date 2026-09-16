@@ -1,0 +1,10 @@
+Archive:  /tmp/control-unsigned.apk
+    testing: classes3.dex             OK
+    testing: classes.dex              OK
+    testing: AndroidManifest.xml      OK
+    testing: res/drawable/ic_crediflow.xml   OK
+    testing: classes2.dex             OK
+    testing: resources.arsc           OK
+    testing: assets/index.html        OK
+    testing: META-INF/com/android/build/gradle/app-metadata.properties   OK
+No errors detected in compressed data of /tmp/control-unsigned.apk.

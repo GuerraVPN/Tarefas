@@ -1,0 +1,2 @@
+main=/tmp/decoded/smali_classes3/br/com/guerravpn/crediflow/MainActivityV06.smali
+app=/tmp/decoded/smali_classes3/br/com/guerravpn/crediflow/CrediFlowApp.smali
