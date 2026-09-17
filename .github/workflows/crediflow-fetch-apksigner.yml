@@ -1,0 +1,30 @@
+name: CrediFlow fetch apksigner
+
+on:
+  push:
+    branches: [crediflow-beta195-build]
+    paths:
+      - '.github/workflows/crediflow-fetch-apksigner.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download apksig tool
+        run: |
+          curl -fL --retry 3 -o /tmp/apksig.jar https://dl.google.com/dl/android/maven2/com/android/tools/build/apksig/8.13.0/apksig-8.13.0.jar
+          echo 'c070ed1394629d74641aa0906f60b2ffa1ee77e6366a1f93437f59717b1aeb89  /tmp/apksig.jar' | sha256sum -c -
+          java -cp /tmp/apksig.jar com.android.apksigner.ApkSignerTool --version > /tmp/version.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: crediflow-apksigner-tool
+          path: |
+            /tmp/apksig.jar
+            /tmp/version.txt
+          if-no-files-found: error
+          retention-days: 1
