@@ -15,16 +15,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Download apksig tool
+      - name: Download Android Build Tools
         run: |
-          curl -fL --retry 3 -o /tmp/apksig.jar https://dl.google.com/dl/android/maven2/com/android/tools/build/apksig/8.13.0/apksig-8.13.0.jar
-          echo 'c070ed1394629d74641aa0906f60b2ffa1ee77e6366a1f93437f59717b1aeb89  /tmp/apksig.jar' | sha256sum -c -
-          java -cp /tmp/apksig.jar com.android.apksigner.ApkSignerTool --version > /tmp/version.txt
+          curl -fL --retry 3 -o /tmp/build-tools.zip https://dl.google.com/android/repository/build-tools_r36.1_linux.zip
+          echo 'a7b5889e4a79fcf3b0976bef40d401f4240fb1eed891d9d91169da1111e11d78  /tmp/build-tools.zip' | sha256sum -c -
+          mkdir -p /tmp/build-tools
+          unzip -q /tmp/build-tools.zip -d /tmp/build-tools
+          APKSIGNER_JAR=$(find /tmp/build-tools -path '*/lib/apksigner.jar' -print -quit)
+          ZIPALIGN=$(find /tmp/build-tools -type f -name zipalign -print -quit)
+          test -n "$APKSIGNER_JAR"
+          test -n "$ZIPALIGN"
+          cp "$APKSIGNER_JAR" /tmp/apksigner.jar
+          cp "$ZIPALIGN" /tmp/zipalign
+          chmod +x /tmp/zipalign
+          java -cp /tmp/apksigner.jar com.android.apksigner.ApkSignerTool --version > /tmp/version.txt
+          /tmp/zipalign -h >/tmp/zipalign.txt 2>&1 || true
       - uses: actions/upload-artifact@v4
         with:
           name: crediflow-apksigner-tool
           path: |
-            /tmp/apksig.jar
+            /tmp/apksigner.jar
+            /tmp/zipalign
             /tmp/version.txt
+            /tmp/zipalign.txt
           if-no-files-found: error
           retention-days: 1
