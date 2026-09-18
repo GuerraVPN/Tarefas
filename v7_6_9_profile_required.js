@@ -6,6 +6,7 @@ window.__TAREFAS_PROFILE_REQUIRED_V769__=true;
 const CONFIG_PAGE='configuracoes.html';
 const HOME_PAGE='dashboard.html';
 const CHECK_INTERVAL=2500;
+const SETTINGS_SESSION_KEY='tarefasPushSession17';
 let checking=false,overlay=null,lastChecked=0;
 
 function loggedUser(){try{return JSON.parse(localStorage.getItem('usuarioLogado')||'null')}catch(_){return null}}
@@ -22,6 +23,7 @@ function validPhone(v){const p=digits(v);return p.length>=10&&p.length<=13}
 function validEmail(v){const e=String(v||'').trim();return e.length>=6&&e.length<=180&&/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e)&&!/^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$/.test(e)}
 function pending(row){const a=[];if(!validCpf(row?.cpf))a.push('CPF');if(!validPhone(row?.telefone))a.push('telefone');if(!validEmail(row?.email))a.push('e-mail');return a}
 function client(){try{return typeof supabaseClient!=='undefined'?supabaseClient:null}catch(_){return null}}
+function sessionToken(){return String(localStorage.getItem(SETTINGS_SESSION_KEY)||'').trim()}
 function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
 async function waitClient(){for(let i=0;i<20;i++){const c=client();if(c)return c;await sleep(100)}return null}
 
@@ -69,8 +71,8 @@ function render(row,missing){
   if(!validEmail(emailValue)){msg.textContent='Informe um e-mail válido.';email.focus();return}
   btn.disabled=true;btn.textContent='Salvando e conferindo...';
   try{
-   const c=await waitClient();const u=loggedUser();if(!c||!u?.id)throw new Error('Sessão indisponível. Entre novamente no sistema.');
-   const r=await c.from('usuarios').update({cpf:cpfValue,telefone:phoneValue,email:emailValue}).eq('id',Number(u.id)).select('id,cpf,telefone,email,nome_guerra').single();
+   const c=await waitClient();const u=loggedUser(),token=sessionToken();if(!c||!u?.id||!token)throw new Error('Sessão indisponível. Entre novamente no sistema.');
+   const r=await c.rpc('v2_3_21_2_update_my_settings',{p_session_token:token,p_changes:{cpf:cpfValue,telefone:phoneValue,email:emailValue}});
    if(r.error||!r.data)throw new Error(r.error?.message||'Não foi possível salvar os dados.');
    const still=pending(r.data);if(still.length)throw new Error('Ainda há dados pendentes: '+still.join(', ')+'.');
    updateLocal(r.data);msg.style.color='#047857';msg.textContent='Cadastro atualizado. Liberando acesso...';
@@ -84,8 +86,8 @@ async function check(force=false){
  const u=loggedUser();if(!u?.id||isAdmin(u)||checking)return;
  if(!force&&Date.now()-lastChecked<1500)return;checking=true;lastChecked=Date.now();
  try{
-  const c=await waitClient();if(!c)return;
-  const r=await c.from('usuarios').select('id,cpf,telefone,email,nome_guerra,nome_completo,ativo').eq('id',Number(u.id)).maybeSingle();
+  const c=await waitClient(),token=sessionToken();if(!c||!token)return;
+  const r=await c.rpc('v2_3_21_2_get_my_settings',{p_session_token:token});
   if(r.error||!r.data)return;
   const missing=pending(r.data);if(!missing.length){updateLocal(r.data);return}
   if(page()!==CONFIG_PAGE){location.replace(CONFIG_PAGE+'?cadastro_obrigatorio=1');return}
