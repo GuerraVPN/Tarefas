@@ -58,9 +58,23 @@ console.log('CONFERÊNCIA 3/3 — Orçamentários e Material Carga');
 const comum=await readFile(path.join(root,'sistema_comum.js'),'utf8');
 for(const marker of ['__TAREFAS_ORC_ACTIVE_MODULE__','guias_v6.js','pedidos_v6.js','movimentacoes_v6.js','material_carga_v6.js','passagem_carga_v6.js','lavanderia_v211.js'])
   if(!comum.includes(marker))errors.push(`sistema_comum.js: lazy-load Orçamentário incompleto: ${marker}`);
-const carga=await readFile(path.join(root,'v7_7_0_material_carga.js'),'utf8');
-for(const marker of ["days=type==='deposito'?30:90","hasPending?'pos_processo':'periodica'","detectProcessCompletion","bindProcessWatcher"])
-  if(!carga.includes(marker))errors.push(`v7_7_0_material_carga.js: regra de conferência ausente: ${marker}`);
+// Material Carga foi modularizado após a V7.7.0.
+// Valide a arquitetura atual em vez de exigir marcadores antigos do arquivo monolítico.
+const cargaLoader=await readFile(path.join(root,'v7_7_0_material_carga.js'),'utf8').catch(()=> '');
+for(const marker of ['v7_8_3_material_carga_fix.js','v7_8_5_material_carga_upload_fix.js'])
+  if(!cargaLoader.includes(marker))errors.push(`v7_7_0_material_carga.js: módulo atual ausente no loader: ${marker}`);
+
+const cargaSafe=await readFile(path.join(root,'v7_8_3_material_carga_fix.js'),'utf8').catch(()=> '');
+for(const marker of ["days=t==='deposito'?30:90","orc_carga_pendencias","Atualização obrigatória após processo"])
+  if(!cargaSafe.includes(marker))errors.push(`v7_8_3_material_carga_fix.js: regra de conferência/validade ausente: ${marker}`);
+
+const cargaUpload=await readFile(path.join(root,'v7_8_5_material_carga_upload_fix.js'),'utf8').catch(()=> '');
+for(const marker of ["?\'pos_processo\':\'periodica\'","v7_7_0_registrar_documento_carga","p_motivo_atualizacao:motivo"])
+  if(!cargaUpload.includes(marker))errors.push(`v7_8_5_material_carga_upload_fix.js: regra de atualização ausente: ${marker}`);
+
+const cargaSql=await readFile(path.join(root,'supabase_v7_7_0_material_carga.sql'),'utf8').catch(()=> '');
+for(const marker of ['v7_7_0_criar_pendencia_carga','v7_7_0_pedido_carga_trigger','v7_7_0_movimentacao_carga_trigger',"new.status='pronto'","set status='resolvida'"])
+  if(!cargaSql.includes(marker))errors.push(`supabase_v7_7_0_material_carga.sql: automação de pendências ausente: ${marker}`);
 
 console.log(`Verificados ${htmlFiles.length} HTML e ${jsFiles.length} JavaScript.`);
 if (errors.length) {
