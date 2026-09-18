@@ -1,0 +1,113 @@
+name: Publicar Android no GitHub Releases
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/publish-android-releases.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar APK oficial e beta já validados
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          curl --fail --location --retry 5             'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.2.0.apk'             -o TAREFAS-2.2.0.apk
+
+          curl --fail --location --retry 5             'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.3.22.apk'             -o TAREFAS-2.3.22-beta.apk
+
+          test -s TAREFAS-2.2.0.apk
+          test -s TAREFAS-2.3.22-beta.apk
+
+          sha256sum TAREFAS-2.2.0.apk > TAREFAS-2.2.0.apk.sha256
+          sha256sum TAREFAS-2.3.22-beta.apk > TAREFAS-2.3.22-beta.apk.sha256
+
+          unzip -tq TAREFAS-2.2.0.apk
+          unzip -tq TAREFAS-2.3.22-beta.apk
+
+      - name: Preparar notas das releases
+        shell: bash
+        run: |
+          cat > stable-notes.md <<'EOF'
+          ## TAREFAS Android 2.2.0 — Release Oficial
+
+          Versão estável para uso normal.
+
+          **Build:** 220  
+          **Canal:** Oficial  
+          **Base Web:** 7.6.9
+
+          ### Destaques
+          - Base oficial do aplicativo Android 2.2.
+          - Sincronização com a base Web aprovada.
+          - Atualização cadastral obrigatória integrada ao fluxo do aplicativo.
+          - Mantém o canal oficial de atualizações.
+
+          ### Arquivos
+          Baixe **TAREFAS-2.2.0.apk** nos Assets abaixo.  
+          O arquivo **.sha256** pode ser usado para conferir a integridade do APK.
+          EOF
+
+          cat > beta-notes.md <<'EOF'
+          ## TAREFAS Android 2.3.22 — Beta
+
+          Pré-release pública para testes antes da promoção ao canal oficial.
+
+          **Build:** 263  
+          **Canal:** Beta  
+          **Base Web:** 7.8.2
+
+          ### Destaques
+          - Consolidação do ciclo 2.3.21.x.
+          - Login por biometria no Android.
+          - Assistente IA integrado ao perfil e às permissões reais do usuário.
+          - Correções no carregamento e salvamento das Configurações.
+          - Melhor sincronização das notificações Android/TAREFAS.
+          - Correções na criação e vinculação de tarefas pela IA.
+          - Downloads com confirmação e tentativa de abertura automática.
+          - Melhor tratamento de anexos e arquivos no aplicativo.
+          - Mantidas as validações de sessão, perfil ativo e confirmação antes de escritas da IA.
+
+          ### Arquivos
+          Baixe **TAREFAS-2.3.22-beta.apk** nos Assets abaixo.  
+          O arquivo **.sha256** pode ser usado para conferir a integridade do APK.
+
+          > Esta versão é Beta e pode receber alterações antes de virar uma versão oficial.
+          EOF
+
+      - name: Publicar Release oficial
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG='android-v2.2.0'
+
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$TAG"               TAREFAS-2.2.0.apk               TAREFAS-2.2.0.apk.sha256               --clobber               --repo "$GITHUB_REPOSITORY"
+            gh release edit "$TAG"               --title 'TAREFAS Android 2.2.0 — Oficial'               --notes-file stable-notes.md               --latest               --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$TAG"               TAREFAS-2.2.0.apk               TAREFAS-2.2.0.apk.sha256               --target 'app/android-v220-prep'               --title 'TAREFAS Android 2.2.0 — Oficial'               --notes-file stable-notes.md               --latest               --repo "$GITHUB_REPOSITORY"
+          fi
+
+      - name: Publicar Pré-release Beta
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG='android-v2.3.22-beta'
+
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$TAG"               TAREFAS-2.3.22-beta.apk               TAREFAS-2.3.22-beta.apk.sha256               --clobber               --repo "$GITHUB_REPOSITORY"
+            gh release edit "$TAG"               --title 'TAREFAS Android 2.3.22 — Beta'               --notes-file beta-notes.md               --prerelease               --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$TAG"               TAREFAS-2.3.22-beta.apk               TAREFAS-2.3.22-beta.apk.sha256               --target 'app/android-v2322-prep'               --title 'TAREFAS Android 2.3.22 — Beta'               --notes-file beta-notes.md               --prerelease               --repo "$GITHUB_REPOSITORY"
+          fi
