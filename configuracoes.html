@@ -60,7 +60,8 @@
         .hint{margin-top:11px;padding:10px 11px;border-radius:7px;background:var(--v4-surface-2);border:1px solid var(--v4-border);color:var(--v4-muted);font-size:11px;line-height:1.45;overflow-wrap:anywhere}.hint.warning{background:#fffbeb;border-color:#fde68a;color:#92400e}.save-system{width:100%;margin-top:15px;background:#111827;color:white;border:0;border-radius:7px;padding:10px 14px;font-size:13px;font-weight:bold}.save-system:hover{background:#1f2937}
         .toast{position:fixed;right:18px;bottom:18px;z-index:100000;background:#111827;color:#fff;padding:11px 14px;border-radius:8px;font-size:12px;box-shadow:0 10px 30px rgba(0,0,0,.22);opacity:0;transform:translateY(12px);pointer-events:none;transition:.2s;max-width:330px}.toast.show{opacity:1;transform:translateY(0)}.toast.error{background:#991b1b}
         .loading-cover{position:fixed;inset:0;background:rgba(243,244,246,.88);display:grid;place-items:center;z-index:200;color:var(--v4-text-2);font-size:13px}.loading-box{display:flex;align-items:center;gap:10px}.spinner{width:18px;height:18px;border:2px solid #cbd5e1;border-top-color:var(--v4-text);border-radius:50%;animation:spin .75s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
-        @media(max-width:1180px){.grid{grid-template-columns:1fr}.content{max-width:920px}}
+        @media(min-width:901px) and (max-width:1180px){.grid{grid-template-columns:minmax(0,1fr)}body.v3-shell .content,.content{max-width:920px!important;padding:20px!important}}
+        @media(max-width:680px){.two-col{grid-template-columns:minmax(0,1fr)}}
         @media(max-width:900px){body{display:block}.sidebar{position:fixed;left:0;top:0;height:100vh;transform:translateX(-100%);transition:.22s ease}.sidebar.open{transform:translateX(0)}.main-content{width:100%}.header{padding:15px}.menu-toggle{display:inline-flex}.content{padding:18px 18px 42px}.grid{grid-template-columns:1fr}}
         @media(max-width:560px){.two-col{grid-template-columns:1fr}.header{align-items:flex-start}.header-actions{gap:8px}.content{padding:15px}.status-strip{align-items:flex-start;flex-direction:column}.avatar-large{width:68px;height:68px}}
     
@@ -77,88 +78,7 @@
         .theme-preview.military .theme-shot{background:#d9d6bf}.theme-preview.military .theme-shot i{background:#29351f}.theme-preview.military .theme-shot b{background:#eeecd9}.theme-preview.military .theme-shot em{background:#d4d0b6}
         @media(max-width:560px){.theme-previews{grid-template-columns:1fr}}
 
-        /* ==========================================================
-           Ajuste da tela de Configurações — desktop/zoom/responsivo
-           Evita cartões cortados quando a sidebar reduz a área útil.
-           ========================================================== */
-        .content{
-            min-width:0;
-            margin:0 auto;
-        }
-        .grid{
-            grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr);
-        }
-        .grid > .card,
-        .card-body,
-        .field,
-        .two-col{
-            min-width:0;
-        }
-        .field input,
-        .field select{
-            min-width:0;
-            max-width:100%;
-        }
-        .hint{
-            overflow-wrap:anywhere;
-        }
-        .theme-previews{
-            grid-template-columns:repeat(2,minmax(120px,1fr));
-        }
 
-        /* Em monitores menores ou com zoom do navegador, usa uma coluna.
-           O breakpoint considera a largura perdida para a sidebar. */
-        @media (min-width:901px) and (max-width:1180px){
-            body.v3-shell .content,
-            .content{
-                padding:20px !important;
-            }
-            .grid{
-                grid-template-columns:minmax(0,1fr);
-                gap:16px;
-            }
-            .theme-previews{
-                grid-template-columns:repeat(4,minmax(0,1fr));
-            }
-        }
-
-        @media (max-width:900px){
-            .content{
-                max-width:100%;
-                margin:0;
-            }
-            .grid{
-                grid-template-columns:minmax(0,1fr);
-                gap:16px;
-            }
-            .theme-previews{
-                grid-template-columns:repeat(2,minmax(0,1fr));
-            }
-        }
-
-        @media (max-width:680px){
-            .two-col{
-                grid-template-columns:minmax(0,1fr);
-            }
-        }
-
-        @media (max-width:430px){
-            .content{
-                padding:12px;
-            }
-            .card-title{
-                padding:14px 15px;
-            }
-            .card-body{
-                padding:15px;
-            }
-            .avatar-row{
-                gap:12px;
-            }
-            .theme-previews{
-                grid-template-columns:minmax(0,1fr);
-            }
-        }
 
     </style>
     <link rel="stylesheet" href="notificacoes.css?v=6.0">
