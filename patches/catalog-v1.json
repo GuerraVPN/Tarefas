@@ -3,8 +3,8 @@
   "app": "TAREFAS",
   "baseVersion": "2.3.24",
   "baseBuild": 271,
-  "generatedAt": "2026-09-21T15:11:00Z",
-  "latestPatch": "2.3.24.3",
+  "generatedAt": "2026-09-21T15:25:00Z",
+  "latestPatch": "2.3.24.4",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -36,30 +36,33 @@
       ]
     },
     {
-      "id": "2.3.24.3",
-      "name": "TAREFAS 2.3.24.3 — Correção da Central de erros",
+      "id": "2.3.24.4",
+      "name": "TAREFAS 2.3.24.4 — Favoritos e filtros por abas",
       "baseVersion": "2.3.24",
       "minBuild": 271,
       "maxBuild": 271,
       "channel": "alpha",
-      "publishedAt": "2026-09-21T15:10:00Z",
+      "publishedAt": "2026-09-21T15:24:00Z",
       "cumulative": true,
       "replacementMode": "replace-older-same-base",
       "replaces": [
         "2.3.24.1",
-        "2.3.24.2"
+        "2.3.24.2",
+        "2.3.24.3"
       ],
       "installable": true,
-      "description": "Corrige erros transitórios de DOM em Usuários e Dashboard e remove esses falsos positivos da Central de erros sem esconder outros diagnósticos.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.3.tpatch",
-      "sha256": "2512281885b8149c1e4bb6d67dad950c678feb91d84f63d96ac56b1a86b90a5c",
+      "description": "Expande Favoritos e Filtros para páginas, subabas, módulos internos e estados de filtro, incluindo Orçamentários e demais áreas do TAREFAS.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.4.tpatch",
+      "sha256": "243b776a7a5400359d9a180fcc11a9047d94733df23b0139fc554038734a110a",
       "changelog": [
-        "Corrigido o erro de usuarios.html: Cannot read properties of null (reading classList).",
-        "Corrigido o erro de dashboard.html: Cannot set properties of null (setting textContent).",
-        "Operações assíncronas antigas deixam de falhar quando o layout móvel já desmontou os elementos da página.",
-        "A Central de erros filtra somente esses dois falsos positivos conhecidos; os demais erros continuam sendo registrados normalmente.",
-        "Registros antigos desses dois erros são removidos automaticamente do estado local da Central.",
-        "Mantida a segurança da 2.3.24.2: bloqueio de entrada somente para quem ativou biometria no TAREFAS."
+        "Favoritos agora permitem escolher páginas e subabas/módulos internos, não apenas a tela atual.",
+        "Orçamentários passa a oferecer Resumo, Guias, Baixas, Distribuição, Movimentação, Material Carga, Passagem de Carga e Lavanderia como destinos separados.",
+        "Central passa a permitir favoritar diretamente Notificações, Mensagens, Downloads, Favoritos e Ferramentas.",
+        "O sistema descobre e memoriza dinamicamente outras abas internas visitadas no aplicativo para disponibilizá-las no seletor.",
+        "Filtros salvos agora guardam também os valores dos campos e a subaba ativa da tela.",
+        "Filtros podem ser renomeados, substituídos pelo estado atual ou excluídos.",
+        "Ao abrir um favorito/filtro com estado interno, o TAREFAS restaura os campos e a aba correspondente.",
+        "Mantidas as correções de erros da 2.3.24.3 e a segurança biométrica condicional da 2.3.24.2."
       ]
     }
   ],
@@ -255,7 +258,7 @@
         "2.3.24.1",
         "2.3.24.2"
       ],
-      "installable": true,
+      "installable": false,
       "description": "Corrige erros transitórios de DOM em Usuários e Dashboard e remove esses falsos positivos da Central de erros sem esconder outros diagnósticos.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.3.tpatch",
       "sha256": "2512281885b8149c1e4bb6d67dad950c678feb91d84f63d96ac56b1a86b90a5c",
@@ -266,8 +269,39 @@
         "A Central de erros filtra somente esses dois falsos positivos conhecidos; os demais erros continuam sendo registrados normalmente.",
         "Registros antigos desses dois erros são removidos automaticamente do estado local da Central.",
         "Mantida a segurança da 2.3.24.2: bloqueio de entrada somente para quem ativou biometria no TAREFAS."
+      ],
+      "supersededBy": "2.3.24.4"
+    },
+    {
+      "id": "2.3.24.4",
+      "name": "TAREFAS 2.3.24.4 — Favoritos e filtros por abas",
+      "baseVersion": "2.3.24",
+      "minBuild": 271,
+      "maxBuild": 271,
+      "channel": "alpha",
+      "publishedAt": "2026-09-21T15:24:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.3.24.1",
+        "2.3.24.2",
+        "2.3.24.3"
+      ],
+      "installable": true,
+      "description": "Expande Favoritos e Filtros para páginas, subabas, módulos internos e estados de filtro, incluindo Orçamentários e demais áreas do TAREFAS.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.4.tpatch",
+      "sha256": "243b776a7a5400359d9a180fcc11a9047d94733df23b0139fc554038734a110a",
+      "changelog": [
+        "Favoritos agora permitem escolher páginas e subabas/módulos internos, não apenas a tela atual.",
+        "Orçamentários passa a oferecer Resumo, Guias, Baixas, Distribuição, Movimentação, Material Carga, Passagem de Carga e Lavanderia como destinos separados.",
+        "Central passa a permitir favoritar diretamente Notificações, Mensagens, Downloads, Favoritos e Ferramentas.",
+        "O sistema descobre e memoriza dinamicamente outras abas internas visitadas no aplicativo para disponibilizá-las no seletor.",
+        "Filtros salvos agora guardam também os valores dos campos e a subaba ativa da tela.",
+        "Filtros podem ser renomeados, substituídos pelo estado atual ou excluídos.",
+        "Ao abrir um favorito/filtro com estado interno, o TAREFAS restaura os campos e a aba correspondente.",
+        "Mantidas as correções de erros da 2.3.24.3 e a segurança biométrica condicional da 2.3.24.2."
       ]
     }
   ],
-  "cacheNonce": "23243-dom-lifecycle-errors"
+  "cacheNonce": "23244-nested-favorites-filters"
 }
