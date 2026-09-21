@@ -3,35 +3,36 @@
   "app": "TAREFAS",
   "baseVersion": "2.3.23.1",
   "baseBuild": 270,
-  "generatedAt": "2026-09-21T13:35:00Z",
-  "latestPatch": "2.3.23.4",
+  "generatedAt": "2026-09-21T13:46:00Z",
+  "latestPatch": "2.3.23.5",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
-      "id": "2.3.23.4",
-      "name": "TAREFAS 2.3.23.4 — Patch cumulativo",
+      "id": "2.3.23.5",
+      "name": "TAREFAS 2.3.23.5 — Notificação imediata de patches",
       "baseVersion": "2.3.23.1",
       "minBuild": 270,
       "maxBuild": 270,
       "channel": "alpha",
-      "publishedAt": "2026-09-21T13:34:00Z",
+      "publishedAt": "2026-09-21T13:45:00Z",
       "cumulative": true,
       "replacementMode": "replace-older-same-base",
       "replaces": [
         "2.3.23.2",
-        "2.3.23.3"
+        "2.3.23.3",
+        "2.3.23.4"
       ],
       "installable": true,
-      "description": "Primeiro patch cumulativo do TAREFAS: instala por cima dos patches anteriores da mesma base e remove automaticamente os antigos, preservando as correções e recursos já lançados.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.23.4.tpatch",
-      "sha256": "acc8aabe41d3685c89d0bcbd8eec89f0ebfc47836eb9db4ecb94b8b16b3b8a07",
+      "description": "Corrige o atraso das notificações de patches e evita avisos depois que o patch já começou a ser instalado ou já está instalado.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.23.5.tpatch",
+      "sha256": "f8ba224baa8cb359a8eb3a867a6f00c6dfc0130c349aa79eb98ac3377184dcbd",
       "changelog": [
-        "Novo modo cumulativo: o patch mais recente substitui automaticamente os patches anteriores da mesma base.",
-        "Ao instalar 2.3.23.4, os patches 2.3.23.2 e 2.3.23.3 são removidos do armazenamento de patches sem ação manual.",
-        "Mantidas as correções de tema e versão introduzidas na 2.3.23.2.",
-        "Mantidos o Gerenciador, histórico e avisos Alpha/Beta de patches introduzidos na 2.3.23.3.",
-        "O catálogo principal passa a oferecer somente o patch atual; versões anteriores permanecem apenas no histórico.",
-        "A versão efetiva passa a ser 2.3.23.4 sobre o APK base 2.3.23.1 / build 270."
+        "Checagem de novos patches passa a rodar imediatamente ao abrir ou retomar o aplicativo.",
+        "Antes de notificar, o app consulta novamente os patches instalados para impedir aviso de uma versão que já foi aplicada.",
+        "Ao tocar em Baixar e aplicar, o patch é marcado como visto antes do download, eliminando a corrida que gerava notificação após a instalação.",
+        "A identificação do patch é reservada antes do disparo assíncrono para evitar notificações duplicadas.",
+        "Mantidos o modelo cumulativo, correções de tema, histórico de patches e canais Alpha/Beta.",
+        "A 2.3.23.5 substitui automaticamente a 2.3.23.4 e demais patches anteriores da mesma base."
       ]
     }
   ],
@@ -92,7 +93,7 @@
         "2.3.23.2",
         "2.3.23.3"
       ],
-      "installable": true,
+      "installable": false,
       "description": "Primeiro patch cumulativo do TAREFAS: instala por cima dos patches anteriores da mesma base e remove automaticamente os antigos, preservando as correções e recursos já lançados.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.23.4.tpatch",
       "sha256": "acc8aabe41d3685c89d0bcbd8eec89f0ebfc47836eb9db4ecb94b8b16b3b8a07",
@@ -103,6 +104,35 @@
         "Mantidos o Gerenciador, histórico e avisos Alpha/Beta de patches introduzidos na 2.3.23.3.",
         "O catálogo principal passa a oferecer somente o patch atual; versões anteriores permanecem apenas no histórico.",
         "A versão efetiva passa a ser 2.3.23.4 sobre o APK base 2.3.23.1 / build 270."
+      ],
+      "supersededBy": "2.3.23.5"
+    },
+    {
+      "id": "2.3.23.5",
+      "name": "TAREFAS 2.3.23.5 — Notificação imediata de patches",
+      "baseVersion": "2.3.23.1",
+      "minBuild": 270,
+      "maxBuild": 270,
+      "channel": "alpha",
+      "publishedAt": "2026-09-21T13:45:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.3.23.2",
+        "2.3.23.3",
+        "2.3.23.4"
+      ],
+      "installable": true,
+      "description": "Corrige o atraso das notificações de patches e evita avisos depois que o patch já começou a ser instalado ou já está instalado.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.23.5.tpatch",
+      "sha256": "f8ba224baa8cb359a8eb3a867a6f00c6dfc0130c349aa79eb98ac3377184dcbd",
+      "changelog": [
+        "Checagem de novos patches passa a rodar imediatamente ao abrir ou retomar o aplicativo.",
+        "Antes de notificar, o app consulta novamente os patches instalados para impedir aviso de uma versão que já foi aplicada.",
+        "Ao tocar em Baixar e aplicar, o patch é marcado como visto antes do download, eliminando a corrida que gerava notificação após a instalação.",
+        "A identificação do patch é reservada antes do disparo assíncrono para evitar notificações duplicadas.",
+        "Mantidos o modelo cumulativo, correções de tema, histórico de patches e canais Alpha/Beta.",
+        "A 2.3.23.5 substitui automaticamente a 2.3.23.4 e demais patches anteriores da mesma base."
       ]
     }
   ]
