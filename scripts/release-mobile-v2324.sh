@@ -61,10 +61,14 @@ with open('android/app/build/outputs/apk/release/output-metadata.json',encoding=
 assert int(e['versionCode']) == 271, e
 assert str(e['versionName']) == '2.3.24', e
 PY
-unzip -p "$UNSIGNED" assets/public/mobile-alpha-v23223-fix.js | grep -q '__TAREFAS_BETA_NAV_V271__'
-unzip -p "$UNSIGNED" assets/public/mobile-bootstrap.js | grep -q '__TAREFAS_VERSION_LABEL_V271__'
-unzip -p "$UNSIGNED" assets/public/mobile-patch-manager-v2324.js | grep -q '__TAREFAS_PATCH_MANAGER_V271__'
-unzip -p "$UNSIGNED" assets/public/mobile-updates-v181.js | grep -q "const APP_CHANNEL = 'beta';"
+unzip -p "$UNSIGNED" assets/public/mobile-alpha-v23223-fix.js > "$RUNNER_TEMP/mobile-alpha-v23223-fix.js"
+unzip -p "$UNSIGNED" assets/public/mobile-bootstrap.js > "$RUNNER_TEMP/mobile-bootstrap.js"
+unzip -p "$UNSIGNED" assets/public/mobile-patch-manager-v2324.js > "$RUNNER_TEMP/mobile-patch-manager-v2324.js"
+unzip -p "$UNSIGNED" assets/public/mobile-updates-v181.js > "$RUNNER_TEMP/mobile-updates-v181.js"
+grep -q '__TAREFAS_BETA_NAV_V271__' "$RUNNER_TEMP/mobile-alpha-v23223-fix.js"
+grep -q '__TAREFAS_VERSION_LABEL_V271__' "$RUNNER_TEMP/mobile-bootstrap.js"
+grep -q '__TAREFAS_PATCH_MANAGER_V271__' "$RUNNER_TEMP/mobile-patch-manager-v2324.js"
+grep -q "const APP_CHANNEL = 'beta';" "$RUNNER_TEMP/mobile-updates-v181.js"
 
 OIDC="$(curl --fail --silent --show-error -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-signing" | jq -r '.value')"
 curl --fail --silent --show-error -H "Authorization: Bearer $OIDC" 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-signing-material' -o "$RUNNER_TEMP/signing.json"
