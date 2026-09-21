@@ -2,7 +2,7 @@
 'use strict';
 if(window.__TAREFAS_7412_GLOBAL__)return;
 window.__TAREFAS_7412_GLOBAL__=true;
-const VERSION='7.4.12';
+const VERSION='7.9.1';
 const $=id=>document.getElementById(id);
 const norm=v=>String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim().toLowerCase();
 let adminActive=false,serviceTimer=null,onlineTimer=null,uiTimer=null;
@@ -90,7 +90,8 @@ async function serviceNotices(){
 function refreshUi(){injectCss();pessoalNav();stampVersion();usersTitle()}
 function init(){
   refreshUi();renderAdminOnline();serviceNotices();
-  uiTimer=setInterval(refreshUi,3000);serviceTimer=setInterval(serviceNotices,10*60*1000);onlineTimer=setInterval(renderAdminOnline,30000);
+  const side=document.querySelector('.sidebar ul');if(side){let queued=false;new MutationObserver(()=>{if(queued)return;queued=true;queueMicrotask(()=>{queued=false;refreshUi()})}).observe(side,{childList:true,subtree:true})}
+  serviceTimer=setInterval(serviceNotices,10*60*1000);onlineTimer=setInterval(renderAdminOnline,30000);
   window.addEventListener('focus',()=>{refreshUi();renderAdminOnline();serviceNotices()});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden){refreshUi();renderAdminOnline();serviceNotices()}});
   window.addEventListener('v65:presenca',renderAdminOnline);
