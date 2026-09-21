@@ -1,0 +1,31 @@
+{
+  "format": "tarefas-tpatch-v1",
+  "id": "2.3.25.2",
+  "name": "TAREFAS 2.3.25.2 — Correção de CSS bruto na tela",
+  "patchVersion": 1,
+  "createdAt": "2026-09-21T18:24:00Z",
+  "baseVersion": "2.3.25",
+  "minBuild": 272,
+  "maxBuild": 272,
+  "channel": "alpha",
+  "cumulative": true,
+  "replacementMode": "replace-older-same-base",
+  "replaces": [
+    "2.3.25.1"
+  ],
+  "description": "Corrige a regressão da 2.3.25.1 que podia deixar conteúdo CSS visível na tela ao atualizar a identificação da base Web 7.9.1.",
+  "changelog": [
+    "Corrigido o vazamento de CSS bruto para a área visível da página.",
+    "Removida a varredura ampla do conteúdo do main usada na 2.3.25.1.",
+    "A atualização de rótulos da Web 7.9.1 passa a atuar somente em elementos conhecidos de versão.",
+    "Adicionada recuperação automática para remover blocos de CSS da IA/layout que tenham sido inseridos como texto no body.",
+    "Mantida a base Web 7.9.1 e o cabeçalho 2.3.25.2 • WEB 7.9.1.",
+    "Mantido o APK base 2.3.25 / build 272, sem necessidade de reinstalação."
+  ],
+  "order": 232502,
+  "payload": {
+    "js": "(()=>{\n'use strict';\n\nconst PATCH_VERSION='2.3.25.2';\nconst BASE_VERSION='2.3.25';\nconst BASE_BUILD=272;\nconst WEB_VERSION='7.9.1';\nconst MARK='__TAREFAS_PATCH_23252_WEB_791_SAFE__';\n\nif(globalThis[MARK])return;\nglobalThis[MARK]=true;\n\nglobalThis.__TAREFAS_WEB_BASE_VERSION__=WEB_VERSION;\nglobalThis.__TAREFAS_EFFECTIVE_VERSION__=PATCH_VERSION;\ndocument.documentElement.dataset.tarefasWebVersion=WEB_VERSION;\ndocument.documentElement.dataset.tarefasEffectiveVersion=PATCH_VERSION;\n\nfunction repairRogueCssText(){\n  try{\n    const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);\n    const bad=[];\n    let node;\n    while((node=walker.nextNode())){\n      const parent=node.parentElement;\n      if(!parent||/^(STYLE|SCRIPT|TEXTAREA|PRE|CODE)$/i.test(parent.tagName))continue;\n      const value=String(node.nodeValue||'');\n      if(value.length<300)continue;\n      const aiCss=value.includes('.ai237-wrap{')||value.includes('.ai238-auto-file{');\n      const layoutCss=value.includes('@media(min-width:901px)')&&value.includes('body.v3-shell');\n      const cssDensity=(value.match(/\\{[^{}]{0,500}\\}/g)||[]).length>=6;\n      if((aiCss||layoutCss)&&cssDensity)bad.push(node);\n    }\n    for(const n of bad)n.remove();\n    return bad.length;\n  }catch(_){return 0}\n}\n\nfunction applyHeader(){\n  try{\n    document.querySelectorAll('.tm-app-brand small').forEach(el=>{\n      const wanted=PATCH_VERSION+' • WEB '+WEB_VERSION;\n      if(el.textContent.trim()!==wanted)el.textContent=wanted;\n    });\n  }catch(_){}\n}\n\nfunction applyKnownVersionLabels(){\n  try{\n    const selectors=[\n      '#tmVersionSync2325',\n      '#tmAppUpdates .tm-update-installed',\n      '.tm-about-version',\n      '[data-tarefas-version]',\n      '[data-app-version]'\n    ];\n    for(const selector of selectors){\n      document.querySelectorAll(selector).forEach(el=>{\n        if(el.closest('style,script'))return;\n        const text=String(el.textContent||'');\n        if(!text||text.length>160)return;\n        let next=text;\n        next=next.replace(/WEB\\s*7\\.8(?:\\.0|\\.1|\\.2|\\.6)?/ig,'WEB '+WEB_VERSION);\n        next=next.replace(/Base\\s*Web\\s*[:•-]?\\s*7\\.8(?:\\.0|\\.1|\\.2|\\.6)?/ig,'Base Web: '+WEB_VERSION);\n        if(next!==text)el.textContent=next;\n      });\n    }\n  }catch(_){}\n}\n\nlet queued=false;\nfunction refresh(){\n  queued=false;\n  repairRogueCssText();\n  applyHeader();\n  applyKnownVersionLabels();\n}\nfunction schedule(){\n  if(queued)return;\n  queued=true;\n  queueMicrotask(refresh);\n}\n\nrefresh();\n\nwindow.addEventListener('pageshow',schedule);\nwindow.addEventListener('focus',schedule);\nwindow.addEventListener('tarefas:versions-synced',schedule);\nwindow.addEventListener('tarefas:patch-official-refreshed',schedule);\ndocument.addEventListener('visibilitychange',()=>{if(!document.hidden)schedule()});\n\nconst observer=new MutationObserver(records=>{\n  for(const record of records){\n    for(const node of record.addedNodes){\n      if(node.nodeType===3){\n        const text=String(node.nodeValue||'');\n        if(text.includes('.ai237-wrap{')||text.includes('.ai238-auto-file{')){\n          schedule();\n          return;\n        }\n        continue;\n      }\n      if(node.nodeType!==1)continue;\n      if(\n        node.matches?.('.tm-app-brand,#tmAppUpdates,.tm-about-version,[data-tarefas-version],[data-app-version]') ||\n        node.querySelector?.('.tm-app-brand,#tmAppUpdates,.tm-about-version,[data-tarefas-version],[data-app-version]')\n      ){\n        schedule();\n        return;\n      }\n    }\n  }\n});\nobserver.observe(document.body,{childList:true,subtree:true});\n\nglobalThis.TarefasWebBase23252=Object.freeze({\n  patchVersion:PATCH_VERSION,\n  baseVersion:BASE_VERSION,\n  baseBuild:BASE_BUILD,\n  webVersion:WEB_VERSION,\n  repair:repairRogueCssText,\n  refresh\n});\n})();",
+    "css": ""
+  },
+  "payloadSha256": "52c3afdb2062ac6d644c05e71d34d7c957bdf47a13905a17850540c2149a90f4"
+}
