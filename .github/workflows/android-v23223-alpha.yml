@@ -1,9 +1,9 @@
-name: Android 2.3.22.3 Alpha - Navegacao e versao
+name: Android 2.3.22.4 Alpha - Notificacoes no local correto
 
 on:
   workflow_dispatch:
   push:
-    branches: [alpha-2.3.22.3]
+    branches: [alpha-2.3.22.4]
     paths:
       - 'app/mobile-alpha-v23223-fix.js'
       - 'app/release-v23223.txt'
@@ -43,9 +43,9 @@ jobs:
           node --check dist/mobile-alpha-v23221.js
           node --check dist/mobile-alpha-v23221-tabs.js
           node scripts/verify-mobile-v23223.mjs dist
-          grep -q '__TAREFAS_ALPHA_NAV_V266__' dist/mobile-alpha-v23223-fix.js
-          grep -q '__TAREFAS_ALPHA_23223__' dist/mobile-bootstrap.js
-          grep -q '2.3.22.3 Alpha' dist/mobile-bootstrap.js
+          grep -q '__TAREFAS_ALPHA_NAV_V267__' dist/mobile-alpha-v23223-fix.js
+          grep -q '__TAREFAS_ALPHA_23224__' dist/mobile-bootstrap.js
+          grep -q '2.3.22.4 Alpha' dist/mobile-bootstrap.js
 
       - name: Firebase Android
         run: |
@@ -62,8 +62,8 @@ jobs:
           set -euo pipefail
           npx cap add android
           cp app/google-services.json android/app/google-services.json
-          sed -i 's/versionCode 1/versionCode 266/' android/app/build.gradle
-          sed -i 's/versionName "1.0"/versionName "2.3.22.3"/' android/app/build.gradle
+          sed -i 's/versionCode 1/versionCode 267/' android/app/build.gradle
+          sed -i 's/versionName "1.0"/versionName "2.3.22.4"/' android/app/build.gradle
           npm run assets:android
           npx cap sync android
           JAVA_DIR='android/app/src/main/java/br/com/guerravpn/tarefas/mobile'
@@ -114,11 +114,11 @@ jobs:
           python3 - <<'PY'
           import json
           with open('android/app/build/outputs/apk/release/output-metadata.json',encoding='utf-8') as f: e=json.load(f)['elements'][0]
-          assert int(e['versionCode']) == 266, e
-          assert str(e['versionName']) == '2.3.22.3', e
+          assert int(e['versionCode']) == 267, e
+          assert str(e['versionName']) == '2.3.22.4', e
           PY
-          unzip -p "$APK" assets/public/mobile-alpha-v23223-fix.js | grep -q '__TAREFAS_ALPHA_NAV_V266__'
-          unzip -p "$APK" assets/public/mobile-bootstrap.js | grep -q '__TAREFAS_VERSION_LABEL_V266__'
+          unzip -p "$APK" assets/public/mobile-alpha-v23223-fix.js | grep -q '__TAREFAS_ALPHA_NAV_V267__'
+          unzip -p "$APK" assets/public/mobile-bootstrap.js | grep -q '__TAREFAS_VERSION_LABEL_V267__'
           unzip -p "$APK" assets/public/mobile-updates-v181.js | grep -q "const APP_CHANNEL = 'alpha';"
 
       - name: Assinar APK GuerraVPN
@@ -133,26 +133,26 @@ jobs:
           EXPECTED_CERT="$(jq -r '.cert_sha256' "$RUNNER_TEMP/signing.json")"
           APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)"
           ZIPALIGN="$(find "$ANDROID_HOME/build-tools" -type f -name zipalign | sort -V | tail -1)"
-          "$ZIPALIGN" -p -f 4 android/app/build/outputs/apk/release/app-release-unsigned.apk "$RUNNER_TEMP/TAREFAS-2.3.22.3-aligned.apk"
-          "$APKSIGNER" sign --ks "$RUNNER_TEMP/GuerraVPN.keystore" --ks-key-alias "$KEY_ALIAS" --ks-pass "pass:$STORE_PASS" --key-pass "pass:$KEY_PASS" --out TAREFAS-2.3.22.3.apk "$RUNNER_TEMP/TAREFAS-2.3.22.3-aligned.apk"
-          "$APKSIGNER" verify --verbose --print-certs TAREFAS-2.3.22.3.apk | tee "$RUNNER_TEMP/apksigner.txt"
+          "$ZIPALIGN" -p -f 4 android/app/build/outputs/apk/release/app-release-unsigned.apk "$RUNNER_TEMP/TAREFAS-2.3.22.4-aligned.apk"
+          "$APKSIGNER" sign --ks "$RUNNER_TEMP/GuerraVPN.keystore" --ks-key-alias "$KEY_ALIAS" --ks-pass "pass:$STORE_PASS" --key-pass "pass:$KEY_PASS" --out TAREFAS-2.3.22.4.apk "$RUNNER_TEMP/TAREFAS-2.3.22.4-aligned.apk"
+          "$APKSIGNER" verify --verbose --print-certs TAREFAS-2.3.22.4.apk | tee "$RUNNER_TEMP/apksigner.txt"
           ACTUAL_CERT="$(sed -n 's/.*certificate SHA-256 digest: //p' "$RUNNER_TEMP/apksigner.txt" | head -1 | tr -d ': ' | tr '[:upper:]' '[:lower:]')"
           EXPECTED_CERT="$(printf '%s' "$EXPECTED_CERT" | tr -d ': ' | tr '[:upper:]' '[:lower:]')"
           test -n "$ACTUAL_CERT"
           test "$ACTUAL_CERT" = "$EXPECTED_CERT"
-          sha256sum TAREFAS-2.3.22.3.apk | tee TAREFAS-2.3.22.3.apk.sha256
+          sha256sum TAREFAS-2.3.22.4.apk | tee TAREFAS-2.3.22.4.apk.sha256
 
       - name: Gerar pacote Alpha
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/package/app" "$RUNNER_TEMP/package/scripts" "$RUNNER_TEMP/package/manifest"
-          cp TAREFAS-2.3.22.3.apk TAREFAS-2.3.22.3.apk.sha256 "$RUNNER_TEMP/package/"
+          cp TAREFAS-2.3.22.4.apk TAREFAS-2.3.22.4.apk.sha256 "$RUNNER_TEMP/package/"
           cp app/mobile-alpha-v23223-fix.js app/release-v23223.txt "$RUNNER_TEMP/package/app/"
           cp scripts/build-mobile-v23223.mjs scripts/verify-mobile-v23223.mjs "$RUNNER_TEMP/package/scripts/"
-          cp dist/ALPHA_2_3_22_3.json "$RUNNER_TEMP/package/manifest/"
-          (cd "$RUNNER_TEMP/package" && zip -qr "$GITHUB_WORKSPACE/TAREFAS-2.3.22.3-alpha-build-266.zip" .)
-          unzip -tq TAREFAS-2.3.22.3-alpha-build-266.zip
-          sha256sum TAREFAS-2.3.22.3-alpha-build-266.zip | tee TAREFAS-2.3.22.3-alpha-build-266.zip.sha256
+          cp dist/ALPHA_2_3_22_4.json "$RUNNER_TEMP/package/manifest/"
+          (cd "$RUNNER_TEMP/package" && zip -qr "$GITHUB_WORKSPACE/TAREFAS-2.3.22.4-alpha-build-267.zip" .)
+          unzip -tq TAREFAS-2.3.22.4-alpha-build-267.zip
+          sha256sum TAREFAS-2.3.22.4-alpha-build-267.zip | tee TAREFAS-2.3.22.4-alpha-build-267.zip.sha256
 
       - name: Publicar APK e ZIP Alpha permanentes
         run: |
@@ -161,40 +161,40 @@ jobs:
           RELEASES_DIR="$RUNNER_TEMP/tarefas-releases"
           git worktree add "$RELEASES_DIR" origin/app/releases
           mkdir -p "$RELEASES_DIR/downloads"
-          cp TAREFAS-2.3.22.3.apk TAREFAS-2.3.22.3.apk.sha256 "$RELEASES_DIR/downloads/"
-          cp TAREFAS-2.3.22.3-alpha-build-266.zip TAREFAS-2.3.22.3-alpha-build-266.zip.sha256 "$RELEASES_DIR/downloads/"
+          cp TAREFAS-2.3.22.4.apk TAREFAS-2.3.22.4.apk.sha256 "$RELEASES_DIR/downloads/"
+          cp TAREFAS-2.3.22.4-alpha-build-267.zip TAREFAS-2.3.22.4-alpha-build-267.zip.sha256 "$RELEASES_DIR/downloads/"
           cd "$RELEASES_DIR"
           git config user.name 'GuerraVPN Android Build'
           git config user.email '81371258+GuerraVPN@users.noreply.github.com'
-          git add downloads/TAREFAS-2.3.22.3*
-          if ! git diff --cached --quiet; then git commit -m 'release(android): TAREFAS 2.3.22.3 alpha build 266'; git push origin HEAD:app/releases; fi
-          URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.3.22.3.apk'
-          LOCAL_SHA="$(sha256sum "$GITHUB_WORKSPACE/TAREFAS-2.3.22.3.apk" | awk '{print $1}')"
+          git add downloads/TAREFAS-2.3.22.4*
+          if ! git diff --cached --quiet; then git commit -m 'release(android): TAREFAS 2.3.22.4 alpha build 267'; git push origin HEAD:app/releases; fi
+          URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.3.22.4.apk'
+          LOCAL_SHA="$(sha256sum "$GITHUB_WORKSPACE/TAREFAS-2.3.22.4.apk" | awk '{print $1}')"
           for attempt in 1 2 3 4 5 6 7 8; do
             if curl --fail --silent --show-error -L "$URL" -o "$RUNNER_TEMP/published.apk" && test "$(sha256sum "$RUNNER_TEMP/published.apk" | awk '{print $1}')" = "$LOCAL_SHA"; then exit 0; fi
             sleep 3
           done
           exit 1
 
-      - name: Registrar Alpha 2.3.22.3
+      - name: Registrar Alpha 2.3.22.4
         run: |
           set -euo pipefail
           OIDC="$(curl --fail --silent --show-error -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-release" | jq -r '.value')"
-          SHA="$(sha256sum TAREFAS-2.3.22.3.apk | awk '{print $1}')"
-          jq -n --arg version '2.3.22.3' --argjson build 266 --arg channel 'alpha' --arg web_version '7.8.6' --arg title 'TAREFAS 2.3.22.3 Alpha — navegação e identificação corrigidas' --arg url 'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.3.22.3.apk' --arg sha "$SHA" '{version:$version,build:$build,channel:$channel,web_version:$web_version,title:$title,changelog:["🧭 Ferramentas, Favoritos, Downloads e Mensagens deixam de ficar dentro da Central de Notificações.","📥 Downloads, ⭐ Favoritos e 🧰 Ferramentas agora carregam o conteúdo correto ao serem selecionados.","✉️ Mensagens passa a ter acesso direto como seção do aplicativo.","🔔 Central fica focada em notificações.","🏷️ Versão corrigida para 2.3.22.3 Alpha / build 266 em cabeçalho, Sobre, preload, atualizador e runtime."],mandatory:false,download_url:$url,sha256:$sha}' > "$RUNNER_TEMP/release.json"
+          SHA="$(sha256sum TAREFAS-2.3.22.4.apk | awk '{print $1}')"
+          jq -n --arg version '2.3.22.4' --argjson build 267 --arg channel 'alpha' --arg web_version '7.8.6' --arg title 'TAREFAS 2.3.22.4 Alpha — Notificações no local correto' --arg url 'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.3.22.4.apk' --arg sha "$SHA" '{version:$version,build:$build,channel:$channel,web_version:$web_version,title:$title,changelog:["🔔 Removida somente a opção Notificações do Acesso rápido.","💬 Notificações continua disponível normalmente em Comunicação.","✅ Mensagens, Downloads, Favoritos e Ferramentas permanecem inalterados.","🏷️ Versão 2.3.22.4 Alpha / build 267."],mandatory:false,download_url:$url,sha256:$sha}' > "$RUNNER_TEMP/release.json"
           CODE="$(curl --silent --show-error -o "$RUNNER_TEMP/result.json" -w '%{http_code}' -H "Authorization: Bearer $OIDC" -H 'Content-Type: application/json' --data-binary @"$RUNNER_TEMP/release.json" 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-release-publish')"
           cat "$RUNNER_TEMP/result.json"
           test "$CODE" = '200'
-          jq -e '.ok == true and .version == "2.3.22.3" and .build == 266 and .channel == "alpha"' "$RUNNER_TEMP/result.json" >/dev/null
+          jq -e '.ok == true and .version == "2.3.22.4" and .build == 267 and .channel == "alpha"' "$RUNNER_TEMP/result.json" >/dev/null
 
       - uses: actions/upload-artifact@v4
         with:
-          name: tarefas-android-2.3.22.3-alpha-build-266
+          name: tarefas-android-2.3.22.4-alpha-build-267
           path: |
-            TAREFAS-2.3.22.3.apk
-            TAREFAS-2.3.22.3.apk.sha256
-            TAREFAS-2.3.22.3-alpha-build-266.zip
-            TAREFAS-2.3.22.3-alpha-build-266.zip.sha256
+            TAREFAS-2.3.22.4.apk
+            TAREFAS-2.3.22.4.apk.sha256
+            TAREFAS-2.3.22.4-alpha-build-267.zip
+            TAREFAS-2.3.22.4-alpha-build-267.zip.sha256
             app/release-v23223.txt
-            dist/ALPHA_2_3_22_3.json
+            dist/ALPHA_2_3_22_4.json
           if-no-files-found: error
