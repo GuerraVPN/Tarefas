@@ -1,0 +1,57 @@
+name: Android 2.4.0.1 Alpha - Launcher Icons
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [alpha-2.4.0.1]
+    paths:
+      - '.v2401-release-trigger'
+      - 'app/android/TarefasLauncherIconPlugin.java'
+      - 'app/mobile-launcher-icon-v2401.js'
+      - 'app/release-v2401.txt'
+      - 'scripts/build-mobile-v2401.mjs'
+      - 'scripts/verify-mobile-v2401.mjs'
+      - 'scripts/release-mobile-v2401.sh'
+      - '.github/workflows/android-v2401-alpha.yml'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Compilar, validar, assinar e publicar 2.4.0.1 Alpha
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          chmod +x scripts/release-mobile-v2401.sh
+          scripts/release-mobile-v2401.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tarefas-android-2.4.0.1-alpha-build-275
+          path: |
+            TAREFAS-2.4.0.1.apk
+            TAREFAS-2.4.0.1.apk.sha256
+            TAREFAS-2.4.0.1-alpha-build-275.zip
+            TAREFAS-2.4.0.1-alpha-build-275.zip.sha256
+            app/release-v2401.txt
+            dist/ALPHA_2_4_0_1.json
+          if-no-files-found: error
