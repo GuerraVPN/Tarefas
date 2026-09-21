@@ -1,0 +1,28 @@
+{
+  "format": "tarefas-tpatch-v1",
+  "id": "2.3.25.1",
+  "name": "TAREFAS 2.3.25.1 — Base Web 7.9.1",
+  "patchVersion": 1,
+  "createdAt": "2026-09-21T18:10:00Z",
+  "baseVersion": "2.3.25",
+  "minBuild": 272,
+  "maxBuild": 272,
+  "channel": "alpha",
+  "cumulative": true,
+  "replacementMode": "replace-older-same-base",
+  "replaces": [],
+  "description": "Atualiza a identificação da base Web do TAREFAS Android de 7.8.2 para 7.9.1, mantendo o APK 2.3.25 build 272.",
+  "changelog": [
+    "Base Web efetiva atualizada para 7.9.1.",
+    "Cabeçalho do aplicativo passa a exibir 2.3.25.1 • WEB 7.9.1.",
+    "Tela Sobre/Atualizações passa a refletir a base Web 7.9.1 quando houver rótulo da versão Web.",
+    "Mantido o APK base 2.3.25 / build 272; nenhuma reinstalação de APK é necessária.",
+    "Patch distribuído no canal Alpha e compatível somente com a Beta 2.3.25 build 272."
+  ],
+  "order": 232501,
+  "payload": {
+    "js": "(()=>{\n'use strict';\n\nconst PATCH_VERSION='2.3.25.1';\nconst BASE_VERSION='2.3.25';\nconst BASE_BUILD=272;\nconst WEB_VERSION='7.9.1';\nconst MARK='__TAREFAS_PATCH_23251_WEB_791__';\n\nif(globalThis[MARK])return;\nglobalThis[MARK]=true;\n\nglobalThis.__TAREFAS_WEB_BASE_VERSION__=WEB_VERSION;\nglobalThis.__TAREFAS_EFFECTIVE_VERSION__=PATCH_VERSION;\ndocument.documentElement.dataset.tarefasWebVersion=WEB_VERSION;\ndocument.documentElement.dataset.tarefasEffectiveVersion=PATCH_VERSION;\n\nfunction updateHeader(){\n  try{\n    document.querySelectorAll('.tm-app-brand small').forEach(el=>{\n      const wanted=PATCH_VERSION+' • WEB '+WEB_VERSION;\n      if(el.textContent.trim()!==wanted)el.textContent=wanted;\n    });\n\n    document.querySelectorAll('[data-tarefas-version],[data-app-version]').forEach(el=>{\n      const txt=String(el.textContent||'');\n      if(/WEB\\s*[0-9.]+/i.test(txt)){\n        const next=txt.replace(/WEB\\s*[0-9.]+/ig,'WEB '+WEB_VERSION);\n        if(next!==txt)el.textContent=next;\n      }\n    });\n  }catch(_){}\n}\n\nfunction updateAboutAndUpdates(){\n  try{\n    const roots=[\n      document.getElementById('tmAppUpdates'),\n      document.querySelector('.about-page'),\n      document.querySelector('.tm-about'),\n      document.querySelector('main')\n    ].filter(Boolean);\n\n    for(const root of roots){\n      root.querySelectorAll('small,span,p,strong,div').forEach(el=>{\n        if(el.children.length) return;\n        const txt=String(el.textContent||'').trim();\n        if(!txt||txt.length>180)return;\n\n        if(/(?:Base\\s*Web|WEB)\\s*(?:[:•-]\\s*)?7\\.8(?:\\.0|\\.1|\\.2)?/i.test(txt)){\n          const next=txt\n            .replace(/Base\\s*Web\\s*(?:[:•-]\\s*)?7\\.8(?:\\.0|\\.1|\\.2)?/ig,'Base Web: '+WEB_VERSION)\n            .replace(/WEB\\s*7\\.8(?:\\.0|\\.1|\\.2)?/ig,'WEB '+WEB_VERSION);\n          if(next!==txt)el.textContent=next;\n        }\n      });\n    }\n  }catch(_){}\n}\n\nlet scheduled=false;\nfunction refresh(){\n  scheduled=false;\n  updateHeader();\n  updateAboutAndUpdates();\n}\nfunction schedule(){\n  if(scheduled)return;\n  scheduled=true;\n  queueMicrotask(refresh);\n}\n\nrefresh();\n\nwindow.addEventListener('pageshow',schedule);\nwindow.addEventListener('focus',schedule);\nwindow.addEventListener('tarefas:versions-synced',schedule);\nwindow.addEventListener('tarefas:patch-official-refreshed',schedule);\ndocument.addEventListener('visibilitychange',()=>{if(!document.hidden)schedule()});\n\nconst obs=new MutationObserver(records=>{\n  for(const rec of records){\n    if(rec.type!=='childList')continue;\n    if(rec.target?.closest?.('#tmVersionSync2325'))continue;\n    let relevant=false;\n    for(const node of rec.addedNodes){\n      if(node.nodeType!==1)continue;\n      if(\n        node.matches?.('.tm-app-brand,#tmAppUpdates,.about-page,.tm-about') ||\n        node.querySelector?.('.tm-app-brand,#tmAppUpdates,.about-page,.tm-about')\n      ){\n        relevant=true;\n        break;\n      }\n    }\n    if(relevant){schedule();break}\n  }\n});\nobs.observe(document.documentElement,{childList:true,subtree:true});\n\nglobalThis.TarefasWebBase23251=Object.freeze({\n  patchVersion:PATCH_VERSION,\n  baseVersion:BASE_VERSION,\n  baseBuild:BASE_BUILD,\n  webVersion:WEB_VERSION,\n  refresh\n});\n})();",
+    "css": ""
+  },
+  "payloadSha256": "466769acc00e7cdceb85a2e0d183a227e84e88dd6eae5e9f6e827a784a067a0a"
+}
