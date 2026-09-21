@@ -1,11 +1,12 @@
-import { copyFile, readFile, readdir, writeFile, rm } from 'node:fs/promises';
+import { copyFile, readFile, readdir, writeFile, rm, access } from 'node:fs/promises';
 import path from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { execFileSync } from 'node:child_process';
 
 const root=process.cwd();
-const VERSION='2.4.0',BUILD=274,WEB_VERSION='7.9.1';
-await import(pathToFileURL(path.resolve('scripts/build-mobile-v2325.mjs')).href+'?v=240');
 const dist=path.join(root,'dist');
+const VERSION='2.4.0',BUILD=274,WEB_VERSION='7.9.1';
+
+await access(dist);
 
 async function patch(rel,fn,{required=true}={}){
   const file=path.join(dist,rel),before=await readFile(file,'utf8'),after=fn(before);
@@ -13,22 +14,83 @@ async function patch(rel,fn,{required=true}={}){
   if(after!==before)await writeFile(file,after,'utf8');
 }
 
+function plain(url){return String(url||'').split('?')[0].split('#')[0]}
+function scriptTags(html){
+  const out=[];const re=/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*><\/script>/gi;let m;
+  while((m=re.exec(html)))out.push({url:m[1],tag:m[0]});
+  return out;
+}
+function linkTags(html){
+  const out=[];const re=/<link\b[^>]*\bhref=["']([^"']+)["'][^>]*>/gi;let m;
+  while((m=re.exec(html)))out.push({url:m[1],tag:m[0]});
+  return out;
+}
+function preserveMobileShell(oldHtml,newHtml){
+  if(!oldHtml)return newHtml;
+  const presentScripts=new Set(scriptTags(newHtml).map(x=>plain(x.url)));
+  const presentLinks=new Set(linkTags(newHtml).map(x=>plain(x.url)));
+  const extraScripts=scriptTags(oldHtml).filter(x=>{
+    const p=plain(x.url);
+    return !presentScripts.has(p)&&(/^(?:mobile-|native-mobile\.js$)/i.test(path.basename(p)));
+  });
+  const extraLinks=linkTags(oldHtml).filter(x=>{
+    const p=plain(x.url);
+    return !presentLinks.has(p)&&(/^(?:mobile.*\.css$|manifest\.webmanifest$)/i.test(path.basename(p)));
+  });
+  for(const x of extraLinks){
+    newHtml=/<\/head>/i.test(newHtml)?newHtml.replace(/<\/head>/i,'  '+x.tag+'\n</head>'):x.tag+'\n'+newHtml;
+  }
+  if(!/name=["']theme-color["']/i.test(newHtml)){
+    newHtml=/<\/head>/i.test(newHtml)?newHtml.replace(/<\/head>/i,'  <meta name="theme-color" content="#05090b">\n</head>'):newHtml;
+  }
+  for(const x of extraScripts){
+    newHtml=/<\/body>/i.test(newHtml)?newHtml.replace(/<\/body>/i,'  '+x.tag+'\n</body>'):newHtml+'\n'+x.tag;
+  }
+  return newHtml;
+}
+
+// Sobrepõe somente os arquivos Web que evoluíram desde a Beta 2.3.25.
+// O dist recebido aqui já foi gerado pela própria Beta, preservando toda a camada Android.
+const diff=execFileSync('git',['diff','--name-status','origin/beta-2.3.25...HEAD'],{encoding:'utf8'})
+  .trim().split(/\r?\n/).filter(Boolean);
+
+for(const line of diff){
+  const parts=line.split(/\t+/),status=parts[0],rel=parts[parts.length-1];
+  if(rel.includes('/'))continue;
+  if(!/\.(?:html|js|css|webmanifest|json)$/i.test(rel))continue;
+  const dst=path.join(dist,rel);
+  if(status.startsWith('D')){await rm(dst,{force:true});continue}
+  const src=path.join(root,rel);
+  try{await access(src)}catch{continue}
+  if(/\.html$/i.test(rel)){
+    let old='';
+    try{old=await readFile(dst,'utf8')}catch{}
+    let current=await readFile(src,'utf8');
+    current=preserveMobileShell(old,current);
+    await writeFile(dst,current,'utf8');
+  }else{
+    await copyFile(src,dst);
+  }
+}
+
 await copyFile(path.join(root,'app/mobile-patch-manager-v240.js'),path.join(dist,'mobile-patch-manager-v240.js'));
 await copyFile(path.join(root,'app/mobile-release-v240.js'),path.join(dist,'mobile-release-v240.js'));
 await rm(path.join(dist,'mobile-patch-manager-v2325.js'),{force:true});
 await rm(path.join(dist,'mobile-beta-v2325.js'),{force:true});
 
+const special=new Set(['reiniciar.html','desligado.html']);
 for(const name of await readdir(dist)){
   if(!/\.html$/i.test(name))continue;
-  const file=path.join(dist,name);
-  let source=await readFile(file,'utf8');
-  source=source.replace(/<script src="mobile-patch-manager-v2325\.js[^"]*"><\/script>\s*/g,'');
-  source=source.replace(/<script src="mobile-beta-v2325\.js[^"]*"><\/script>\s*/g,'');
-  source=source.replace(/<script src="mobile-patch-manager-v240\.js[^"]*"><\/script>\s*/g,'');
-  source=source.replace(/<script src="mobile-release-v240\.js[^"]*"><\/script>\s*/g,'');
+  const file=path.join(dist,name);let source=await readFile(file,'utf8');
+  source=source.replace(/<script src=["']mobile-patch-manager-v2325\.js[^"']*["'][^>]*><\/script>\s*/gi,'');
+  source=source.replace(/<script src=["']mobile-beta-v2325\.js[^"']*["'][^>]*><\/script>\s*/gi,'');
+  source=source.replace(/<script src=["']mobile-patch-manager-v240\.js[^"']*["'][^>]*><\/script>\s*/gi,'');
+  source=source.replace(/<script src=["']mobile-release-v240\.js[^"']*["'][^>]*><\/script>\s*/gi,'');
   source=source.replaceAll('2.3.25-b272','2.4.0-b274');
-  const tags='<script src="mobile-patch-manager-v240.js?v='+VERSION+'-b'+BUILD+'"></script>\n<script src="mobile-release-v240.js?v='+VERSION+'-b'+BUILD+'"></script>';
-  source=source.includes('</body>')?source.replace('</body>',tags+'\n</body>'):source+'\n'+tags;
+  if(!special.has(name.toLowerCase())){
+    const tags='<script src="mobile-patch-manager-v240.js?v='+VERSION+'-b'+BUILD+'"></script>\n<script src="mobile-release-v240.js?v='+VERSION+'-b'+BUILD+'"></script>';
+    source=source.includes('</body>')?source.replace('</body>',tags+'\n</body>'):source+'\n'+tags;
+  }
   await writeFile(file,source,'utf8');
 }
 
@@ -79,28 +141,27 @@ await patch('mobile-ai-v230.js',source=>source
 
 await patch('native-mobile.js',source=>source
   .replaceAll("version:'2.3.25'","version:'"+VERSION+"'")
-  .replaceAll('build:272','build:'+BUILD),{required:false});
+  .replaceAll('build:272','build:'+BUILD)
+  .replaceAll('"2.3.25"','"2.4.0"')
+  .replaceAll("'2.3.25'","'2.4.0'"),{required:false});
 
 await rm(path.join(dist,'BETA_2_3_25.json'),{force:true});
 await writeFile(path.join(dist,'RELEASE_2_4_0.json'),JSON.stringify({
   version:VERSION,build:BUILD,channel:'official',webVersion:WEB_VERSION,generatedAt:new Date().toISOString(),
-  previousOfficial:'2.2.0',
-  developmentLine:'2.3.x',
+  previousOfficial:'2.2.0',developmentLine:'2.3.x',
   consolidates:[
     '2.3.24.1','2.3.24.2','2.3.24.3','2.3.24.4','2.3.24.5','2.3.24.6','2.3.24.7','2.3.24.8','2.3.24.9',
     '2.3.25.1','2.3.25.2','2.3.25.3'
   ],
   features:{
-    web791:true,sitePanel791:true,central2:true,
-    patchManager:true,tpatchV1:true,cumulativePatches:true,replaceOlderSameBase:true,
-    manualImport:true,officialCatalog:true,sha256Validation:true,patchHistory:true,
-    alphaAutoPatchCheck:true,globalEffectiveVersion:true,cacheSafeCatalog:true,
-    biometricColdStartOnly:true,biometricBackgroundReturnNoPrompt:true,
-    nestedFavorites:true,savedFilterState:true,diagnosticTabs:true,
-    advancedTaskFilters:true,aiOptimized:true,offlineQueueRecovery:true,
-    autoVersionSync:true,configDomGuard:true,pageLifecycleToken:true,
+    web791:true,sitePanel791:true,central2:true,patchManager:true,tpatchV1:true,
+    cumulativePatches:true,replaceOlderSameBase:true,manualImport:true,officialCatalog:true,
+    sha256Validation:true,patchHistory:true,alphaAutoPatchCheck:true,globalEffectiveVersion:true,
+    biometricColdStartOnly:true,biometricBackgroundReturnNoPrompt:true,nestedFavorites:true,
+    savedFilterState:true,diagnosticTabs:true,advancedTaskFilters:true,aiOptimized:true,
+    offlineQueueRecovery:true,autoVersionSync:true,configDomGuard:true,pageLifecycleToken:true,
     versionMuteGuard:true,cssLeakRepair:true
   }
 },null,2)+'\n','utf8');
 
-console.log('TAREFAS Android '+VERSION+' build '+BUILD+' OFICIAL: Web '+WEB_VERSION+' + linha 2.3.x consolidada.');
+console.log('TAREFAS Android '+VERSION+' build '+BUILD+' OFICIAL: Beta Android validada + Web '+WEB_VERSION+' + patches até 2.3.25.3.');
