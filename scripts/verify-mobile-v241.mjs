@@ -54,9 +54,11 @@ must(updates.includes('const APP_BUILD = 276;'),'atualizador mostra build anteri
 must(updates.includes("const APP_CHANNEL = 'beta';"),'atualizador não está Beta');
 must(ai.includes('BETA 2.4.1')||ai.includes("version:'2.4.1'"),'IA não recebeu versão Beta');
 
-must(release.includes("const PATCH_VERSION='2.4.1';"),'runtime consolidado não usa 2.4.1');
-must(release.includes("const BASE_VERSION='2.4.1';"),'runtime consolidado não usa base 2.4.1');
+must((release.match(/const PATCH_VERSION='2\\.4\\.1';/g)||[]).length>=2,'todos os runtimes não usam 2.4.1');
+must((release.match(/const BASE_VERSION='2\\.4\\.1';/g)||[]).length>=3,'todas as bases de runtime não usam 2.4.1');
 must(release.includes('const BUILD=276;'),'runtime consolidado não usa build 276');
+must((release.match(/const BASE_BUILD=276;/g)||[]).length>=2,'BASE_BUILD 276 não foi propagado');
+must(release.includes("version:'2.4.1',build:276,channel:'beta'"),'metadados de runtime não estão Beta 2.4.1');
 must(release.includes('__TAREFAS_BETA_241__'),'marcador Beta final ausente');
 must(release.includes("WEB_VERSION='7.9.1'"),'Web 7.9.1 não preservada');
 
