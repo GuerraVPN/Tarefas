@@ -174,7 +174,7 @@ function install(){
   card.innerHTML=`
     <div class="card-title">Ícone da tela inicial <small style="font-size:9px;opacity:.55">Alpha ${VERSION}</small></div>
     <div class="card-body">
-      <div class="tm-li-copy">Escolha o visual do TAREFAS no launcher. Os modelos fixos trocam o ícone do aplicativo; <b>Meu perfil</b> usa a imagem do seu perfil para criar/atualizar o atalho TAREFAS na tela inicial.</div>
+      <div class="tm-li-copy">Escolha o ícone do atalho TAREFAS que aparece na tela inicial. A Alpha 2.4.0.1 também corrige o ícone padrão do aplicativo para o modelo azul; <b>Meu perfil</b> usa a própria imagem do seu perfil no atalho.</div>
       <div class="tm-li-grid">
         <button type="button" class="tm-li-option" data-launcher-mode="blue"><span class="tm-li-icon tm-li-blue">T</span><strong>TAREFAS Azul</strong></button>
         <button type="button" class="tm-li-option" data-launcher-mode="military"><span class="tm-li-icon tm-li-military">★</span><strong>Militar</strong></button>
@@ -183,7 +183,7 @@ function install(){
         <button type="button" class="tm-li-option" data-launcher-mode="profile"><span class="tm-li-icon tm-li-profile" id="tmLauncherProfilePreview2401">👤</span><strong>Meu perfil</strong></button>
       </div>
       <div class="tm-li-status" id="tmLauncherIconStatus2401">Carregando seletor…</div>
-      <div class="tm-li-note">No modo <b>Meu perfil</b>, o Android pode pedir confirmação para adicionar o atalho. Por segurança do próprio Android, uma foto escolhida pelo usuário não pode substituir dinamicamente o ícone da gaveta de apps; ela é aplicada ao atalho da tela inicial.</div>
+      <div class="tm-li-note">Na primeira troca, o Android pode pedir confirmação para adicionar o atalho à tela inicial. Depois disso, as próximas escolhas atualizam esse mesmo atalho. O ícone da gaveta de apps permanece no modelo padrão corrigido.</div>
     </div>
   `;
   grid.appendChild(card);
