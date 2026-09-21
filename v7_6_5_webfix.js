@@ -2,7 +2,7 @@
 'use strict';
 if(window.__TAREFAS_V790_WEBFIX__)return;
 window.__TAREFAS_V790_WEBFIX__=true;
-const VERSION='7.9.0';
+const VERSION='7.9.1';
 function page(){return (location.pathname.split('/').pop()||'').toLowerCase()}
 function installCss(){if(document.getElementById('v765WebfixStyle'))return;const s=document.createElement('style');s.id='v765WebfixStyle';s.textContent='#lavanderiaModule[hidden]{display:none!important}#lavanderiaModule:not([hidden]){display:block!important}';document.head.appendChild(s)}
 function ensureGamesNav(){
@@ -50,5 +50,5 @@ function start(){
  if(list){let queued=false;const obs=new MutationObserver(()=>{if(queued)return;queued=true;queueMicrotask(()=>{queued=false;sync()})});obs.observe(list,{childList:true,subtree:true})}
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
-window.addEventListener('focus',sync);setInterval(sync,30000);
+window.addEventListener('focus',sync);window.addEventListener('pageshow',sync);window.addEventListener('resize',sync,{passive:true});
 })();
