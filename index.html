@@ -66,6 +66,8 @@
       cursor: pointer;
     }
     .criar-conta a:hover { text-decoration: underline; }
+    .site-action-msg{display:none;margin:0 0 16px;padding:11px 12px;border-radius:9px;background:#fff7ed;border:1px solid #fb923c;color:#9a3412;font-size:12px;line-height:1.45;font-weight:700}
+    .site-action-msg.show{display:block}
   </style>
     <link rel="stylesheet" href="v4_tema.css?v=6.0">
 </head>
@@ -75,6 +77,7 @@
     <div class="logo">TAREFAS</div>
     <p class="subtitle">Organize suas tarefas</p>
     <h2>Entrar</h2>
+    <div class="site-action-msg" id="siteActionMsg"></div>
 
     <form id="formLogin">
       <input
@@ -116,9 +119,22 @@
     }
 
     function encerrarSessaoLocal() {
-      localStorage.removeItem("usuarioLogado");
-      localStorage.removeItem(SESSAO26_CHAVE);
-      localStorage.removeItem(MENSAGENS_SESSAO_CHAVE);
+      try {
+        const u = lerUsuarioJaLogado();
+        localStorage.removeItem("usuarioLogado");
+        localStorage.removeItem(SESSAO26_CHAVE);
+        localStorage.removeItem(MENSAGENS_SESSAO_CHAVE);
+        if (u?.id) localStorage.removeItem("perfilAtivo26Pel:" + u.id);
+      } catch (_) {}
+    }
+
+    const siteParams = new URLSearchParams(location.search);
+    const siteAction = siteParams.get("site_action") || (siteParams.has("exit_users") ? "exit_users" : "");
+    if (siteAction === "exit_users") {
+      encerrarSessaoLocal();
+      const box = document.getElementById("siteActionMsg");
+      box.textContent = "⚠ O administrador executou EXIT USERS. Sua sessão foi encerrada. Faça login novamente para continuar.";
+      box.classList.add("show");
     }
 
     function sessaoAindaValida() {
@@ -145,7 +161,7 @@
     }
 
     // Se já está autenticado e a sessão não expirou, nem exibe o login.
-    if (sessaoAindaValida()) {
+    if (siteAction !== "exit_users" && sessaoAindaValida()) {
       window.location.replace("dashboard.html");
     }
 
