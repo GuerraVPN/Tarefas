@@ -125,7 +125,8 @@ function init(){
    const obs=new MutationObserver(()=>syncModal());
    obs.observe(m,{attributes:true,attributeFilter:['class']});
  }
- setInterval(markEditableCells,2000);
+ const board=$('scaleBoard');
+ if(board){let queued=false;const obs=new MutationObserver(()=>{if(queued)return;queued=true;queueMicrotask(()=>{queued=false;markEditableCells()})});obs.observe(board,{childList:true,subtree:true,attributes:true,attributeFilter:['class']})}
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
