@@ -3,8 +3,8 @@
   "app": "TAREFAS",
   "baseVersion": "2.3.24",
   "baseBuild": 271,
-  "generatedAt": "2026-09-21T15:39:00Z",
-  "latestPatch": "2.3.24.5",
+  "generatedAt": "2026-09-21T15:53:00Z",
+  "latestPatch": "2.3.24.6",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -36,35 +36,35 @@
       ]
     },
     {
-      "id": "2.3.24.5",
-      "name": "TAREFAS 2.3.24.5 — IA mais rápida, fila e filtros avançados",
+      "id": "2.3.24.6",
+      "name": "TAREFAS 2.3.24.6 — Sincronização automática de versões",
       "baseVersion": "2.3.24",
       "minBuild": 271,
       "maxBuild": 271,
       "channel": "alpha",
-      "publishedAt": "2026-09-21T15:38:00Z",
+      "publishedAt": "2026-09-21T15:52:00Z",
       "cumulative": true,
       "replacementMode": "replace-older-same-base",
       "replaces": [
         "2.3.24.1",
         "2.3.24.2",
         "2.3.24.3",
-        "2.3.24.4"
+        "2.3.24.4",
+        "2.3.24.5"
       ],
       "installable": true,
-      "description": "Atualiza a versão exibida pela IA, reduz o contexto enviado para melhorar a resposta, reforça a retomada da fila offline e adiciona filtro de status combinado com seção/busca nas tarefas.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.5.tpatch",
-      "sha256": "b0609a6c04080efe2e1b51e9120fd2c01f6d95d3aa0b740ff7798049de724ea1",
+      "description": "Sincroniza automaticamente as informações da versão mais recente de patch e APK, sem baixar ou instalar atualizações.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.6.tpatch",
+      "sha256": "119045dce0e02ec9bd76ae10a004dc8348b5ed20261acf97335afc20f5c3685f",
       "changelog": [
-        "O cabeçalho do Assistente IA passa a mostrar a versão efetiva atual do TAREFAS, em vez da Beta antiga.",
-        "Perguntas passam a enviar somente as 6 mensagens mais recentes, limitadas a 2.500 caracteres cada, reduzindo payload e contexto processado.",
-        "Enquanto a IA responde, o indicador Pensando/Analisando mostra o tempo decorrido em segundos.",
-        "Adicionado preconnect para o backend da IA para reduzir o custo da primeira conexão.",
-        "A fila offline tenta sincronizar novamente ao recuperar internet, voltar ao app, mudar a conexão e em verificações periódicas.",
-        "Quadro e Minhas Tarefas ganham filtro por status combinado com busca e seção, incluindo botão Limpar filtros.",
-        "Os filtros salvos da 2.3.24.4 capturam automaticamente o novo filtro de status.",
-        "Incluída uma API interna de acesso seguro ao DOM para próximos módulos.",
-        "Mantidas todas as correções cumulativas das versões 2.3.24.1 até 2.3.24.4."
+        "Adicionada sincronização automática do catálogo de patches em segundo plano.",
+        "Adicionada sincronização automática da versão mais recente do APK disponível para o usuário.",
+        "A tela Atualizações passa a mostrar APK instalado, APK mais recente, patch aplicado e patch mais recente.",
+        "A consulta roda ao abrir, voltar ao aplicativo, recuperar internet e a cada 5 minutos enquanto o app estiver em uso.",
+        "Nenhum patch ou APK é baixado ou instalado automaticamente; a instalação continua totalmente manual.",
+        "Incluído botão Sincronizar agora para atualização imediata das informações.",
+        "O horário da última sincronização fica visível na tela de Atualizações.",
+        "Mantidas todas as correções cumulativas das versões 2.3.24.1 até 2.3.24.5."
       ]
     }
   ],
@@ -321,7 +321,7 @@
         "2.3.24.3",
         "2.3.24.4"
       ],
-      "installable": true,
+      "installable": false,
       "description": "Atualiza a versão exibida pela IA, reduz o contexto enviado para melhorar a resposta, reforça a retomada da fila offline e adiciona filtro de status combinado com seção/busca nas tarefas.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.5.tpatch",
       "sha256": "b0609a6c04080efe2e1b51e9120fd2c01f6d95d3aa0b740ff7798049de724ea1",
@@ -335,8 +335,41 @@
         "Os filtros salvos da 2.3.24.4 capturam automaticamente o novo filtro de status.",
         "Incluída uma API interna de acesso seguro ao DOM para próximos módulos.",
         "Mantidas todas as correções cumulativas das versões 2.3.24.1 até 2.3.24.4."
+      ],
+      "supersededBy": "2.3.24.6"
+    },
+    {
+      "id": "2.3.24.6",
+      "name": "TAREFAS 2.3.24.6 — Sincronização automática de versões",
+      "baseVersion": "2.3.24",
+      "minBuild": 271,
+      "maxBuild": 271,
+      "channel": "alpha",
+      "publishedAt": "2026-09-21T15:52:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.3.24.1",
+        "2.3.24.2",
+        "2.3.24.3",
+        "2.3.24.4",
+        "2.3.24.5"
+      ],
+      "installable": true,
+      "description": "Sincroniza automaticamente as informações da versão mais recente de patch e APK, sem baixar ou instalar atualizações.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.6.tpatch",
+      "sha256": "119045dce0e02ec9bd76ae10a004dc8348b5ed20261acf97335afc20f5c3685f",
+      "changelog": [
+        "Adicionada sincronização automática do catálogo de patches em segundo plano.",
+        "Adicionada sincronização automática da versão mais recente do APK disponível para o usuário.",
+        "A tela Atualizações passa a mostrar APK instalado, APK mais recente, patch aplicado e patch mais recente.",
+        "A consulta roda ao abrir, voltar ao aplicativo, recuperar internet e a cada 5 minutos enquanto o app estiver em uso.",
+        "Nenhum patch ou APK é baixado ou instalado automaticamente; a instalação continua totalmente manual.",
+        "Incluído botão Sincronizar agora para atualização imediata das informações.",
+        "O horário da última sincronização fica visível na tela de Atualizações.",
+        "Mantidas todas as correções cumulativas das versões 2.3.24.1 até 2.3.24.5."
       ]
     }
   ],
-  "cacheNonce": "23245-ai-sync-filters"
+  "cacheNonce": "23246-auto-version-sync"
 }
