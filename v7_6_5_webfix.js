@@ -1,8 +1,8 @@
 (function(){
 'use strict';
-if(window.__TAREFAS_V782_WEBFIX__)return;
-window.__TAREFAS_V782_WEBFIX__=true;
-const VERSION='7.8.2';
+if(window.__TAREFAS_V790_WEBFIX__)return;
+window.__TAREFAS_V790_WEBFIX__=true;
+const VERSION='7.9.0';
 function page(){return (location.pathname.split('/').pop()||'').toLowerCase()}
 function installCss(){if(document.getElementById('v765WebfixStyle'))return;const s=document.createElement('style');s.id='v765WebfixStyle';s.textContent='#lavanderiaModule[hidden]{display:none!important}#lavanderiaModule:not([hidden]){display:block!important}';document.head.appendChild(s)}
 function ensureGamesNav(){
@@ -17,10 +17,10 @@ function ensureLaundryNav(){
 }
 function ensureAboutVersion(){
  if(page()!=='about.html')return;
- const release={v:VERSION,title:'Versão Web 7.8.2 — correções e integração da IA',current:true,items:[
-  'Versão atual do site consolidada em 7.8.2.',
-  'Corrigido o About que continuava exibindo 7.7.1 por causa de um carregador legado.',
-  'Mantidas as integrações da Assistente IA e dos anexos de conversa da linha 7.8.',
+ const release={v:VERSION,title:'Web 7.9.0 — Central 2.0 e estabilização',current:true,items:[
+  'Versão atual do site consolidada em 7.9.0.',
+  'Central 2.0, Favoritos, Filtros e diagnóstico passam a fazer parte da nova base Web.',
+  'Mantidas e otimizadas as integrações da Assistente IA e dos anexos de conversa da linha 7.8.',
   'Material Carga passa a carregar os dados essenciais sem esperar consultas auxiliares.',
   'Corrigida a atualização repetitiva do saldo da Cia Com na Lavagem de Forro de Cama.'
  ]};
