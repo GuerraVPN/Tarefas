@@ -1,0 +1,26 @@
+TAREFAS 2.4.0.1 Alpha — build 275
+
+Base:
+- Oficial 2.4.0.
+- Web 7.9.1.
+
+Novidades:
+- Novo seletor de ícones dentro das Configurações do app.
+- Novo ícone padrão TAREFAS Azul para substituir o ícone incorreto da 2.4.0.
+- Modelos adicionais: Militar, Preto & Ouro e Sistema.
+- Novo modo "Meu perfil", usando a imagem/ícone do perfil do usuário no atalho da tela inicial.
+- Na primeira escolha, o Android pode pedir confirmação para adicionar o atalho TAREFAS.
+- Depois de fixado, o mesmo atalho pode ser atualizado ao trocar de modelo.
+- O ícone da gaveta de aplicativos permanece no padrão corrigido; a imagem personalizada do perfil é aplicada ao atalho da tela inicial, respeitando as limitações de segurança do Android.
+
+Preservado:
+- Base Web 7.9.1.
+- Patch Manager .tpatch v1.
+- Biometria cold-start-only.
+- Central 2.0.
+- Abas de diagnóstico.
+- Todas as correções consolidadas na Oficial 2.4.0.
+
+Versão: 2.4.0.1
+Build: 275
+Canal: Alpha
