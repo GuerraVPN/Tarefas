@@ -1,0 +1,27 @@
+/* TAREFAS Android V1.5 — correções específicas do WebView */
+html.tarefas-mobile-shell body{
+  padding-bottom:calc(var(--tm-nav) + env(safe-area-inset-bottom,0px) + 28px)!important;
+}
+html.tarefas-mobile-shell .v6-dashboard-content{
+  padding-bottom:calc(var(--tm-nav) + env(safe-area-inset-bottom,0px) + 52px)!important;
+}
+html.tarefas-mobile-shell .v6-dashboard-content > :last-child{
+  margin-bottom:18px!important;
+}
+html.tarefas-mobile-shell .v6-grid2,
+html.tarefas-mobile-shell .v6-panel,
+html.tarefas-mobile-shell #recentTasks{
+  position:relative;
+  z-index:1;
+}
+html.tarefas-mobile-shell .tm-bottom-nav{
+  padding-bottom:max(env(safe-area-inset-bottom,0px),6px)!important;
+}
+html.tarefas-mobile-shell.tm-page-dashboard .v6-shortcuts:empty::before{
+  content:'Carregando atalhos…';
+  display:block;
+  grid-column:1/-1;
+  padding:18px;
+  color:var(--tm-muted);
+  text-align:center;
+}

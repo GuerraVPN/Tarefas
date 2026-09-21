@@ -1,0 +1,20 @@
+TAREFAS 2.3.25 Beta — build 272
+
+Pré-release de estabilização para a futura Release 2.4.
+
+Destaques:
+- Consolida diretamente no APK todos os patches 2.3.24.1 até 2.3.24.9.
+- Biometria é solicitada somente em um novo início real do app; voltar do segundo plano não pede novamente.
+- Gerenciador de Patches usa a nova base 2.3.25 / build 272.
+- Quem ativou Alpha tem verificação automática dos patches oficiais no Gerenciador; instalação continua manual.
+- Quem não ativou Alpha não faz a consulta automática de patches Alpha.
+- Sincronização automática continua mostrando APK mais recente; patch mais recente só é consultado automaticamente no canal Alpha ativo.
+- Favoritos e filtros preservam páginas, subabas, módulos e estado dos campos.
+- Filtros avançados combinam busca, seção e status nas tarefas.
+- Melhorias de desempenho e contexto no Assistente IA.
+- Recuperação automática da fila offline ao voltar a conexão.
+- Proteções extras contra erros de DOM e respostas assíncronas obsoletas.
+- Mantida a correção do loop de sincronização da tela de Atualizações.
+
+Base Web: 7.8.2
+Canal: Beta

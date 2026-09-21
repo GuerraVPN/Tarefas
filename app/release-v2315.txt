@@ -1,0 +1,6 @@
+TAREFAS Android 2.3.15 build 245 beta
+- Armazenamento fixo restaurado
+- Atualizações: Documentos/TAREFAS/Oficial ou Beta
+- PDFs/ODTs/documentos: Downloads/TAREFAS
+- Sem seletor Salvar como
+- Sem acesso total aos arquivos
