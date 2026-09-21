@@ -1,0 +1,55 @@
+name: Android 2.3.25.1 Alpha - Web 7.9.1
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [alpha-2.3.25.1]
+    paths:
+      - '.v23251-release-trigger'
+      - 'app/mobile-alpha-v23251.js'
+      - 'app/mobile-patch-manager-v23251.js'
+      - 'app/release-v23251.txt'
+      - 'scripts/build-mobile-v23251.mjs'
+      - 'scripts/verify-mobile-v23251.mjs'
+      - 'scripts/release-mobile-v23251.sh'
+      - '.github/workflows/android-v23251-alpha.yml'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Compilar, validar, assinar e publicar Alpha
+        run: |
+          set -euo pipefail
+          chmod +x scripts/release-mobile-v23251.sh
+          scripts/release-mobile-v23251.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tarefas-android-2.3.25.1-alpha-build-273
+          path: |
+            TAREFAS-2.3.25.1.apk
+            TAREFAS-2.3.25.1.apk.sha256
+            TAREFAS-2.3.25.1-alpha-build-273.zip
+            TAREFAS-2.3.25.1-alpha-build-273.zip.sha256
+            app/release-v23251.txt
+            dist/ALPHA_2_3_25_1.json
+          if-no-files-found: error
