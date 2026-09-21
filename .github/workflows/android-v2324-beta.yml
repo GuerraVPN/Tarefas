@@ -1,0 +1,54 @@
+name: Android 2.3.24 Beta - Patches Consolidados
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [app/android-v2324-prep]
+    paths:
+      - '.v2324-release-trigger'
+      - 'app/mobile-patch-manager-v2324.js'
+      - 'app/release-v2324.txt'
+      - 'scripts/build-mobile-v2324.mjs'
+      - 'scripts/verify-mobile-v2324.mjs'
+      - 'scripts/release-mobile-v2324.sh'
+      - '.github/workflows/android-v2324-beta.yml'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Compilar, validar, assinar e publicar Beta
+        run: |
+          set -euo pipefail
+          chmod +x scripts/release-mobile-v2324.sh
+          scripts/release-mobile-v2324.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tarefas-android-2.3.24-beta-build-271
+          path: |
+            TAREFAS-2.3.24.apk
+            TAREFAS-2.3.24.apk.sha256
+            TAREFAS-2.3.24-beta-build-271.zip
+            TAREFAS-2.3.24-beta-build-271.zip.sha256
+            app/release-v2324.txt
+            dist/BETA_2_3_24.json
+          if-no-files-found: error
