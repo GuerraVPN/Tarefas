@@ -1,10 +1,9 @@
-TAREFAS 2.3.22.4 Alpha — build 267
+TAREFAS 2.3.22.5 Alpha — build 268
 
 Correção desta Alpha:
-- Removida somente a opção 🔔 Notificações do grupo Acesso rápido.
-- 🔔 Notificações continua disponível normalmente em Comunicação.
-- Mensagens, Downloads, Favoritos e Ferramentas permanecem como já estavam na 2.3.22.3.
+- Removido por completo o grupo ACESSO RÁPIDO do menu.
+- Notificações, Mensagens, Downloads, Favoritos e Ferramentas permanecem disponíveis somente nas abas próprias.
 - Nenhuma outra função ou navegação foi alterada.
 - Canal de atualização mantido como alpha.
 
-Base: 2.3.22.3 Alpha.
+Base: 2.3.22.4 Alpha.
