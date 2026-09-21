@@ -3,8 +3,8 @@
   "app": "TAREFAS",
   "baseVersion": "2.3.24",
   "baseBuild": 271,
-  "generatedAt": "2026-09-21T16:09:00Z",
-  "latestPatch": "2.3.24.8",
+  "generatedAt": "2026-09-21T16:57:00Z",
+  "latestPatch": "2.3.24.9",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -36,13 +36,13 @@
       ]
     },
     {
-      "id": "2.3.24.8",
-      "name": "TAREFAS 2.3.24.8 — Pré-estabilização para Release 2.4",
+      "id": "2.3.24.9",
+      "name": "TAREFAS 2.3.24.9 — Biometria somente ao abrir o app",
       "baseVersion": "2.3.24",
       "minBuild": 271,
       "maxBuild": 271,
       "channel": "alpha",
-      "publishedAt": "2026-09-21T16:08:00Z",
+      "publishedAt": "2026-09-21T16:56:00Z",
       "cumulative": true,
       "replacementMode": "replace-older-same-base",
       "replaces": [
@@ -52,21 +52,21 @@
         "2.3.24.4",
         "2.3.24.5",
         "2.3.24.6",
-        "2.3.24.7"
+        "2.3.24.7",
+        "2.3.24.8"
       ],
       "installable": true,
-      "description": "Pré-estabilização da futura Release 2.4 com proteção extra de DOM, escopo de filtros por subaba, silenciamento local de avisos de versão e utilitários de ciclo de tela.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.8.tpatch",
-      "sha256": "cfe95309a300bcfabb1abbe6b3f64faaae1bc32b2d12716c663eca2f0079a60d",
+      "description": "A biometria deixa de ser solicitada ao voltar do segundo plano e passa a ser cobrada apenas em um novo início real do aplicativo.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.9.tpatch",
+      "sha256": "50e404756c36f874eb0648240f601d501192396f8178ddba300eaf897b73c81b",
       "changelog": [
-        "Configurações recebe proteção preventiva contra acesso a elementos já desmontados durante operações assíncronas.",
-        "A Central de erros reconhece também o falso positivo de style em configuracoes.html após desmontagem da tela.",
-        "Adicionado token de ciclo da tela para novos fluxos assíncronos descartarem respostas obsoletas.",
-        "Filtros salvos recebem scopeKey por página e subaba/módulo.",
-        "Avisos locais de patch/versão passam a respeitar imediatamente a categoria versoes silenciada.",
-        "A fila offline existente permanece sequencial; não foi introduzido envio paralelo.",
-        "Adicionado diagnóstico interno de pré-release para DOM, fila, filtros, favoritos, silenciamento e sincronização.",
-        "Mantidas todas as correções cumulativas das versões 2.3.24.1 até 2.3.24.7."
+        "Ir para segundo plano e voltar ao TAREFAS não solicita mais biometria.",
+        "Apagar a tela, abrir a lista de aplicativos recentes ou alternar para outro app não cria uma nova trava biométrica.",
+        "A biometria continua sendo solicitada no próximo início real do TAREFAS após encerramento completo da Activity/WebView.",
+        "A navegação entre telas e abas continua sem solicitações adicionais.",
+        "A instalação da 2.3.24.9 preserva uma sessão já desbloqueada da 2.3.24.8 para não pedir biometria apenas por causa do reload do patch.",
+        "Quem não ativou biometria continua sem receber solicitação de senha/biometria.",
+        "Mantidas todas as correções cumulativas das versões 2.3.24.1 até 2.3.24.8."
       ]
     }
   ],
@@ -425,7 +425,7 @@
         "2.3.24.6",
         "2.3.24.7"
       ],
-      "installable": true,
+      "installable": false,
       "description": "Pré-estabilização da futura Release 2.4 com proteção extra de DOM, escopo de filtros por subaba, silenciamento local de avisos de versão e utilitários de ciclo de tela.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.8.tpatch",
       "sha256": "cfe95309a300bcfabb1abbe6b3f64faaae1bc32b2d12716c663eca2f0079a60d",
@@ -438,8 +438,43 @@
         "A fila offline existente permanece sequencial; não foi introduzido envio paralelo.",
         "Adicionado diagnóstico interno de pré-release para DOM, fila, filtros, favoritos, silenciamento e sincronização.",
         "Mantidas todas as correções cumulativas das versões 2.3.24.1 até 2.3.24.7."
+      ],
+      "supersededBy": "2.3.24.9"
+    },
+    {
+      "id": "2.3.24.9",
+      "name": "TAREFAS 2.3.24.9 — Biometria somente ao abrir o app",
+      "baseVersion": "2.3.24",
+      "minBuild": 271,
+      "maxBuild": 271,
+      "channel": "alpha",
+      "publishedAt": "2026-09-21T16:56:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.3.24.1",
+        "2.3.24.2",
+        "2.3.24.3",
+        "2.3.24.4",
+        "2.3.24.5",
+        "2.3.24.6",
+        "2.3.24.7",
+        "2.3.24.8"
+      ],
+      "installable": true,
+      "description": "A biometria deixa de ser solicitada ao voltar do segundo plano e passa a ser cobrada apenas em um novo início real do aplicativo.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.9.tpatch",
+      "sha256": "50e404756c36f874eb0648240f601d501192396f8178ddba300eaf897b73c81b",
+      "changelog": [
+        "Ir para segundo plano e voltar ao TAREFAS não solicita mais biometria.",
+        "Apagar a tela, abrir a lista de aplicativos recentes ou alternar para outro app não cria uma nova trava biométrica.",
+        "A biometria continua sendo solicitada no próximo início real do TAREFAS após encerramento completo da Activity/WebView.",
+        "A navegação entre telas e abas continua sem solicitações adicionais.",
+        "A instalação da 2.3.24.9 preserva uma sessão já desbloqueada da 2.3.24.8 para não pedir biometria apenas por causa do reload do patch.",
+        "Quem não ativou biometria continua sem receber solicitação de senha/biometria.",
+        "Mantidas todas as correções cumulativas das versões 2.3.24.1 até 2.3.24.8."
       ]
     }
   ],
-  "cacheNonce": "23248-prerelease-hardening"
+  "cacheNonce": "23249-cold-start-biometric"
 }
