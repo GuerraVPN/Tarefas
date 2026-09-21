@@ -3,6 +3,23 @@
   "app": "TAREFAS",
   "baseVersion": "2.3.23.1",
   "baseBuild": 270,
-  "generatedAt": "2026-09-21T12:45:00Z",
-  "patches": []
+  "generatedAt": "2026-09-21T13:19:00Z",
+  "patches": [
+    {
+      "id": "2.3.23.2",
+      "name": "TAREFAS 2.3.23.2 — Tema e versão",
+      "baseVersion": "2.3.23.1",
+      "minBuild": 270,
+      "maxBuild": 270,
+      "description": "Corrige o tema voltando sozinho para claro e os rótulos antigos de versão 2.3.22.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.23.2.tpatch",
+      "sha256": "6e646f28340176fe37b2803007f2fa6ce8310406041cdc4b3807d5f60b3e2693",
+      "changelog": [
+        "Tema escolhido localmente passa a ter prioridade sobre uma preferência remota antiga.",
+        "Troca manual de tema continua disponível.",
+        "Cabeçalho passa a exibir 2.3.23.2 no lugar de 2.3.22.",
+        "Tela Sobre passa a refletir a versão efetiva 2.3.23.2."
+      ]
+    }
+  ]
 }
