@@ -1,9 +1,10 @@
-TAREFAS 2.3.22.5 Alpha — build 268
+TAREFAS 2.3.23 Beta — build 269
 
-Correção desta Alpha:
-- Removido por completo o grupo ACESSO RÁPIDO do menu.
-- Notificações, Mensagens, Downloads, Favoritos e Ferramentas permanecem disponíveis somente nas abas próprias.
-- Nenhuma outra função ou navegação foi alterada.
-- Canal de atualização mantido como alpha.
+Promoção da Beta:
+- Base promovida diretamente da Alpha 2.3.22.5 já validada.
+- Remoção completa do bloco ACESSO RÁPIDO preservada.
+- Notificações, Mensagens, Downloads, Favoritos e Ferramentas permanecem somente nas abas próprias.
+- Mantidas as correções e recursos validados na série 2.3.22.x.
+- Canal de atualização alterado de alpha para beta.
 
-Base: 2.3.22.4 Alpha.
+Base: 2.3.22.5 Alpha.
