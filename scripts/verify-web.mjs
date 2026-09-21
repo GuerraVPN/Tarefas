@@ -41,9 +41,10 @@ for (const name of htmlFiles) {
 
 console.log('CONFERÊNCIA 2/3 — Anti-travamento global');
 const requiredMarkers = {
-  'v6_2_mobile.js':['__TAREFAS_V771_PAGE_LOADER__',"'about.html','games.html','orcamentarios.html'",'v7_7_1_site_light.js'],
+  'v6_2_mobile.js':['__TAREFAS_V771_PAGE_LOADER__',"'about.html','games.html','orcamentarios.html'",'v7_9_1_site.js?v=7.9.1','v7_9_1_web.js?v=7.9.1'],
   'v6_5_patch.js':['HEARTBEAT_MS=60000','PRESENCE_REFRESH_MS=60000','presenceVisualPage()'],
-  'v7_7_1_site_light.js':['POLL_MS=30000']
+  'v7_9_1_site.js':['POLL_IDLE=10000','POLL_PENDING=2000',"'v7_4_12_controle_site','v7_4_9_controle_site','v7_4_7_controle_site'",'reiniciar.html','desligado.html','broadcastAction','if(isAdmin)return'],
+  'v7_9_1_web.js':["const VERSION='7.9.1'",'schemaVersion:1','data-favrename','data-qretry','TarefasWeb791Lifecycle']
 };
 for (const [name,markers] of Object.entries(requiredMarkers)) {
   const src=await readFile(path.join(root,name),'utf8').catch(()=> '');
@@ -53,6 +54,17 @@ for (const [name,markers] of Object.entries(requiredMarkers)) {
 const v65=await readFile(path.join(root,'v6_5_patch.js'),'utf8');
 if(v65.includes('postgres_changes'))errors.push('v6_5_patch.js: realtime global de presença não pode voltar');
 if(v65.includes('document.documentElement,{subtree:true'))errors.push('v6_5_patch.js: MutationObserver global não pode voltar');
+const perfFiles={
+  'v7_5_3_patch.js':'setInterval(()=>{const sig=calendarDomSignature()',
+  'v7_5_2_service_labels.js':'setInterval(tick,1200)',
+  'v7_5_service_editor.js':'setInterval(markEditableCells,2000)',
+  'v7_4_12_global.js':'uiTimer=setInterval(refreshUi,3000)',
+  'v7_6_5_webfix.js':'setInterval(sync,30000)'
+};
+for(const [name,forbidden] of Object.entries(perfFiles)){
+  const src=await readFile(path.join(root,name),'utf8').catch(()=> '');
+  if(src.includes(forbidden))errors.push(name+': polling legado agressivo voltou: '+forbidden);
+}
 
 console.log('CONFERÊNCIA 3/3 — Orçamentários e Material Carga');
 const comum=await readFile(path.join(root,'sistema_comum.js'),'utf8');
