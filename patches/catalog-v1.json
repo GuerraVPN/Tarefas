@@ -3,8 +3,8 @@
   "app": "TAREFAS",
   "baseVersion": "2.3.25",
   "baseBuild": 272,
-  "generatedAt": "2026-09-21T18:11:00Z",
-  "latestPatch": "2.3.25.1",
+  "generatedAt": "2026-09-21T18:25:00Z",
+  "latestPatch": "2.3.25.2",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -70,26 +70,29 @@
       ]
     },
     {
-      "id": "2.3.25.1",
-      "name": "TAREFAS 2.3.25.1 — Base Web 7.9.1",
+      "id": "2.3.25.2",
+      "name": "TAREFAS 2.3.25.2 — Correção de CSS bruto na tela",
       "baseVersion": "2.3.25",
       "minBuild": 272,
       "maxBuild": 272,
       "channel": "alpha",
-      "publishedAt": "2026-09-21T18:10:00Z",
+      "publishedAt": "2026-09-21T18:24:00Z",
       "cumulative": true,
       "replacementMode": "replace-older-same-base",
-      "replaces": [],
+      "replaces": [
+        "2.3.25.1"
+      ],
       "installable": true,
-      "description": "Atualiza a identificação da base Web do TAREFAS Android de 7.8.2 para 7.9.1, mantendo o APK 2.3.25 build 272.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.25.1.tpatch",
-      "sha256": "1b26572f965abdc746d7c9825f836719a64dd9d492a1e319cbaf96f01a30dc2c",
+      "description": "Corrige a regressão da 2.3.25.1 que podia deixar conteúdo CSS visível na tela ao atualizar a identificação da base Web 7.9.1.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.25.2.tpatch",
+      "sha256": "f522ada9618e2f97a29fb855454b6d07a7e9127354748cf7a1f8c02a27082e66",
       "changelog": [
-        "Base Web efetiva atualizada para 7.9.1.",
-        "Cabeçalho do aplicativo passa a exibir 2.3.25.1 • WEB 7.9.1.",
-        "Tela Sobre/Atualizações passa a refletir a base Web 7.9.1 quando houver rótulo da versão Web.",
-        "Mantido o APK base 2.3.25 / build 272; nenhuma reinstalação de APK é necessária.",
-        "Patch distribuído no canal Alpha e compatível somente com a Beta 2.3.25 build 272."
+        "Corrigido o vazamento de CSS bruto para a área visível da página.",
+        "Removida a varredura ampla do conteúdo do main usada na 2.3.25.1.",
+        "A atualização de rótulos da Web 7.9.1 passa a atuar somente em elementos conhecidos de versão.",
+        "Adicionada recuperação automática para remover blocos de CSS da IA/layout que tenham sido inseridos como texto no body.",
+        "Mantida a base Web 7.9.1 e o cabeçalho 2.3.25.2 • WEB 7.9.1.",
+        "Mantido o APK base 2.3.25 / build 272, sem necessidade de reinstalação."
       ]
     }
   ],
@@ -509,7 +512,7 @@
       "cumulative": true,
       "replacementMode": "replace-older-same-base",
       "replaces": [],
-      "installable": true,
+      "installable": false,
       "description": "Atualiza a identificação da base Web do TAREFAS Android de 7.8.2 para 7.9.1, mantendo o APK 2.3.25 build 272.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.25.1.tpatch",
       "sha256": "1b26572f965abdc746d7c9825f836719a64dd9d492a1e319cbaf96f01a30dc2c",
@@ -519,8 +522,35 @@
         "Tela Sobre/Atualizações passa a refletir a base Web 7.9.1 quando houver rótulo da versão Web.",
         "Mantido o APK base 2.3.25 / build 272; nenhuma reinstalação de APK é necessária.",
         "Patch distribuído no canal Alpha e compatível somente com a Beta 2.3.25 build 272."
+      ],
+      "supersededBy": "2.3.25.2"
+    },
+    {
+      "id": "2.3.25.2",
+      "name": "TAREFAS 2.3.25.2 — Correção de CSS bruto na tela",
+      "baseVersion": "2.3.25",
+      "minBuild": 272,
+      "maxBuild": 272,
+      "channel": "alpha",
+      "publishedAt": "2026-09-21T18:24:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.3.25.1"
+      ],
+      "installable": true,
+      "description": "Corrige a regressão da 2.3.25.1 que podia deixar conteúdo CSS visível na tela ao atualizar a identificação da base Web 7.9.1.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.25.2.tpatch",
+      "sha256": "f522ada9618e2f97a29fb855454b6d07a7e9127354748cf7a1f8c02a27082e66",
+      "changelog": [
+        "Corrigido o vazamento de CSS bruto para a área visível da página.",
+        "Removida a varredura ampla do conteúdo do main usada na 2.3.25.1.",
+        "A atualização de rótulos da Web 7.9.1 passa a atuar somente em elementos conhecidos de versão.",
+        "Adicionada recuperação automática para remover blocos de CSS da IA/layout que tenham sido inseridos como texto no body.",
+        "Mantida a base Web 7.9.1 e o cabeçalho 2.3.25.2 • WEB 7.9.1.",
+        "Mantido o APK base 2.3.25 / build 272, sem necessidade de reinstalação."
       ]
     }
   ],
-  "cacheNonce": "23251-web-791"
+  "cacheNonce": "23252-fix-raw-css"
 }
