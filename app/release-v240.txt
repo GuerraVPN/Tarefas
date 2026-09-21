@@ -1,0 +1,31 @@
+TAREFAS 2.4.0 — Release Oficial
+Build 274 · Web 7.9.1
+
+A 2.4.0 encerra o ciclo de desenvolvimento 2.3.x e substitui a antiga Release Oficial 2.2.0.
+
+Principais novidades
+- Web 7.9.1 incorporada integralmente ao APK.
+- Central de Notificações 2.0.
+- Favoritos para páginas, módulos e subabas.
+- Filtros e estado de telas aprimorados.
+- Abas para diagnóstico na Central de Erros.
+- Gerenciador oficial de patches .tpatch, com validação SHA-256 e patches cumulativos.
+- Verificação automática de patches Alpha somente para usuários que optaram pelo canal Alpha.
+- Biometria consolidada: é cobrada em um novo início real do aplicativo, não ao voltar do segundo plano.
+- Assistente IA integrado ao perfil e às permissões do usuário, com anexos, ações e contexto otimizado.
+- Fila offline com retomada automática ao recuperar conexão.
+- Proteções contra respostas assíncronas obsoletas e erros de DOM.
+- Correção do vazamento de CSS como texto.
+- Sincronização automática das versões de APK e patches.
+- Painel SITE 7.9.1 com Reiniciar, Desligar e EXIT USERS; usuários Admin são preservados.
+- Redução dos pollings legados mais agressivos da camada Web.
+
+Consolidação
+- Inclui nativamente as correções 2.3.24.1 até 2.3.24.9.
+- Inclui nativamente as Alphas/Patches 2.3.25.1, 2.3.25.2 e 2.3.25.3.
+- Não exige instalação prévia desses patches.
+
+Canal: Oficial
+Base Web: 7.9.1
+Versão Android: 2.4.0
+Build: 274
