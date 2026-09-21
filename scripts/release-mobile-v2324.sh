@@ -117,4 +117,4 @@ jq -n --arg version "$VERSION" --argjson build "$BUILD" --arg channel 'beta' --a
 CODE="$(curl --silent --show-error -o "$RUNNER_TEMP/result.json" -w '%{http_code}' -H "Authorization: Bearer $OIDC_RELEASE" -H 'Content-Type: application/json' --data-binary @"$RUNNER_TEMP/release.json" 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-release-publish')"
 cat "$RUNNER_TEMP/result.json"
 test "$CODE" = '200'
-jq -e '.ok == true and .version == "2.3.23.1" and .build == 271 and .channel == "alpha"' "$RUNNER_TEMP/result.json" >/dev/null
+jq -e '.ok == true and .version == "2.3.24" and .build == 271 and .channel == "beta"' "$RUNNER_TEMP/result.json" >/dev/null
