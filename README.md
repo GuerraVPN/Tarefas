@@ -40,6 +40,8 @@ O próprio aplicativo também possui a área de atualizações e pode receber ve
 
 ## Web
 
+**Versão Web atual: 7.9.0** — Central 2.0, Favoritos/Filtros por subaba, melhorias da IA e estabilização do navegador.
+
 A versão Web continua disponível pelo GitHub Pages:
 
 https://guerravpn.github.io/Tarefas/
