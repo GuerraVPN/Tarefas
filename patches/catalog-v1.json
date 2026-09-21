@@ -3,8 +3,8 @@
   "app": "TAREFAS",
   "baseVersion": "2.3.24",
   "baseBuild": 271,
-  "generatedAt": "2026-09-21T15:25:00Z",
-  "latestPatch": "2.3.24.4",
+  "generatedAt": "2026-09-21T15:39:00Z",
+  "latestPatch": "2.3.24.5",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -36,33 +36,35 @@
       ]
     },
     {
-      "id": "2.3.24.4",
-      "name": "TAREFAS 2.3.24.4 — Favoritos e filtros por abas",
+      "id": "2.3.24.5",
+      "name": "TAREFAS 2.3.24.5 — IA mais rápida, fila e filtros avançados",
       "baseVersion": "2.3.24",
       "minBuild": 271,
       "maxBuild": 271,
       "channel": "alpha",
-      "publishedAt": "2026-09-21T15:24:00Z",
+      "publishedAt": "2026-09-21T15:38:00Z",
       "cumulative": true,
       "replacementMode": "replace-older-same-base",
       "replaces": [
         "2.3.24.1",
         "2.3.24.2",
-        "2.3.24.3"
+        "2.3.24.3",
+        "2.3.24.4"
       ],
       "installable": true,
-      "description": "Expande Favoritos e Filtros para páginas, subabas, módulos internos e estados de filtro, incluindo Orçamentários e demais áreas do TAREFAS.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.4.tpatch",
-      "sha256": "243b776a7a5400359d9a180fcc11a9047d94733df23b0139fc554038734a110a",
+      "description": "Atualiza a versão exibida pela IA, reduz o contexto enviado para melhorar a resposta, reforça a retomada da fila offline e adiciona filtro de status combinado com seção/busca nas tarefas.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.5.tpatch",
+      "sha256": "b0609a6c04080efe2e1b51e9120fd2c01f6d95d3aa0b740ff7798049de724ea1",
       "changelog": [
-        "Favoritos agora permitem escolher páginas e subabas/módulos internos, não apenas a tela atual.",
-        "Orçamentários passa a oferecer Resumo, Guias, Baixas, Distribuição, Movimentação, Material Carga, Passagem de Carga e Lavanderia como destinos separados.",
-        "Central passa a permitir favoritar diretamente Notificações, Mensagens, Downloads, Favoritos e Ferramentas.",
-        "O sistema descobre e memoriza dinamicamente outras abas internas visitadas no aplicativo para disponibilizá-las no seletor.",
-        "Filtros salvos agora guardam também os valores dos campos e a subaba ativa da tela.",
-        "Filtros podem ser renomeados, substituídos pelo estado atual ou excluídos.",
-        "Ao abrir um favorito/filtro com estado interno, o TAREFAS restaura os campos e a aba correspondente.",
-        "Mantidas as correções de erros da 2.3.24.3 e a segurança biométrica condicional da 2.3.24.2."
+        "O cabeçalho do Assistente IA passa a mostrar a versão efetiva atual do TAREFAS, em vez da Beta antiga.",
+        "Perguntas passam a enviar somente as 6 mensagens mais recentes, limitadas a 2.500 caracteres cada, reduzindo payload e contexto processado.",
+        "Enquanto a IA responde, o indicador Pensando/Analisando mostra o tempo decorrido em segundos.",
+        "Adicionado preconnect para o backend da IA para reduzir o custo da primeira conexão.",
+        "A fila offline tenta sincronizar novamente ao recuperar internet, voltar ao app, mudar a conexão e em verificações periódicas.",
+        "Quadro e Minhas Tarefas ganham filtro por status combinado com busca e seção, incluindo botão Limpar filtros.",
+        "Os filtros salvos da 2.3.24.4 capturam automaticamente o novo filtro de status.",
+        "Incluída uma API interna de acesso seguro ao DOM para próximos módulos.",
+        "Mantidas todas as correções cumulativas das versões 2.3.24.1 até 2.3.24.4."
       ]
     }
   ],
@@ -287,7 +289,7 @@
         "2.3.24.2",
         "2.3.24.3"
       ],
-      "installable": true,
+      "installable": false,
       "description": "Expande Favoritos e Filtros para páginas, subabas, módulos internos e estados de filtro, incluindo Orçamentários e demais áreas do TAREFAS.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.4.tpatch",
       "sha256": "243b776a7a5400359d9a180fcc11a9047d94733df23b0139fc554038734a110a",
@@ -300,8 +302,41 @@
         "Filtros podem ser renomeados, substituídos pelo estado atual ou excluídos.",
         "Ao abrir um favorito/filtro com estado interno, o TAREFAS restaura os campos e a aba correspondente.",
         "Mantidas as correções de erros da 2.3.24.3 e a segurança biométrica condicional da 2.3.24.2."
+      ],
+      "supersededBy": "2.3.24.5"
+    },
+    {
+      "id": "2.3.24.5",
+      "name": "TAREFAS 2.3.24.5 — IA mais rápida, fila e filtros avançados",
+      "baseVersion": "2.3.24",
+      "minBuild": 271,
+      "maxBuild": 271,
+      "channel": "alpha",
+      "publishedAt": "2026-09-21T15:38:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.3.24.1",
+        "2.3.24.2",
+        "2.3.24.3",
+        "2.3.24.4"
+      ],
+      "installable": true,
+      "description": "Atualiza a versão exibida pela IA, reduz o contexto enviado para melhorar a resposta, reforça a retomada da fila offline e adiciona filtro de status combinado com seção/busca nas tarefas.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.5.tpatch",
+      "sha256": "b0609a6c04080efe2e1b51e9120fd2c01f6d95d3aa0b740ff7798049de724ea1",
+      "changelog": [
+        "O cabeçalho do Assistente IA passa a mostrar a versão efetiva atual do TAREFAS, em vez da Beta antiga.",
+        "Perguntas passam a enviar somente as 6 mensagens mais recentes, limitadas a 2.500 caracteres cada, reduzindo payload e contexto processado.",
+        "Enquanto a IA responde, o indicador Pensando/Analisando mostra o tempo decorrido em segundos.",
+        "Adicionado preconnect para o backend da IA para reduzir o custo da primeira conexão.",
+        "A fila offline tenta sincronizar novamente ao recuperar internet, voltar ao app, mudar a conexão e em verificações periódicas.",
+        "Quadro e Minhas Tarefas ganham filtro por status combinado com busca e seção, incluindo botão Limpar filtros.",
+        "Os filtros salvos da 2.3.24.4 capturam automaticamente o novo filtro de status.",
+        "Incluída uma API interna de acesso seguro ao DOM para próximos módulos.",
+        "Mantidas todas as correções cumulativas das versões 2.3.24.1 até 2.3.24.4."
       ]
     }
   ],
-  "cacheNonce": "23244-nested-favorites-filters"
+  "cacheNonce": "23245-ai-sync-filters"
 }
