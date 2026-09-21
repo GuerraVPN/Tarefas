@@ -18,6 +18,19 @@ node --check app/mobile-patch-manager-v240.js
 node --check scripts/build-mobile-v240.mjs
 node --check scripts/verify-mobile-v240.mjs
 
+# Gera primeiro exatamente o dist da Beta 2.3.25 já validada.
+git fetch origin beta-2.3.25
+BASE_DIR="$RUNNER_TEMP/base-2325"
+git worktree add "$BASE_DIR" origin/beta-2.3.25
+ln -s "$GITHUB_WORKSPACE/node_modules" "$BASE_DIR/node_modules"
+(
+  cd "$BASE_DIR"
+  node scripts/build-mobile-v2325.mjs
+)
+rm -rf "$GITHUB_WORKSPACE/dist"
+cp -a "$BASE_DIR/dist" "$GITHUB_WORKSPACE/dist"
+
+# Atualiza apenas o que mudou para a Web 7.9.1 e promove para 2.4.0.
 node scripts/build-mobile-v240.mjs
 node scripts/verify-mobile-v240.mjs dist
 
