@@ -1,10 +1,10 @@
 {
   "format": "tarefas-patch-catalog-v1",
   "app": "TAREFAS",
-  "baseVersion": "2.3.23.1",
-  "baseBuild": 270,
-  "generatedAt": "2026-09-21T14:18:00Z",
-  "latestPatch": "2.3.23.6",
+  "baseVersion": "2.3.24",
+  "baseBuild": 271,
+  "generatedAt": "2026-09-21T14:43:00Z",
+  "latestPatch": "2.3.24.1",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -33,6 +33,30 @@
         "Mantidas as correções de notificação imediata introduzidas na 2.3.23.5.",
         "Mantidos o modelo cumulativo, histórico de patches, correções de tema e canais Alpha/Beta.",
         "A 2.3.23.6 substitui automaticamente a 2.3.23.5 e os patches anteriores da mesma base."
+      ]
+    },
+    {
+      "id": "2.3.24.1",
+      "name": "TAREFAS 2.3.24.1 — Bloqueio biométrico ao entrar",
+      "baseVersion": "2.3.24",
+      "minBuild": 271,
+      "maxBuild": 271,
+      "channel": "alpha",
+      "publishedAt": "2026-09-21T14:43:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [],
+      "installable": true,
+      "description": "Bloqueia o TAREFAS ao abrir ou retornar do segundo plano e exige biometria ou a senha da conta para continuar.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.1.tpatch",
+      "sha256": "177ce45090a5293288222708cac9c72af302f0cce591e4d1a9278f95d97741e9",
+      "changelog": [
+        "Ao abrir uma sessão já autenticada, o conteúdo do aplicativo fica bloqueado até confirmar a identidade.",
+        "Se a biometria estiver ativada no aparelho, o leitor é solicitado automaticamente.",
+        "A senha da própria conta fica disponível como alternativa à biometria.",
+        "Ao retornar do segundo plano, o aplicativo volta a exigir autenticação.",
+        "Trocar entre as abas internas do TAREFAS não dispara uma nova autenticação.",
+        "A validação biométrica continua confirmando a sessão no servidor antes de liberar o aplicativo."
       ]
     }
   ],
@@ -161,7 +185,31 @@
         "Mantidos o modelo cumulativo, histórico de patches, correções de tema e canais Alpha/Beta.",
         "A 2.3.23.6 substitui automaticamente a 2.3.23.5 e os patches anteriores da mesma base."
       ]
+    },
+    {
+      "id": "2.3.24.1",
+      "name": "TAREFAS 2.3.24.1 — Bloqueio biométrico ao entrar",
+      "baseVersion": "2.3.24",
+      "minBuild": 271,
+      "maxBuild": 271,
+      "channel": "alpha",
+      "publishedAt": "2026-09-21T14:43:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [],
+      "installable": true,
+      "description": "Bloqueia o TAREFAS ao abrir ou retornar do segundo plano e exige biometria ou a senha da conta para continuar.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.1.tpatch",
+      "sha256": "177ce45090a5293288222708cac9c72af302f0cce591e4d1a9278f95d97741e9",
+      "changelog": [
+        "Ao abrir uma sessão já autenticada, o conteúdo do aplicativo fica bloqueado até confirmar a identidade.",
+        "Se a biometria estiver ativada no aparelho, o leitor é solicitado automaticamente.",
+        "A senha da própria conta fica disponível como alternativa à biometria.",
+        "Ao retornar do segundo plano, o aplicativo volta a exigir autenticação.",
+        "Trocar entre as abas internas do TAREFAS não dispara uma nova autenticação.",
+        "A validação biométrica continua confirmando a sessão no servidor antes de liberar o aplicativo."
+      ]
     }
   ],
-  "cacheNonce": "23236-global-version-repair"
+  "cacheNonce": "23241-secure-entry"
 }
