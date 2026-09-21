@@ -3,8 +3,8 @@
   "app": "TAREFAS",
   "baseVersion": "2.3.24",
   "baseBuild": 271,
-  "generatedAt": "2026-09-21T15:53:00Z",
-  "latestPatch": "2.3.24.6",
+  "generatedAt": "2026-09-21T15:59:00Z",
+  "latestPatch": "2.3.24.7",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -36,13 +36,13 @@
       ]
     },
     {
-      "id": "2.3.24.6",
-      "name": "TAREFAS 2.3.24.6 — Sincronização automática de versões",
+      "id": "2.3.24.7",
+      "name": "TAREFAS 2.3.24.7 — Correção do loop de sincronização",
       "baseVersion": "2.3.24",
       "minBuild": 271,
       "maxBuild": 271,
       "channel": "alpha",
-      "publishedAt": "2026-09-21T15:52:00Z",
+      "publishedAt": "2026-09-21T15:58:00Z",
       "cumulative": true,
       "replacementMode": "replace-older-same-base",
       "replaces": [
@@ -50,21 +50,21 @@
         "2.3.24.2",
         "2.3.24.3",
         "2.3.24.4",
-        "2.3.24.5"
+        "2.3.24.5",
+        "2.3.24.6"
       ],
       "installable": true,
-      "description": "Sincroniza automaticamente as informações da versão mais recente de patch e APK, sem baixar ou instalar atualizações.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.6.tpatch",
-      "sha256": "119045dce0e02ec9bd76ae10a004dc8348b5ed20261acf97335afc20f5c3685f",
+      "description": "Corrige o travamento causado por loop do MutationObserver na sincronização automática de versões, mantendo a checagem automática de APK e patches.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.7.tpatch",
+      "sha256": "6654cbd4c9b17782a253490fb349c573cdabb16ab08568692e0fbf2a315385c2",
       "changelog": [
-        "Adicionada sincronização automática do catálogo de patches em segundo plano.",
-        "Adicionada sincronização automática da versão mais recente do APK disponível para o usuário.",
-        "A tela Atualizações passa a mostrar APK instalado, APK mais recente, patch aplicado e patch mais recente.",
-        "A consulta roda ao abrir, voltar ao aplicativo, recuperar internet e a cada 5 minutos enquanto o app estiver em uso.",
-        "Nenhum patch ou APK é baixado ou instalado automaticamente; a instalação continua totalmente manual.",
-        "Incluído botão Sincronizar agora para atualização imediata das informações.",
-        "O horário da última sincronização fica visível na tela de Atualizações.",
-        "Mantidas todas as correções cumulativas das versões 2.3.24.1 até 2.3.24.5."
+        "Corrigido o loop MutationObserver → renderização → MutationObserver que travava a tela de Atualizações.",
+        "O observador agora reage somente quando a área de Atualizações é criada/removida ou quando o painel de sincronização desaparece externamente.",
+        "Alterações dentro do próprio painel de sincronização são ignoradas pelo observador.",
+        "A renderização usa fingerprint para evitar redesenhar o painel quando os dados não mudaram.",
+        "Mantida a sincronização automática de APK e patches sem instalação automática.",
+        "O cabeçalho volta a reforçar a versão efetiva do patch durante as sincronizações.",
+        "Mantidas todas as correções cumulativas das versões 2.3.24.1 até 2.3.24.6."
       ]
     }
   ],
@@ -355,7 +355,7 @@
         "2.3.24.4",
         "2.3.24.5"
       ],
-      "installable": true,
+      "installable": false,
       "description": "Sincroniza automaticamente as informações da versão mais recente de patch e APK, sem baixar ou instalar atualizações.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.6.tpatch",
       "sha256": "119045dce0e02ec9bd76ae10a004dc8348b5ed20261acf97335afc20f5c3685f",
@@ -368,8 +368,41 @@
         "Incluído botão Sincronizar agora para atualização imediata das informações.",
         "O horário da última sincronização fica visível na tela de Atualizações.",
         "Mantidas todas as correções cumulativas das versões 2.3.24.1 até 2.3.24.5."
+      ],
+      "supersededBy": "2.3.24.7"
+    },
+    {
+      "id": "2.3.24.7",
+      "name": "TAREFAS 2.3.24.7 — Correção do loop de sincronização",
+      "baseVersion": "2.3.24",
+      "minBuild": 271,
+      "maxBuild": 271,
+      "channel": "alpha",
+      "publishedAt": "2026-09-21T15:58:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.3.24.1",
+        "2.3.24.2",
+        "2.3.24.3",
+        "2.3.24.4",
+        "2.3.24.5",
+        "2.3.24.6"
+      ],
+      "installable": true,
+      "description": "Corrige o travamento causado por loop do MutationObserver na sincronização automática de versões, mantendo a checagem automática de APK e patches.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.7.tpatch",
+      "sha256": "6654cbd4c9b17782a253490fb349c573cdabb16ab08568692e0fbf2a315385c2",
+      "changelog": [
+        "Corrigido o loop MutationObserver → renderização → MutationObserver que travava a tela de Atualizações.",
+        "O observador agora reage somente quando a área de Atualizações é criada/removida ou quando o painel de sincronização desaparece externamente.",
+        "Alterações dentro do próprio painel de sincronização são ignoradas pelo observador.",
+        "A renderização usa fingerprint para evitar redesenhar o painel quando os dados não mudaram.",
+        "Mantida a sincronização automática de APK e patches sem instalação automática.",
+        "O cabeçalho volta a reforçar a versão efetiva do patch durante as sincronizações.",
+        "Mantidas todas as correções cumulativas das versões 2.3.24.1 até 2.3.24.6."
       ]
     }
   ],
-  "cacheNonce": "23246-auto-version-sync"
+  "cacheNonce": "23247-sync-loop-fix"
 }
