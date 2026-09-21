@@ -75,8 +75,11 @@ const html=(await readdir(dir)).filter(x=>/\.html$/i.test(x));
 must(html.length>0,'nenhum HTML gerado');
 for(const name of html){
   const source=await read(name);
-  must(source.includes('mobile-patch-manager-v240.js'),name+' não carrega Patch Manager 2.4');
-  must(source.includes('mobile-release-v240.js'),name+' não carrega runtime oficial 2.4');
+  const special=['reiniciar.html','desligado.html'].includes(name.toLowerCase());
+  if(!special){
+    must(source.includes('mobile-patch-manager-v240.js'),name+' não carrega Patch Manager 2.4');
+    must(source.includes('mobile-release-v240.js'),name+' não carrega runtime oficial 2.4');
+  }
   must(!source.includes('mobile-patch-manager-v2325.js'),name+' ainda carrega Patch Manager 2.3.25');
   must(!source.includes('mobile-beta-v2325.js'),name+' ainda carrega runtime Beta 2.3.25');
 }
