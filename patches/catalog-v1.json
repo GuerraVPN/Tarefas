@@ -1,10 +1,10 @@
 {
   "format": "tarefas-patch-catalog-v1",
   "app": "TAREFAS",
-  "baseVersion": "2.3.24",
-  "baseBuild": 271,
-  "generatedAt": "2026-09-21T16:57:00Z",
-  "latestPatch": "2.3.24.9",
+  "baseVersion": "2.3.25",
+  "baseBuild": 272,
+  "generatedAt": "2026-09-21T18:11:00Z",
+  "latestPatch": "2.3.25.1",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -67,6 +67,29 @@
         "A instalação da 2.3.24.9 preserva uma sessão já desbloqueada da 2.3.24.8 para não pedir biometria apenas por causa do reload do patch.",
         "Quem não ativou biometria continua sem receber solicitação de senha/biometria.",
         "Mantidas todas as correções cumulativas das versões 2.3.24.1 até 2.3.24.8."
+      ]
+    },
+    {
+      "id": "2.3.25.1",
+      "name": "TAREFAS 2.3.25.1 — Base Web 7.9.1",
+      "baseVersion": "2.3.25",
+      "minBuild": 272,
+      "maxBuild": 272,
+      "channel": "alpha",
+      "publishedAt": "2026-09-21T18:10:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [],
+      "installable": true,
+      "description": "Atualiza a identificação da base Web do TAREFAS Android de 7.8.2 para 7.9.1, mantendo o APK 2.3.25 build 272.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.25.1.tpatch",
+      "sha256": "1b26572f965abdc746d7c9825f836719a64dd9d492a1e319cbaf96f01a30dc2c",
+      "changelog": [
+        "Base Web efetiva atualizada para 7.9.1.",
+        "Cabeçalho do aplicativo passa a exibir 2.3.25.1 • WEB 7.9.1.",
+        "Tela Sobre/Atualizações passa a refletir a base Web 7.9.1 quando houver rótulo da versão Web.",
+        "Mantido o APK base 2.3.25 / build 272; nenhuma reinstalação de APK é necessária.",
+        "Patch distribuído no canal Alpha e compatível somente com a Beta 2.3.25 build 272."
       ]
     }
   ],
@@ -474,7 +497,30 @@
         "Quem não ativou biometria continua sem receber solicitação de senha/biometria.",
         "Mantidas todas as correções cumulativas das versões 2.3.24.1 até 2.3.24.8."
       ]
+    },
+    {
+      "id": "2.3.25.1",
+      "name": "TAREFAS 2.3.25.1 — Base Web 7.9.1",
+      "baseVersion": "2.3.25",
+      "minBuild": 272,
+      "maxBuild": 272,
+      "channel": "alpha",
+      "publishedAt": "2026-09-21T18:10:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [],
+      "installable": true,
+      "description": "Atualiza a identificação da base Web do TAREFAS Android de 7.8.2 para 7.9.1, mantendo o APK 2.3.25 build 272.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.25.1.tpatch",
+      "sha256": "1b26572f965abdc746d7c9825f836719a64dd9d492a1e319cbaf96f01a30dc2c",
+      "changelog": [
+        "Base Web efetiva atualizada para 7.9.1.",
+        "Cabeçalho do aplicativo passa a exibir 2.3.25.1 • WEB 7.9.1.",
+        "Tela Sobre/Atualizações passa a refletir a base Web 7.9.1 quando houver rótulo da versão Web.",
+        "Mantido o APK base 2.3.25 / build 272; nenhuma reinstalação de APK é necessária.",
+        "Patch distribuído no canal Alpha e compatível somente com a Beta 2.3.25 build 272."
+      ]
     }
   ],
-  "cacheNonce": "23249-cold-start-biometric"
+  "cacheNonce": "23251-web-791"
 }
