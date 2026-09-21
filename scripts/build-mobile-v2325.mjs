@@ -68,6 +68,7 @@ await patch('mobile-updates-v181.js',source=>source
   .replace("const APP_CHANNEL = 'beta';","const APP_CHANNEL = 'beta';"),{required:false});
 
 await patch('mobile-ai-v230.js',source=>source
+  .replaceAll('BETA 2.3.2','BETA '+VERSION)
   .replaceAll('BETA 2.3.24','BETA '+VERSION)
   .replaceAll("version:'2.3.24'","version:'"+VERSION+"'")
   .replaceAll('build:271','build:'+BUILD),{required:false});
