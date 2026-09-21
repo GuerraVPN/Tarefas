@@ -14,6 +14,10 @@ on:
       - 'scripts/release-mobile-v241.sh'
       - '.github/workflows/android-v241-beta.yml'
 
+concurrency:
+  group: android-v241-beta
+  cancel-in-progress: true
+
 jobs:
   release:
     runs-on: ubuntu-latest
