@@ -3,13 +3,13 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 const root=process.cwd();
-const VERSION='2.3.22.5',BUILD=268;
+const VERSION='2.3.23',BUILD=269;
 await import(pathToFileURL(path.resolve('scripts/build-mobile-v23221.mjs')).href+'?v=23223');
 const dist=path.join(root,'dist');
 
 async function patch(rel,fn,{required=true}={}){
   const file=path.join(dist,rel),before=await readFile(file,'utf8'),after=fn(before);
-  if(required&&after===before)throw new Error(`2.3.22.5: alteração não aplicada em ${rel}`);
+  if(required&&after===before)throw new Error(`2.3.23: alteração não aplicada em ${rel}`);
   if(after!==before)await writeFile(file,after,'utf8');
 }
 
@@ -18,7 +18,7 @@ await copyFile(path.join(root,'app/mobile-alpha-v23223-fix.js'),path.join(dist,'
 for(const name of await readdir(dist)){
   if(!/\.html$/i.test(name))continue;
   const file=path.join(dist,name);let source=await readFile(file,'utf8');
-  source=source.replaceAll('2.3.22.1-b264','2.3.22.5-b268');
+  source=source.replaceAll('2.3.22.1-b264','2.3.23-b269');
   if(!source.includes('mobile-alpha-v23223-fix.js')){
     const tag=`<script src="mobile-alpha-v23223-fix.js?v=${VERSION}-b${BUILD}"></script>`;
     source=source.includes('</body>')?source.replace('</body>',tag+'\n</body>'):source+'\n'+tag;
@@ -30,22 +30,34 @@ await patch('mobile-bootstrap.js',source=>{
   let out=source
     .replace("const APP_VERSION = '2.3.22.1';",`const APP_VERSION = '${VERSION}';`)
     .replace('const APP_BUILD = 264;',`const APP_BUILD = ${BUILD};`)
-    .replaceAll('Alpha 2.3.22.1','Alpha 2.3.22.5')
-    .replaceAll('2.3.22.1 Alpha','2.3.22.5 Alpha');
+    .replaceAll('Alpha 2.3.22.1','Beta 2.3.23')
+    .replaceAll('2.3.22.1 Alpha','2.3.23 Beta')
+    .replaceAll('Alpha 2.3.22.5','Beta 2.3.23')
+    .replaceAll('2.3.22.5 Alpha','2.3.23 Beta');
   const communication="    ['Comunicação', [\n      ['Central','central.html','Notificações e mensagens']\n    ]],";
   const replacement="    ['Comunicação', [\n      ['Notificações','central.html?tab=notificacoes','Avisos e atualizações'],\n      ['Mensagens','central.html?tab=mensagens','Conversas entre usuários'],\n      ['Downloads','central.html?tab=downloads','Arquivos salvos no aparelho'],\n      ['Favoritos','central.html?tab=favoritos','Atalhos pessoais'],\n      ['Ferramentas','central.html?tab=ferramentas','Filtros, sincronização e diagnóstico']\n    ]],";
   if(out.includes(communication))out=out.replace(communication,replacement);
-  out+=`\n;globalThis.__TAREFAS_ALPHA_23225__={version:'${VERSION}',build:${BUILD},channel:'alpha',fixes:['topLevelSections','sectionRouting','alphaVersionLabel']};\n`;
+  out+=`\n;globalThis.__TAREFAS_BETA_2323__={version:'${VERSION}',build:${BUILD},channel:'beta',promotedFrom:'2.3.22.5',fixes:['topLevelSections','sectionRouting','quickAccessRemoved','betaVersionLabel']};\n`;
   return out;
 });
 
-await patch('mobile-alpha-v23221.js',source=>source.replace("const VERSION='2.3.22.1',BUILD=264",`const VERSION='${VERSION}',BUILD=${BUILD}`));
-await patch('mobile-alpha-v23221-tabs.js',source=>source.replace("const MARK='__TAREFAS_ALPHA_TABS_V264__',VERSION='2.3.22.1',BUILD=264",`const MARK='__TAREFAS_ALPHA_TABS_V268__',VERSION='${VERSION}',BUILD=${BUILD}`));
+await patch('mobile-alpha-v23221.js',source=>source
+  .replace("const VERSION='2.3.22.1',BUILD=264",`const VERSION='${VERSION}',BUILD=${BUILD}`)
+  .replaceAll('Central Alpha 2.3.22.1',`Central Beta ${VERSION}`)
+  .replaceAll('Nenhum download registrado nesta Alpha.','Nenhum download registrado nesta Beta.')
+  .replaceAll('Apagar os erros registrados nesta Alpha?','Apagar os erros registrados nesta Beta?')
+  .replaceAll('Ferramentas Alpha 2.3.22.1',`Ferramentas Beta ${VERSION}`)
+  .replaceAll('ALPHA 23221','BETA 2323'));
+await patch('mobile-alpha-v23221-tabs.js',source=>source
+  .replace("const MARK='__TAREFAS_ALPHA_TABS_V264__',VERSION='2.3.22.1',BUILD=264",`const MARK='__TAREFAS_BETA_TABS_V269__',VERSION='${VERSION}',BUILD=${BUILD}`)
+  .replaceAll('Apagar os erros registrados nesta Alpha?','Apagar os erros registrados nesta Beta?')
+  .replaceAll('Falha na Central Alpha','Falha na Central Beta')
+  .replace('<small>Alpha ${VERSION}</small>','<small>Beta ${VERSION}</small>'));
 await patch('mobile-preload.js',source=>source.replace("tarefasAppVersion = '2.3.22.1'",`tarefasAppVersion = '${VERSION}'`).replace("tarefasAppBuild = '264'",`tarefasAppBuild = '${BUILD}'`));
-await patch('mobile-updates-v181.js',source=>source.replace("const APP_VERSION = '2.3.22.1';",`const APP_VERSION = '${VERSION}';`).replace('const APP_BUILD = 264;',`const APP_BUILD = ${BUILD};`).replace("const APP_CHANNEL = 'beta';","const APP_CHANNEL = 'alpha';"),{required:false});
-await patch('mobile-ai-v230.js',source=>source.replaceAll('ALPHA 2.3.22.1',`ALPHA ${VERSION}`).replaceAll("version:'2.3.22.1'",`version:'${VERSION}'`).replaceAll('build:264',`build:${BUILD}`),{required:false});
+await patch('mobile-updates-v181.js',source=>source.replace("const APP_VERSION = '2.3.22.1';",`const APP_VERSION = '${VERSION}';`).replace('const APP_BUILD = 264;',`const APP_BUILD = ${BUILD};`).replace("const APP_CHANNEL = 'alpha';","const APP_CHANNEL = 'beta';"),{required:false});
+await patch('mobile-ai-v230.js',source=>source.replaceAll('ALPHA 2.3.22.1',`BETA ${VERSION}`).replaceAll("version:'2.3.22.1'",`version:'${VERSION}'`).replaceAll('build:264',`build:${BUILD}`),{required:false});
 await patch('native-mobile.js',source=>source.replaceAll("version:'2.3.22.1'",`version:'${VERSION}'`).replaceAll('build:264',`build:${BUILD}`),{required:false});
 
-await appendFile(path.join(dist,'mobile-bootstrap.js'),`\n;globalThis.__TAREFAS_VERSION_LABEL_V268__='${VERSION} Alpha';\n`,'utf8');
-await writeFile(path.join(dist,'ALPHA_2_3_22_5.json'),JSON.stringify({version:VERSION,build:BUILD,channel:'alpha',base:'2.3.22',generatedAt:new Date().toISOString(),fixes:{topLevelSections:true,quickAccessRemoved:true,notificationCentralSeparated:true,downloadsView:true,favoritesView:true,toolsView:true,messagesView:true,versionLabel:true}},null,2)+'\n','utf8');
-console.log(`TAREFAS Android ${VERSION} build ${BUILD} ALPHA: bloco Acesso rápido removido; seções mantidas nas abas.`);
+await appendFile(path.join(dist,'mobile-bootstrap.js'),`\n;globalThis.__TAREFAS_VERSION_LABEL_V269__='${VERSION} Beta';\n`,'utf8');
+await writeFile(path.join(dist,'BETA_2_3_23.json'),JSON.stringify({version:VERSION,build:BUILD,channel:'beta',base:'2.3.22.5',generatedAt:new Date().toISOString(),fixes:{topLevelSections:true,quickAccessRemoved:true,notificationCentralSeparated:true,downloadsView:true,favoritesView:true,toolsView:true,messagesView:true,versionLabel:true}},null,2)+'\n','utf8');
+console.log(`TAREFAS Android ${VERSION} build ${BUILD} BETA: promoção da 2.3.22.5, sem Acesso rápido duplicado.`);
