@@ -179,7 +179,15 @@ function installTaskFilters(){
  const apply=()=>{const v=status.value;document.querySelectorAll('.kanban-column').forEach(col=>{const t=(col.className+' '+(col.querySelector('h2,h3')?.textContent||'')).toLowerCase();const kind=t.includes('concl')?'concluida':t.includes('andam')?'andamento':'pendente';col.style.display=v==='todas'||v===kind?'':'none'})};status.onchange=apply;apply();
 }
 function enhanceAi(){
- let starts=new WeakMap();const fix=()=>{document.querySelectorAll('.ai780-title span').forEach(e=>{const wanted='WEB '+VERSION+' · leitura + ações + anexos';if(e.textContent!==wanted)e.textContent=wanted});document.querySelectorAll('.ai780-typing').forEach(e=>{if(!starts.has(e))starts.set(e,Date.now());const sec=Math.floor((Date.now()-starts.get(e))/1000);e.textContent=(/anexo/i.test(e.textContent)?'Lendo anexos':'Pensando')+'… '+sec+'s'})};fix();const o=new MutationObserver(()=>fix());o.observe(document.body,{childList:true,subtree:true});setInterval(fix,1000);
+ const starts=new WeakMap();let timer=null;
+ const fix=()=>{
+  document.querySelectorAll('.ai780-title span').forEach(e=>{const wanted='WEB '+VERSION+' · leitura + ações + anexos';if(e.textContent!==wanted)e.textContent=wanted});
+  const typing=[...document.querySelectorAll('.ai780-typing')];
+  typing.forEach(e=>{if(!starts.has(e))starts.set(e,Date.now());const sec=Math.floor((Date.now()-starts.get(e))/1000),wanted=(/anexo/i.test(e.textContent)?'Lendo anexos':'Pensando')+'… '+sec+'s';if(e.textContent!==wanted)e.textContent=wanted});
+  if(typing.length&&!timer)timer=setInterval(fix,1000);
+  if(!typing.length&&timer){clearInterval(timer);timer=null}
+ };
+ fix();const o=new MutationObserver(()=>queueMicrotask(fix));o.observe(document.body,{childList:true,subtree:true});
 }
 function installPreconnect(){if(document.querySelector('link[data-w790-preconnect]'))return;const l=document.createElement('link');l.rel='preconnect';l.href='https://bpvijatnsluwsgnzklrd.supabase.co';l.dataset.w790Preconnect='1';document.head.appendChild(l)}
 
