@@ -16,12 +16,12 @@ async function patch(rel,fn,{required=true}={}){
 await copyFile(path.join(root,'app/mobile-patch-manager-v23231.js'),path.join(dist,'mobile-patch-manager-v23231.js'));
 
 for(const name of await readdir(dist)){
-  if(!/\\.html$/i.test(name))continue;
+  if(!/\.html$/i.test(name))continue;
   const file=path.join(dist,name);let source=await readFile(file,'utf8');
   source=source.replaceAll('2.3.23-b269','2.3.23.1-b270');
   if(!source.includes('mobile-patch-manager-v23231.js')){
     const tag='<script src="mobile-patch-manager-v23231.js?v='+VERSION+'-b'+BUILD+'"></script>';
-    source=source.includes('</body>')?source.replace('</body>',tag+'\\n</body>'):source+'\\n'+tag;
+    source=source.includes('</body>')?source.replace('</body>',tag+'\n</body>'):source+'\n'+tag;
   }
   await writeFile(file,source,'utf8');
 }
@@ -35,7 +35,7 @@ await patch('mobile-bootstrap.js',source=>{
     .replaceAll('__TAREFAS_BETA_2323__','__TAREFAS_ALPHA_23231__')
     .replaceAll("channel:'beta'","channel:'alpha'")
     .replaceAll("promotedFrom:'2.3.22.5'","basedOn:'2.3.23'");
-  out+="\\n;globalThis.__TAREFAS_PATCH_SYSTEM_V270__={version:'"+VERSION+"',build:"+BUILD+",channel:'alpha',format:'tarefas-tpatch-v1',catalog:'app/releases/patches/catalog-v1.json',rollback:true,manualImport:true,sha256:true};\\n";
+  out+="\n;globalThis.__TAREFAS_PATCH_SYSTEM_V270__={version:'"+VERSION+"',build:"+BUILD+",channel:'alpha',format:'tarefas-tpatch-v1',catalog:'app/releases/patches/catalog-v1.json',rollback:true,manualImport:true,sha256:true};\n";
   return out;
 });
 
@@ -74,13 +74,13 @@ await patch('native-mobile.js',source=>source
   .replaceAll("version:'2.3.23'","version:'"+VERSION+"'")
   .replaceAll('build:269','build:'+BUILD),{required:false});
 
-await appendFile(path.join(dist,'mobile-bootstrap.js'),"\\n;globalThis.__TAREFAS_VERSION_LABEL_V270__='"+VERSION+" Alpha';\\n",'utf8');
+await appendFile(path.join(dist,'mobile-bootstrap.js'),"\n;globalThis.__TAREFAS_VERSION_LABEL_V270__='"+VERSION+" Alpha';\n",'utf8');
 await writeFile(path.join(dist,'ALPHA_2_3_23_1.json'),JSON.stringify({
   version:VERSION,build:BUILD,channel:'alpha',base:'2.3.23',generatedAt:new Date().toISOString(),
   features:{
     patchManager:true,tpatchV1:true,manualImport:true,officialCatalog:true,sha256Validation:true,
     compatibilityCheck:true,enableDisable:true,rollbackByReload:true,removePatch:true,installedPatchHistory:true
   }
-},null,2)+'\\n','utf8');
+},null,2)+'\n','utf8');
 
 console.log('TAREFAS Android '+VERSION+' build '+BUILD+' ALPHA: Patch Manager .tpatch habilitado sobre a Beta 2.3.23.');
