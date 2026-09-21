@@ -66,7 +66,7 @@ unzip -p "$UNSIGNED" assets/public/mobile-bootstrap.js > "$RUNNER_TEMP/mobile-bo
 unzip -p "$UNSIGNED" assets/public/mobile-patch-manager-v2324.js > "$RUNNER_TEMP/mobile-patch-manager-v2324.js"
 unzip -p "$UNSIGNED" assets/public/mobile-updates-v181.js > "$RUNNER_TEMP/mobile-updates-v181.js"
 grep -q '__TAREFAS_BETA_NAV_V271__' "$RUNNER_TEMP/mobile-alpha-v23223-fix.js"
-grep -q '__TAREFAS_VERSION_LABEL_V271__' "$RUNNER_TEMP/mobile-bootstrap.js"
+grep -q '__TAREFAS_BETA_2324__' "$RUNNER_TEMP/mobile-bootstrap.js"
 grep -q '__TAREFAS_PATCH_MANAGER_V271__' "$RUNNER_TEMP/mobile-patch-manager-v2324.js"
 grep -q "const APP_CHANNEL = 'beta';" "$RUNNER_TEMP/mobile-updates-v181.js"
 
