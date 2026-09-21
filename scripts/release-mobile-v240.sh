@@ -10,6 +10,40 @@ ZIP="TAREFAS-${VERSION}-official-build-${BUILD}.zip"
 npm ci
 npm install --no-save --package-lock=false --ignore-scripts jspdf@2.5.2
 
+# Preflight de autorização da assinatura antes da compilação longa.
+OIDC_PREFLIGHT_FILE="$RUNNER_TEMP/oidc-preflight.json"
+OIDC_PREFLIGHT_CODE="$(curl --silent --show-error -o "$OIDC_PREFLIGHT_FILE" -w '%{http_code}' \
+  -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+  "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-signing")"
+if [ "$OIDC_PREFLIGHT_CODE" != "200" ]; then
+  echo "OIDC_PREFLIGHT_HTTP=$OIDC_PREFLIGHT_CODE"
+  cat "$OIDC_PREFLIGHT_FILE"
+  exit 41
+fi
+OIDC_PREFLIGHT="$(jq -r '.value // empty' "$OIDC_PREFLIGHT_FILE")"
+test -n "$OIDC_PREFLIGHT"
+
+SIGN_PREFLIGHT_FILE="$RUNNER_TEMP/signing-preflight.json"
+SIGN_PREFLIGHT_CODE="$(curl --silent --show-error -o "$SIGN_PREFLIGHT_FILE" -w '%{http_code}' \
+  -H "Authorization: Bearer $OIDC_PREFLIGHT" \
+  'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-signing-material')"
+if [ "$SIGN_PREFLIGHT_CODE" != "200" ]; then
+  echo "SIGNING_PREFLIGHT_HTTP=$SIGN_PREFLIGHT_CODE"
+  python3 - <<'PY'
+import json, pathlib
+p=pathlib.Path(__import__('os').environ['RUNNER_TEMP'])/'signing-preflight.json'
+try:
+    data=json.loads(p.read_text())
+    # Never print signing material if the service unexpectedly returned it.
+    safe={k:v for k,v in data.items() if k not in {'keystore_b64','store_password','key_password'}}
+    print(json.dumps(safe,ensure_ascii=False))
+except Exception:
+    print(p.read_text()[:1000])
+PY
+  exit 42
+fi
+rm -f "$OIDC_PREFLIGHT_FILE" "$SIGN_PREFLIGHT_FILE"
+
 # Primeiro valida a base Web 7.9.1 que será incorporada ao APK.
 node scripts/verify-web.mjs .
 
