@@ -98,24 +98,24 @@ function add(src,attr,done){
 function chain(list,i=0){if(i>=list.length)return;const [src,attr]=list[i];add(src,attr,()=>chain(list,i+1))}
 if(heavy.has(page)){
   const list=[
-    ['v7_9_0_web.js?v=7.9.0','data-v790-web'],
-    ['v7_7_1_site_light.js?v=7.7.1','data-v771-site-light'],
+    ['v7_9_1_web.js?v=7.9.1','data-v791-web'],
+    ['v7_9_1_site.js?v=7.9.1','data-v791-site'],
     ['v6_5_patch.js?v=7.7.1-perf','data-v65-loader'],
     ['v7_6_5_webfix.js?v=7.7.1-perf','data-v765-webfix']
   ];
-  if(page==='about.html')list.push(['v7_5_1_about.js?v=7.9.0','data-v751-about']);
+  if(page==='about.html')list.push(['v7_5_1_about.js?v=7.9.1','data-v751-about']);
   chain(list);
   if(page==='games.html'){
-    const stamp=()=>{const el=document.getElementById('gamesVersionLabel');if(el&&el.textContent!=='WEB 7.9.0 · 26º PEL PE MEC')el.textContent='WEB 7.9.0 · 26º PEL PE MEC'};
+    const stamp=()=>{const el=document.getElementById('gamesVersionLabel');if(el&&el.textContent!=='WEB 7.9.1 · 26º PEL PE MEC')el.textContent='WEB 7.9.1 · 26º PEL PE MEC'};
     if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',stamp,{once:true});else stamp();
   }
   return;
 }
 const list=[
-  ['v7_4_12_site.js?v=7.7.1-perf','data-v7412-site'],
+  ['v7_9_1_site.js?v=7.9.1','data-v791-site'],
   ['v6_5_patch.js?v=7.7.1-perf','data-v65-loader'],
   ['v7_4_12_global.js?v=7.7.1-perf','data-v7412-global'],
-  ['v7_5_1_version.js?v=7.9.0','data-v751-version']
+  ['v7_5_1_version.js?v=7.9.1','data-v751-version']
 ];
 if(page==='missao.html'){
   list.push(['v7_4_7_mission_patch.js?v=7.7.1','data-v747-mission-patch']);
