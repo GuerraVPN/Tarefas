@@ -31,3 +31,14 @@ Patches importados manualmente ficam marcados como IMPORTADO. O app valida forma
 
 ## Rollback
 Em Patches instalados, use Reverter / desativar. O patch é desativado e o app recarrega sem executá-lo. Também é possível reativar ou remover definitivamente o patch.
+
+
+## Canais e notificações
+
+A partir do patch 2.3.23.3, cada entrada do catálogo possui um campo `channel` com `alpha`, `beta` ou `official`.
+
+- Patch `alpha`: aviso somente para usuários elegíveis com recebimento de Alpha ativado.
+- Patch `beta`: aviso para usuários com recebimento de Beta ativado.
+- Patch `official`: aviso permitido para todos os usuários do canal oficial.
+
+O cliente consulta o catálogo ao abrir/retomar o app, ao voltar a ficar online e periodicamente enquanto estiver ativo. Patches já instalados são marcados como vistos para evitar notificação retroativa ou duplicada.
