@@ -1,0 +1,27 @@
+name: Android 2.4.0 Signing Probe
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [app/android-v240-prep]
+    paths:
+      - '.v240-signing-probe'
+      - '.github/workflows/android-v2324-beta.yml'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Testar autorização da assinatura
+        run: |
+          set -euo pipefail
+          OIDC="$(curl --fail --silent --show-error -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-signing" | jq -r '.value')"
+          CODE="$(curl --silent --show-error -o "$RUNNER_TEMP/signing.json" -w '%{http_code}' -H "Authorization: Bearer $OIDC" 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-signing-material')"
+          echo "SIGNING_HTTP=$CODE"
+          if [ "$CODE" != "200" ]; then cat "$RUNNER_TEMP/signing.json"; exit 42; fi
+          jq -e '.keystore_b64 and .store_password and .key_alias and .key_password and .cert_sha256' "$RUNNER_TEMP/signing.json" >/dev/null
+          echo "SIGNING_AUTH_OK"
