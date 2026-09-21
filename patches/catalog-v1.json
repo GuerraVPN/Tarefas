@@ -3,8 +3,39 @@
   "app": "TAREFAS",
   "baseVersion": "2.3.23.1",
   "baseBuild": 270,
-  "generatedAt": "2026-09-21T13:28:00Z",
+  "generatedAt": "2026-09-21T13:35:00Z",
+  "latestPatch": "2.3.23.4",
+  "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
+    {
+      "id": "2.3.23.4",
+      "name": "TAREFAS 2.3.23.4 — Patch cumulativo",
+      "baseVersion": "2.3.23.1",
+      "minBuild": 270,
+      "maxBuild": 270,
+      "channel": "alpha",
+      "publishedAt": "2026-09-21T13:34:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.3.23.2",
+        "2.3.23.3"
+      ],
+      "installable": true,
+      "description": "Primeiro patch cumulativo do TAREFAS: instala por cima dos patches anteriores da mesma base e remove automaticamente os antigos, preservando as correções e recursos já lançados.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.23.4.tpatch",
+      "sha256": "57982d507a60ed3d896edb221e1ed89c3b8655833112ec21af3bf1661c7c2652",
+      "changelog": [
+        "Novo modo cumulativo: o patch mais recente substitui automaticamente os patches anteriores da mesma base.",
+        "Ao instalar 2.3.23.4, os patches 2.3.23.2 e 2.3.23.3 são removidos do armazenamento de patches sem ação manual.",
+        "Mantidas as correções de tema e versão introduzidas na 2.3.23.2.",
+        "Mantidos o Gerenciador, histórico e avisos Alpha/Beta de patches introduzidos na 2.3.23.3.",
+        "O catálogo principal passa a oferecer somente o patch atual; versões anteriores permanecem apenas no histórico.",
+        "A versão efetiva passa a ser 2.3.23.4 sobre o APK base 2.3.23.1 / build 270."
+      ]
+    }
+  ],
+  "history": [
     {
       "id": "2.3.23.2",
       "name": "TAREFAS 2.3.23.2 — Tema e versão",
@@ -21,7 +52,9 @@
         "Tela Sobre passa a refletir a versão efetiva 2.3.23.2."
       ],
       "channel": "alpha",
-      "publishedAt": "2026-09-21T13:19:00Z"
+      "publishedAt": "2026-09-21T13:19:00Z",
+      "installable": false,
+      "supersededBy": "2.3.23.4"
     },
     {
       "id": "2.3.23.3",
@@ -41,6 +74,35 @@
         "Usuários com Alpha ativado recebem aviso de novos patches Alpha; usuários com Beta ativado recebem avisos de patches Beta.",
         "Avisos de patches usam as preferências de atualização já existentes no TAREFAS.",
         "A versão efetiva exibida no cabeçalho passa a ser 2.3.23.3, mantendo o APK base em 2.3.23.1 / build 270."
+      ],
+      "installable": false,
+      "supersededBy": "2.3.23.4"
+    },
+    {
+      "id": "2.3.23.4",
+      "name": "TAREFAS 2.3.23.4 — Patch cumulativo",
+      "baseVersion": "2.3.23.1",
+      "minBuild": 270,
+      "maxBuild": 270,
+      "channel": "alpha",
+      "publishedAt": "2026-09-21T13:34:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.3.23.2",
+        "2.3.23.3"
+      ],
+      "installable": true,
+      "description": "Primeiro patch cumulativo do TAREFAS: instala por cima dos patches anteriores da mesma base e remove automaticamente os antigos, preservando as correções e recursos já lançados.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.23.4.tpatch",
+      "sha256": "57982d507a60ed3d896edb221e1ed89c3b8655833112ec21af3bf1661c7c2652",
+      "changelog": [
+        "Novo modo cumulativo: o patch mais recente substitui automaticamente os patches anteriores da mesma base.",
+        "Ao instalar 2.3.23.4, os patches 2.3.23.2 e 2.3.23.3 são removidos do armazenamento de patches sem ação manual.",
+        "Mantidas as correções de tema e versão introduzidas na 2.3.23.2.",
+        "Mantidos o Gerenciador, histórico e avisos Alpha/Beta de patches introduzidos na 2.3.23.3.",
+        "O catálogo principal passa a oferecer somente o patch atual; versões anteriores permanecem apenas no histórico.",
+        "A versão efetiva passa a ser 2.3.23.4 sobre o APK base 2.3.23.1 / build 270."
       ]
     }
   ]
