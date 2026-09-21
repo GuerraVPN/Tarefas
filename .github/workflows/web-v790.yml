@@ -1,0 +1,65 @@
+name: Web 7.9.0 - Central 2.0 e Estabilizacao
+
+on:
+  push:
+    branches: [web-7.9.0-prep]
+    paths:
+      - 'v7_9_0_web.js'
+      - 'v7_5_1_version.js'
+      - 'v7_5_4_patch.js'
+      - 'v7_6_5_webfix.js'
+      - 'v7_8_0_ai.js'
+      - 'v7_8_0_about.js'
+      - 'v6_2_mobile.js'
+      - 'README.md'
+      - 'README_WEB_7_9_0.txt'
+      - '.github/workflows/web-v790.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  validate-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: web-7.9.0-prep
+          fetch-depth: 0
+
+      - name: Validar JavaScript
+        run: |
+          set -euo pipefail
+          node --check v7_9_0_web.js
+          node --check v7_5_1_version.js
+          node --check v7_5_4_patch.js
+          node --check v7_6_5_webfix.js
+          node --check v7_8_0_ai.js
+          node --check v7_8_0_about.js
+          node --check v6_2_mobile.js
+
+      - name: Validar recursos 7.9.0
+        run: |
+          set -euo pipefail
+          grep -q "const VERSION='7.9.0'" v7_9_0_web.js
+          grep -q '__TAREFAS_WEB_790__' v7_9_0_web.js
+          grep -q 'Notificações 2.0' v7_9_0_web.js
+          grep -q 'Escolher telas e abas' v7_9_0_web.js
+          grep -q 'w790TaskStatus' v7_9_0_web.js
+          grep -q 'TarefasWeb790Lifecycle' v7_9_0_web.js
+          grep -q 'async function flushQueue' v7_9_0_web.js
+          grep -q "const VERSION='7.9.0',BADGE=" v7_5_1_version.js
+          grep -q "v7_9_0_web.js" v7_5_1_version.js
+          grep -q "v7_9_0_web.js?v=7.9.0" v6_2_mobile.js
+          grep -q 'WEB 7.9.0 · leitura + ações + anexos' v7_8_0_ai.js
+          grep -q 'messages.slice(-6)' v7_8_0_ai.js
+          grep -q 'Web 7.9.0 — Central 2.0' v7_8_0_about.js
+          ! grep -q 'setInterval(apply,5000)' v7_5_1_version.js
+          ! grep -q 'setInterval(schedule,2500)' v7_5_4_patch.js
+
+      - name: Publicar Web 7.9.0 no main
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git merge-base --is-ancestor origin/main HEAD
+          git push origin HEAD:main
