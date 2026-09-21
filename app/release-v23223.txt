@@ -1,0 +1,10 @@
+TAREFAS 2.3.23 Beta — build 269
+
+Promoção da Beta:
+- Base promovida diretamente da Alpha 2.3.22.5 já validada.
+- Remoção completa do bloco ACESSO RÁPIDO preservada.
+- Notificações, Mensagens, Downloads, Favoritos e Ferramentas permanecem somente nas abas próprias.
+- Mantidas as correções e recursos validados na série 2.3.22.x.
+- Canal de atualização alterado de alpha para beta.
+
+Base: 2.3.22.5 Alpha.
