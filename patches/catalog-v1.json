@@ -3,8 +3,8 @@
   "app": "TAREFAS",
   "baseVersion": "2.3.25",
   "baseBuild": 272,
-  "generatedAt": "2026-09-21T18:25:00Z",
-  "latestPatch": "2.3.25.2",
+  "generatedAt": "2026-09-21T19:19:00Z",
+  "latestPatch": "2.3.25.3",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -70,29 +70,32 @@
       ]
     },
     {
-      "id": "2.3.25.2",
-      "name": "TAREFAS 2.3.25.2 — Correção de CSS bruto na tela",
+      "id": "2.3.25.3",
+      "name": "TAREFAS 2.3.25.3 — Abas para diagnóstico",
       "baseVersion": "2.3.25",
       "minBuild": 272,
       "maxBuild": 272,
       "channel": "alpha",
-      "publishedAt": "2026-09-21T18:24:00Z",
+      "publishedAt": "2026-09-21T19:18:00Z",
       "cumulative": true,
       "replacementMode": "replace-older-same-base",
       "replaces": [
-        "2.3.25.1"
+        "2.3.25.1",
+        "2.3.25.2"
       ],
       "installable": true,
-      "description": "Corrige a regressão da 2.3.25.1 que podia deixar conteúdo CSS visível na tela ao atualizar a identificação da base Web 7.9.1.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.25.2.tpatch",
-      "sha256": "f522ada9618e2f97a29fb855454b6d07a7e9127354748cf7a1f8c02a27082e66",
+      "description": "Troca o antigo Salvar filtro atual por um seletor de abas para diagnóstico na Central de Ferramentas.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.25.3.tpatch",
+      "sha256": "13cdec37f84283c0a9e021d33cd6f4713c7f1f9dd9b233bb4f2c372465dff995",
       "changelog": [
-        "Corrigido o vazamento de CSS bruto para a área visível da página.",
-        "Removida a varredura ampla do conteúdo do main usada na 2.3.25.1.",
-        "A atualização de rótulos da Web 7.9.1 passa a atuar somente em elementos conhecidos de versão.",
-        "Adicionada recuperação automática para remover blocos de CSS da IA/layout que tenham sido inseridos como texto no body.",
-        "Mantida a base Web 7.9.1 e o cabeçalho 2.3.25.2 • WEB 7.9.1.",
-        "Mantido o APK base 2.3.25 / build 272, sem necessidade de reinstalação."
+        "O botão Salvar filtro atual foi substituído por Abas para diagnóstico.",
+        "Agora é possível escolher quais páginas, abas e módulos entram na visualização da Central de Erros.",
+        "Incluídas subabas da Central e módulos internos de Orçamentários no seletor.",
+        "Por padrão, Todas as abas permanece ativo para preservar o diagnóstico existente.",
+        "Quando abas específicas são escolhidas, a Central de Erros mostra somente os erros dessas áreas.",
+        "Erros de outras abas continuam armazenados; o filtro não apaga histórico.",
+        "A seção Filtros salvos em Ferramentas passa a mostrar Abas em diagnóstico.",
+        "Mantidas as correções da 2.3.25.2 para CSS bruto e a base Web 7.9.1."
       ]
     }
   ],
@@ -523,7 +526,7 @@
         "Mantido o APK base 2.3.25 / build 272; nenhuma reinstalação de APK é necessária.",
         "Patch distribuído no canal Alpha e compatível somente com a Beta 2.3.25 build 272."
       ],
-      "supersededBy": "2.3.25.2"
+      "supersededBy": "2.3.25.3"
     },
     {
       "id": "2.3.25.2",
@@ -538,7 +541,7 @@
       "replaces": [
         "2.3.25.1"
       ],
-      "installable": true,
+      "installable": false,
       "description": "Corrige a regressão da 2.3.25.1 que podia deixar conteúdo CSS visível na tela ao atualizar a identificação da base Web 7.9.1.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.25.2.tpatch",
       "sha256": "f522ada9618e2f97a29fb855454b6d07a7e9127354748cf7a1f8c02a27082e66",
@@ -549,8 +552,38 @@
         "Adicionada recuperação automática para remover blocos de CSS da IA/layout que tenham sido inseridos como texto no body.",
         "Mantida a base Web 7.9.1 e o cabeçalho 2.3.25.2 • WEB 7.9.1.",
         "Mantido o APK base 2.3.25 / build 272, sem necessidade de reinstalação."
+      ],
+      "supersededBy": "2.3.25.3"
+    },
+    {
+      "id": "2.3.25.3",
+      "name": "TAREFAS 2.3.25.3 — Abas para diagnóstico",
+      "baseVersion": "2.3.25",
+      "minBuild": 272,
+      "maxBuild": 272,
+      "channel": "alpha",
+      "publishedAt": "2026-09-21T19:18:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.3.25.1",
+        "2.3.25.2"
+      ],
+      "installable": true,
+      "description": "Troca o antigo Salvar filtro atual por um seletor de abas para diagnóstico na Central de Ferramentas.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.25.3.tpatch",
+      "sha256": "13cdec37f84283c0a9e021d33cd6f4713c7f1f9dd9b233bb4f2c372465dff995",
+      "changelog": [
+        "O botão Salvar filtro atual foi substituído por Abas para diagnóstico.",
+        "Agora é possível escolher quais páginas, abas e módulos entram na visualização da Central de Erros.",
+        "Incluídas subabas da Central e módulos internos de Orçamentários no seletor.",
+        "Por padrão, Todas as abas permanece ativo para preservar o diagnóstico existente.",
+        "Quando abas específicas são escolhidas, a Central de Erros mostra somente os erros dessas áreas.",
+        "Erros de outras abas continuam armazenados; o filtro não apaga histórico.",
+        "A seção Filtros salvos em Ferramentas passa a mostrar Abas em diagnóstico.",
+        "Mantidas as correções da 2.3.25.2 para CSS bruto e a base Web 7.9.1."
       ]
     }
   ],
-  "cacheNonce": "23252-fix-raw-css"
+  "cacheNonce": "23253-diagnostic-tabs"
 }
