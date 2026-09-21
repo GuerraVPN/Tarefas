@@ -1,14 +1,14 @@
 (function(){
 'use strict';
-if(window.__TAREFAS_V790_VERSION__)return;
-window.__TAREFAS_V790_VERSION__=true;
-const VERSION='7.9.0',BADGE='● TAREFAS v'+VERSION;
+if(window.__TAREFAS_V791_VERSION__)return;
+window.__TAREFAS_V791_VERSION__=true;
+const VERSION='7.9.1',BADGE='● TAREFAS v'+VERSION;
 let busy=false;
 function addScript(src,flag){
  if(window[flag]||document.querySelector(`script[src*="${src}"]`))return;
  const s=document.createElement('script');s.src=`${src}?v=${VERSION}`;s.defer=true;document.head.appendChild(s);
 }
-function addPatches(){addScript('v7_5_4_patch.js','__TAREFAS_V754_PATCH__');addScript('v7_5_5_patch.js','__TAREFAS_V755_PATCH__');addScript('v7_5_6_patch.js','__TAREFAS_V756_PATCH__');addScript('v7_5_7_patch.js','__TAREFAS_V757_PATCH__');addScript('v7_5_8_patch.js','__TAREFAS_V758_PATCH__');addScript('v7_6_0_patch.js','__TAREFAS_V760_PATCH__');addScript('v7_6_5_webfix.js','__TAREFAS_V765_WEBFIX__');addScript('v7_6_8_theme_fix.js','__TAREFAS_V768_THEME_FIX__');addScript('v7_7_2_site_patch.js','__TAREFAS_V772_SITE_PATCH__');addScript('v7_7_2_scale_export.js','__TAREFAS_V772_SCALE_EXPORT__');addScript('v7_8_0_ai.js','__TAREFAS_WEB_790_AI__');addScript('v7_8_2_chat_attachments.js','__TAREFAS_CHAT_ATTACHMENTS_782__');addScript('v7_8_0_about.js','__TAREFAS_V790_ABOUT__');addScript('v7_9_0_web.js','__TAREFAS_WEB_790__')}
+function addPatches(){addScript('v7_5_4_patch.js','__TAREFAS_V754_PATCH__');addScript('v7_5_5_patch.js','__TAREFAS_V755_PATCH__');addScript('v7_5_6_patch.js','__TAREFAS_V756_PATCH__');addScript('v7_5_7_patch.js','__TAREFAS_V757_PATCH__');addScript('v7_5_8_patch.js','__TAREFAS_V758_PATCH__');addScript('v7_6_0_patch.js','__TAREFAS_V760_PATCH__');addScript('v7_6_5_webfix.js','__TAREFAS_V765_WEBFIX__');addScript('v7_6_8_theme_fix.js','__TAREFAS_V768_THEME_FIX__');addScript('v7_7_2_site_patch.js','__TAREFAS_V772_SITE_PATCH__');addScript('v7_7_2_scale_export.js','__TAREFAS_V772_SCALE_EXPORT__');addScript('v7_8_0_ai.js','__TAREFAS_WEB_791_AI__');addScript('v7_8_2_chat_attachments.js','__TAREFAS_CHAT_ATTACHMENTS_782__');addScript('v7_8_0_about.js','__TAREFAS_V791_ABOUT__');addScript('v7_9_1_web.js','__TAREFAS_WEB_791__')}
 function ensureLabels(){
  const page=(location.pathname.split('/').pop()||'').toLowerCase();
  if(page!=='pessoal.html'||window.__TAREFAS_V752_SERVICE_LABELS__)return;
@@ -21,7 +21,7 @@ function apply(){
   document.documentElement.dataset.tarefasVersion=VERSION;
   document.querySelectorAll('.v65-version-badge').forEach(b=>{if(b.textContent!==BADGE)b.textContent=BADGE;b.title='Sobre a versão '+VERSION});
   document.querySelectorAll('.v65-mobile-version').forEach(v=>{const t='v'+VERSION;if(v.textContent!==t)v.textContent=t});
-  const siteTitle=document.querySelector('#v7412Modal h3');if(siteTitle&&siteTitle.textContent!=='Painel SITE · V'+VERSION)siteTitle.textContent='Painel SITE · V'+VERSION;
+  const siteTitle=document.querySelector('#site791Modal h3,#v7412Modal h3');if(siteTitle&&siteTitle.textContent!=='Painel SITE · V'+VERSION)siteTitle.textContent='Painel SITE · V'+VERSION;
   ensureLabels();addPatches();
  }finally{busy=false}
 }
