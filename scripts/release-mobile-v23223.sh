@@ -98,7 +98,7 @@ cd "$RELEASES_DIR"
 git config user.name 'GuerraVPN Android Build'
 git config user.email '81371258+GuerraVPN@users.noreply.github.com'
 git add downloads/TAREFAS-2.3.23*
-if ! git diff --cached --quiet; then git commit -m 'release(android): TAREFAS 2.3.22.5 beta build 269'; git push origin HEAD:app/releases; fi
+if ! git diff --cached --quiet; then git commit -m 'release(android): TAREFAS 2.3.23 beta build 269'; git push origin HEAD:app/releases; fi
 cd "$GITHUB_WORKSPACE"
 URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.3.23.apk'
 LOCAL_SHA="$(sha256sum "$APK" | awk '{print $1}')"
@@ -110,8 +110,8 @@ done
 
 OIDC_RELEASE="$(curl --fail --silent --show-error -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-release" | jq -r '.value')"
 SHA="$(sha256sum "$APK" | awk '{print $1}')"
-jq -n --arg version "$VERSION" --argjson build "$BUILD" --arg channel 'beta' --arg web_version '7.8.6' --arg title 'TAREFAS 2.3.23 Beta — Acesso rápido removido' --arg url "$URL" --arg sha "$SHA" '{version:$version,build:$build,channel:$channel,web_version:$web_version,title:$title,changelog:["🧹 Removido por completo o bloco Acesso rápido do menu lateral.","📑 Notificações, Mensagens, Downloads, Favoritos e Ferramentas continuam disponíveis somente nas abas próprias.","✅ Nenhuma outra navegação ou função foi alterada.","🏷️ Versão 2.3.23 Beta / build 268." ],mandatory:false,download_url:$url,sha256:$sha}' > "$RUNNER_TEMP/release.json"
+jq -n --arg version "$VERSION" --argjson build "$BUILD" --arg channel 'beta' --arg web_version '7.8.6' --arg title 'TAREFAS 2.3.23 Beta — promoção da Alpha 2.3.22.5' --arg url "$URL" --arg sha "$SHA" '{version:$version,build:$build,channel:$channel,web_version:$web_version,title:$title,changelog:["🧪 Promoção da Alpha 2.3.22.5 para o canal Beta.","🧹 O bloco duplicado Acesso rápido permanece removido do menu.","📑 Notificações, Mensagens, Downloads, Favoritos e Ferramentas continuam somente nas abas próprias.","✅ Mantidas as correções e recursos validados na série 2.3.22.x.","🏷️ Versão 2.3.23 Beta / build 269."],mandatory:false,download_url:$url,sha256:$sha}' > "$RUNNER_TEMP/release.json"
 CODE="$(curl --silent --show-error -o "$RUNNER_TEMP/result.json" -w '%{http_code}' -H "Authorization: Bearer $OIDC_RELEASE" -H 'Content-Type: application/json' --data-binary @"$RUNNER_TEMP/release.json" 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-release-publish')"
 cat "$RUNNER_TEMP/result.json"
 test "$CODE" = '200'
-jq -e '.ok == true and .version == "2.3.22.5" and .build == 269 and .channel == "beta"' "$RUNNER_TEMP/result.json" >/dev/null
+jq -e '.ok == true and .version == "2.3.23" and .build == 269 and .channel == "beta"' "$RUNNER_TEMP/result.json" >/dev/null
