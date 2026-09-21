@@ -3,7 +3,7 @@
   "app": "TAREFAS",
   "baseVersion": "2.3.23.1",
   "baseBuild": 270,
-  "generatedAt": "2026-09-21T13:46:00Z",
+  "generatedAt": "2026-09-21T14:02:00Z",
   "latestPatch": "2.3.23.5",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
@@ -135,5 +135,6 @@
         "A 2.3.23.5 substitui automaticamente a 2.3.23.4 e demais patches anteriores da mesma base."
       ]
     }
-  ]
+  ],
+  "cacheNonce": "23235-20260921T140200Z"
 }
