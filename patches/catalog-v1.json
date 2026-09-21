@@ -1,0 +1,8 @@
+{
+  "format": "tarefas-patch-catalog-v1",
+  "app": "TAREFAS",
+  "baseVersion": "2.3.23.1",
+  "baseBuild": 270,
+  "generatedAt": "2026-09-21T12:45:00Z",
+  "patches": []
+}
