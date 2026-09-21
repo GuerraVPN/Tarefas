@@ -58,8 +58,15 @@ function wire(){
    e.preventDefault();e.stopImmediatePropagation();executor.click();
  },true);
 }
-function tick(){wire();load();apply()}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',tick);else tick();
-setInterval(tick,1200);
+let boardObserver=null,queued=false;
+function observeBoard(){
+ const board=$('scaleBoard');if(!board)return;
+ boardObserver?.disconnect();
+ boardObserver=new MutationObserver(()=>{if(queued)return;queued=true;setTimeout(()=>{queued=false;wire();load()},80)});
+ boardObserver.observe(board,{childList:true,subtree:true});
+}
+function tick(){wire();load();apply();observeBoard()}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',tick,{once:true});else tick();
 window.addEventListener('focus',()=>{lastRange='';load()});
+document.addEventListener('click',e=>{if(e.target.closest('#scaleBoard,[data-v743-shift],#prevMonth,#nextMonth,#todayMonth'))setTimeout(()=>{wire();load();observeBoard()},80)},true);
 })();
