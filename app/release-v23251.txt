@@ -1,0 +1,26 @@
+TAREFAS 2.3.25.1 Alpha — build 273
+
+Primeira Alpha sobre a Beta 2.3.25.
+
+Mudança principal:
+- Base Web atualizada de 7.8.2 para 7.9.1.
+
+Incluído pela Web 7.9.1:
+- Painel SITE 7.9.1.
+- EXIT USERS com aviso e redirecionamento dos usuários comuns para o Login.
+- Reiniciar SITE com aviso e tela reiniciar.html.
+- Desligar SITE com aviso e tela desligado.html.
+- Perfis Admin preservados nas ações do Painel SITE.
+- Central 2.0 e hardening de Favoritos/Filtros.
+- Melhorias de fila offline e ciclo de tela.
+- Redução dos pollings legados mais agressivos.
+
+Android:
+- Mantém todas as funções consolidadas da Beta 2.3.25.
+- Build 273.
+- Canal Alpha.
+- Atualização distribuída somente a usuários elegíveis que ativaram o recebimento de Alpha.
+
+Base Web: 7.9.1
+Base Android: 2.3.25
+Canal: Alpha
