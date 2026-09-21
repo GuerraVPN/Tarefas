@@ -1,0 +1,69 @@
+name: Android 2.3.23 Beta - Promocao 2.3.22.5
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [app/android-v2323-prep]
+    paths:
+      - 'app/mobile-alpha-v23223-fix.js'
+      - 'app/release-v23223.txt'
+      - 'scripts/build-mobile-v23223.mjs'
+      - 'scripts/verify-mobile-v23223.mjs'
+      - 'scripts/release-mobile-v23223.sh'
+      - '.github/workflows/android-v2323-beta.yml'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Build, assinar, publicar e registrar Beta
+        run: bash scripts/release-mobile-v23223.sh
+
+      - name: Publicar pre-release no GitHub
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG='android-v2.3.23-beta'
+          TITLE='TAREFAS Android 2.3.23 — Beta'
+          APK='TAREFAS-2.3.23.apk'
+          ZIP='TAREFAS-2.3.23-beta-build-269.zip'
+          test -s "$APK"
+          test -s "$APK.sha256"
+          test -s "$ZIP"
+          test -s "$ZIP.sha256"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$APK" "$APK.sha256" "$ZIP" "$ZIP.sha256" --clobber --repo "$GITHUB_REPOSITORY"
+            gh release edit "$TAG" --title "$TITLE" --notes-file app/release-v23223.txt --prerelease --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$TAG" "$APK" "$APK.sha256" "$ZIP" "$ZIP.sha256" --target "$GITHUB_SHA" --title "$TITLE" --notes-file app/release-v23223.txt --prerelease --repo "$GITHUB_REPOSITORY"
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tarefas-android-2.3.23-beta-build-269
+          path: |
+            TAREFAS-2.3.23.apk
+            TAREFAS-2.3.23.apk.sha256
+            TAREFAS-2.3.23-beta-build-269.zip
+            TAREFAS-2.3.23-beta-build-269.zip.sha256
+            app/release-v23223.txt
+            dist/BETA_2_3_23.json
+          if-no-files-found: error
