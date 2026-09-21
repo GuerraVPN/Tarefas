@@ -3,8 +3,8 @@
   "app": "TAREFAS",
   "baseVersion": "2.3.24",
   "baseBuild": 271,
-  "generatedAt": "2026-09-21T15:59:00Z",
-  "latestPatch": "2.3.24.7",
+  "generatedAt": "2026-09-21T16:09:00Z",
+  "latestPatch": "2.3.24.8",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -36,13 +36,13 @@
       ]
     },
     {
-      "id": "2.3.24.7",
-      "name": "TAREFAS 2.3.24.7 — Correção do loop de sincronização",
+      "id": "2.3.24.8",
+      "name": "TAREFAS 2.3.24.8 — Pré-estabilização para Release 2.4",
       "baseVersion": "2.3.24",
       "minBuild": 271,
       "maxBuild": 271,
       "channel": "alpha",
-      "publishedAt": "2026-09-21T15:58:00Z",
+      "publishedAt": "2026-09-21T16:08:00Z",
       "cumulative": true,
       "replacementMode": "replace-older-same-base",
       "replaces": [
@@ -51,20 +51,22 @@
         "2.3.24.3",
         "2.3.24.4",
         "2.3.24.5",
-        "2.3.24.6"
+        "2.3.24.6",
+        "2.3.24.7"
       ],
       "installable": true,
-      "description": "Corrige o travamento causado por loop do MutationObserver na sincronização automática de versões, mantendo a checagem automática de APK e patches.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.7.tpatch",
-      "sha256": "6654cbd4c9b17782a253490fb349c573cdabb16ab08568692e0fbf2a315385c2",
+      "description": "Pré-estabilização da futura Release 2.4 com proteção extra de DOM, escopo de filtros por subaba, silenciamento local de avisos de versão e utilitários de ciclo de tela.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.8.tpatch",
+      "sha256": "cfe95309a300bcfabb1abbe6b3f64faaae1bc32b2d12716c663eca2f0079a60d",
       "changelog": [
-        "Corrigido o loop MutationObserver → renderização → MutationObserver que travava a tela de Atualizações.",
-        "O observador agora reage somente quando a área de Atualizações é criada/removida ou quando o painel de sincronização desaparece externamente.",
-        "Alterações dentro do próprio painel de sincronização são ignoradas pelo observador.",
-        "A renderização usa fingerprint para evitar redesenhar o painel quando os dados não mudaram.",
-        "Mantida a sincronização automática de APK e patches sem instalação automática.",
-        "O cabeçalho volta a reforçar a versão efetiva do patch durante as sincronizações.",
-        "Mantidas todas as correções cumulativas das versões 2.3.24.1 até 2.3.24.6."
+        "Configurações recebe proteção preventiva contra acesso a elementos já desmontados durante operações assíncronas.",
+        "A Central de erros reconhece também o falso positivo de style em configuracoes.html após desmontagem da tela.",
+        "Adicionado token de ciclo da tela para novos fluxos assíncronos descartarem respostas obsoletas.",
+        "Filtros salvos recebem scopeKey por página e subaba/módulo.",
+        "Avisos locais de patch/versão passam a respeitar imediatamente a categoria versoes silenciada.",
+        "A fila offline existente permanece sequencial; não foi introduzido envio paralelo.",
+        "Adicionado diagnóstico interno de pré-release para DOM, fila, filtros, favoritos, silenciamento e sincronização.",
+        "Mantidas todas as correções cumulativas das versões 2.3.24.1 até 2.3.24.7."
       ]
     }
   ],
@@ -389,7 +391,7 @@
         "2.3.24.5",
         "2.3.24.6"
       ],
-      "installable": true,
+      "installable": false,
       "description": "Corrige o travamento causado por loop do MutationObserver na sincronização automática de versões, mantendo a checagem automática de APK e patches.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.7.tpatch",
       "sha256": "6654cbd4c9b17782a253490fb349c573cdabb16ab08568692e0fbf2a315385c2",
@@ -401,8 +403,43 @@
         "Mantida a sincronização automática de APK e patches sem instalação automática.",
         "O cabeçalho volta a reforçar a versão efetiva do patch durante as sincronizações.",
         "Mantidas todas as correções cumulativas das versões 2.3.24.1 até 2.3.24.6."
+      ],
+      "supersededBy": "2.3.24.8"
+    },
+    {
+      "id": "2.3.24.8",
+      "name": "TAREFAS 2.3.24.8 — Pré-estabilização para Release 2.4",
+      "baseVersion": "2.3.24",
+      "minBuild": 271,
+      "maxBuild": 271,
+      "channel": "alpha",
+      "publishedAt": "2026-09-21T16:08:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.3.24.1",
+        "2.3.24.2",
+        "2.3.24.3",
+        "2.3.24.4",
+        "2.3.24.5",
+        "2.3.24.6",
+        "2.3.24.7"
+      ],
+      "installable": true,
+      "description": "Pré-estabilização da futura Release 2.4 com proteção extra de DOM, escopo de filtros por subaba, silenciamento local de avisos de versão e utilitários de ciclo de tela.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.8.tpatch",
+      "sha256": "cfe95309a300bcfabb1abbe6b3f64faaae1bc32b2d12716c663eca2f0079a60d",
+      "changelog": [
+        "Configurações recebe proteção preventiva contra acesso a elementos já desmontados durante operações assíncronas.",
+        "A Central de erros reconhece também o falso positivo de style em configuracoes.html após desmontagem da tela.",
+        "Adicionado token de ciclo da tela para novos fluxos assíncronos descartarem respostas obsoletas.",
+        "Filtros salvos recebem scopeKey por página e subaba/módulo.",
+        "Avisos locais de patch/versão passam a respeitar imediatamente a categoria versoes silenciada.",
+        "A fila offline existente permanece sequencial; não foi introduzido envio paralelo.",
+        "Adicionado diagnóstico interno de pré-release para DOM, fila, filtros, favoritos, silenciamento e sincronização.",
+        "Mantidas todas as correções cumulativas das versões 2.3.24.1 até 2.3.24.7."
       ]
     }
   ],
-  "cacheNonce": "23247-sync-loop-fix"
+  "cacheNonce": "23248-prerelease-hardening"
 }
