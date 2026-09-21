@@ -2,7 +2,7 @@
 'use strict';
 if(window.__TAREFAS_V754_PATCH__)return;
 window.__TAREFAS_V754_PATCH__=true;
-const VERSION='7.5.4';
+const VERSION='7.9.0';
 const page=()=>((location.pathname.split('/').pop()||'dashboard.html').toLowerCase());
 const native=()=>!!window.__TAREFAS_NATIVE_APP__;
 const user=()=>{try{return JSON.parse(localStorage.getItem('usuarioLogado')||'null')}catch(_){return null}};
@@ -113,6 +113,6 @@ function apply(){
  scheduled=false;injectCss();markScalePage();replaceTSV();taskModalLayer();usersInline();injectSiteUpdateSetting();injectAppLogout();filterSiteAppUpdates();document.documentElement.dataset.tarefasVersion=VERSION;
 }
 function schedule(){if(scheduled)return;scheduled=true;requestAnimationFrame(apply)}
-function init(){apply();const obs=new MutationObserver(schedule);obs.observe(document.body,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['style','class']});setInterval(schedule,2500);window.addEventListener('focus',schedule);window.addEventListener('tarefas:v754-site-update-pref',schedule)}
+function init(){apply();const obs=new MutationObserver(schedule);obs.observe(document.body,{childList:true,subtree:true});window.addEventListener('focus',schedule);window.addEventListener('pageshow',schedule);window.addEventListener('resize',schedule,{passive:true});document.addEventListener('click',schedule,true);document.addEventListener('change',schedule,true);window.addEventListener('tarefas:v754-site-update-pref',schedule)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
