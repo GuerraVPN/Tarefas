@@ -58,3 +58,16 @@ Cada novo patch deve:
 - remover automaticamente do IndexedDB os patches da mesma base com versão inferior à atual.
 
 Resultado esperado: depois da instalação e recarga automática, o aparelho mantém apenas o patch cumulativo mais recente da base.
+
+
+## Evitar notificação atrasada
+
+A partir do patch 2.3.23.5, a checagem de patches é imediata ao iniciar/retomar o app e usa proteção contra corrida:
+
+- sincroniza os IDs já instalados antes de avaliar notificações;
+- confere novamente se o patch foi instalado imediatamente antes do aviso;
+- reserva o ID como visto antes da chamada assíncrona de notificação;
+- ao tocar em "Baixar e aplicar", marca o patch como visto antes do download;
+- se a notificação falhar e o patch ainda não tiver sido instalado, libera o ID para uma tentativa futura.
+
+Isso impede que uma notificação de "patch disponível" apareça depois que a instalação já começou ou foi concluída.
