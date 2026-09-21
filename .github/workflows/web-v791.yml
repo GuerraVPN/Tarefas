@@ -1,0 +1,85 @@
+name: Web 7.9.1 - SITE e Estabilizacao
+
+on:
+  push:
+    branches: [web-7.9.1-prep]
+    paths:
+      - 'v7_9_1_site.js'
+      - 'v7_9_1_web.js'
+      - 'reiniciar.html'
+      - 'desligado.html'
+      - 'index.html'
+      - 'v6_2_mobile.js'
+      - 'v7_5_1_version.js'
+      - 'v7_5_3_patch.js'
+      - 'v7_5_2_service_labels.js'
+      - 'v7_5_service_editor.js'
+      - 'v7_4_12_global.js'
+      - 'v7_6_5_webfix.js'
+      - 'v7_8_0_ai.js'
+      - 'v7_8_0_about.js'
+      - 'scripts/verify-web.mjs'
+      - 'README.md'
+      - 'README_WEB_7_9_1.txt'
+      - '.github/workflows/web-v791.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  validate-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: web-7.9.1-prep
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Conferência geral da Web
+        run: |
+          set -euo pipefail
+          node scripts/verify-web.mjs .
+
+      - name: Validar Painel SITE 7.9.1
+        run: |
+          set -euo pipefail
+          node --check v7_9_1_site.js
+          node --check v7_9_1_web.js
+          grep -q "const VERSION='7.9.1'" v7_9_1_site.js
+          grep -q "v7_4_12_controle_site','v7_4_9_controle_site','v7_4_7_controle_site" v7_9_1_site.js
+          grep -q "index.html?site_action=exit_users" v7_9_1_site.js
+          grep -q "reiniciar.html?site_action=reiniciar" v7_9_1_site.js
+          grep -q "desligado.html?site_action=desligar" v7_9_1_site.js
+          grep -q "if(isAdmin)return" v7_9_1_site.js
+          grep -q "broadcastAction" v7_9_1_site.js
+          grep -q "tarefas_site_791_restart_completed_at" v7_9_1_site.js
+          grep -q "site_action.*exit_users" index.html
+          grep -q "TAREFAS — Reiniciando" reiniciar.html
+          grep -q "TAREFAS — SITE desligado" desligado.html
+
+      - name: Validar hardening e performance
+        run: |
+          set -euo pipefail
+          grep -q "schemaVersion:1" v7_9_1_web.js
+          grep -q "data-favrename" v7_9_1_web.js
+          grep -q "data-qretry" v7_9_1_web.js
+          grep -q "TarefasWeb791Lifecycle" v7_9_1_web.js
+          ! grep -q "setInterval(()=>{const sig=calendarDomSignature()" v7_5_3_patch.js
+          ! grep -q "setInterval(tick,1200)" v7_5_2_service_labels.js
+          ! grep -q "setInterval(markEditableCells,2000)" v7_5_service_editor.js
+          ! grep -q "uiTimer=setInterval(refreshUi,3000)" v7_4_12_global.js
+          ! grep -q "setInterval(sync,30000)" v7_6_5_webfix.js
+          grep -q "v7_9_1_site.js?v=7.9.1" v6_2_mobile.js
+          grep -q "v7_9_1_web.js?v=7.9.1" v6_2_mobile.js
+          grep -q "WEB 7.9.1 · leitura + ações + anexos" v7_8_0_ai.js
+
+      - name: Publicar Web 7.9.1 no main
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git merge-base --is-ancestor origin/main HEAD
+          git push origin HEAD:main
