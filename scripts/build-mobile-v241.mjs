@@ -84,9 +84,11 @@ await patch('native-mobile.js',source=>source
 
 await patch('mobile-release-v240.js',source=>{
   let out=source
-    .replace("const PATCH_VERSION='2.4.0';","const PATCH_VERSION='"+VERSION+"';")
-    .replace("const BASE_VERSION='2.4.0';","const BASE_VERSION='"+VERSION+"';")
-    .replace('const BUILD=274;','const BUILD='+BUILD+';');
+    .replaceAll("const PATCH_VERSION='2.4.0';","const PATCH_VERSION='"+VERSION+"';")
+    .replaceAll("const BASE_VERSION='2.4.0';","const BASE_VERSION='"+VERSION+"';")
+    .replaceAll('const BUILD=274;','const BUILD='+BUILD+';')
+    .replaceAll('const BASE_BUILD=274;','const BASE_BUILD='+BUILD+';')
+    .replaceAll("version:'2.4.0',build:274,channel:'official'","version:'"+VERSION+"',build:"+BUILD+",channel:'beta'");
   out+="\n;globalThis.__TAREFAS_BETA_241__=Object.freeze({version:'"+VERSION+"',build:"+BUILD+",channel:'beta',webVersion:'"+WEB_VERSION+"',launcherIconBridge:true,profileHomeIcon:true,patchChannelsFollowApkPreferences:true});\n";
   out+=";globalThis.__TAREFAS_EFFECTIVE_VERSION__='"+VERSION+"';\n";
   return out;
