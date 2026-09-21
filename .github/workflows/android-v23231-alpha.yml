@@ -3,8 +3,9 @@ name: Android 2.3.23.1 Alpha - Patch Manager
 on:
   workflow_dispatch:
   push:
-    branches: [alpha-2.3.23.1]
+    branches: [app/android-v23231-prep]
     paths:
+      - '.v23231-release-trigger'
       - 'app/mobile-patch-manager-v23231.js'
       - 'app/release-v23231.txt'
       - 'scripts/build-mobile-v23231.mjs'
