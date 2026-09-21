@@ -3,7 +3,7 @@ name: Android 2.4.0 Oficial
 on:
   workflow_dispatch:
   push:
-    branches: [release-2.4.0-prep]
+    branches: [app/android-v240-prep]
     paths:
       - '.v240-release-trigger'
       - 'app/mobile-release-v240.js'
