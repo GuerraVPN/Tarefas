@@ -3,7 +3,7 @@
   "app": "TAREFAS",
   "baseVersion": "2.3.23.1",
   "baseBuild": 270,
-  "generatedAt": "2026-09-21T14:02:00Z",
+  "generatedAt": "2026-09-21T14:04:00Z",
   "latestPatch": "2.3.23.5",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
@@ -25,14 +25,15 @@
       "installable": true,
       "description": "Corrige o atraso das notificações de patches e evita avisos depois que o patch já começou a ser instalado ou já está instalado.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.23.5.tpatch",
-      "sha256": "f8ba224baa8cb359a8eb3a867a6f00c6dfc0130c349aa79eb98ac3377184dcbd",
+      "sha256": "3f3a0413751453a6057d60c78907c354f837c6cf0607f054b50dd0a53798b6c6",
       "changelog": [
         "Checagem de novos patches passa a rodar imediatamente ao abrir ou retomar o aplicativo.",
         "Antes de notificar, o app consulta novamente os patches instalados para impedir aviso de uma versão que já foi aplicada.",
         "Ao tocar em Baixar e aplicar, o patch é marcado como visto antes do download, eliminando a corrida que gerava notificação após a instalação.",
         "A identificação do patch é reservada antes do disparo assíncrono para evitar notificações duplicadas.",
         "Mantidos o modelo cumulativo, correções de tema, histórico de patches e canais Alpha/Beta.",
-        "A 2.3.23.5 substitui automaticamente a 2.3.23.4 e demais patches anteriores da mesma base."
+        "A 2.3.23.5 substitui automaticamente a 2.3.23.4 e demais patches anteriores da mesma base.",
+        "O catálogo de patches passa a usar cache-busting automático para novas versões aparecerem imediatamente no Gerenciador."
       ]
     }
   ],
@@ -125,16 +126,17 @@
       "installable": true,
       "description": "Corrige o atraso das notificações de patches e evita avisos depois que o patch já começou a ser instalado ou já está instalado.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.23.5.tpatch",
-      "sha256": "f8ba224baa8cb359a8eb3a867a6f00c6dfc0130c349aa79eb98ac3377184dcbd",
+      "sha256": "3f3a0413751453a6057d60c78907c354f837c6cf0607f054b50dd0a53798b6c6",
       "changelog": [
         "Checagem de novos patches passa a rodar imediatamente ao abrir ou retomar o aplicativo.",
         "Antes de notificar, o app consulta novamente os patches instalados para impedir aviso de uma versão que já foi aplicada.",
         "Ao tocar em Baixar e aplicar, o patch é marcado como visto antes do download, eliminando a corrida que gerava notificação após a instalação.",
         "A identificação do patch é reservada antes do disparo assíncrono para evitar notificações duplicadas.",
         "Mantidos o modelo cumulativo, correções de tema, histórico de patches e canais Alpha/Beta.",
-        "A 2.3.23.5 substitui automaticamente a 2.3.23.4 e demais patches anteriores da mesma base."
+        "A 2.3.23.5 substitui automaticamente a 2.3.23.4 e demais patches anteriores da mesma base.",
+        "O catálogo de patches passa a usar cache-busting automático para novas versões aparecerem imediatamente no Gerenciador."
       ]
     }
   ],
-  "cacheNonce": "23235-20260921T140200Z"
+  "cacheNonce": "23235-cachebuster-final"
 }
