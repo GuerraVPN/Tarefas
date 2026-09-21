@@ -42,3 +42,19 @@ A partir do patch 2.3.23.3, cada entrada do catálogo possui um campo `channel` 
 - Patch `official`: aviso permitido para todos os usuários do canal oficial.
 
 O cliente consulta o catálogo ao abrir/retomar o app, ao voltar a ficar online e periodicamente enquanto estiver ativo. Patches já instalados são marcados como vistos para evitar notificação retroativa ou duplicada.
+
+
+## Patches cumulativos
+
+A partir do 2.3.23.4, os patches seguem o modelo cumulativo.
+
+O catálogo principal expõe somente o patch instalável mais recente da mesma base. Patches anteriores ficam apenas em `history`.
+
+Cada novo patch deve:
+- manter as correções e recursos necessários dos patches anteriores;
+- usar `cumulative: true`;
+- usar `replacementMode: "replace-older-same-base"`;
+- informar os IDs antigos em `replaces`;
+- remover automaticamente do IndexedDB os patches da mesma base com versão inferior à atual.
+
+Resultado esperado: depois da instalação e recarga automática, o aparelho mantém apenas o patch cumulativo mais recente da base.
