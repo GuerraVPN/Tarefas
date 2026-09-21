@@ -1,6 +1,6 @@
 (()=>{
 'use strict';
-const VERSION='2.3.22.4',BUILD=267,MARK='__TAREFAS_ALPHA_NAV_V267__';
+const VERSION='2.3.22.5',BUILD=268,MARK='__TAREFAS_ALPHA_NAV_V268__';
 if(globalThis[MARK])return;globalThis[MARK]=true;
 const page=()=>((location.pathname.split('/').pop()||'dashboard.html').toLowerCase());
 const tabs=[
@@ -20,9 +20,9 @@ function css(){if(document.getElementById('a23223-nav-style'))return;const s=doc
 function installMainTabs(tab){let nav=document.getElementById('tmAlphaMainTabs');if(!nav){nav=document.createElement('nav');nav.id='tmAlphaMainTabs';nav.className='tm-alpha-main-tabs';nav.setAttribute('aria-label','Seções do aplicativo');nav.innerHTML=tabs.map(([key,icon,label])=>`<button class="tm-alpha-main-tab" data-main-tab="${key}"><span>${icon}</span>${label}</button>`).join('');const header=document.querySelector('.tm-app-header');const pageRoot=document.querySelector('.page');if(header)header.after(nav);else if(pageRoot)pageRoot.before(nav);else document.body.prepend(nav);nav.addEventListener('click',e=>{const b=e.target.closest('[data-main-tab]');if(!b)return;location.href=`central.html?tab=${encodeURIComponent(b.dataset.mainTab)}`})}nav.querySelectorAll('[data-main-tab]').forEach(b=>b.classList.toggle('active',b.dataset.mainTab===tab))}
 function updateHeading(tab){const meta=Object.fromEntries(tabs.map(x=>[x[0],x]));const [,icon,label,desc]=meta[tab]||meta.notificacoes;const h=document.querySelector('.page .heading h2'),p=document.querySelector('.page .heading p'),newMsg=document.getElementById('newMsg');if(h)h.textContent=`${icon} ${label}`;if(p)p.textContent=desc;if(newMsg)newMsg.hidden=tab!=='mensagens';document.title=`${label} - TAREFAS ${VERSION} Alpha`}
 function activateLegacyView(tab){const oldTabs=document.getElementById('a23221-central-tabs');const oldButton=oldTabs?.querySelector(`[data-tab="${tab}"]`);if(oldButton)oldButton.click();setTimeout(()=>{document.getElementById('a23221-central-tabs')?.remove();const aux=document.getElementById('a23221-central-aux');if(['downloads','favoritos','ferramentas'].includes(tab)&&aux&&!aux.innerHTML.trim()&&oldButton){oldButton.click();setTimeout(()=>document.getElementById('a23221-central-tabs')?.remove(),0)}},0)}
-function addDrawerShortcuts(){const body=document.querySelector('#tmDrawer .tm-sheet-body');if(!body||body.querySelector('[data-alpha-quick]'))return;const group=document.createElement('div');group.className='tm-drawer-group';group.dataset.alphaQuick='1';group.innerHTML=`<h3>Acesso rápido</h3>${tabs.filter(([key])=>key!=='notificacoes').map(([key,icon,label,desc])=>`<button class="tm-drawer-item" data-alpha-href="central.html?tab=${key}"><span><strong>${icon} ${label}</strong><small>${desc}</small></span></button>`).join('')}`;group.querySelectorAll('[data-alpha-href]').forEach(b=>b.onclick=()=>location.href=b.dataset.alphaHref);body.appendChild(group)}
+function removeDrawerShortcuts(){document.querySelectorAll('[data-alpha-quick]').forEach(el=>el.remove())}
 function apply(){css();if(page()!=='central.html')return;const tab=requested();document.body.classList.add('a23223-section',`a23223-section-${tab}`);installMainTabs(tab);updateHeading(tab);activateLegacyView(tab);setTimeout(()=>{installMainTabs(tab);updateHeading(tab);activateLegacyView(tab)},250)}
-const obs=new MutationObserver(()=>addDrawerShortcuts());obs.observe(document.documentElement,{childList:true,subtree:true});
+const obs=new MutationObserver(()=>removeDrawerShortcuts());obs.observe(document.documentElement,{childList:true,subtree:true});removeDrawerShortcuts();
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply,{once:true});else apply();
-globalThis.TarefasAlpha23224={version:VERSION,build:BUILD,open:tab=>{if(valid.has(tab))location.href=`central.html?tab=${tab}`}};
+globalThis.TarefasAlpha23225={version:VERSION,build:BUILD,open:tab=>{if(valid.has(tab))location.href=`central.html?tab=${tab}`}};
 })();
