@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TAREFAS — SITE desligado</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#050b16;color:#e5e7eb;font-family:Arial,sans-serif;padding:20px}.box{width:min(600px,100%);padding:34px;border:1px solid #334155;border-radius:22px;background:#0f172a;text-align:center;box-shadow:0 28px 70px #0009}h1{margin:0 0 10px;color:#fff}p{color:#94a3b8;line-height:1.6}.dot{width:13px;height:13px;border-radius:50%;background:#ef4444;margin:20px auto;box-shadow:0 0 0 8px #7f1d1d55}.status{margin-top:14px;padding:10px;border-radius:10px;background:#111827;font-size:12px;color:#cbd5e1}.btn{margin-top:16px;border:1px solid #475569;background:#111827;color:#e5e7eb;border-radius:10px;padding:10px 14px;font-weight:800;cursor:pointer}
+</style>
+</head>
+<body><main class="box"><h1>⏻ TAREFAS temporariamente desligado</h1><p>O administrador colocou o SITE em manutenção. Seu acesso será liberado automaticamente quando o sistema for iniciado novamente.</p><div class="dot"></div><div class="status" id="status">Aguardando liberação do administrador…</div><button class="btn" id="check">Verificar agora</button></main>
+<script>
+const SUPABASE_URL='https://bpvijatnsluwsgnzklrd.supabase.co';
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwdmlqYXRuc2x1d3NnbnprbHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MzkxNDMsImV4cCI6MjEwMjQxNTE0M30.uvyfm9mgl6MON0v75CwfGzNz6FBqw58uzR4ZcRAOLNQ';
+const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+const $=id=>document.getElementById(id);
+const user=()=>{try{return JSON.parse(localStorage.getItem('usuarioLogado')||'null')}catch(_){return null}};
+const row=d=>Array.isArray(d)?(d[0]||null):(d||null);
+async function admin(){
+ const u=user();if(!u?.id)return false;
+ try{const r=await supabaseClient.rpc('v7_4_12_admin_context',{p_usuario_id:Number(u.id)}),d=row(r.data);if(!r.error&&d?.is_admin)return true}catch(_){}
+ try{const q=await supabaseClient.from('usuario_perfis').select('secao,ativo').eq('usuario_id',Number(u.id)).eq('ativo',true);return !q.error&&(q.data||[]).some(x=>String(x.secao||'').trim().toLowerCase()==='admin')}catch(_){return false}
+}
+async function state(){
+ for(const name of ['v7_4_12_estado_site','v7_4_9_estado_site','v7_4_7_estado_site']){
+  try{const r=await supabaseClient.rpc(name);if(!r.error)return row(r.data)}catch(_){}
+ }
+ return null;
+}
+let busy=false;
+async function check(){
+ if(busy)return;busy=true;
+ try{
+  if(!user()?.id){location.replace('index.html');return}
+  if(await admin()){location.replace('dashboard.html?site_admin=1');return}
+  $('status').textContent='Consultando estado do SITE…';
+  const s=await state();
+  if(s&&s.modo!=='desligado'&&s.acao_pendente!=='desligar'){location.replace('dashboard.html?site_online=1&t='+Date.now());return}
+  $('status').textContent='SITE ainda em manutenção · última verificação '+new Date().toLocaleTimeString('pt-BR');
+ }catch(_){$('status').textContent='Não foi possível consultar agora. Tentaremos novamente automaticamente.'}
+ finally{busy=false}
+}
+$('check').onclick=check;check();setInterval(check,5000);window.addEventListener('focus',check);
+</script></body></html>
