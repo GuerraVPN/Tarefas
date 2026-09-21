@@ -1,0 +1,55 @@
+name: Android 2.3.25 Beta - Pre Release 2.4
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [app/android-v2325-prep]
+    paths:
+      - '.v2325-release-trigger'
+      - 'app/mobile-beta-v2325.js'
+      - 'app/mobile-patch-manager-v2325.js'
+      - 'app/release-v2325.txt'
+      - 'scripts/build-mobile-v2325.mjs'
+      - 'scripts/verify-mobile-v2325.mjs'
+      - 'scripts/release-mobile-v2325.sh'
+      - '.github/workflows/android-v2325-beta.yml'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Compilar, validar, assinar e publicar Beta
+        run: |
+          set -euo pipefail
+          chmod +x scripts/release-mobile-v2325.sh
+          scripts/release-mobile-v2325.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tarefas-android-2.3.25-beta-build-272
+          path: |
+            TAREFAS-2.3.25.apk
+            TAREFAS-2.3.25.apk.sha256
+            TAREFAS-2.3.25-beta-build-272.zip
+            TAREFAS-2.3.25-beta-build-272.zip.sha256
+            app/release-v2325.txt
+            dist/BETA_2_3_25.json
+          if-no-files-found: error
