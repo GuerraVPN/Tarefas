@@ -108,7 +108,10 @@ function calendarDomSignature(){
 function watchCalendar(){
  if(page!=='calendario.html')return;
  ensureCalendarCss();loadCalendarServices(true);
- setInterval(()=>{const sig=calendarDomSignature();if(!sig||sig===lastDomSig)return;lastDomSig=sig;loadCalendarServices()},350);
+ const grid=document.getElementById('calendarGrid');let queued=false;
+ const sync=()=>{queued=false;const sig=calendarDomSignature();if(!sig||sig===lastDomSig)return;lastDomSig=sig;loadCalendarServices()};
+ const schedule=()=>{if(queued)return;queued=true;setTimeout(sync,80)};
+ if(grid){new MutationObserver(schedule).observe(grid,{childList:true,subtree:true,attributes:true,attributeFilter:['class','data-date']});grid.addEventListener('click',()=>setTimeout(schedule,0),true)}
  try{const c=client();if(c){channel=c.channel('v753-calendario-servicos').on('postgres_changes',{event:'*',schema:'public',table:'escala_servicos'},()=>loadCalendarServices(true)).subscribe()}}catch(_){}
  window.addEventListener('focus',()=>loadCalendarServices(true));
 }
