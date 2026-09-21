@@ -1,11 +1,6 @@
 package br.com.guerravpn.tarefas.mobile;
 
-import android.app.PendingIntent;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.pm.ShortcutInfo;
 import android.content.pm.ShortcutManager;
 import android.graphics.Bitmap;
@@ -14,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.graphics.drawable.Icon;
 import android.os.Build;
 import android.util.Base64;
@@ -31,78 +27,73 @@ import java.util.List;
 public class TarefasLauncherIconPlugin extends Plugin {
     private static final String PREFS = "tarefas_launcher_icon_v2401";
     private static final String MODE_KEY = "mode";
-    private static final String PROFILE_SHORTCUT_ID = "tarefas-profile-home";
+    private static final String SHORTCUT_ID = "tarefas-custom-home";
 
-    private static final String[] MODES = {"blue", "military", "gold", "system"};
-    private static final String[] ALIASES = {
-        ".LauncherBlue",
-        ".LauncherMilitary",
-        ".LauncherGold",
-        ".LauncherSystem"
-    };
-
-    private SharedPreferences prefs() {
-        return getContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+    private boolean supported() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return false;
+        ShortcutManager manager = getContext().getSystemService(ShortcutManager.class);
+        return manager != null && manager.isRequestPinShortcutSupported();
     }
 
-    private boolean validMode(String mode) {
-        if (mode == null) return false;
-        for (String item : MODES) if (item.equals(mode)) return true;
-        return false;
-    }
-
-    private void setAliasState(String alias, boolean enabled) {
-        PackageManager pm = getContext().getPackageManager();
-        ComponentName component = new ComponentName(
-            getContext().getPackageName(),
-            getContext().getPackageName() + alias
-        );
-        pm.setComponentEnabledSetting(
-            component,
-            enabled ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED : PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-            PackageManager.DONT_KILL_APP
-        );
+    private JSObject unsupported() {
+        JSObject out = new JSObject();
+        out.put("ok", false);
+        out.put("supported", false);
+        out.put("message", "O launcher deste aparelho não permite ícone personalizado na tela inicial.");
+        return out;
     }
 
     @PluginMethod
     public void getState(PluginCall call) {
         JSObject out = new JSObject();
-        out.put("mode", prefs().getString(MODE_KEY, "blue"));
-        out.put("profileShortcutSupported",
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
-            getContext().getSystemService(ShortcutManager.class) != null &&
-            getContext().getSystemService(ShortcutManager.class).isRequestPinShortcutSupported()
-        );
+        out.put("mode", getContext().getSharedPreferences(PREFS, 0).getString(MODE_KEY, "blue"));
+        out.put("profileShortcutSupported", supported());
         out.put("native", true);
         call.resolve(out);
     }
 
-    @PluginMethod
-    public void setPreset(PluginCall call) {
-        String mode = call.getString("mode", "blue");
-        if (!validMode(mode)) {
-            call.reject("Ícone inválido.");
-            return;
+    private Bitmap presetBitmap(String mode) {
+        int bg;
+        int fg;
+        String glyph = "T";
+
+        switch (mode) {
+            case "military":
+                bg = 0xFF283620;
+                fg = 0xFFE3E7C8;
+                glyph = "★";
+                break;
+            case "gold":
+                bg = 0xFF121212;
+                fg = 0xFFF2C94C;
+                break;
+            case "system":
+                bg = 0xFFEFF3F7;
+                fg = 0xFF475569;
+                break;
+            case "blue":
+            default:
+                bg = 0xFF08283B;
+                fg = 0xFF55C7FF;
+                break;
         }
 
-        try {
-            // Liga o novo primeiro para nunca deixar o app sem entrada no launcher.
-            for (int i = 0; i < MODES.length; i++) {
-                if (MODES[i].equals(mode)) setAliasState(ALIASES[i], true);
-            }
-            for (int i = 0; i < MODES.length; i++) {
-                if (!MODES[i].equals(mode)) setAliasState(ALIASES[i], false);
-            }
+        Bitmap out = Bitmap.createBitmap(192, 192, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(out);
+        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
 
-            prefs().edit().putString(MODE_KEY, mode).apply();
-            JSObject out = new JSObject();
-            out.put("ok", true);
-            out.put("mode", mode);
-            out.put("message", "Ícone alterado. O launcher pode levar alguns segundos para atualizar.");
-            call.resolve(out);
-        } catch (Exception error) {
-            call.reject("Não foi possível trocar o ícone: " + error.getMessage(), error);
-        }
+        paint.setColor(bg);
+        canvas.drawRoundRect(new RectF(0, 0, 192, 192), 42, 42, paint);
+
+        paint.setColor(fg);
+        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
+        paint.setTextSize("★".equals(glyph) ? 96f : 110f);
+        Paint.FontMetrics fm = paint.getFontMetrics();
+        float y = 96f - (fm.ascent + fm.descent) / 2f;
+        canvas.drawText(glyph, 96f, y, paint);
+
+        return out;
     }
 
     private Bitmap avatarBitmap(String dataUrl) {
@@ -110,6 +101,7 @@ public class TarefasLauncherIconPlugin extends Plugin {
         String raw = dataUrl.trim();
         int comma = raw.indexOf(',');
         if (comma >= 0) raw = raw.substring(comma + 1);
+
         byte[] bytes = Base64.decode(raw, Base64.DEFAULT);
         Bitmap source = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
         if (source == null) return null;
@@ -124,24 +116,25 @@ public class TarefasLauncherIconPlugin extends Plugin {
         Rect src = new Rect(left, top, left + size, top + size);
         RectF dst = new RectF(0, 0, 192, 192);
 
-        // Fundo e recorte circular para ficar consistente com launchers modernos.
         paint.setColor(0xFF07151C);
-        canvas.drawOval(dst, paint);
+        canvas.drawRoundRect(dst, 42, 42, paint);
+
+        android.graphics.Path clip = new android.graphics.Path();
+        clip.addRoundRect(dst, 42, 42, android.graphics.Path.Direction.CW);
         canvas.save();
-        canvas.clipPath(new android.graphics.Path() {{
-            addOval(dst, Direction.CW);
-        }});
+        canvas.clipPath(clip);
         canvas.drawBitmap(source, src, dst, paint);
         canvas.restore();
+
         return out;
     }
 
-    private ShortcutInfo profileShortcut(Bitmap bitmap, String label) {
+    private ShortcutInfo makeShortcut(Bitmap bitmap, String label) {
         Intent intent = new Intent(getContext(), MainActivity.class);
         intent.setAction(Intent.ACTION_VIEW);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-        return new ShortcutInfo.Builder(getContext(), PROFILE_SHORTCUT_ID)
+        return new ShortcutInfo.Builder(getContext(), SHORTCUT_ID)
             .setShortLabel(label)
             .setLongLabel(label)
             .setIcon(Icon.createWithBitmap(bitmap))
@@ -149,19 +142,66 @@ public class TarefasLauncherIconPlugin extends Plugin {
             .build();
     }
 
-    @PluginMethod
-    public void pinProfileShortcut(PluginCall call) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            call.reject("O ícone do perfil na tela inicial requer Android 8 ou superior.");
-            return;
-        }
+    private JSObject applyShortcut(Bitmap bitmap, String mode, String label) {
+        if (!supported()) return unsupported();
 
         ShortcutManager manager = getContext().getSystemService(ShortcutManager.class);
-        if (manager == null || !manager.isRequestPinShortcutSupported()) {
-            call.reject("O launcher deste aparelho não permite fixar ícones personalizados.");
+        ShortcutInfo shortcut = makeShortcut(bitmap, label);
+
+        boolean alreadyPinned = false;
+        List<ShortcutInfo> pinned = manager.getPinnedShortcuts();
+        for (ShortcutInfo item : pinned) {
+            if (SHORTCUT_ID.equals(item.getId())) {
+                alreadyPinned = true;
+                break;
+            }
+        }
+
+        JSObject out = new JSObject();
+        if (alreadyPinned) {
+            manager.updateShortcuts(Collections.singletonList(shortcut));
+            getContext().getSharedPreferences(PREFS, 0).edit().putString(MODE_KEY, mode).apply();
+            out.put("ok", true);
+            out.put("supported", true);
+            out.put("mode", mode);
+            out.put("updated", true);
+            out.put("requested", false);
+            out.put("message", "Ícone da tela inicial atualizado.");
+            return out;
+        }
+
+        boolean requested = manager.requestPinShortcut(shortcut, null);
+        if (requested) {
+            getContext().getSharedPreferences(PREFS, 0).edit().putString(MODE_KEY, mode).apply();
+        }
+        out.put("ok", requested);
+        out.put("supported", true);
+        out.put("mode", requested ? mode : getContext().getSharedPreferences(PREFS, 0).getString(MODE_KEY, "blue"));
+        out.put("updated", false);
+        out.put("requested", requested);
+        out.put("message", requested
+            ? "Confirme no Android para adicionar o ícone TAREFAS à tela inicial."
+            : "O launcher não aceitou a solicitação.");
+        return out;
+    }
+
+    @PluginMethod
+    public void setPreset(PluginCall call) {
+        String mode = call.getString("mode", "blue");
+        if (!"blue".equals(mode) && !"military".equals(mode) && !"gold".equals(mode) && !"system".equals(mode)) {
+            call.reject("Ícone inválido.");
             return;
         }
 
+        try {
+            call.resolve(applyShortcut(presetBitmap(mode), mode, "TAREFAS"));
+        } catch (Exception error) {
+            call.reject("Não foi possível aplicar o ícone: " + error.getMessage(), error);
+        }
+    }
+
+    @PluginMethod
+    public void pinProfileShortcut(PluginCall call) {
         String dataUrl = call.getString("avatarDataUrl", "");
         String label = call.getString("label", "TAREFAS");
         if (label == null || label.trim().isEmpty()) label = "TAREFAS";
@@ -172,44 +212,9 @@ public class TarefasLauncherIconPlugin extends Plugin {
                 call.reject("O perfil ainda não possui uma imagem válida.");
                 return;
             }
-
-            ShortcutInfo shortcut = profileShortcut(bitmap, label.trim());
-            boolean alreadyPinned = false;
-            List<ShortcutInfo> pinned = manager.getPinnedShortcuts();
-            for (ShortcutInfo item : pinned) {
-                if (PROFILE_SHORTCUT_ID.equals(item.getId())) {
-                    alreadyPinned = true;
-                    break;
-                }
-            }
-
-            if (alreadyPinned) {
-                manager.updateShortcuts(Collections.singletonList(shortcut));
-                prefs().edit().putString(MODE_KEY, "profile").apply();
-                JSObject out = new JSObject();
-                out.put("ok", true);
-                out.put("mode", "profile");
-                out.put("updated", true);
-                out.put("requested", false);
-                out.put("message", "Ícone do perfil atualizado na tela inicial.");
-                call.resolve(out);
-                return;
-            }
-
-            boolean requested = manager.requestPinShortcut(shortcut, null);
-            if (requested) prefs().edit().putString(MODE_KEY, "profile").apply();
-
-            JSObject out = new JSObject();
-            out.put("ok", requested);
-            out.put("mode", requested ? "profile" : prefs().getString(MODE_KEY, "blue"));
-            out.put("updated", false);
-            out.put("requested", requested);
-            out.put("message", requested
-                ? "Confirme no Android para adicionar o ícone do perfil à tela inicial."
-                : "O launcher não aceitou a solicitação.");
-            call.resolve(out);
+            call.resolve(applyShortcut(bitmap, "profile", label.trim()));
         } catch (Exception error) {
-            call.reject("Não foi possível criar o ícone do perfil: " + error.getMessage(), error);
+            call.reject("Não foi possível usar o ícone do perfil: " + error.getMessage(), error);
         }
     }
 }
