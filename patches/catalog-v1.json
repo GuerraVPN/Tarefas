@@ -3,13 +3,13 @@
   "app": "TAREFAS",
   "baseVersion": "2.3.23.1",
   "baseBuild": 270,
-  "generatedAt": "2026-09-21T14:11:00Z",
+  "generatedAt": "2026-09-21T14:18:00Z",
   "latestPatch": "2.3.23.6",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
       "id": "2.3.23.6",
-      "name": "TAREFAS 2.3.23.6 — Teste de notificação Alpha",
+      "name": "TAREFAS 2.3.23.6 — Catálogo confiável e versão global",
       "baseVersion": "2.3.23.1",
       "minBuild": 270,
       "maxBuild": 270,
@@ -24,13 +24,14 @@
         "2.3.23.5"
       ],
       "installable": true,
-      "description": "Patch Alpha cumulativo criado para testar o aviso automático de novos patches usando a correção de notificações da 2.3.23.5.",
+      "description": "Corrige a consulta do catálogo para evitar cache do GitHub e faz a versão efetiva do patch aparecer no cabeçalho de todas as abas.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.23.6.tpatch",
-      "sha256": "f106046f807be4e828bbf95d295310efd1e1d037efd2f305d1bae2dbd8ded937",
+      "sha256": "5f0e5668b6c65fa22943eacbe29eeee825980f0a55aed6a26ca6909b9017c27d",
       "changelog": [
-        "Patch de teste para validar a notificação automática de novo patch Alpha.",
-        "Nenhuma alteração funcional adicional além do marcador de teste e avanço da versão efetiva.",
-        "Mantidas todas as correções e recursos cumulativos da 2.3.23.5.",
+        "Catálogo e arquivos oficiais passam a ser consultados pela GitHub Contents API, com fallback para raw.githubusercontent.com sem cache.",
+        "A versão efetiva 2.3.23.6 passa a aparecer no cabeçalho de todas as abas, não apenas na área de Atualizações.",
+        "Mantidas as correções de notificação imediata introduzidas na 2.3.23.5.",
+        "Mantidos o modelo cumulativo, histórico de patches, correções de tema e canais Alpha/Beta.",
         "A 2.3.23.6 substitui automaticamente a 2.3.23.5 e os patches anteriores da mesma base."
       ]
     }
@@ -108,7 +109,7 @@
     },
     {
       "id": "2.3.23.5",
-      "name": "TAREFAS 2.3.23.5 — Notificação imediata de patches",
+      "name": "TAREFAS 2.3.23.5 — Reparo de catálogo e versão global",
       "baseVersion": "2.3.23.1",
       "minBuild": 270,
       "maxBuild": 270,
@@ -122,23 +123,20 @@
         "2.3.23.4"
       ],
       "installable": false,
-      "description": "Corrige o atraso das notificações de patches e evita avisos depois que o patch já começou a ser instalado ou já está instalado.",
+      "description": "Revisão de reparo da 2.3.23.5 para evitar cache do catálogo e mostrar a versão efetiva no cabeçalho de todas as abas.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.23.5.tpatch",
-      "sha256": "3f3a0413751453a6057d60c78907c354f837c6cf0607f054b50dd0a53798b6c6",
+      "sha256": "248039dcc248e497b12844ec6948f1d701030e46c4a41752216ab4166baa0cd3",
       "changelog": [
-        "Checagem de novos patches passa a rodar imediatamente ao abrir ou retomar o aplicativo.",
-        "Antes de notificar, o app consulta novamente os patches instalados para impedir aviso de uma versão que já foi aplicada.",
-        "Ao tocar em Baixar e aplicar, o patch é marcado como visto antes do download, eliminando a corrida que gerava notificação após a instalação.",
-        "A identificação do patch é reservada antes do disparo assíncrono para evitar notificações duplicadas.",
-        "Mantidos o modelo cumulativo, correções de tema, histórico de patches e canais Alpha/Beta.",
-        "A 2.3.23.5 substitui automaticamente a 2.3.23.4 e demais patches anteriores da mesma base.",
-        "O catálogo de patches passa a usar cache-busting automático para novas versões aparecerem imediatamente no Gerenciador."
+        "Catálogo e arquivos oficiais passam a ser consultados pela GitHub Contents API, com fallback sem cache.",
+        "A versão 2.3.23.5 passa a aparecer no cabeçalho de todas as abas.",
+        "Mantida a correção de notificação imediata e de aviso pós-instalação.",
+        "Este reparo existe apenas para permitir a transição confiável para a 2.3.23.6."
       ],
       "supersededBy": "2.3.23.6"
     },
     {
       "id": "2.3.23.6",
-      "name": "TAREFAS 2.3.23.6 — Teste de notificação Alpha",
+      "name": "TAREFAS 2.3.23.6 — Catálogo confiável e versão global",
       "baseVersion": "2.3.23.1",
       "minBuild": 270,
       "maxBuild": 270,
@@ -153,16 +151,17 @@
         "2.3.23.5"
       ],
       "installable": true,
-      "description": "Patch Alpha cumulativo criado para testar o aviso automático de novos patches usando a correção de notificações da 2.3.23.5.",
+      "description": "Corrige a consulta do catálogo para evitar cache do GitHub e faz a versão efetiva do patch aparecer no cabeçalho de todas as abas.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.23.6.tpatch",
-      "sha256": "f106046f807be4e828bbf95d295310efd1e1d037efd2f305d1bae2dbd8ded937",
+      "sha256": "5f0e5668b6c65fa22943eacbe29eeee825980f0a55aed6a26ca6909b9017c27d",
       "changelog": [
-        "Patch de teste para validar a notificação automática de novo patch Alpha.",
-        "Nenhuma alteração funcional adicional além do marcador de teste e avanço da versão efetiva.",
-        "Mantidas todas as correções e recursos cumulativos da 2.3.23.5.",
+        "Catálogo e arquivos oficiais passam a ser consultados pela GitHub Contents API, com fallback para raw.githubusercontent.com sem cache.",
+        "A versão efetiva 2.3.23.6 passa a aparecer no cabeçalho de todas as abas, não apenas na área de Atualizações.",
+        "Mantidas as correções de notificação imediata introduzidas na 2.3.23.5.",
+        "Mantidos o modelo cumulativo, histórico de patches, correções de tema e canais Alpha/Beta.",
         "A 2.3.23.6 substitui automaticamente a 2.3.23.5 e os patches anteriores da mesma base."
       ]
     }
   ],
-  "cacheNonce": "23236-notification-test"
+  "cacheNonce": "23236-global-version-repair"
 }
