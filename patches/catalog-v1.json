@@ -3,7 +3,7 @@
   "app": "TAREFAS",
   "baseVersion": "2.3.23.1",
   "baseBuild": 270,
-  "generatedAt": "2026-09-21T13:19:00Z",
+  "generatedAt": "2026-09-21T13:28:00Z",
   "patches": [
     {
       "id": "2.3.23.2",
@@ -19,6 +19,28 @@
         "Troca manual de tema continua disponível.",
         "Cabeçalho passa a exibir 2.3.23.2 no lugar de 2.3.22.",
         "Tela Sobre passa a refletir a versão efetiva 2.3.23.2."
+      ],
+      "channel": "alpha",
+      "publishedAt": "2026-09-21T13:19:00Z"
+    },
+    {
+      "id": "2.3.23.3",
+      "name": "TAREFAS 2.3.23.3 — Gerenciador e notificações de patches",
+      "baseVersion": "2.3.23.1",
+      "minBuild": 270,
+      "maxBuild": 270,
+      "channel": "alpha",
+      "publishedAt": "2026-09-21T13:28:00Z",
+      "description": "Move o Gerenciador de Patches para logo abaixo da atualização do aplicativo, adiciona histórico detalhado de patches e passa a avisar sobre novos patches conforme os canais Alpha/Beta ativados.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.23.3.tpatch",
+      "sha256": "2db5e7623f5845a294774009ea92d173b2c723e16e541b9fe78607a69eadffb8",
+      "changelog": [
+        "Gerenciador de Patches passa a aparecer logo abaixo de Atualização do aplicativo.",
+        "Novo Histórico de patches mostra versão, canal, estado e o que mudou em cada patch.",
+        "Patches publicados passam a possuir canal Alpha, Beta ou Oficial no catálogo.",
+        "Usuários com Alpha ativado recebem aviso de novos patches Alpha; usuários com Beta ativado recebem avisos de patches Beta.",
+        "Avisos de patches usam as preferências de atualização já existentes no TAREFAS.",
+        "A versão efetiva exibida no cabeçalho passa a ser 2.3.23.3, mantendo o APK base em 2.3.23.1 / build 270."
       ]
     }
   ]
