@@ -124,6 +124,7 @@ function clearSession(){
 function rememberToken(key,value){try{localStorage.setItem(key,String(value||Date.now()))}catch(_){}}
 function executeClientAction(action){
  if(isAdmin)return;
+ if(action==='reiniciar'){const done=Number(localStorage.getItem('tarefas_site_791_restart_completed_at')||0);if(done&&Date.now()-done<60000)return}
  if(action==='exit_users'){clearSession();location.replace('index.html?site_action=exit_users&t='+Date.now());return}
  if(action==='reiniciar'){rememberToken(KEY_RESTART,current?.restart_token);location.replace('reiniciar.html?site_action=reiniciar&t='+Date.now());return}
  if(action==='desligar'){location.replace('desligado.html?site_action=desligar&t='+Date.now());return}
