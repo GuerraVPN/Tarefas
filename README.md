@@ -2,24 +2,27 @@
 
 Gerenciador de tarefas com versão Web e aplicativo Android, usando a mesma base de dados do sistema.
 
-> Este README serve apenas como documentação do repositório no GitHub. Ele não é carregado pelo GitHub Pages e não altera a página do TAREFAS.
+> Este README serve como documentação principal do repositório no GitHub. O aplicativo e a Web possuem seus próprios canais de atualização.
 
 ## Android
 
-Os APKs públicos ficam na seção **Releases** do GitHub.
+Os APKs públicos ficam na seção **Releases** do GitHub. As versões de teste posteriores à Beta 2.4.1 podem ser entregues pelo Gerenciador de Patches `.tpatch` do próprio aplicativo.
 
 | Canal | Versão | Build | Base Web | Indicação |
 |---|---:|---:|---:|---|
-| **Release / Oficial** | **2.2.0** | 220 | 7.6.9 | Uso normal |
-| **Pré-release / Beta** | **2.3.22** | 263 | 7.8.2 | Testes e novidades antecipadas |
+| **Release / Oficial** | **2.4.0** | **274** | **7.9.1** | Uso normal |
+| **Pré-release / Beta** | **2.4.1** | **276** | **7.9.1** | Base nativa atual de testes |
+| **Alpha / Patch** | **2.4.1.3** | 276 | 7.9.1 | Testes antecipados via `.tpatch` |
 
 ### Download
 
 - [Abrir Releases](https://github.com/GuerraVPN/Tarefas/releases)
 - [Última versão oficial](https://github.com/GuerraVPN/Tarefas/releases/latest)
-- [TAREFAS 2.3.22 Beta](https://github.com/GuerraVPN/Tarefas/releases/tag/android-v2.3.22-beta)
+- [TAREFAS 2.4.0 Oficial](https://github.com/GuerraVPN/Tarefas/releases/tag/android-v2.4.0)
+- [TAREFAS 2.4.1 Beta](https://github.com/GuerraVPN/Tarefas/releases/tag/android-v2.4.1-beta)
+- [Catálogo oficial de patches](https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/catalog-v1.json)
 
-Baixe o arquivo **.apk** da versão desejada nos *Assets* da release.
+Baixe o arquivo **.apk** da versão desejada nos *Assets* da release. Para Alphas/Betas distribuídas por patch, use o **Gerenciador de Patches** dentro do TAREFAS.
 
 ## Instalação no Android
 
@@ -34,9 +37,13 @@ Ao atualizar uma instalação existente, mantenha o APK assinado do projeto para
 
 **Oficial** é o canal estável, destinado ao uso normal.
 
-**Beta** é uma prévia pública para testar recursos e correções antes de serem promovidos ao canal oficial. Pode receber mudanças com maior frequência.
+**Beta** recebe novidades antes do canal oficial. A **2.4.1 / build 276** é a base nativa atual e inclui a ponte Android necessária para recursos como o seletor de ícones.
 
-O próprio aplicativo também possui a área de atualizações e pode receber versões conforme o canal habilitado para o usuário.
+**Alpha** é destinada aos usuários elegíveis que habilitaram esse canal. A partir da base 2.4.1, as próximas Betas e Alphas podem ser entregues como **`.tpatch`**, seguindo as mesmas preferências de notificação dos canais APK.
+
+### Patch Alpha atual
+
+**2.4.1.3** — estabiliza **EXIT USERS** e **Reinício**, impedindo que tokens administrativos antigos sejam interpretados como uma ação nova quando alguém entra no site ou no aplicativo. Também preserva a correção de sincronização da versão usada nas notificações.
 
 ## Web
 
