@@ -15,7 +15,7 @@
   "changelog": [
     "Sincroniza o aparelho atual com a versão base correta 2.4.1 no cadastro de notificações push.",
     "Corrige a origem do lembrete que podia exibir uma versão inválida como 2.3.222.1.",
-    "Lembreretes antigos da 2.4.1 são marcados como lidos após a sincronização do aparelho.",
+    "Lembretes antigos da 2.4.1 são marcados como lidos após a sincronização do aparelho.",
     "O servidor passa a ocultar versões inválidas no título de futuros lembretes, usando uma mensagem genérica quando necessário.",
     "A versão efetiva do aplicativo passa a aparecer como 2.4.1.1 após a instalação do patch.",
     "Mantidos o seletor nativo de ícones, Base Web 7.9.1 e todas as funções da Beta 2.4.1."
