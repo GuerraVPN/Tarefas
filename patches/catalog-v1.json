@@ -1,10 +1,10 @@
 {
   "format": "tarefas-patch-catalog-v1",
   "app": "TAREFAS",
-  "baseVersion": "2.3.25",
-  "baseBuild": 272,
-  "generatedAt": "2026-09-21T19:19:00Z",
-  "latestPatch": "2.3.25.3",
+  "baseVersion": "2.4.1",
+  "baseBuild": 276,
+  "generatedAt": "2026-09-22T12:11:00Z",
+  "latestPatch": "2.4.1.1",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -96,6 +96,30 @@
         "Erros de outras abas continuam armazenados; o filtro não apaga histórico.",
         "A seção Filtros salvos em Ferramentas passa a mostrar Abas em diagnóstico.",
         "Mantidas as correções da 2.3.25.2 para CSS bruto e a base Web 7.9.1."
+      ]
+    },
+    {
+      "id": "2.4.1.1",
+      "name": "TAREFAS 2.4.1.1 — Correção da versão nas notificações",
+      "baseVersion": "2.4.1",
+      "minBuild": 276,
+      "maxBuild": 276,
+      "channel": "alpha",
+      "publishedAt": "2026-09-22T12:10:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [],
+      "installable": true,
+      "description": "Corrige o registro da versão do aparelho usado pelos lembretes de atualização, evitando avisos com versões inválidas como 2.3.222.1.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.1.tpatch",
+      "sha256": "cb7016c662cc3c1e04e25b0d17069fb7ebc43630394cf50646d360a1bd8aac11",
+      "changelog": [
+        "Sincroniza o aparelho atual com a versão base correta 2.4.1 no cadastro de notificações push.",
+        "Corrige a origem do lembrete que podia exibir uma versão inválida como 2.3.222.1.",
+        "Lembretes antigos da 2.4.1 são marcados como lidos após a sincronização do aparelho.",
+        "O servidor passa a ocultar versões inválidas no título de futuros lembretes, usando uma mensagem genérica quando necessário.",
+        "A versão efetiva do aplicativo passa a aparecer como 2.4.1.1 após a instalação do patch.",
+        "Mantidos o seletor nativo de ícones, Base Web 7.9.1 e todas as funções da Beta 2.4.1."
       ]
     }
   ],
@@ -585,5 +609,5 @@
       ]
     }
   ],
-  "cacheNonce": "23253-diagnostic-tabs"
+  "cacheNonce": "2411-version-notification-fix"
 }
