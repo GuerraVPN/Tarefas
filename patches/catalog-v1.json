@@ -3,8 +3,8 @@
   "app": "TAREFAS",
   "baseVersion": "2.4.1",
   "baseBuild": 276,
-  "generatedAt": "2026-09-22T19:40:00Z",
-  "latestPatch": "2.4.1.6",
+  "generatedAt": "2026-09-22T19:57:00Z",
+  "latestPatch": "2.4.1.7",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -99,13 +99,13 @@
       ]
     },
     {
-      "id": "2.4.1.6",
-      "name": "TAREFAS 2.4.1.6 — Escalas externas + IA",
+      "id": "2.4.1.7",
+      "name": "TAREFAS 2.4.1.7 — Correção de travamento das Escalas",
       "baseVersion": "2.4.1",
       "minBuild": 276,
       "maxBuild": 276,
       "channel": "alpha",
-      "publishedAt": "2026-09-22T19:35:00Z",
+      "publishedAt": "2026-09-22T19:55:00Z",
       "cumulative": true,
       "replacementMode": "replace-older-same-base",
       "replaces": [
@@ -113,19 +113,20 @@
         "2.4.1.2",
         "2.4.1.3",
         "2.4.1.4",
-        "2.4.1.5"
+        "2.4.1.5",
+        "2.4.1.6"
       ],
       "installable": true,
-      "description": "Transforma Escalas em item próprio da navegação, remove Missões e integra a IA às planilhas oficiais de Motorista, Patrulheiro e Permanência.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.6.tpatch",
-      "sha256": "7bf531f15bd8aeb7f1f650b20883726b12cf158fde275f6d08c50aec6e2e3c75",
+      "description": "Corrige o travamento causado pela atualização contínua do menu de Escalas na Alpha 2.4.1.6.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.7.tpatch",
+      "sha256": "34e654064ee8e0ea2bff01764a247e63bc556288f3224d6077073ec233aec84f",
       "changelog": [
-        "Escalas agora aparece como item próprio no menu, sem o caminho Pessoal/Escalas.",
-        "Remove a aba/link de Missões da navegação.",
-        "Mantém apenas as escalas externas de Motorista, Patrulheiro e Permanência.",
-        "A IA passa a consultar em modo somente leitura a aba Previsão das três planilhas oficiais.",
-        "Remove Escala de Serviço e Missões antigas do contexto consultável pela IA.",
-        "Perguntas sobre motorista, patrulheiro e permanência passam a usar os dados das planilhas.",
+        "Corrige o travamento geral introduzido na 2.4.1.6.",
+        "Remove o observador de DOM que recriava o menu de Escalas em loop contínuo.",
+        "Escalas continua como item próprio do menu, fora de Pessoal.",
+        "Mantém Motorista, Patrulheiro e Permanência com os três links oficiais.",
+        "Mantém Missões removida da navegação.",
+        "Mantém a IA consultando as três planilhas em modo somente leitura.",
         "Mantém as correções cumulativas das Alphas anteriores."
       ]
     }
@@ -753,7 +754,39 @@
         "Preserva Férias/Dispensas, Usuários, Base Web 7.9.1 e todas as funções da Beta 2.4.1."
       ],
       "supersededBy": "2.4.1.6"
+    },
+    {
+      "id": "2.4.1.6",
+      "name": "TAREFAS 2.4.1.6 — Escalas externas + IA",
+      "baseVersion": "2.4.1",
+      "minBuild": 276,
+      "maxBuild": 276,
+      "channel": "alpha",
+      "publishedAt": "2026-09-22T19:35:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.4.1.1",
+        "2.4.1.2",
+        "2.4.1.3",
+        "2.4.1.4",
+        "2.4.1.5"
+      ],
+      "installable": false,
+      "description": "Transforma Escalas em item próprio da navegação, remove Missões e integra a IA às planilhas oficiais de Motorista, Patrulheiro e Permanência. RETIRADO: causava travamento por loop de MutationObserver.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.6.tpatch",
+      "sha256": "7bf531f15bd8aeb7f1f650b20883726b12cf158fde275f6d08c50aec6e2e3c75",
+      "changelog": [
+        "Escalas agora aparece como item próprio no menu, sem o caminho Pessoal/Escalas.",
+        "Remove a aba/link de Missões da navegação.",
+        "Mantém apenas as escalas externas de Motorista, Patrulheiro e Permanência.",
+        "A IA passa a consultar em modo somente leitura a aba Previsão das três planilhas oficiais.",
+        "Remove Escala de Serviço e Missões antigas do contexto consultável pela IA.",
+        "Perguntas sobre motorista, patrulheiro e permanência passam a usar os dados das planilhas.",
+        "Mantém as correções cumulativas das Alphas anteriores."
+      ],
+      "supersededBy": "2.4.1.7"
     }
   ],
-  "cacheNonce": "2416-scales-nav-ai-r2"
+  "cacheNonce": "2417-freeze-fix"
 }
