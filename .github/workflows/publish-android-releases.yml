@@ -19,67 +19,70 @@ jobs:
         run: |
           set -euo pipefail
 
-          curl --fail --location --retry 5             'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.2.0.apk'             -o TAREFAS-2.2.0.apk
+          curl --fail --location --retry 5 \
+            'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.4.0.apk' \
+            -o TAREFAS-2.4.0.apk
 
-          curl --fail --location --retry 5             'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.3.22.apk'             -o TAREFAS-2.3.22-beta.apk
+          curl --fail --location --retry 5 \
+            'https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.4.1.apk' \
+            -o TAREFAS-2.4.1-beta.apk
 
-          test -s TAREFAS-2.2.0.apk
-          test -s TAREFAS-2.3.22-beta.apk
+          test -s TAREFAS-2.4.0.apk
+          test -s TAREFAS-2.4.1-beta.apk
 
-          sha256sum TAREFAS-2.2.0.apk > TAREFAS-2.2.0.apk.sha256
-          sha256sum TAREFAS-2.3.22-beta.apk > TAREFAS-2.3.22-beta.apk.sha256
+          sha256sum TAREFAS-2.4.0.apk > TAREFAS-2.4.0.apk.sha256
+          sha256sum TAREFAS-2.4.1-beta.apk > TAREFAS-2.4.1-beta.apk.sha256
 
-          unzip -tq TAREFAS-2.2.0.apk
-          unzip -tq TAREFAS-2.3.22-beta.apk
+          unzip -tq TAREFAS-2.4.0.apk
+          unzip -tq TAREFAS-2.4.1-beta.apk
 
       - name: Preparar notas das releases
         shell: bash
         run: |
           cat > stable-notes.md <<'EOF'
-          ## TAREFAS Android 2.2.0 — Release Oficial
+          ## TAREFAS Android 2.4.0 — Release Oficial
 
-          Versão estável para uso normal.
+          Versão estável atual para uso normal.
 
-          **Build:** 220  
+          **Build:** 274  
           **Canal:** Oficial  
-          **Base Web:** 7.6.9
+          **Base Web:** 7.9.1
 
           ### Destaques
-          - Base oficial do aplicativo Android 2.2.
-          - Sincronização com a base Web aprovada.
-          - Atualização cadastral obrigatória integrada ao fluxo do aplicativo.
-          - Mantém o canal oficial de atualizações.
+          - Consolida a linha de desenvolvimento 2.3.x.
+          - Base Web 7.9.1 integrada.
+          - Central 2.0, favoritos, filtros avançados e melhorias de diagnóstico.
+          - Patch Manager .tpatch v1 integrado.
+          - Biometria ajustada para novo início real do app.
+          - Correções de estabilidade, navegação, notificações e sincronização.
 
           ### Arquivos
-          Baixe **TAREFAS-2.2.0.apk** nos Assets abaixo.  
+          Baixe **TAREFAS-2.4.0.apk** nos Assets abaixo.  
           O arquivo **.sha256** pode ser usado para conferir a integridade do APK.
           EOF
 
           cat > beta-notes.md <<'EOF'
-          ## TAREFAS Android 2.3.22 — Beta
+          ## TAREFAS Android 2.4.1 — Beta
 
-          Pré-release pública para testes antes da promoção ao canal oficial.
+          Base Beta nativa atual.
 
-          **Build:** 263  
+          **Build:** 276  
           **Canal:** Beta  
-          **Base Web:** 7.8.2
+          **Base Web:** 7.9.1
 
           ### Destaques
-          - Consolidação do ciclo 2.3.21.x.
-          - Login por biometria no Android.
-          - Assistente IA integrado ao perfil e às permissões reais do usuário.
-          - Correções no carregamento e salvamento das Configurações.
-          - Melhor sincronização das notificações Android/TAREFAS.
-          - Correções na criação e vinculação de tarefas pela IA.
-          - Downloads com confirmação e tentativa de abertura automática.
-          - Melhor tratamento de anexos e arquivos no aplicativo.
-          - Mantidas as validações de sessão, perfil ativo e confirmação antes de escritas da IA.
+          - Adiciona a ponte nativa Android para o seletor de ícones.
+          - Corrige o ícone padrão do APK.
+          - Permite usar TAREFAS Azul, Militar, Preto & Ouro, Sistema e o ícone/foto do perfil no atalho da tela inicial.
+          - Mantém o Patch Manager .tpatch v1.
+          - A partir desta base, próximas Betas e Alphas podem ser distribuídas como patches pelo próprio aplicativo.
+          - Mantém todas as funções e correções da Oficial 2.4.0.
 
           ### Arquivos
-          Baixe **TAREFAS-2.3.22-beta.apk** nos Assets abaixo.  
+          Baixe **TAREFAS-2.4.1-beta.apk** nos Assets abaixo.  
           O arquivo **.sha256** pode ser usado para conferir a integridade do APK.
 
-          > Esta versão é Beta e pode receber alterações antes de virar uma versão oficial.
+          > Esta versão é Beta e pode receber patches Alpha/Beta antes da próxima promoção oficial.
           EOF
 
       - name: Publicar Release oficial
@@ -88,13 +91,28 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          TAG='android-v2.2.0'
+          TAG='android-v2.4.0'
 
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release upload "$TAG"               TAREFAS-2.2.0.apk               TAREFAS-2.2.0.apk.sha256               --clobber               --repo "$GITHUB_REPOSITORY"
-            gh release edit "$TAG"               --title 'TAREFAS Android 2.2.0 — Oficial'               --notes-file stable-notes.md               --latest               --repo "$GITHUB_REPOSITORY"
+            gh release upload "$TAG" \
+              TAREFAS-2.4.0.apk \
+              TAREFAS-2.4.0.apk.sha256 \
+              --clobber \
+              --repo "$GITHUB_REPOSITORY"
+            gh release edit "$TAG" \
+              --title 'TAREFAS Android 2.4.0 — Oficial' \
+              --notes-file stable-notes.md \
+              --latest \
+              --repo "$GITHUB_REPOSITORY"
           else
-            gh release create "$TAG"               TAREFAS-2.2.0.apk               TAREFAS-2.2.0.apk.sha256               --target 'app/android-v220-prep'               --title 'TAREFAS Android 2.2.0 — Oficial'               --notes-file stable-notes.md               --latest               --repo "$GITHUB_REPOSITORY"
+            gh release create "$TAG" \
+              TAREFAS-2.4.0.apk \
+              TAREFAS-2.4.0.apk.sha256 \
+              --target 'app/android-v240-prep' \
+              --title 'TAREFAS Android 2.4.0 — Oficial' \
+              --notes-file stable-notes.md \
+              --latest \
+              --repo "$GITHUB_REPOSITORY"
           fi
 
       - name: Publicar Pré-release Beta
@@ -103,11 +121,26 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          TAG='android-v2.3.22-beta'
+          TAG='android-v2.4.1-beta'
 
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release upload "$TAG"               TAREFAS-2.3.22-beta.apk               TAREFAS-2.3.22-beta.apk.sha256               --clobber               --repo "$GITHUB_REPOSITORY"
-            gh release edit "$TAG"               --title 'TAREFAS Android 2.3.22 — Beta'               --notes-file beta-notes.md               --prerelease               --repo "$GITHUB_REPOSITORY"
+            gh release upload "$TAG" \
+              TAREFAS-2.4.1-beta.apk \
+              TAREFAS-2.4.1-beta.apk.sha256 \
+              --clobber \
+              --repo "$GITHUB_REPOSITORY"
+            gh release edit "$TAG" \
+              --title 'TAREFAS Android 2.4.1 — Beta' \
+              --notes-file beta-notes.md \
+              --prerelease \
+              --repo "$GITHUB_REPOSITORY"
           else
-            gh release create "$TAG"               TAREFAS-2.3.22-beta.apk               TAREFAS-2.3.22-beta.apk.sha256               --target 'app/android-v2322-prep'               --title 'TAREFAS Android 2.3.22 — Beta'               --notes-file beta-notes.md               --prerelease               --repo "$GITHUB_REPOSITORY"
+            gh release create "$TAG" \
+              TAREFAS-2.4.1-beta.apk \
+              TAREFAS-2.4.1-beta.apk.sha256 \
+              --target 'beta-2.4.1' \
+              --title 'TAREFAS Android 2.4.1 — Beta' \
+              --notes-file beta-notes.md \
+              --prerelease \
+              --repo "$GITHUB_REPOSITORY"
           fi
