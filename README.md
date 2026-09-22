@@ -12,7 +12,7 @@ Os APKs públicos ficam na seção **Releases** do GitHub. As versões de teste 
 |---|---:|---:|---:|---|
 | **Release / Oficial** | **2.4.0** | **274** | **7.9.1** | Uso normal |
 | **Pré-release / Beta** | **2.4.1** | **276** | **7.9.1** | Base nativa atual de testes |
-| **Alpha / Patch** | **2.4.1.3** | 276 | 7.9.1 | Testes antecipados via `.tpatch` |
+| **Alpha / Patch** | **2.4.1.4** | 276 | 7.9.1 | Testes antecipados via `.tpatch` |
 
 ### Download
 
@@ -43,7 +43,7 @@ Ao atualizar uma instalação existente, mantenha o APK assinado do projeto para
 
 ### Patch Alpha atual
 
-**2.4.1.3** — estabiliza **EXIT USERS** e **Reinício**, impedindo que tokens administrativos antigos sejam interpretados como uma ação nova quando alguém entra no site ou no aplicativo. Também preserva a correção de sincronização da versão usada nas notificações.
+**2.4.1.4** — corrige o **login/biometria sendo solicitado duas vezes** após uma autenticação já concluída. Também mantém as correções de **EXIT USERS**, **Reinício** e sincronização da versão usadas nas notificações.
 
 ## Web
 
