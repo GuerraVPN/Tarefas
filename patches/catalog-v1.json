@@ -3,7 +3,7 @@
   "app": "TAREFAS",
   "baseVersion": "2.4.1",
   "baseBuild": 276,
-  "generatedAt": "2026-09-22T19:37:00Z",
+  "generatedAt": "2026-09-22T19:40:00Z",
   "latestPatch": "2.4.1.6",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
@@ -118,7 +118,7 @@
       "installable": true,
       "description": "Transforma Escalas em item próprio da navegação, remove Missões e integra a IA às planilhas oficiais de Motorista, Patrulheiro e Permanência.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.6.tpatch",
-      "sha256": "c9c9ba2bcb6da85530a0d39582640efdfcef8dac7bef6c633c8d3da5c835de02",
+      "sha256": "7bf531f15bd8aeb7f1f650b20883726b12cf158fde275f6d08c50aec6e2e3c75",
       "changelog": [
         "Escalas agora aparece como item próprio no menu, sem o caminho Pessoal/Escalas.",
         "Remove a aba/link de Missões da navegação.",
@@ -755,5 +755,5 @@
       "supersededBy": "2.4.1.6"
     }
   ],
-  "cacheNonce": "2416-scales-nav-ai"
+  "cacheNonce": "2416-scales-nav-ai-r2"
 }
