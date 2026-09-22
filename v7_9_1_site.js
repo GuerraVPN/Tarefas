@@ -132,7 +132,14 @@ function executeClientAction(action){
 function processTokens(){
  if(!current||isAdmin)return;
  const exit=Number(current.exit_token||0),restart=Number(current.restart_token||0);
- const seenE=Number(localStorage.getItem(KEY_EXIT)||0),seenR=Number(localStorage.getItem(KEY_RESTART)||0);
+ const rawE=localStorage.getItem(KEY_EXIT),rawR=localStorage.getItem(KEY_RESTART);
+ let seenE=Number(rawE||0),seenR=Number(rawR||0);
+
+ // Um navegador/app novo não pode interpretar tokens históricos como uma ação nova.
+ // Na primeira leitura, sem ação pendente correspondente, adota o estado atual como baseline.
+ if(rawE===null&&current.acao_pendente!=='exit_users'){rememberToken(KEY_EXIT,exit);seenE=exit}
+ if(rawR===null&&current.acao_pendente!=='reiniciar'){rememberToken(KEY_RESTART,restart);seenR=restart}
+
  if(exit>seenE){rememberToken(KEY_EXIT,exit);clearSession();location.replace('index.html?site_action=exit_users&t='+Date.now());return}
  if(current.modo==='desligado'&&page()!=='desligado.html'){location.replace('desligado.html?site_action=desligar&t='+Date.now());return}
  if(restart>seenR){rememberToken(KEY_RESTART,restart);if(page()!=='reiniciar.html')location.replace('reiniciar.html?site_action=reiniciar&t='+Date.now())}
