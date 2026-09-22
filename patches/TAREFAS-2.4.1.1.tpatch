@@ -1,0 +1,29 @@
+{
+  "format": "tarefas-tpatch-v1",
+  "id": "2.4.1.1",
+  "name": "TAREFAS 2.4.1.1 — Correção da versão nas notificações",
+  "patchVersion": 1,
+  "createdAt": "2026-09-22T12:10:00Z",
+  "baseVersion": "2.4.1",
+  "minBuild": 276,
+  "maxBuild": 276,
+  "channel": "alpha",
+  "cumulative": true,
+  "replacementMode": "replace-older-same-base",
+  "replaces": [],
+  "description": "Corrige o registro da versão do aparelho usado pelos lembretes de atualização, evitando avisos com versões inválidas como 2.3.222.1.",
+  "changelog": [
+    "Sincroniza o aparelho atual com a versão base correta 2.4.1 no cadastro de notificações push.",
+    "Corrige a origem do lembrete que podia exibir uma versão inválida como 2.3.222.1.",
+    "Lembreretes antigos da 2.4.1 são marcados como lidos após a sincronização do aparelho.",
+    "O servidor passa a ocultar versões inválidas no título de futuros lembretes, usando uma mensagem genérica quando necessário.",
+    "A versão efetiva do aplicativo passa a aparecer como 2.4.1.1 após a instalação do patch.",
+    "Mantidos o seletor nativo de ícones, Base Web 7.9.1 e todas as funções da Beta 2.4.1."
+  ],
+  "order": 241101,
+  "payload": {
+    "js": "(()=>{\n'use strict';\n\nconst PATCH_VERSION='2.4.1.1';\nconst BASE_VERSION='2.4.1';\nconst BASE_BUILD=276;\nconst WEB_VERSION='7.9.1';\nconst MARK='__TAREFAS_ALPHA_2411_VERSION_SYNC__';\nconst SYNC_KEY='tarefas2411VersionSyncAt';\n\nif(globalThis[MARK])return;\nglobalThis[MARK]=true;\n\nglobalThis.__TAREFAS_EFFECTIVE_VERSION__=PATCH_VERSION;\nglobalThis.__TAREFAS_WEB_BASE_VERSION__=WEB_VERSION;\ndocument.documentElement.dataset.tarefasEffectiveVersion=PATCH_VERSION;\ndocument.documentElement.dataset.tarefasWebVersion=WEB_VERSION;\n\nconst getClient=()=>{try{return typeof supabaseClient!=='undefined'?supabaseClient:null}catch(_){return null}};\nconst sessionToken=()=>String(localStorage.getItem('tarefasPushSession17')||'').trim();\n\nfunction applyLabels(){\n  try{\n    document.querySelectorAll('.tm-app-brand small').forEach(el=>{\n      const wanted=PATCH_VERSION+' • WEB '+WEB_VERSION;\n      if(el.textContent.trim()!==wanted)el.textContent=wanted;\n    });\n    document.querySelectorAll('[data-tarefas-version],[data-app-version],.tm-about-version').forEach(el=>{\n      const text=String(el.textContent||'');\n      if(!text||text.length>160)return;\n      let next=text\n        .replace(/\\b2\\.4\\.1\\b/g,PATCH_VERSION)\n        .replace(/\\b2\\.3\\.222\\.1\\b/g,BASE_VERSION);\n      if(next!==text)el.textContent=next;\n    });\n  }catch(_){}\n}\n\nlet syncing=null;\nasync function syncRegisteredVersion({force=false}={}){\n  if(syncing)return syncing;\n  syncing=(async()=>{\n    const token=sessionToken();\n    const client=getClient();\n    if(!token||token.length<32||!client)return false;\n\n    if(!force){\n      const last=Number(localStorage.getItem(SYNC_KEY)||0);\n      if(last&&Date.now()-last<5*60*1000)return true;\n    }\n\n    const {data,error}=await client.rpc('v2_4_1_1_sync_app_version',{\n      p_session_token:token,\n      p_app_version:BASE_VERSION\n    });\n    if(error)throw error;\n    if(data!==true)return false;\n\n    localStorage.setItem(SYNC_KEY,String(Date.now()));\n    window.dispatchEvent(new CustomEvent('tarefas:app-version-synced',{\n      detail:{baseVersion:BASE_VERSION,effectiveVersion:PATCH_VERSION,build:BASE_BUILD}\n    }));\n    window.dispatchEvent(new CustomEvent('v6:notificacoes:update'));\n    return true;\n  })().catch(err=>{\n    console.warn('[TAREFAS 2.4.1.1] Falha ao sincronizar versão do aparelho:',err?.message||err);\n    return false;\n  }).finally(()=>{syncing=null});\n  return syncing;\n}\n\nfunction scheduleSync(force=false){\n  setTimeout(()=>syncRegisteredVersion({force}),250);\n}\n\napplyLabels();\nscheduleSync(true);\n\nwindow.addEventListener('pageshow',()=>{applyLabels();scheduleSync(false)});\nwindow.addEventListener('focus',()=>{applyLabels();scheduleSync(false)});\nwindow.addEventListener('tarefas:push-session-ready',()=>scheduleSync(true));\nwindow.addEventListener('tarefas:push-status',event=>{\n  if(event?.detail?.ready===true)scheduleSync(true);\n});\ndocument.addEventListener('visibilitychange',()=>{\n  if(!document.hidden){applyLabels();scheduleSync(false)}\n});\n\nconst observer=new MutationObserver(records=>{\n  for(const record of records){\n    for(const node of record.addedNodes){\n      if(node.nodeType!==1)continue;\n      if(node.matches?.('.tm-app-brand,.tm-about-version,[data-tarefas-version],[data-app-version]')||\n         node.querySelector?.('.tm-app-brand,.tm-about-version,[data-tarefas-version],[data-app-version]')){\n        queueMicrotask(applyLabels);\n        return;\n      }\n    }\n  }\n});\nobserver.observe(document.body,{childList:true,subtree:true});\n\nglobalThis.TarefasAlpha2411=Object.freeze({\n  patchVersion:PATCH_VERSION,\n  baseVersion:BASE_VERSION,\n  build:BASE_BUILD,\n  webVersion:WEB_VERSION,\n  sync:()=>syncRegisteredVersion({force:true}),\n  refresh:applyLabels\n});\n})();",
+    "css": ""
+  },
+  "payloadSha256": "8c71099ac4bfde728b4e56f3c8ec35c2e4ff7446c6eddaf6deedbfa82d0d3596"
+}
