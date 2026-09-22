@@ -12,7 +12,7 @@ Os APKs públicos ficam na seção **Releases** do GitHub. As versões de teste 
 |---|---:|---:|---:|---|
 | **Release / Oficial** | **2.4.0** | **274** | **7.9.1** | Uso normal |
 | **Pré-release / Beta** | **2.4.1** | **276** | **7.9.1** | Base nativa atual de testes |
-| **Alpha / Patch** | **2.4.1.5** | 276 | 7.9.1 | Testes antecipados via `.tpatch` |
+| **Alpha / Patch** | **2.4.1.6** | 276 | 7.9.1 | Testes antecipados via `.tpatch` |
 
 ### Download
 
@@ -43,7 +43,7 @@ Ao atualizar uma instalação existente, mantenha o APK assinado do projeto para
 
 ### Patch Alpha atual
 
-**2.4.1.5** — substitui as antigas **Escala de serviço** e **Escala de missão** por links oficiais das escalas de **Motorista**, **Patrulheiro** e **Permanência** no Google Planilhas. Também mantém a correção de login biométrico duplicado e as correções anteriores.
+**2.4.1.6** — coloca **Escalas** como item próprio do menu, remove **Missões**, mantém apenas **Motorista**, **Patrulheiro** e **Permanência** e integra a IA às abas **Previsão** das três planilhas em modo somente leitura. Também mantém a correção de login biométrico duplicado e as correções anteriores.
 
 ## Web
 
