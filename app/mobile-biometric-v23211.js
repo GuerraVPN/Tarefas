@@ -6,6 +6,9 @@
   const SESSION_KEY = 'tarefasPushSession17';
   const USER_KEY = 'usuarioLogado';
   const ACTIVITY_KEY = 'sessao26_ultima_atividade';
+  const PROCESS_SESSION_KEY = 'tarefasSecureProcessSessionV1';
+  const SECURE_UNLOCK_KEY = 'tarefasSecureUnlocked23249';
+  const SECURE_LOCK_KEY = 'tarefasSecureLockRequired23249';
   let settingsRendering = false;
   const page = () => (location.pathname.split('/').pop() || 'index.html').toLowerCase();
   const api = () => window.TarefasNative?.biometric || null;
@@ -48,6 +51,15 @@
     return biometric.enable({ sessionToken: String(sessionToken || '') });
   }
 
+  function markCurrentAppSessionUnlocked(source = 'login') {
+    try {
+      sessionStorage.setItem(PROCESS_SESSION_KEY, '1');
+      sessionStorage.setItem(SECURE_UNLOCK_KEY, '1');
+      sessionStorage.removeItem(SECURE_LOCK_KEY);
+    } catch (_) {}
+    window.dispatchEvent(new CustomEvent('tarefas:secure-unlocked', { detail: { source, at: Date.now() } }));
+  }
+
   function saveSession(sessionToken, currentUser) {
     localStorage.setItem(SESSION_KEY, String(sessionToken));
     localStorage.setItem(USER_KEY, JSON.stringify({
@@ -80,6 +92,7 @@
         throw new Error('A sessão biométrica expirou. Entre novamente com CPF e senha.');
       }
       saveSession(sessionToken, currentUser);
+      markCurrentAppSessionUnlocked('biometric-login');
       location.replace('dashboard.html');
     } catch (error) {
       if (!canceled(error)) alert(error?.message || String(error));
@@ -141,6 +154,7 @@
 
   window.TarefasBiometricLogin = Object.freeze({
     async afterPasswordLogin({ sessionToken }) {
+      markCurrentAppSessionUnlocked('password-login');
       const checkbox = document.getElementById('tmEnableBiometric');
       if (!checkbox?.checked) return false;
       try {
