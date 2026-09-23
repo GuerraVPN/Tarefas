@@ -28,6 +28,7 @@ rm -rf "$GITHUB_WORKSPACE/dist"
 cp -a "$BASE_DIR/dist" "$GITHUB_WORKSPACE/dist"
 
 node scripts/build-mobile-v240.mjs
+node scripts/build-mobile-v242.mjs
 node scripts/build-mobile-v243.mjs
 node scripts/verify-mobile-v243.mjs dist
 
