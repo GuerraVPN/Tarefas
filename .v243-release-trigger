@@ -1,1 +1,1 @@
-release=2.4.3-build-278\nstatus=ready-to-build\ntrigger=workflow-registered-on-main\n
+release=2.4.3-build-278\nstatus=ready-to-build\ntrigger=build-script-fixed\n
