@@ -18,7 +18,7 @@ on:
       - '.github/workflows/android-v244-beta.yml'
 
 concurrency:
-  group: android-v244-beta
+  group: android-v244-beta-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:
