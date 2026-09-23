@@ -36,7 +36,16 @@ jobs:
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: '21'      - name: Compilar, validar, assinar e publicar 2.4.4 Beta
+          java-version: '21'      - name: Diagnóstico SHA interno 2.4.5.1
+        run: |
+          node - <<'NODE'
+          const fs=require('fs'), crypto=require('crypto');
+          const p=JSON.parse(fs.readFileSync('patches/TAREFAS-2.4.5.1.tpatch','utf8'));
+          const t=JSON.stringify({js:String(p?.payload?.js||''),css:String(p?.payload?.css||'')});
+          console.log('INTERNAL_PAYLOAD_SHA256='+crypto.createHash('sha256').update(t,'utf8').digest('hex'));
+          console.log('DECLARED_PAYLOAD_SHA256='+p.payloadSha256);
+          NODE
+      - name: Compilar, validar, assinar e publicar 2.4.4 Beta
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
