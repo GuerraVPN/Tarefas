@@ -1,5 +1,6 @@
 release=2.4.4-build-279
 status=ready-to-build
+pr-trigger=verification
 trigger=alpha-2.4.3.6-consolidation
 
 dispatch=main-workflow-ready
