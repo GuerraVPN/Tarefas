@@ -57,5 +57,5 @@ jobs:
             TAREFAS-2.4.2-beta-build-277.zip
             TAREFAS-2.4.2-beta-build-277.zip.sha256
             app/release-v242.txt
-            dist/BETA_2_4_1.json
+            dist/BETA_2_4_2.json
           if-no-files-found: error
