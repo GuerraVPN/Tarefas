@@ -1,0 +1,30 @@
+{
+  "format": "tarefas-tpatch-v1",
+  "id": "2.4.5.1",
+  "name": "TAREFAS 2.4.5.1 — Correção do histórico e remoção do Próximo Serviço",
+  "patchVersion": 1,
+  "createdAt": "2026-09-23T22:16:51.867Z",
+  "baseVersion": "2.4.5",
+  "minBuild": 280,
+  "maxBuild": 280,
+  "channel": "alpha",
+  "cumulative": true,
+  "replacementMode": "replace-older-same-base",
+  "replaces": [],
+  "description": "Corrige a descrição repetida da Beta 2.4.1 no histórico de versões e remove novamente o card Próximo Serviço da tela inicial.",
+  "changelog": [
+    "Corrige o histórico para que as descrições das versões 2.4.1, 2.4.2, 2.4.3 e 2.4.5 não sejam reutilizadas como se fossem a mesma descrição.",
+    "Remove novamente o card Próximo Serviço da tela inicial.",
+    "Patch cumulativo compatível com a Beta 2.4.5/build 280.",
+    "Não altera Escalas, Patch Manager ou outras funções da 2.4.5."
+  ],
+  "order": 24501,
+  "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.5.1.tpatch",
+  "sha256": "3ba9bf3032d97fb91fe82b292c9fa48ba946321c682c490ba8e0b8383400e879",
+  "installable": true,
+  "payload": {
+    "js": "(()=>{'use strict';\nconst MARK='__TAREFAS_ALPHA_2451_PATCH__';if(globalThis[MARK])return;globalThis[MARK]=true;\nfunction removeNext(){\n  for(const e of document.querySelectorAll('#kNextServiceCard,#kNextService,.tm-next-service-kpi,[data-tarefas-next-service],[data-next-service],.next-service-card'))e.remove();\n  for(const el of document.querySelectorAll('h1,h2,h3,h4,h5,h6,strong,b,p,span,button,a')){\n    if(!el.children.length&&String(el.textContent||'').normalize('NFD').replace(/[̀-ͯ]/g,'').trim().toLowerCase()==='proximo servico'){\n      const c=el.closest('.tm-next-service-kpi,#kNextServiceCard,#kNextService,.dashboard-card,.v4-card,.card,article,section');if(c)c.remove();\n    }\n  }\n}\nfunction fixVersionHistory(){\n  try{\n    const current='2.4.5.1';\n    globalThis.__TAREFAS_RELEASE_HISTORY_FIX_2451__=Object.freeze({\n      current,\n      descriptions:{\n        '2.4.1':'TAREFAS 2.4.1 Beta — Seletor de ícones',\n        '2.4.2':'TAREFAS 2.4.2 Beta — Consolidação do Patch Manager',\n        '2.4.3':'TAREFAS 2.4.3 Beta — Base consolidada',\n        '2.4.5':'TAREFAS 2.4.5 Beta — Base 2.4.3 validada',\n        '2.4.5.1':'TAREFAS 2.4.5.1 Alpha — Correção de histórico e remoção do Próximo Serviço'\n      }\n    });\n    for(const el of document.querySelectorAll('[data-version-description],[data-release-description],.version-description,.release-description')){\n      const v=String(el.dataset.version||el.dataset.releaseVersion||'');\n      if(globalThis.__TAREFAS_RELEASE_HISTORY_FIX_2451__.descriptions[v])el.textContent=globalThis.__TAREFAS_RELEASE_HISTORY_FIX_2451__.descriptions[v];\n    }\n  }catch(_){}\n}\nfunction boot(){removeNext();fixVersionHistory();let n=0;const tm=setInterval(()=>{removeNext();fixVersionHistory();if(++n>80)clearInterval(tm)},250);window.addEventListener('focus',removeNext);window.addEventListener('pageshow',removeNext)}\nboot();new MutationObserver(removeNext).observe(document.documentElement,{childList:true,subtree:true});\nglobalThis.TarefasAlpha2451Patch=Object.freeze({version:'2.4.5.1',base:'2.4.5',removeNextService:true,historyDescriptionsFixed:true});\n})();",
+    "css": ""
+  },
+  "payloadSha256": "3ba9bf3032d97fb91fe82b292c9fa48ba946321c682c490ba8e0b8383400e879"
+}
