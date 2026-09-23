@@ -1,0 +1,59 @@
+name: Android 2.4.4 Beta - Patch Consolidation
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [app/android-v244-prep]
+  pull_request:
+    branches: [main, app/releases]
+    paths:
+      - '.v244-release-trigger'
+      - 'app/android/TarefasLauncherIconPlugin.java'
+      - 'app/mobile-launcher-icon-v241.js'
+      - 'app/mobile-alpha-v2436-consolidated.js'
+      - 'app/release-v244.txt'
+      - 'scripts/build-mobile-v244.mjs'
+      - 'scripts/verify-mobile-v244.mjs'
+      - 'scripts/release-mobile-v244.sh'
+      - '.github/workflows/dispatch-android-v244-beta.yml'
+      - '.github/workflows/android-v244-beta.yml'
+
+concurrency:
+  group: android-v244-beta
+  cancel-in-progress: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Compilar, validar, assinar e publicar 2.4.4 Beta
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          chmod +x scripts/release-mobile-v244.sh
+          scripts/release-mobile-v244.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tarefas-android-2.4.4-beta-build-279
+          path: |
+            TAREFAS-2.4.4.apk
+            TAREFAS-2.4.4.apk.sha256
+            TAREFAS-2.4.4-beta-build-279.zip
+            TAREFAS-2.4.4-beta-build-279.zip.sha256
+            app/release-v244.txt
+            dist/BETA_2_4_4.json
+          if-no-files-found: error
