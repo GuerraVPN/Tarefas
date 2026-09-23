@@ -11,6 +11,7 @@ async function patch(rel,fn,{required=true}={}){
 }
 
 await copyFile(path.join(root,'app/mobile-launcher-icon-v241.js'),path.join(dist,'mobile-launcher-icon-v241.js'));
+await copyFile(path.join(root,'app/mobile-alpha-v2436-consolidated.js'),path.join(dist,'mobile-alpha-v2436-consolidated.js'));
 
 const special=new Set(['reiniciar.html','desligado.html']);
 for(const name of await readdir(dist)){
@@ -21,7 +22,8 @@ for(const name of await readdir(dist)){
   source=source.replaceAll('2.4.0-b274','2.4.4-b279').replaceAll('2.4.2-b277','2.4.4-b279');
   if(!special.has(name.toLowerCase())){
     const tag='<script src="mobile-launcher-icon-v241.js?v='+VERSION+'-b'+BUILD+'"></script>';
-    source=source.includes('</body>')?source.replace('</body>',tag+'\n</body>'):source+'\n'+tag;
+    const scaleTag='<script src="mobile-alpha-v2436-consolidated.js?v='+VERSION+'-b'+BUILD+'"></script>';
+    source=source.includes('</body>')?source.replace('</body>',tag+'\n'+scaleTag+'\n</body>'):source+'\n'+tag+'\n'+scaleTag;
   }
   await writeFile(file,source,'utf8');
 }
@@ -115,10 +117,10 @@ await patch('mobile-release-v240.js',source=>{
 
 await rm(path.join(dist,'RELEASE_2_4_0.json'),{force:true});
 await rm(path.join(dist,'BETA_2_4_2.json'),{force:true});
-await writeFile(path.join(dist,'BETA_2_4_3.json'),JSON.stringify({
+await writeFile(path.join(dist,'BETA_2_4_4.json'),JSON.stringify({
   version:VERSION,build:BUILD,channel:'beta',base:'2.4.2',webVersion:WEB_VERSION,generatedAt:new Date().toISOString(),
   futureDelivery:{beta:'tpatch',alpha:'tpatch',betaNotifications:'same-apk-beta-preference',alphaNotifications:'same-apk-alpha-preference'},
   features:{launcherIconSelector:true,launcherNativeBridge:true,profileAvatarAsHomeIcon:true,launcherPresetBlue:true,launcherPresetMilitary:true,launcherPresetGold:true,launcherPresetSystem:true,defaultLauncherIconFixed:true,patchManager:true,patchBetaChannelUsesApkPreference:true,patchAlphaChannelUsesApkPreference:true,web791:true,biometricColdStartOnly:true,diagnosticTabs:true,drawerScalesOnly:true,officialPatchSha256Bytes:true}
 },null,2)+'\n','utf8');
 
-console.log('TAREFAS Android '+VERSION+' build '+BUILD+' BETA: base consolidada com patches 2.4.1.8–2.4.1.12, menu Escalas e ponte nativa de ícones.');
+console.log('TAREFAS Android '+VERSION+' build '+BUILD+' BETA: base consolidada com Alpha 2.4.3.6, Escalas via Supabase e limpeza do Próximo Serviço.');
