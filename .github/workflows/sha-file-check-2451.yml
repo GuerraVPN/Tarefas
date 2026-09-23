@@ -1,0 +1,21 @@
+name: SHA file check 2.4.5.1
+on:
+  push:
+    branches: [diagnostic/sha-file-check]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: Hash patch
+        run: |
+          set -euo pipefail
+          git fetch origin app/releases
+          git checkout --detach origin/app/releases
+          echo "COMMIT=$(git rev-parse HEAD)"
+          wc -c < patches/TAREFAS-2.4.5.1.tpatch
+          sha256sum patches/TAREFAS-2.4.5.1.tpatch
+          grep -o '"payloadSha256": "[0-9a-f]*"' patches/TAREFAS-2.4.5.1.tpatch
