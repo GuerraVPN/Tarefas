@@ -136,7 +136,7 @@ unzip -p "$UNSIGNED" assets/public/mobile-patch-manager-v240.js > "$RUNNER_TEMP/
 unzip -p "$UNSIGNED" assets/public/mobile-updates-v181.js > "$RUNNER_TEMP/updates-v244.js"
 grep -q '__TAREFAS_LAUNCHER_ICON_241__' "$RUNNER_TEMP/launcher-v244.js"
 grep -q 'pinProfileShortcut' "$RUNNER_TEMP/launcher-v244.js"
-grep -q '__TAREFAS_BETA_243_BOOT__' "$RUNNER_TEMP/bootstrap-v244.js"
+grep -q '__TAREFAS_BETA_244_BOOT__' "$RUNNER_TEMP/bootstrap-v244.js"
 grep -q '__TAREFAS_PATCH_MANAGER_V279__' "$RUNNER_TEMP/pm-v244.js"
 grep -q "v1_8_get_beta_updates" "$RUNNER_TEMP/pm-v244.js"
 grep -q "v2_3_21_alpha_context" "$RUNNER_TEMP/pm-v244.js"
