@@ -26,4 +26,4 @@ Versão: 2.4.4
 Build: 279
 Canal: Beta
 
-Build automático: gatilho GitHub Actions armado.
+Build automático: gatilho GitHub Actions direto no branch de releases armado.
