@@ -3,9 +3,9 @@ name: Android 2.4.4 Beta - Patch Consolidation
 on:
   workflow_dispatch:
   push:
-    branches: [app/android-v244-prep]
+    branches: [app/android-v244-prep, app/releases]
   pull_request:
-    branches: [main]
+    branches: [main, app/releases]
     paths:
       - '.v244-release-trigger'
       - 'app/android/TarefasLauncherIconPlugin.java'
@@ -18,7 +18,7 @@ on:
       - '.github/workflows/android-v244-beta.yml'
 
 concurrency:
-  group: android-v244-beta
+  group: android-v244-beta-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:
@@ -33,7 +33,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: npm
       - uses: actions/setup-java@v5
         with:
           distribution: temurin

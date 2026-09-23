@@ -29,14 +29,14 @@ for(const name of await readdir(dist)){
 }
 
 await patch('mobile-patch-manager-v240.js',source=>source
-  .replace("const APP_VERSION='2.4.2',APP_BUILD=277,APP_CHANNEL='beta';","const APP_VERSION='"+VERSION+"',APP_BUILD="+BUILD+",APP_CHANNEL='beta';")
-  .replace("__TAREFAS_PATCH_MANAGER_V277__","__TAREFAS_PATCH_MANAGER_V279__")
-  .replaceAll("source:'beta-2.4.2'","source:'beta-2.4.4'"),{required:true});
+  .replace("const APP_VERSION='2.4.0',APP_BUILD=274,APP_CHANNEL='official';","const APP_VERSION='"+VERSION+"',APP_BUILD="+BUILD+",APP_CHANNEL='beta';")
+  .replace("__TAREFAS_PATCH_MANAGER_V274__","__TAREFAS_PATCH_MANAGER_V279__")
+  .replaceAll("source:'beta-2.4.2'","source:'beta-2.4.4'").replaceAll("source:'beta-2.4.0'","source:'beta-2.4.4'"),{required:true});
 
 await patch('mobile-bootstrap.js',source=>{
   let out=source
-    .replace("const APP_VERSION = '2.4.2';","const APP_VERSION = '"+VERSION+"';")
-    .replace('const APP_BUILD = 277;','const APP_BUILD = '+BUILD+';')
+    .replace(/const APP_VERSION = '[^']+';/,"const APP_VERSION = '"+VERSION+"';")
+    .replace(/const APP_BUILD = \d+;/,'const APP_BUILD = '+BUILD+';')
     .replaceAll('Beta 2.4.2','Beta '+VERSION)
     .replaceAll('2.4.2 Beta',VERSION+' Beta')
     .replaceAll('__TAREFAS_BETA_242_BOOT__','__TAREFAS_BETA_244_BOOT__')
@@ -68,7 +68,8 @@ await patch('mobile-bootstrap.js',source=>{
 await patch('mobile-alpha-v23223-fix.js',source=>source
   .replace("const VERSION='2.4.2',BUILD=277,MARK='__TAREFAS_BETA_NAV_V277__';","const VERSION='"+VERSION+"',BUILD="+BUILD+",MARK='__TAREFAS_BETA_NAV_V279__';")
   .replaceAll('TAREFAS 2.4.2 Beta','TAREFAS '+VERSION+' Beta')
-  .replaceAll('TarefasBeta242','TarefasBeta244'),{required:false});
+  .replaceAll('TarefasBeta242','TarefasBeta244')
+  .concat("\n;globalThis.__TAREFAS_BETA_NAV_V279__={version:'"+VERSION+"',build:"+BUILD+",channel:'beta'};"),{required:false});
 
 await patch('mobile-alpha-v23221.js',source=>source
   .replace("const VERSION='2.4.2',BUILD=277","const VERSION='"+VERSION+"',BUILD="+BUILD)
@@ -78,13 +79,15 @@ await patch('mobile-alpha-v23221.js',source=>source
 
 await patch('mobile-alpha-v23221-tabs.js',source=>source
   .replace("const MARK='__TAREFAS_BETA_TABS_V277__',VERSION='2.4.2',BUILD=277","const MARK='__TAREFAS_BETA_TABS_V279__',VERSION='"+VERSION+"',BUILD="+BUILD)
-  .replace('<small>Beta 2.4.2</small>','<small>Beta '+VERSION+'</small>'),{required:false});
+  .replace('<small>Beta 2.4.2</small>','<small>Beta '+VERSION+'</small>')
+  .concat("\n;globalThis.__TAREFAS_BETA_TABS_V279__={version:'"+VERSION+"',build:"+BUILD+",channel:'beta'};"),{required:false});
 
-await patch('mobile-preload.js',source=>source
-  .replaceAll("tarefasAppVersion = '2.4.2'","tarefasAppVersion = '"+VERSION+"'")
-  .replaceAll("tarefasAppBuild = '277'","tarefasAppBuild = '"+BUILD+"'")
-  .replaceAll("tarefasAppVersion = '2.4.0'","tarefasAppVersion = '"+VERSION+"'")
-  .replaceAll("tarefasAppBuild = '274'","tarefasAppBuild = '"+BUILD+"'"));
+await patch('mobile-preload.js',source=>{
+  const out=source
+    .replace(/tarefasAppVersion\s*=\s*'[^']+'/g,"tarefasAppVersion = '"+VERSION+"'")
+    .replace(/tarefasAppBuild\s*=\s*'[^']+'/g,"tarefasAppBuild = '"+BUILD+"'");
+  return out;
+});
 
 await patch('mobile-updates-v181.js',source=>source
   .replace("const APP_VERSION = '2.4.2';","const APP_VERSION = '"+VERSION+"';")

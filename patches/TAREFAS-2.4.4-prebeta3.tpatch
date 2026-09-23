@@ -1,0 +1,38 @@
+{
+  "format": "tarefas-tpatch-v1",
+  "id": "2.4.4-prebeta3",
+  "name": "TAREFAS 2.4.4-prebeta3 — Correção de substituição, histórico e Próximo Serviço",
+  "patchVersion": 1,
+  "createdAt": "2026-09-23T18:00:00Z",
+  "baseVersion": "2.4.3",
+  "minBuild": 278,
+  "maxBuild": 278,
+  "channel": "alpha",
+  "cumulative": true,
+  "replacementMode": "replace-older-same-base",
+  "replaces": [
+    "2.4.3.1",
+    "2.4.3.2",
+    "2.4.3.3",
+    "2.4.3.4",
+    "2.4.3.5",
+    "2.4.3.6",
+    "2.4.4-prebeta",
+    "2.4.4-prebeta2"
+  ],
+  "description": "Corrige a cadeia substituível dos patches da base 2.4.3, remove definitivamente o Próximo Serviço da tela inicial e restaura o histórico completo de patches.",
+  "changelog": [
+    "Remove definitivamente o card Próximo Serviço da tela inicial.",
+    "A 2.4.4-prebeta3 substitui a 2.4.4-prebeta2, a 2.4.4-prebeta e os patches 2.4.3.1 até 2.4.3.6.",
+    "Limpa do armazenamento local os patches antigos substituídos para impedir que a 2.4.3.6 volte a aparecer como atualização.",
+    "O catálogo deixa somente a 2.4.4-prebeta3 como atualizável para a base 2.4.3.",
+    "Restaura o histórico completo, incluindo os patches publicados antes da 2.4.4-prebeta2.",
+    "Mantém Escalas com Motorista PA, Patrulheiro e Permanência abrindo diretamente as planilhas oficiais do Google."
+  ],
+  "order": 2440203,
+  "payload": {
+    "js": "(()=>{'use strict';\nconst MARK='__TAREFAS_ALPHA_244_PREBETA3_FIX__';if(globalThis[MARK])return;globalThis[MARK]=true;\nconst LINKS=[{id:'motorista_pa',label:'Motorista PA',url:'https://docs.google.com/spreadsheets/d/1T_BM9KY0NLwVhlifetQ6W6AdetujQjx--zOZHa27eQs/edit?usp=drivesdk'},{id:'patrulheiro',label:'Patrulheiro',url:'https://docs.google.com/spreadsheets/d/1_LlfIHx4EuSHkC9BOR2VorvXoaiMyLa028wU6C0dQLs/edit?usp=drivesdk'},{id:'permanencia',label:'Permanência',url:'https://docs.google.com/spreadsheets/d/13eEei_JdGjAdVo371BGfPS59QdYySe9lJ47DLjWb_x0/edit?usp=drivesdk'}];\nconst OLD=['2.4.3.1','2.4.3.2','2.4.3.3','2.4.3.4','2.4.3.5','2.4.3.6','2.4.4-prebeta','2.4.4-prebeta2'];\nconst norm=v=>String(v??'').normalize('NFD').replace(/[\\\\u0300-\\\\u036f]/g,'').replace(/\\\\s+/g,' ').trim().toLowerCase();\nfunction removeNext(){document.querySelectorAll('#kNextServiceCard,[data-tarefas-next-service],.k-next-service-card,[data-next-service],.next-service-card').forEach(e=>e.remove());for(const el of document.querySelectorAll('h1,h2,h3,h4,h5,h6,strong,b,p,span,button,a'))if(!el.children.length&&norm(el.textContent)==='proximo servico'){const c=el.closest('#kNextServiceCard,.k-next-service-card,[data-tarefas-next-service],[data-next-service],.next-service-card,.tm-dashboard-card,.v4-card,.dashboard-card,.card,article,section');if(c)c.remove()}}\nfunction hideOld(){for(const el of document.querySelectorAll('a,button,li,[role=\"menuitem\"]')){const t=norm(el.textContent),h=String(el.getAttribute?.('href')||el.dataset?.href||'').toLowerCase();if(t==='missões'||t==='missoes'||t==='pessoal / escalas'||h.includes('missao.html')){const i=el.closest?.('li,[role=\"menuitem\"]')||el;i.style.display='none'}}}\nfunction ensureLinks(){hideOld();for(const p of document.querySelectorAll('.v7-pessoal-parent,[data-menu=\"pessoal\"],nav,aside')){const sub=p.querySelector('.v7-pessoal-sub,ul');if(!sub)continue;if(!sub.querySelector('[data-tarefas-prebeta3-scale=\"motorista_pa\"]'))for(const r of LINKS){const a=document.createElement('a');a.href=r.url;a.target='_blank';a.rel='noopener noreferrer';a.dataset.tarefasPrebeta3Scale=r.id;a.textContent=r.label;sub.appendChild(a)}}}\nasync function prune(){try{const req=indexedDB.open('tarefas-patches-v1',1);await new Promise((ok,no)=>{req.onerror=()=>no(req.error);req.onsuccess=()=>{const db=req.result,tx=db.transaction('patches','readwrite'),s=tx.objectStore('patches');OLD.forEach(id=>s.delete(id));tx.oncomplete=()=>{db.close();ok()};tx.onerror=()=>{db.close();no(tx.error)}}})}catch(e){}}\nfunction esc(v){return String(v??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',\"'\":'&#039;'}[c]))}\nasync function history(){const t=document.getElementById('tmPatchHistory');if(!t)return;try{const c=await globalThis.TarefasPatchManager?.checkCatalog?.();if(!c)return;const rows=(Array.isArray(c.history)?c.history:c.patches||[]).filter(p=>String(p.baseVersion||'')==='2.4.3').sort((a,b)=>Number(b.order||0)-Number(a.order||0));const local=await globalThis.TarefasPatchManager?.list?.().catch?.(()=>[])||[],m=new Map(local.map(p=>[String(p.id),p]));t.innerHTML=rows.map(p=>'<article class=\"tm-patch-history-item\"><div class=\"tm-patch-history-head\"><div><strong>'+esc(p.id)+'</strong><small>'+esc(p.name||'Patch TAREFAS')+'</small></div><span class=\"tm-patch-history-badge\">'+esc(m.has(String(p.id))?'INSTALADO':(p.installable===false?'SUBSTITUÍDO':'DISPONÍVEL'))+'</span></div><p>'+esc(p.description||'')+'</p>'+(Array.isArray(p.changelog)&&p.changelog.length?'<ul>'+p.changelog.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'')+'</article>').join('')}catch(e){}}\nfunction boot(){removeNext();hideOld();ensureLinks();prune();let n=0;const tm=setInterval(()=>{removeNext();ensureLinks();n++;if(document.getElementById('tmPatchHistory')){history();clearInterval(tm)}if(n>120)clearInterval(tm)},100);window.addEventListener('tarefas:patch-official-refreshed',()=>history());window.addEventListener('focus',()=>{removeNext();ensureLinks();history()});window.addEventListener('pageshow',()=>{removeNext();ensureLinks();history()})}\nboot();const obs=new MutationObserver(removeNext);obs.observe(document.body||document.documentElement,{childList:true,subtree:true});\nglobalThis.TarefasAlpha244Prebeta3=Object.freeze({version:'2.4.4-prebeta3',refresh:()=>{removeNext();ensureLinks();history()}});\n})();",
+    "css": ""
+  },
+  "payloadSha256": "e0dddf35bdb50cf77e18785ce235005826967777d3b2a95020ff654ffeee78df"
+}

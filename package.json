@@ -20,12 +20,19 @@
     "@capacitor/local-notifications": "8.0.1",
     "@capacitor/preferences": "8.0.1",
     "@capacitor/push-notifications": "8.0.1",
-    "@capacitor/share": "8.0.1"
+    "@capacitor/share": "8.0.1",
+    "@capawesome-team/capacitor-file-opener": "8.0.2",
+    "@capacitor/file-transfer": "^2.0.4"
   },
   "devDependencies": {
     "@capacitor/assets": "3.0.5",
     "@capacitor/cli": "8.5.0",
     "esbuild": "^0.25.9",
     "typescript": "^5.9.2"
+  },
+  "overrides": {
+    "sharp": "0.35.4",
+    "tar": "7.5.22",
+    "uuid": "11.1.1"
   }
 }

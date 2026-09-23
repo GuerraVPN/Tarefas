@@ -3,8 +3,8 @@
   "app": "TAREFAS",
   "baseVersion": "2.4.1",
   "baseBuild": 276,
-  "generatedAt": "2026-09-23T15:00:00Z",
-  "latestPatch": "2.4.3.6",
+  "generatedAt": "2026-09-23T18:20:00Z",
+  "latestPatch": "2.4.4-prebeta3",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -320,7 +320,7 @@
         "Mantida a remoção de Pessoal / Escalas e Missões.",
         "O patch 2.4.3.2 substitui cumulativamente o 2.4.3.1."
       ],
-      "supersededBy": "2.4.3.6"
+      "supersededBy": "2.4.4-prebeta3"
     },
     {
       "id": "2.4.3.3",
@@ -349,7 +349,7 @@
         "Mantém Escalas como item único e remove Pessoal / Escalas e Missões.",
         "Substitui cumulativamente a 2.4.3.2 e os patches anteriores da mesma base."
       ],
-      "supersededBy": "2.4.3.6"
+      "supersededBy": "2.4.4-prebeta3"
     },
     {
       "id": "2.4.3.4",
@@ -378,7 +378,7 @@
         "Mantém Motorista PA, Patrulheiro e Permanência.",
         "Substitui cumulativamente a 2.4.3.3, 2.4.3.2 e os patches anteriores da mesma base."
       ],
-      "supersededBy": "2.4.3.6"
+      "supersededBy": "2.4.4-prebeta3"
     },
     {
       "id": "2.4.3.5",
@@ -408,7 +408,7 @@
         "Não altera a tela Escalas nem remove o acesso às planilhas Google.",
         "Mantém a correção de identificação de nome das versões anteriores."
       ],
-      "supersededBy": "2.4.3.6"
+      "supersededBy": "2.4.4-prebeta3"
     },
     {
       "id": "2.4.3.6",
@@ -427,7 +427,7 @@
         "2.4.3.4",
         "2.4.3.5"
       ],
-      "installable": true,
+      "installable": false,
       "description": "Remove a interferência da escala antiga com a nova integração de Escalas, retira o card Próximo serviço da tela inicial e oculta versões antigas de patches 2.4.3 no verificador oficial.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.3.6.tpatch",
       "sha256": "db1f47b1caba39ccaec99d0363bc7c608aa3f500ce3ac56da2e7abf16cc0fc24",
@@ -437,25 +437,94 @@
         "Limpa o estado local usado pelo antigo Próximo serviço para evitar reabertura de dados antigos.",
         "Filtra a lista de patches oficiais da base 2.4.3 para exibir somente o 2.4.3.6.",
         "Mantém a integração nova das Escalas e as correções cumulativas anteriores."
-      ]
-    }
-  ],
-  "history": [
+      ],
+      "supersededBy": "2.4.4-prebeta3"
+    },
     {
-      "id": "2.4.3.1",
-      "name": "TAREFAS 2.4.3.1 — Correção do menu Escalas",
+      "id": "2.4.4-prebeta2",
+      "name": "TAREFAS 2.4.4-prebeta2 — Escalas diretas do Google",
       "baseVersion": "2.4.3",
       "minBuild": 278,
       "maxBuild": 278,
       "channel": "alpha",
-      "publishedAt": "2026-09-23T13:45:00Z",
+      "publishedAt": "2026-09-23T16:20:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.4.3.1",
+        "2.4.3.2",
+        "2.4.3.3",
+        "2.4.3.4",
+        "2.4.3.5",
+        "2.4.3.6",
+        "2.4.4-prebeta"
+      ],
+      "installable": false,
+      "description": "Corrige a 2.4.4-prebeta para voltar a carregar as escalas diretamente das planilhas oficiais do Google, sem tentar sincronizar pelo Supabase/Apps Script.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.4-prebeta2.tpatch",
+      "sha256": "fd39bed4f690978c80dba1e605c884c35eb18203ba64bb80b90ba71b048ba009",
+      "changelog": [
+        "Mantém a base cumulativa da 2.4.3.6.",
+        "Remove o fluxo de sincronização Google Sheets → Apps Script → Supabase da tela de Escalas.",
+        "As escalas Motorista PA, Patrulheiro e Permanência passam a abrir diretamente as planilhas oficiais do Google.",
+        "Remove Pessoal / Escalas e Missões da navegação.",
+        "Mantém a remoção do Próximo Serviço.",
+        "Substitui integralmente a 2.4.4-prebeta anterior."
+      ],
+      "supersededBy": "2.4.4-prebeta3"
+    },
+    {
+      "format": "tarefas-tpatch-v1",
+      "id": "2.4.4-prebeta3",
+      "name": "TAREFAS 2.4.4-prebeta3 — Correção de substituição, histórico e Próximo Serviço",
+      "patchVersion": 1,
+      "createdAt": "2026-09-23T18:00:00Z",
+      "baseVersion": "2.4.3",
+      "minBuild": 278,
+      "maxBuild": 278,
+      "channel": "alpha",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.4.3.1",
+        "2.4.3.2",
+        "2.4.3.3",
+        "2.4.3.4",
+        "2.4.3.5",
+        "2.4.3.6",
+        "2.4.4-prebeta",
+        "2.4.4-prebeta2"
+      ],
+      "description": "Corrige a cadeia substituível dos patches da base 2.4.3, remove definitivamente o Próximo Serviço da tela inicial e restaura o histórico completo de patches.",
+      "changelog": [
+        "Remove definitivamente o card Próximo Serviço da tela inicial.",
+        "A 2.4.4-prebeta3 substitui a 2.4.4-prebeta2, a 2.4.4-prebeta e os patches 2.4.3.1 até 2.4.3.6.",
+        "Limpa do armazenamento local os patches antigos substituídos para impedir que a 2.4.3.6 volte a aparecer como atualização.",
+        "O catálogo deixa somente a 2.4.4-prebeta3 como atualizável para a base 2.4.3.",
+        "Restaura o histórico completo, incluindo os patches publicados antes da 2.4.4-prebeta2.",
+        "Mantém Escalas com Motorista PA, Patrulheiro e Permanência abrindo diretamente as planilhas oficiais do Google."
+      ],
+      "order": 2440203,
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.4-prebeta3.tpatch",
+      "sha256": "17a0eed60cdfb18557258a15a503fee0dd0927b25012c926acf270d3cd52547c",
+      "installable": true
+    }
+  ],
+  "history": [
+    {
+      "format": "tarefas-tpatch-v1",
+      "id": "2.4.3.1",
+      "name": "TAREFAS 2.4.3.1 — Correção do menu Escalas",
+      "patchVersion": 1,
+      "createdAt": "2026-09-23T13:30:00Z",
+      "baseVersion": "2.4.3",
+      "minBuild": 278,
+      "maxBuild": 278,
+      "channel": "alpha",
       "cumulative": true,
       "replacementMode": "replace-older-same-base",
       "replaces": [],
-      "installable": false,
       "description": "Patch Alpha cumulativo para remover definitivamente Pessoal / Escalas e Missões do menu móvel da base 2.4.3 e deixar somente Escalas.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.3.1.tpatch",
-      "sha256": "dc474d3a7cc6eff1fea3b07ed9e4fbf4a99ec59cee1cbcb5a0cf04bd7423db2a",
       "changelog": [
         "Remove do menu móvel Pessoal / Escalas.",
         "Remove do menu móvel Missões.",
@@ -463,864 +532,265 @@
         "Executa a limpeza somente sobre itens de menu, sem alterar páginas de conteúdo.",
         "Patch cumulativo da base 2.4.3."
       ],
-      "supersededBy": "2.4.3.2"
-    },
-    {
-      "id": "2.3.23.2",
-      "name": "TAREFAS 2.3.23.2 — Tema e versão",
-      "baseVersion": "2.3.23.1",
-      "minBuild": 270,
-      "maxBuild": 270,
-      "description": "Corrige o tema voltando sozinho para claro e os rótulos antigos de versão 2.3.22.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.23.2.tpatch",
-      "sha256": "6e646f28340176fe37b2803007f2fa6ce8310406041cdc4b3807d5f60b3e2693",
-      "changelog": [
-        "Tema escolhido localmente passa a ter prioridade sobre uma preferência remota antiga.",
-        "Troca manual de tema continua disponível.",
-        "Cabeçalho passa a exibir 2.3.23.2 no lugar de 2.3.22.",
-        "Tela Sobre passa a refletir a versão efetiva 2.3.23.2."
-      ],
-      "channel": "alpha",
-      "publishedAt": "2026-09-21T13:19:00Z",
+      "order": 24301,
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.3.1.tpatch",
+      "sha256": "6f4c5ad00fc0ca95213bf46bebae5cfab2c582f1f8e876edefc1ab2f38de34c6",
       "installable": false,
-      "supersededBy": "2.3.23.4"
+      "supersededBy": "2.4.4-prebeta3"
     },
     {
-      "id": "2.3.23.3",
-      "name": "TAREFAS 2.3.23.3 — Gerenciador e notificações de patches",
-      "baseVersion": "2.3.23.1",
-      "minBuild": 270,
-      "maxBuild": 270,
+      "id": "2.4.3.2",
+      "name": "TAREFAS 2.4.3.2 — Escalas integradas ao Supabase",
+      "baseVersion": "2.4.3",
+      "minBuild": 278,
+      "maxBuild": 278,
       "channel": "alpha",
-      "publishedAt": "2026-09-21T13:28:00Z",
-      "description": "Move o Gerenciador de Patches para logo abaixo da atualização do aplicativo, adiciona histórico detalhado de patches e passa a avisar sobre novos patches conforme os canais Alpha/Beta ativados.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.23.3.tpatch",
-      "sha256": "2db5e7623f5845a294774009ea92d173b2c723e16e541b9fe78607a69eadffb8",
-      "changelog": [
-        "Gerenciador de Patches passa a aparecer logo abaixo de Atualização do aplicativo.",
-        "Novo Histórico de patches mostra versão, canal, estado e o que mudou em cada patch.",
-        "Patches publicados passam a possuir canal Alpha, Beta ou Oficial no catálogo.",
-        "Usuários com Alpha ativado recebem aviso de novos patches Alpha; usuários com Beta ativado recebem avisos de patches Beta.",
-        "Avisos de patches usam as preferências de atualização já existentes no TAREFAS.",
-        "A versão efetiva exibida no cabeçalho passa a ser 2.3.23.3, mantendo o APK base em 2.3.23.1 / build 270."
-      ],
-      "installable": false,
-      "supersededBy": "2.3.23.4"
-    },
-    {
-      "id": "2.3.23.4",
-      "name": "TAREFAS 2.3.23.4 — Patch cumulativo",
-      "baseVersion": "2.3.23.1",
-      "minBuild": 270,
-      "maxBuild": 270,
-      "channel": "alpha",
-      "publishedAt": "2026-09-21T13:34:00Z",
+      "publishedAt": "2026-09-23T13:44:12.247Z",
       "cumulative": true,
       "replacementMode": "replace-older-same-base",
       "replaces": [
-        "2.3.23.2",
-        "2.3.23.3"
+        "2.4.3.1"
       ],
       "installable": false,
-      "description": "Primeiro patch cumulativo do TAREFAS: instala por cima dos patches anteriores da mesma base e remove automaticamente os antigos, preservando as correções e recursos já lançados.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.23.4.tpatch",
-      "sha256": "acc8aabe41d3685c89d0bcbd8eec89f0ebfc47836eb9db4ecb94b8b16b3b8a07",
+      "description": "Integra a tela Escalas ao Supabase, que valida a sessão do TAREFAS e consulta em tempo real os dados das planilhas Google via Apps Script, identificando o nome do usuário logado.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.3.2.tpatch",
+      "sha256": "ea3c6879c2c25f36760da0742fe45628cd52f435b6eb7ef9e1636cd4eebd7778",
       "changelog": [
-        "Novo modo cumulativo: o patch mais recente substitui automaticamente os patches anteriores da mesma base.",
-        "Ao instalar 2.3.23.4, os patches 2.3.23.2 e 2.3.23.3 são removidos do armazenamento de patches sem ação manual.",
-        "Mantidas as correções de tema e versão introduzidas na 2.3.23.2.",
-        "Mantidos o Gerenciador, histórico e avisos Alpha/Beta de patches introduzidos na 2.3.23.3.",
-        "O catálogo principal passa a oferecer somente o patch atual; versões anteriores permanecem apenas no histórico.",
-        "A versão efetiva passa a ser 2.3.23.4 sobre o APK base 2.3.23.1 / build 270."
+        "Escalas deixa de abrir diretamente as planilhas Google.",
+        "A tela passa a consultar o Supabase para validar a sessão do usuário.",
+        "Supabase consulta a ponte Apps Script ligada às três planilhas.",
+        "Patrulheiro passa a localizar automaticamente o nome do usuário logado.",
+        "Incluídas as escalas Motorista PA, Patrulheiro e Permanência.",
+        "Mantida a remoção de Pessoal / Escalas e Missões.",
+        "O patch 2.4.3.2 substitui cumulativamente o 2.4.3.1."
       ],
-      "supersededBy": "2.3.23.5"
+      "supersededBy": "2.4.4-prebeta3"
     },
     {
-      "id": "2.3.23.5",
-      "name": "TAREFAS 2.3.23.5 — Reparo de catálogo e versão global",
-      "baseVersion": "2.3.23.1",
-      "minBuild": 270,
-      "maxBuild": 270,
+      "id": "2.4.3.3",
+      "name": "TAREFAS 2.4.3.3 — Correção da busca de nome nas Escalas",
+      "baseVersion": "2.4.3",
+      "minBuild": 278,
+      "maxBuild": 278,
       "channel": "alpha",
-      "publishedAt": "2026-09-21T13:45:00Z",
+      "publishedAt": "2026-09-23T14:00:00Z",
       "cumulative": true,
       "replacementMode": "replace-older-same-base",
       "replaces": [
-        "2.3.23.2",
-        "2.3.23.3",
-        "2.3.23.4"
+        "2.4.3.1",
+        "2.4.3.2"
       ],
       "installable": false,
-      "description": "Revisão de reparo da 2.3.23.5 para evitar cache do catálogo e mostrar a versão efetiva no cabeçalho de todas as abas.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.23.5.tpatch",
-      "sha256": "248039dcc248e497b12844ec6948f1d701030e46c4a41752216ab4166baa0cd3",
+      "description": "Corrige a identificação do nome nas escalas, removendo prefixos de posto/graduação como Sd e aceitando o nome de guerra sem a patente. Mantém a integração Google Sheets → Apps Script → Supabase.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.3.3.tpatch",
+      "sha256": "4cc62ef3f4276cd4a3164e0c8f2882fd8449b269477c70b4ae1e66491f6bd11c",
       "changelog": [
-        "Catálogo e arquivos oficiais passam a ser consultados pela GitHub Contents API, com fallback sem cache.",
-        "A versão 2.3.23.5 passa a aparecer no cabeçalho de todas as abas.",
-        "Mantida a correção de notificação imediata e de aviso pós-instalação.",
-        "Este reparo existe apenas para permitir a transição confiável para a 2.3.23.6."
+        "Corrige a busca que procurava 'Sd Guerra' em vez de 'Guerra'.",
+        "Remove automaticamente prefixos comuns de posto/graduação antes de montar os aliases.",
+        "Aceita Guerra, Sd Guerra, SD GUERRA e o nome completo como formas de identificação.",
+        "Corrige a normalização de acentos e espaços usada pela busca.",
+        "Mantém Motorista PA, Patrulheiro e Permanência.",
+        "Mantém Escalas como item único e remove Pessoal / Escalas e Missões.",
+        "Substitui cumulativamente a 2.4.3.2 e os patches anteriores da mesma base."
       ],
-      "supersededBy": "2.3.23.6"
+      "supersededBy": "2.4.4-prebeta3"
     },
     {
-      "id": "2.3.23.6",
-      "name": "TAREFAS 2.3.23.6 — Catálogo confiável e versão global",
-      "baseVersion": "2.3.23.1",
-      "minBuild": 270,
-      "maxBuild": 270,
+      "id": "2.4.3.4",
+      "name": "TAREFAS 2.4.3.4 — Correção definitiva da validação SHA-256",
+      "baseVersion": "2.4.3",
+      "minBuild": 278,
+      "maxBuild": 278,
       "channel": "alpha",
-      "publishedAt": "2026-09-21T14:10:00Z",
+      "publishedAt": "2026-09-23T14:15:00Z",
       "cumulative": true,
       "replacementMode": "replace-older-same-base",
       "replaces": [
-        "2.3.23.2",
-        "2.3.23.3",
-        "2.3.23.4",
-        "2.3.23.5"
-      ],
-      "installable": true,
-      "description": "Corrige a consulta do catálogo para evitar cache do GitHub e faz a versão efetiva do patch aparecer no cabeçalho de todas as abas.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.23.6.tpatch",
-      "sha256": "5f0e5668b6c65fa22943eacbe29eeee825980f0a55aed6a26ca6909b9017c27d",
-      "changelog": [
-        "Catálogo e arquivos oficiais passam a ser consultados pela GitHub Contents API, com fallback para raw.githubusercontent.com sem cache.",
-        "A versão efetiva 2.3.23.6 passa a aparecer no cabeçalho de todas as abas, não apenas na área de Atualizações.",
-        "Mantidas as correções de notificação imediata introduzidas na 2.3.23.5.",
-        "Mantidos o modelo cumulativo, histórico de patches, correções de tema e canais Alpha/Beta.",
-        "A 2.3.23.6 substitui automaticamente a 2.3.23.5 e os patches anteriores da mesma base."
-      ]
-    },
-    {
-      "id": "2.3.24.1",
-      "name": "TAREFAS 2.3.24.1 — Bloqueio biométrico ao entrar",
-      "baseVersion": "2.3.24",
-      "minBuild": 271,
-      "maxBuild": 271,
-      "channel": "alpha",
-      "publishedAt": "2026-09-21T14:43:00Z",
-      "cumulative": true,
-      "replacementMode": "replace-older-same-base",
-      "replaces": [],
-      "installable": false,
-      "description": "Bloqueia o TAREFAS ao abrir ou retornar do segundo plano e exige biometria ou a senha da conta para continuar.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.1.tpatch",
-      "sha256": "177ce45090a5293288222708cac9c72af302f0cce591e4d1a9278f95d97741e9",
-      "changelog": [
-        "Ao abrir uma sessão já autenticada, o conteúdo do aplicativo fica bloqueado até confirmar a identidade.",
-        "Se a biometria estiver ativada no aparelho, o leitor é solicitado automaticamente.",
-        "A senha da própria conta fica disponível como alternativa à biometria.",
-        "Ao retornar do segundo plano, o aplicativo volta a exigir autenticação.",
-        "Trocar entre as abas internas do TAREFAS não dispara uma nova autenticação.",
-        "A validação biométrica continua confirmando a sessão no servidor antes de liberar o aplicativo."
-      ],
-      "supersededBy": "2.3.24.2"
-    },
-    {
-      "id": "2.3.24.2",
-      "name": "TAREFAS 2.3.24.2 — Segurança só com biometria ativa",
-      "baseVersion": "2.3.24",
-      "minBuild": 271,
-      "maxBuild": 271,
-      "channel": "alpha",
-      "publishedAt": "2026-09-21T14:48:00Z",
-      "cumulative": true,
-      "replacementMode": "replace-older-same-base",
-      "replaces": [
-        "2.3.24.1"
+        "2.4.3.1",
+        "2.4.3.2",
+        "2.4.3.3"
       ],
       "installable": false,
-      "description": "O bloqueio ao abrir ou retornar ao TAREFAS passa a funcionar somente nos aparelhos em que a biometria do app está ativada.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.2.tpatch",
-      "sha256": "7976f8042fb47376d7ef44352c7a2e153fdcdbfd27e60309c8257577158976b7",
+      "description": "Corrige a assinatura SHA-256 interna do patch e mantém a correção da identificação do nome nas Escalas.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.3.4.tpatch",
+      "sha256": "938f96b4d40be0fe6731ea808fb1a383d18f8bd126256ead6f3862144198b548",
       "changelog": [
-        "Quem não ativou biometria no TAREFAS deixa de receber solicitações repetidas de senha.",
-        "O bloqueio ao abrir ou voltar do segundo plano só é criado quando existe credencial biométrica ativa no aparelho.",
-        "Para quem usa biometria, o leitor continua sendo solicitado automaticamente.",
-        "A senha da conta continua disponível apenas como alternativa quando o bloqueio biométrico estiver ativo.",
-        "Se a biometria for desativada no aparelho, a trava deixa de ser aplicada automaticamente.",
-        "Mantida a navegação entre abas internas sem novas solicitações de autenticação."
+        "Corrige o SHA-256 interno do payload para coincidir exatamente com a validação do Gerenciador de Patches.",
+        "Corrige a busca que procurava 'Sd Guerra' em vez de 'Guerra'.",
+        "Remove automaticamente prefixos comuns de posto/graduação antes de montar os aliases.",
+        "Aceita Guerra, Sd Guerra, SD GUERRA e o nome completo como formas de identificação.",
+        "Mantém Motorista PA, Patrulheiro e Permanência.",
+        "Substitui cumulativamente a 2.4.3.3, 2.4.3.2 e os patches anteriores da mesma base."
       ],
-      "supersededBy": "2.3.24.3"
+      "supersededBy": "2.4.4-prebeta3"
     },
     {
-      "id": "2.3.24.3",
-      "name": "TAREFAS 2.3.24.3 — Correção da Central de erros",
-      "baseVersion": "2.3.24",
-      "minBuild": 271,
-      "maxBuild": 271,
+      "id": "2.4.3.5",
+      "name": "TAREFAS 2.4.3.5 — Correção do Próximo Serviço na Tela Inicial",
+      "baseVersion": "2.4.3",
+      "minBuild": 278,
+      "maxBuild": 278,
       "channel": "alpha",
-      "publishedAt": "2026-09-21T15:10:00Z",
+      "publishedAt": "2026-09-23T14:30:00Z",
       "cumulative": true,
       "replacementMode": "replace-older-same-base",
       "replaces": [
-        "2.3.24.1",
-        "2.3.24.2"
+        "2.4.3.1",
+        "2.4.3.2",
+        "2.4.3.3",
+        "2.4.3.4"
       ],
       "installable": false,
-      "description": "Corrige erros transitórios de DOM em Usuários e Dashboard e remove esses falsos positivos da Central de erros sem esconder outros diagnósticos.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.3.tpatch",
-      "sha256": "2512281885b8149c1e4bb6d67dad950c678feb91d84f63d96ac56b1a86b90a5c",
+      "description": "Corrige exclusivamente o card Próximo serviço da tela inicial para buscar o próximo serviço confirmado do usuário logado diretamente em escala_servicos. A tela Escalas permanece com a integração Google Planilhas → Apps Script → Supabase.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.3.5.tpatch",
+      "sha256": "2935c0a16cd2c97755e5074dcec9c769d71629413bf22f06e22c7eda9f3b2860",
       "changelog": [
-        "Corrigido o erro de usuarios.html: Cannot read properties of null (reading classList).",
-        "Corrigido o erro de dashboard.html: Cannot set properties of null (setting textContent).",
-        "Operações assíncronas antigas deixam de falhar quando o layout móvel já desmontou os elementos da página.",
-        "A Central de erros filtra somente esses dois falsos positivos conhecidos; os demais erros continuam sendo registrados normalmente.",
-        "Registros antigos desses dois erros são removidos automaticamente do estado local da Central.",
-        "Mantida a segurança da 2.3.24.2: bloqueio de entrada somente para quem ativou biometria no TAREFAS."
+        "Corrige o Próximo serviço da tela inicial que podia calcular/puxar a pessoa errada.",
+        "A tela inicial agora consulta escala_servicos filtrando diretamente pelo usuario_id do usuário logado.",
+        "Seleciona a menor data futura do próprio usuário.",
+        "Ao clicar, mantém a abertura da tela Escalas/Pessoal no dia correto e grava o usuário e serviço alvo para permitir seleção correta.",
+        "Não altera a tela Escalas nem remove o acesso às planilhas Google.",
+        "Mantém a correção de identificação de nome das versões anteriores."
       ],
-      "supersededBy": "2.3.24.4"
+      "supersededBy": "2.4.4-prebeta3"
     },
     {
-      "id": "2.3.24.4",
-      "name": "TAREFAS 2.3.24.4 — Favoritos e filtros por abas",
-      "baseVersion": "2.3.24",
-      "minBuild": 271,
-      "maxBuild": 271,
+      "id": "2.4.3.6",
+      "name": "TAREFAS 2.4.3.6 — Escalas nova, remoção do Próximo Serviço e limpeza de patches antigos",
+      "baseVersion": "2.4.3",
+      "minBuild": 278,
+      "maxBuild": 278,
       "channel": "alpha",
-      "publishedAt": "2026-09-21T15:24:00Z",
+      "publishedAt": "2026-09-23T15:00:00Z",
       "cumulative": true,
       "replacementMode": "replace-older-same-base",
       "replaces": [
-        "2.3.24.1",
-        "2.3.24.2",
-        "2.3.24.3"
+        "2.4.3.1",
+        "2.4.3.2",
+        "2.4.3.3",
+        "2.4.3.4",
+        "2.4.3.5"
       ],
       "installable": false,
-      "description": "Expande Favoritos e Filtros para páginas, subabas, módulos internos e estados de filtro, incluindo Orçamentários e demais áreas do TAREFAS.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.4.tpatch",
-      "sha256": "243b776a7a5400359d9a180fcc11a9047d94733df23b0139fc554038734a110a",
+      "description": "Remove a interferência da escala antiga com a nova integração de Escalas, retira o card Próximo serviço da tela inicial e oculta versões antigas de patches 2.4.3 no verificador oficial.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.3.6.tpatch",
+      "sha256": "db1f47b1caba39ccaec99d0363bc7c608aa3f500ce3ac56da2e7abf16cc0fc24",
       "changelog": [
-        "Favoritos agora permitem escolher páginas e subabas/módulos internos, não apenas a tela atual.",
-        "Orçamentários passa a oferecer Resumo, Guias, Baixas, Distribuição, Movimentação, Material Carga, Passagem de Carga e Lavanderia como destinos separados.",
-        "Central passa a permitir favoritar diretamente Notificações, Mensagens, Downloads, Favoritos e Ferramentas.",
-        "O sistema descobre e memoriza dinamicamente outras abas internas visitadas no aplicativo para disponibilizá-las no seletor.",
-        "Filtros salvos agora guardam também os valores dos campos e a subaba ativa da tela.",
-        "Filtros podem ser renomeados, substituídos pelo estado atual ou excluídos.",
-        "Ao abrir um favorito/filtro com estado interno, o TAREFAS restaura os campos e a aba correspondente.",
-        "Mantidas as correções de erros da 2.3.24.3 e a segurança biométrica condicional da 2.3.24.2."
+        "Remove da navegação e da interface os acessos antigos às escalas/planilhas, mantendo somente a nova tela Escalas integrada.",
+        "Remove completamente o card Próximo serviço da tela inicial.",
+        "Limpa o estado local usado pelo antigo Próximo serviço para evitar reabertura de dados antigos.",
+        "Filtra a lista de patches oficiais da base 2.4.3 para exibir somente o 2.4.3.6.",
+        "Mantém a integração nova das Escalas e as correções cumulativas anteriores."
       ],
-      "supersededBy": "2.3.24.5"
+      "supersededBy": "2.4.4-prebeta3"
     },
     {
-      "id": "2.3.24.5",
-      "name": "TAREFAS 2.3.24.5 — IA mais rápida, fila e filtros avançados",
-      "baseVersion": "2.3.24",
-      "minBuild": 271,
-      "maxBuild": 271,
+      "format": "tarefas-tpatch-v1",
+      "id": "2.4.4-prebeta",
+      "name": "TAREFAS 2.4.4-prebeta — Alpha de teste",
+      "patchVersion": 1,
+      "createdAt": "2026-09-23T16:14:17.182Z",
+      "baseVersion": "2.4.3",
+      "minBuild": 278,
+      "maxBuild": 278,
       "channel": "alpha",
-      "publishedAt": "2026-09-21T15:38:00Z",
       "cumulative": true,
       "replacementMode": "replace-older-same-base",
       "replaces": [
-        "2.3.24.1",
-        "2.3.24.2",
-        "2.3.24.3",
-        "2.3.24.4"
+        "2.4.3.1",
+        "2.4.3.2",
+        "2.4.3.3",
+        "2.4.3.4",
+        "2.4.3.5",
+        "2.4.3.6"
       ],
+      "description": "Alpha 2.4.4-prebeta para testar antes da Beta 2.4.4.",
+      "changelog": [
+        "Remove o Próximo Serviço.",
+        "Remove interferências da escala antiga.",
+        "Centraliza Escalas em Motorista PA, Patrulheiro e Permanência.",
+        "Usa Google Sheets → Apps Script → Supabase → TAREFAS.",
+        "Limpa patches antigos da base 2.4.3.",
+        "Valida SHA-256 do payload."
+      ],
+      "order": 244001,
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.4-prebeta.tpatch",
+      "sha256": "f7f84ddd6829360af66ecf5c099d3aad1137d673e4011478d3d1a1678fa2b1e3",
       "installable": false,
-      "description": "Atualiza a versão exibida pela IA, reduz o contexto enviado para melhorar a resposta, reforça a retomada da fila offline e adiciona filtro de status combinado com seção/busca nas tarefas.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.5.tpatch",
-      "sha256": "b0609a6c04080efe2e1b51e9120fd2c01f6d95d3aa0b740ff7798049de724ea1",
-      "changelog": [
-        "O cabeçalho do Assistente IA passa a mostrar a versão efetiva atual do TAREFAS, em vez da Beta antiga.",
-        "Perguntas passam a enviar somente as 6 mensagens mais recentes, limitadas a 2.500 caracteres cada, reduzindo payload e contexto processado.",
-        "Enquanto a IA responde, o indicador Pensando/Analisando mostra o tempo decorrido em segundos.",
-        "Adicionado preconnect para o backend da IA para reduzir o custo da primeira conexão.",
-        "A fila offline tenta sincronizar novamente ao recuperar internet, voltar ao app, mudar a conexão e em verificações periódicas.",
-        "Quadro e Minhas Tarefas ganham filtro por status combinado com busca e seção, incluindo botão Limpar filtros.",
-        "Os filtros salvos da 2.3.24.4 capturam automaticamente o novo filtro de status.",
-        "Incluída uma API interna de acesso seguro ao DOM para próximos módulos.",
-        "Mantidas todas as correções cumulativas das versões 2.3.24.1 até 2.3.24.4."
-      ],
-      "supersededBy": "2.3.24.6"
+      "supersededBy": "2.4.4-prebeta3"
     },
     {
-      "id": "2.3.24.6",
-      "name": "TAREFAS 2.3.24.6 — Sincronização automática de versões",
-      "baseVersion": "2.3.24",
-      "minBuild": 271,
-      "maxBuild": 271,
+      "format": "tarefas-tpatch-v1",
+      "id": "2.4.4-prebeta2",
+      "name": "TAREFAS 2.4.4-prebeta2 — Escalas diretas do Google",
+      "patchVersion": 1,
+      "createdAt": "2026-09-23T16:20:00Z",
+      "baseVersion": "2.4.3",
+      "minBuild": 278,
+      "maxBuild": 278,
       "channel": "alpha",
-      "publishedAt": "2026-09-21T15:52:00Z",
       "cumulative": true,
       "replacementMode": "replace-older-same-base",
       "replaces": [
-        "2.3.24.1",
-        "2.3.24.2",
-        "2.3.24.3",
-        "2.3.24.4",
-        "2.3.24.5"
+        "2.4.3.1",
+        "2.4.3.2",
+        "2.4.3.3",
+        "2.4.3.4",
+        "2.4.3.5",
+        "2.4.3.6",
+        "2.4.4-prebeta"
       ],
+      "description": "Corrige a 2.4.4-prebeta para voltar a carregar as escalas diretamente das planilhas oficiais do Google, sem tentar sincronizar pelo Supabase/Apps Script.",
+      "changelog": [
+        "Mantém a base cumulativa da 2.4.3.6.",
+        "Remove o fluxo de sincronização Google Sheets → Apps Script → Supabase da tela de Escalas.",
+        "As escalas Motorista PA, Patrulheiro e Permanência passam a abrir diretamente as planilhas oficiais do Google.",
+        "Remove Pessoal / Escalas e Missões da navegação.",
+        "Mantém a remoção do Próximo Serviço.",
+        "Substitui integralmente a 2.4.4-prebeta anterior."
+      ],
+      "order": 2440202,
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.4-prebeta2.tpatch",
+      "sha256": "28e5da136a3904fac980827eb7228b6884af6682da54b84b8c658c0dc3ee61d6",
       "installable": false,
-      "description": "Sincroniza automaticamente as informações da versão mais recente de patch e APK, sem baixar ou instalar atualizações.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.6.tpatch",
-      "sha256": "119045dce0e02ec9bd76ae10a004dc8348b5ed20261acf97335afc20f5c3685f",
-      "changelog": [
-        "Adicionada sincronização automática do catálogo de patches em segundo plano.",
-        "Adicionada sincronização automática da versão mais recente do APK disponível para o usuário.",
-        "A tela Atualizações passa a mostrar APK instalado, APK mais recente, patch aplicado e patch mais recente.",
-        "A consulta roda ao abrir, voltar ao aplicativo, recuperar internet e a cada 5 minutos enquanto o app estiver em uso.",
-        "Nenhum patch ou APK é baixado ou instalado automaticamente; a instalação continua totalmente manual.",
-        "Incluído botão Sincronizar agora para atualização imediata das informações.",
-        "O horário da última sincronização fica visível na tela de Atualizações.",
-        "Mantidas todas as correções cumulativas das versões 2.3.24.1 até 2.3.24.5."
-      ],
-      "supersededBy": "2.3.24.7"
+      "supersededBy": "2.4.4-prebeta3"
     },
     {
-      "id": "2.3.24.7",
-      "name": "TAREFAS 2.3.24.7 — Correção do loop de sincronização",
-      "baseVersion": "2.3.24",
-      "minBuild": 271,
-      "maxBuild": 271,
+      "format": "tarefas-tpatch-v1",
+      "id": "2.4.4-prebeta3",
+      "name": "TAREFAS 2.4.4-prebeta3 — Correção de substituição, histórico e Próximo Serviço",
+      "patchVersion": 1,
+      "createdAt": "2026-09-23T18:00:00Z",
+      "baseVersion": "2.4.3",
+      "minBuild": 278,
+      "maxBuild": 278,
       "channel": "alpha",
-      "publishedAt": "2026-09-21T15:58:00Z",
       "cumulative": true,
       "replacementMode": "replace-older-same-base",
       "replaces": [
-        "2.3.24.1",
-        "2.3.24.2",
-        "2.3.24.3",
-        "2.3.24.4",
-        "2.3.24.5",
-        "2.3.24.6"
+        "2.4.3.1",
+        "2.4.3.2",
+        "2.4.3.3",
+        "2.4.3.4",
+        "2.4.3.5",
+        "2.4.3.6",
+        "2.4.4-prebeta",
+        "2.4.4-prebeta2"
       ],
-      "installable": false,
-      "description": "Corrige o travamento causado por loop do MutationObserver na sincronização automática de versões, mantendo a checagem automática de APK e patches.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.7.tpatch",
-      "sha256": "6654cbd4c9b17782a253490fb349c573cdabb16ab08568692e0fbf2a315385c2",
+      "description": "Corrige a cadeia substituível dos patches da base 2.4.3, remove definitivamente o Próximo Serviço da tela inicial e restaura o histórico completo de patches.",
       "changelog": [
-        "Corrigido o loop MutationObserver → renderização → MutationObserver que travava a tela de Atualizações.",
-        "O observador agora reage somente quando a área de Atualizações é criada/removida ou quando o painel de sincronização desaparece externamente.",
-        "Alterações dentro do próprio painel de sincronização são ignoradas pelo observador.",
-        "A renderização usa fingerprint para evitar redesenhar o painel quando os dados não mudaram.",
-        "Mantida a sincronização automática de APK e patches sem instalação automática.",
-        "O cabeçalho volta a reforçar a versão efetiva do patch durante as sincronizações.",
-        "Mantidas todas as correções cumulativas das versões 2.3.24.1 até 2.3.24.6."
+        "Remove definitivamente o card Próximo Serviço da tela inicial.",
+        "A 2.4.4-prebeta3 substitui a 2.4.4-prebeta2, a 2.4.4-prebeta e os patches 2.4.3.1 até 2.4.3.6.",
+        "Limpa do armazenamento local os patches antigos substituídos para impedir que a 2.4.3.6 volte a aparecer como atualização.",
+        "O catálogo deixa somente a 2.4.4-prebeta3 como atualizável para a base 2.4.3.",
+        "Restaura o histórico completo, incluindo os patches publicados antes da 2.4.4-prebeta2.",
+        "Mantém Escalas com Motorista PA, Patrulheiro e Permanência abrindo diretamente as planilhas oficiais do Google."
       ],
-      "supersededBy": "2.3.24.8"
-    },
-    {
-      "id": "2.3.24.8",
-      "name": "TAREFAS 2.3.24.8 — Pré-estabilização para Release 2.4",
-      "baseVersion": "2.3.24",
-      "minBuild": 271,
-      "maxBuild": 271,
-      "channel": "alpha",
-      "publishedAt": "2026-09-21T16:08:00Z",
-      "cumulative": true,
-      "replacementMode": "replace-older-same-base",
-      "replaces": [
-        "2.3.24.1",
-        "2.3.24.2",
-        "2.3.24.3",
-        "2.3.24.4",
-        "2.3.24.5",
-        "2.3.24.6",
-        "2.3.24.7"
-      ],
-      "installable": false,
-      "description": "Pré-estabilização da futura Release 2.4 com proteção extra de DOM, escopo de filtros por subaba, silenciamento local de avisos de versão e utilitários de ciclo de tela.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.8.tpatch",
-      "sha256": "cfe95309a300bcfabb1abbe6b3f64faaae1bc32b2d12716c663eca2f0079a60d",
-      "changelog": [
-        "Configurações recebe proteção preventiva contra acesso a elementos já desmontados durante operações assíncronas.",
-        "A Central de erros reconhece também o falso positivo de style em configuracoes.html após desmontagem da tela.",
-        "Adicionado token de ciclo da tela para novos fluxos assíncronos descartarem respostas obsoletas.",
-        "Filtros salvos recebem scopeKey por página e subaba/módulo.",
-        "Avisos locais de patch/versão passam a respeitar imediatamente a categoria versoes silenciada.",
-        "A fila offline existente permanece sequencial; não foi introduzido envio paralelo.",
-        "Adicionado diagnóstico interno de pré-release para DOM, fila, filtros, favoritos, silenciamento e sincronização.",
-        "Mantidas todas as correções cumulativas das versões 2.3.24.1 até 2.3.24.7."
-      ],
-      "supersededBy": "2.3.24.9"
-    },
-    {
-      "id": "2.3.24.9",
-      "name": "TAREFAS 2.3.24.9 — Biometria somente ao abrir o app",
-      "baseVersion": "2.3.24",
-      "minBuild": 271,
-      "maxBuild": 271,
-      "channel": "alpha",
-      "publishedAt": "2026-09-21T16:56:00Z",
-      "cumulative": true,
-      "replacementMode": "replace-older-same-base",
-      "replaces": [
-        "2.3.24.1",
-        "2.3.24.2",
-        "2.3.24.3",
-        "2.3.24.4",
-        "2.3.24.5",
-        "2.3.24.6",
-        "2.3.24.7",
-        "2.3.24.8"
-      ],
-      "installable": true,
-      "description": "A biometria deixa de ser solicitada ao voltar do segundo plano e passa a ser cobrada apenas em um novo início real do aplicativo.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.24.9.tpatch",
-      "sha256": "50e404756c36f874eb0648240f601d501192396f8178ddba300eaf897b73c81b",
-      "changelog": [
-        "Ir para segundo plano e voltar ao TAREFAS não solicita mais biometria.",
-        "Apagar a tela, abrir a lista de aplicativos recentes ou alternar para outro app não cria uma nova trava biométrica.",
-        "A biometria continua sendo solicitada no próximo início real do TAREFAS após encerramento completo da Activity/WebView.",
-        "A navegação entre telas e abas continua sem solicitações adicionais.",
-        "A instalação da 2.3.24.9 preserva uma sessão já desbloqueada da 2.3.24.8 para não pedir biometria apenas por causa do reload do patch.",
-        "Quem não ativou biometria continua sem receber solicitação de senha/biometria.",
-        "Mantidas todas as correções cumulativas das versões 2.3.24.1 até 2.3.24.8."
-      ]
-    },
-    {
-      "id": "2.3.25.1",
-      "name": "TAREFAS 2.3.25.1 — Base Web 7.9.1",
-      "baseVersion": "2.3.25",
-      "minBuild": 272,
-      "maxBuild": 272,
-      "channel": "alpha",
-      "publishedAt": "2026-09-21T18:10:00Z",
-      "cumulative": true,
-      "replacementMode": "replace-older-same-base",
-      "replaces": [],
-      "installable": false,
-      "description": "Atualiza a identificação da base Web do TAREFAS Android de 7.8.2 para 7.9.1, mantendo o APK 2.3.25 build 272.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.25.1.tpatch",
-      "sha256": "1b26572f965abdc746d7c9825f836719a64dd9d492a1e319cbaf96f01a30dc2c",
-      "changelog": [
-        "Base Web efetiva atualizada para 7.9.1.",
-        "Cabeçalho do aplicativo passa a exibir 2.3.25.1 • WEB 7.9.1.",
-        "Tela Sobre/Atualizações passa a refletir a base Web 7.9.1 quando houver rótulo da versão Web.",
-        "Mantido o APK base 2.3.25 / build 272; nenhuma reinstalação de APK é necessária.",
-        "Patch distribuído no canal Alpha e compatível somente com a Beta 2.3.25 build 272."
-      ],
-      "supersededBy": "2.3.25.3"
-    },
-    {
-      "id": "2.3.25.2",
-      "name": "TAREFAS 2.3.25.2 — Correção de CSS bruto na tela",
-      "baseVersion": "2.3.25",
-      "minBuild": 272,
-      "maxBuild": 272,
-      "channel": "alpha",
-      "publishedAt": "2026-09-21T18:24:00Z",
-      "cumulative": true,
-      "replacementMode": "replace-older-same-base",
-      "replaces": [
-        "2.3.25.1"
-      ],
-      "installable": false,
-      "description": "Corrige a regressão da 2.3.25.1 que podia deixar conteúdo CSS visível na tela ao atualizar a identificação da base Web 7.9.1.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.25.2.tpatch",
-      "sha256": "f522ada9618e2f97a29fb855454b6d07a7e9127354748cf7a1f8c02a27082e66",
-      "changelog": [
-        "Corrigido o vazamento de CSS bruto para a área visível da página.",
-        "Removida a varredura ampla do conteúdo do main usada na 2.3.25.1.",
-        "A atualização de rótulos da Web 7.9.1 passa a atuar somente em elementos conhecidos de versão.",
-        "Adicionada recuperação automática para remover blocos de CSS da IA/layout que tenham sido inseridos como texto no body.",
-        "Mantida a base Web 7.9.1 e o cabeçalho 2.3.25.2 • WEB 7.9.1.",
-        "Mantido o APK base 2.3.25 / build 272, sem necessidade de reinstalação."
-      ],
-      "supersededBy": "2.3.25.3"
-    },
-    {
-      "id": "2.3.25.3",
-      "name": "TAREFAS 2.3.25.3 — Abas para diagnóstico",
-      "baseVersion": "2.3.25",
-      "minBuild": 272,
-      "maxBuild": 272,
-      "channel": "alpha",
-      "publishedAt": "2026-09-21T19:18:00Z",
-      "cumulative": true,
-      "replacementMode": "replace-older-same-base",
-      "replaces": [
-        "2.3.25.1",
-        "2.3.25.2"
-      ],
-      "installable": true,
-      "description": "Troca o antigo Salvar filtro atual por um seletor de abas para diagnóstico na Central de Ferramentas.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.3.25.3.tpatch",
-      "sha256": "13cdec37f84283c0a9e021d33cd6f4713c7f1f9dd9b233bb4f2c372465dff995",
-      "changelog": [
-        "O botão Salvar filtro atual foi substituído por Abas para diagnóstico.",
-        "Agora é possível escolher quais páginas, abas e módulos entram na visualização da Central de Erros.",
-        "Incluídas subabas da Central e módulos internos de Orçamentários no seletor.",
-        "Por padrão, Todas as abas permanece ativo para preservar o diagnóstico existente.",
-        "Quando abas específicas são escolhidas, a Central de Erros mostra somente os erros dessas áreas.",
-        "Erros de outras abas continuam armazenados; o filtro não apaga histórico.",
-        "A seção Filtros salvos em Ferramentas passa a mostrar Abas em diagnóstico.",
-        "Mantidas as correções da 2.3.25.2 para CSS bruto e a base Web 7.9.1."
-      ]
-    },
-    {
-      "id": "2.4.1.1",
-      "name": "TAREFAS 2.4.1.1 — Correção da versão nas notificações",
-      "baseVersion": "2.4.1",
-      "minBuild": 276,
-      "maxBuild": 276,
-      "channel": "alpha",
-      "publishedAt": "2026-09-22T12:10:00Z",
-      "cumulative": true,
-      "replacementMode": "replace-older-same-base",
-      "replaces": [],
-      "installable": false,
-      "description": "Corrige o registro da versão do aparelho usado pelos lembretes de atualização, evitando avisos com versões inválidas como 2.3.222.1.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.1.tpatch",
-      "sha256": "cb7016c662cc3c1e04e25b0d17069fb7ebc43630394cf50646d360a1bd8aac11",
-      "changelog": [
-        "Sincroniza o aparelho atual com a versão base correta 2.4.1 no cadastro de notificações push.",
-        "Corrige a origem do lembrete que podia exibir uma versão inválida como 2.3.222.1.",
-        "Lembretes antigos da 2.4.1 são marcados como lidos após a sincronização do aparelho.",
-        "O servidor passa a ocultar versões inválidas no título de futuros lembretes, usando uma mensagem genérica quando necessário.",
-        "A versão efetiva do aplicativo passa a aparecer como 2.4.1.1 após a instalação do patch.",
-        "Mantidos o seletor nativo de ícones, Base Web 7.9.1 e todas as funções da Beta 2.4.1."
-      ],
-      "supersededBy": "2.4.1.11"
-    },
-    {
-      "id": "2.4.1.2",
-      "name": "TAREFAS 2.4.1.2 — Correção de EXIT USERS e Reinício",
-      "baseVersion": "2.4.1",
-      "minBuild": 276,
-      "maxBuild": 276,
-      "channel": "alpha",
-      "publishedAt": "2026-09-22T17:40:00Z",
-      "cumulative": true,
-      "replacementMode": "replace-older-same-base",
-      "replaces": [
-        "2.4.1.1"
-      ],
-      "installable": false,
-      "description": "Corrige EXIT USERS e Reinício disparando ao entrar no site/app por causa de tokens históricos do Painel SITE.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.2.tpatch",
-      "sha256": "120f885b264377e0824173625c25efe51d7b61d058ba0eacba00bbd1fcaeabdf",
-      "changelog": [
-        "Corrige o bug que podia executar EXIT USERS em usuários que acabavam de entrar no TAREFAS.",
-        "Corrige o bug equivalente que podia redirecionar usuários para Reinício ao abrir o site ou o app.",
-        "A primeira leitura de tokens históricos do Painel SITE agora é tratada como baseline, não como uma nova ação administrativa.",
-        "O servidor passa a expor tokens de EXIT/REINÍCIO somente por uma janela curta após uma ação realmente concluída, evitando reaproveitamento de tokens antigos.",
-        "Mantém a correção da 2.4.1.1 para sincronização da versão usada nas notificações de atualização.",
-        "Mantém Base Web 7.9.1, seletor nativo de ícones e todas as funções da Beta 2.4.1."
-      ],
-      "supersededBy": "2.4.1.11"
-    },
-    {
-      "id": "2.4.1.3",
-      "name": "TAREFAS 2.4.1.3 — Estabilização de EXIT USERS e Reinício",
-      "baseVersion": "2.4.1",
-      "minBuild": 276,
-      "maxBuild": 276,
-      "channel": "alpha",
-      "publishedAt": "2026-09-22T17:45:00Z",
-      "cumulative": true,
-      "replacementMode": "replace-older-same-base",
-      "replaces": [
-        "2.4.1.1",
-        "2.4.1.2"
-      ],
-      "installable": false,
-      "description": "Estabiliza a correção de EXIT USERS e Reinício na entrada do site/app, incluindo proteção contra corrida de inicialização.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.3.tpatch",
-      "sha256": "9dbc89b6f667da7c23159dd3d5538df2df5a6defb7a2e237213b77c1dfef0847",
-      "changelog": [
-        "Mantém a correção que impede tokens históricos de EXIT USERS de expulsarem usuários ao entrar.",
-        "Mantém a correção equivalente para Reinício.",
-        "Adiciona tentativas de baseline por até 10 segundos para cobrir carregamento assíncrono do Painel SITE no app e no navegador.",
-        "Mantém a correção da versão registrada para notificações de atualização introduzida na 2.4.1.1.",
-        "Preserva o seletor nativo de ícones, Base Web 7.9.1 e todas as funções da Beta 2.4.1."
-      ],
-      "supersededBy": "2.4.1.11"
-    },
-    {
-      "id": "2.4.1.4",
-      "name": "TAREFAS 2.4.1.4 — Biometria sem login duplicado",
-      "baseVersion": "2.4.1",
-      "minBuild": 276,
-      "maxBuild": 276,
-      "channel": "alpha",
-      "publishedAt": "2026-09-22T17:50:00Z",
-      "cumulative": true,
-      "replacementMode": "replace-older-same-base",
-      "replaces": [
-        "2.4.1.1",
-        "2.4.1.2",
-        "2.4.1.3"
-      ],
-      "installable": false,
-      "description": "Corrige o segundo pedido de login/biometria após uma autenticação já concluída na tela de entrada.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.4.tpatch",
-      "sha256": "3c241a54ef9813fd5ba91872fb449f4833bef88c27df1f2f2cc36b9f0f8bed63",
-      "changelog": [
-        "Corrige o login biométrico sendo solicitado duas vezes ao entrar no aplicativo.",
-        "Uma autenticação concluída na tela de login passa a valer como desbloqueio do ciclo atual do app.",
-        "Login por senha também passa a impedir uma segunda solicitação biométrica logo após entrar.",
-        "A biometria continua sendo solicitada novamente apenas em um novo início real do aplicativo.",
-        "Mantém as correções de EXIT USERS/Reinício e sincronização da versão das Alphas anteriores.",
-        "Preserva Base Web 7.9.1, seletor nativo de ícones e todas as funções da Beta 2.4.1."
-      ],
-      "supersededBy": "2.4.1.11"
-    },
-    {
-      "id": "2.4.1.5",
-      "name": "TAREFAS 2.4.1.5 — Escalas por Google Planilhas",
-      "baseVersion": "2.4.1",
-      "minBuild": 276,
-      "maxBuild": 276,
-      "channel": "alpha",
-      "publishedAt": "2026-09-22T19:10:00Z",
-      "cumulative": true,
-      "replacementMode": "replace-older-same-base",
-      "replaces": [
-        "2.4.1.1",
-        "2.4.1.2",
-        "2.4.1.3",
-        "2.4.1.4"
-      ],
-      "installable": false,
-      "description": "Substitui as escalas internas de Serviço e Missão por links oficiais das escalas de Motorista, Patrulheiro e Permanência.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.5.tpatch",
-      "sha256": "d9e3a87cb7938b2028dabec57e86fe6558c35a3c8716240e768caaffab1af43f",
-      "changelog": [
-        "Remove Escala de serviço e Escala de missão do menu Pessoal.",
-        "Adiciona link oficial para a Escala de motorista no Google Planilhas.",
-        "Adiciona link oficial para a Escala de patrulheiro no Google Planilhas.",
-        "Adiciona link oficial para a Escala de permanência no Google Planilhas.",
-        "Acesso direto às páginas antigas de Serviço/Missão passa a mostrar somente o novo painel de escalas externas.",
-        "Mantém a correção de login biométrico duplicado da 2.4.1.4 e todas as correções anteriores.",
-        "Preserva Férias/Dispensas, Usuários, Base Web 7.9.1 e todas as funções da Beta 2.4.1."
-      ],
-      "supersededBy": "2.4.1.11"
-    },
-    {
-      "id": "2.4.1.6",
-      "name": "TAREFAS 2.4.1.6 — Escalas externas + IA",
-      "baseVersion": "2.4.1",
-      "minBuild": 276,
-      "maxBuild": 276,
-      "channel": "alpha",
-      "publishedAt": "2026-09-22T19:35:00Z",
-      "cumulative": true,
-      "replacementMode": "replace-older-same-base",
-      "replaces": [
-        "2.4.1.1",
-        "2.4.1.2",
-        "2.4.1.3",
-        "2.4.1.4",
-        "2.4.1.5"
-      ],
-      "installable": false,
-      "description": "Transforma Escalas em item próprio da navegação, remove Missões e integra a IA às planilhas oficiais de Motorista, Patrulheiro e Permanência. RETIRADO: causava travamento por loop de MutationObserver.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.6.tpatch",
-      "sha256": "7bf531f15bd8aeb7f1f650b20883726b12cf158fde275f6d08c50aec6e2e3c75",
-      "changelog": [
-        "Escalas agora aparece como item próprio no menu, sem o caminho Pessoal/Escalas.",
-        "Remove a aba/link de Missões da navegação.",
-        "Mantém apenas as escalas externas de Motorista, Patrulheiro e Permanência.",
-        "A IA passa a consultar em modo somente leitura a aba Previsão das três planilhas oficiais.",
-        "Remove Escala de Serviço e Missões antigas do contexto consultável pela IA.",
-        "Perguntas sobre motorista, patrulheiro e permanência passam a usar os dados das planilhas.",
-        "Mantém as correções cumulativas das Alphas anteriores."
-      ],
-      "supersededBy": "2.4.1.11"
-    },
-    {
-      "id": "2.4.1.7",
-      "name": "TAREFAS 2.4.1.7 — Correção de travamento das Escalas",
-      "baseVersion": "2.4.1",
-      "minBuild": 276,
-      "maxBuild": 276,
-      "channel": "alpha",
-      "publishedAt": "2026-09-22T19:55:00Z",
-      "cumulative": true,
-      "replacementMode": "replace-older-same-base",
-      "replaces": [
-        "2.4.1.1",
-        "2.4.1.2",
-        "2.4.1.3",
-        "2.4.1.4",
-        "2.4.1.5",
-        "2.4.1.6"
-      ],
-      "installable": false,
-      "description": "Corrige o travamento causado pela atualização contínua do menu de Escalas na Alpha 2.4.1.6.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.7.tpatch",
-      "sha256": "34e654064ee8e0ea2bff01764a247e63bc556288f3224d6077073ec233aec84f",
-      "changelog": [
-        "Corrige o travamento geral introduzido na 2.4.1.6.",
-        "Remove o observador de DOM que recriava o menu de Escalas em loop contínuo.",
-        "Escalas continua como item próprio do menu, fora de Pessoal.",
-        "Mantém Motorista, Patrulheiro e Permanência com os três links oficiais.",
-        "Mantém Missões removida da navegação.",
-        "Mantém a IA consultando as três planilhas em modo somente leitura.",
-        "Mantém as correções cumulativas das Alphas anteriores."
-      ],
-      "supersededBy": "2.4.1.11"
-    },
-    {
-      "id": "2.4.1.8",
-      "name": "TAREFAS 2.4.1.8 — Correção do menu Escalas",
-      "baseVersion": "2.4.1",
-      "minBuild": 276,
-      "maxBuild": 276,
-      "channel": "alpha",
-      "publishedAt": "2026-09-23T09:40:15.732Z",
-      "cumulative": true,
-      "replacementMode": "replace-older-same-base",
-      "replaces": [
-        "2.4.1.1",
-        "2.4.1.2",
-        "2.4.1.3",
-        "2.4.1.4",
-        "2.4.1.5",
-        "2.4.1.6",
-        "2.4.1.7"
-      ],
-      "installable": false,
-      "description": "Corrige o menu móvel para remover definitivamente Pessoal / Escalas e Missões e deixar apenas Escalas, com as três planilhas oficiais.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.8.tpatch",
-      "sha256": "bb86868b1c3a586fed5b84348f0910514b56d90512c93db2e46cd3d95c4ec21f",
-      "changelog": [
-        "Remove Pessoal / Escalas do menu móvel.",
-        "Remove Missões do menu móvel.",
-        "Adiciona somente Escalas em Serviços e pessoal.",
-        "Escalas abre Motorista, Patrulheiro e Permanência.",
-        "Mantém as três URLs oficiais das planilhas.",
-        "Não altera a navegação base do app e não usa observador recursivo."
-      ],
-      "supersededBy": "2.4.1.11"
-    },
-    {
-      "id": "2.4.1.9",
-      "name": "TAREFAS 2.4.1.9 — Ocultar patches antigos já substituídos",
-      "baseVersion": "2.4.1",
-      "minBuild": 276,
-      "maxBuild": 276,
-      "channel": "alpha",
-      "publishedAt": "2026-09-23T06:45:00Z",
-      "cumulative": true,
-      "replacementMode": "replace-older-same-base",
-      "replaces": [
-        "2.4.1.1",
-        "2.4.1.2",
-        "2.4.1.3",
-        "2.4.1.4",
-        "2.4.1.5",
-        "2.4.1.6",
-        "2.4.1.7",
-        "2.4.1.8"
-      ],
-      "installable": false,
-      "description": "Corrige o Gerenciador de Patches para não exibir patches antigos que já foram substituídos por um patch cumulativo instalado.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.9.tpatch",
-      "sha256": "1951e374c6b8f71b342f0421b3661292751892605c475ca7df8f89dacb70553b",
-      "changelog": [
-        "Oculta patches oficiais anteriores ao patch cumulativo atualmente instalado.",
-        "Impede que a Alpha 2.4.1.7 continue aparecendo depois da instalação da 2.4.1.8.",
-        "Funciona mesmo quando o catálogo antigo ficou preso em cache na interface.",
-        "Observador limitado a alterações de conteúdo, sem loop recursivo."
-      ],
-      "supersededBy": "2.4.1.11"
-    },
-    {
-      "id": "2.4.1.10",
-      "name": "TAREFAS 2.4.1.10 — Correção do Gerenciador de Patches",
-      "baseVersion": "2.4.1",
-      "minBuild": 276,
-      "maxBuild": 276,
-      "channel": "alpha",
-      "publishedAt": "2026-09-23T06:50:00Z",
-      "cumulative": true,
-      "replacementMode": "replace-older-same-base",
-      "replaces": [
-        "2.4.1.1",
-        "2.4.1.2",
-        "2.4.1.3",
-        "2.4.1.4",
-        "2.4.1.5",
-        "2.4.1.6",
-        "2.4.1.7",
-        "2.4.1.8",
-        "2.4.1.9"
-      ],
-      "installable": true,
-      "description": "Corrige o carregamento do Gerenciador de Patches após a 2.4.1.9, removendo o observador que causava atualizações contínuas na tela.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.10.tpatch",
-      "sha256": "efcfa50dec03cb47ba39c9e5f6eb6c1bd454c4334a4736c5285c1ab24cbbaa2d",
-      "changelog": [
-        "Desativa o observador introduzido pela 2.4.1.9.",
-        "Remove o estado de carregamento contínuo causado pelo loop de mutações.",
-        "Restaura o Gerenciador de Patches para voltar a consultar e exibir os patches normalmente.",
-        "Não altera a navegação nem o sistema de Escalas."
-      ],
-      "supersededBy": "2.4.1.11"
-    },
-    {
-      "id": "2.4.1.11",
-      "name": "TAREFAS 2.4.1.11 — SHA-256 por bytes",
-      "baseVersion": "2.4.1",
-      "minBuild": 276,
-      "maxBuild": 276,
-      "channel": "alpha",
-      "publishedAt": "2026-09-23T08:10:00Z",
-      "cumulative": true,
-      "replacementMode": "replace-older-same-base",
-      "replaces": [
-        "2.4.1.1",
-        "2.4.1.2",
-        "2.4.1.3",
-        "2.4.1.4",
-        "2.4.1.5",
-        "2.4.1.6",
-        "2.4.1.7",
-        "2.4.1.8",
-        "2.4.1.9",
-        "2.4.1.10"
-      ],
-      "installable": false,
-      "description": "Corrige a validação de SHA-256 do Gerenciador de Patches para calcular o hash diretamente sobre os bytes baixados, sem conversão bytes→texto→bytes.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.11.tpatch",
-      "sha256": "0e90c50d7e8679176ece11f40ae23a62b7d50400cf00ef50e9dc9290cca70f42",
-      "changelog": [
-        "Validação do arquivo oficial passa a usar SHA-256 diretamente sobre os bytes recebidos.",
-        "Leitura do .tpatch só acontece depois da validação do hash.",
-        "Usa a GitHub Contents API em Base64 como fonte primária e preserva fallback para o download raw.",
-        "Mostra no erro o SHA esperado, o SHA calculado e o tamanho recebido para diagnóstico.",
-        "Desativa o observador problemático da 2.4.1.9 para evitar carregamento contínuo.",
-        "Esta Alpha substitui cumulativamente as versões 2.4.1.1 até 2.4.1.10."
-      ],
-      "supersededBy": "2.4.1.12"
-    },
-    {
-      "id": "2.4.1.12",
-      "name": "TAREFAS 2.4.1.12 — Teste de SHA-256",
-      "baseVersion": "2.4.1",
-      "minBuild": 276,
-      "maxBuild": 276,
-      "channel": "alpha",
-      "publishedAt": "2026-09-23T10:38:00Z",
-      "cumulative": true,
-      "replacementMode": "replace-older-same-base",
-      "replaces": [
-        "2.4.1.1",
-        "2.4.1.2",
-        "2.4.1.3",
-        "2.4.1.4",
-        "2.4.1.5",
-        "2.4.1.6",
-        "2.4.1.7",
-        "2.4.1.8",
-        "2.4.1.9",
-        "2.4.1.10",
-        "2.4.1.11"
-      ],
-      "installable": true,
-      "description": "Patch de teste para validar o cálculo do SHA-256 do arquivo oficial usando os bytes recebidos.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.12.tpatch",
-      "sha256": "b014cfaaa7a8ca7328673bc3c1c9c03cc25cccf3683a30c431e89a243e4af459",
-      "changelog": [
-        "Patch mínimo e inofensivo para teste de validação SHA-256.",
-        "Não altera a navegação nem as Escalas.",
-        "Define apenas um marcador interno para confirmar a execução do patch.",
-        "Substitui cumulativamente a 2.4.1.11 e os patches anteriores da mesma base."
-      ]
+      "order": 2440203,
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.4-prebeta3.tpatch",
+      "sha256": "17a0eed60cdfb18557258a15a503fee0dd0927b25012c926acf270d3cd52547c",
+      "installable": true
     }
   ],
-  "cacheNonce": "2436-scales-cleanup-r1"
+  "cacheNonce": "244-prebeta3-google-r3"
 }

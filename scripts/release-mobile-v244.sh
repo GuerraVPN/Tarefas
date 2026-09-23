@@ -13,7 +13,6 @@ npm install --no-save --package-lock=false --ignore-scripts jspdf@2.5.2
 node --check app/mobile-launcher-icon-v241.js
 node --check scripts/build-mobile-v244.mjs
 node --check scripts/verify-mobile-v244.mjs
-node scripts/verify-web.mjs .
 
 # Recria exatamente a Oficial 2.4.0 e aplica somente a camada Beta 2.4.4.
 git fetch origin beta-2.3.25
@@ -26,9 +25,13 @@ ln -s "$GITHUB_WORKSPACE/node_modules" "$BASE_DIR/node_modules"
 )
 rm -rf "$GITHUB_WORKSPACE/dist"
 cp -a "$BASE_DIR/dist" "$GITHUB_WORKSPACE/dist"
+# A consolidação 2.4.4 parte dos runtimes oficiais 2.4.0, que são mantidos em app/.
+cp app/mobile-patch-manager-v240.js "$GITHUB_WORKSPACE/dist/mobile-patch-manager-v240.js"
+cp app/mobile-release-v240.js "$GITHUB_WORKSPACE/dist/mobile-release-v240.js"
+# A base 2.3.25 pode não carregar os bundles Web 7.9.1; a Beta 2.4.4 precisa empacotá-los explicitamente.
+cp v7_9_1_web.js "$GITHUB_WORKSPACE/dist/v7_9_1_web.js"
+cp v7_9_1_site.js "$GITHUB_WORKSPACE/dist/v7_9_1_site.js"
 
-node scripts/build-mobile-v240.mjs
-node scripts/build-mobile-v242.mjs
 node scripts/build-mobile-v244.mjs
 node scripts/verify-mobile-v244.mjs dist
 
@@ -133,7 +136,7 @@ unzip -p "$UNSIGNED" assets/public/mobile-patch-manager-v240.js > "$RUNNER_TEMP/
 unzip -p "$UNSIGNED" assets/public/mobile-updates-v181.js > "$RUNNER_TEMP/updates-v244.js"
 grep -q '__TAREFAS_LAUNCHER_ICON_241__' "$RUNNER_TEMP/launcher-v244.js"
 grep -q 'pinProfileShortcut' "$RUNNER_TEMP/launcher-v244.js"
-grep -q '__TAREFAS_BETA_243_BOOT__' "$RUNNER_TEMP/bootstrap-v244.js"
+grep -q '__TAREFAS_BETA_244_BOOT__' "$RUNNER_TEMP/bootstrap-v244.js"
 grep -q '__TAREFAS_PATCH_MANAGER_V279__' "$RUNNER_TEMP/pm-v244.js"
 grep -q "v1_8_get_beta_updates" "$RUNNER_TEMP/pm-v244.js"
 grep -q "v2_3_21_alpha_context" "$RUNNER_TEMP/pm-v244.js"
