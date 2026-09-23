@@ -26,7 +26,7 @@ const [launcher,pm,release,bootstrap,nav,tabs,runtime,preload,updates,ai]=await 
   read('mobile-ai-v230.js')
 ]);
 
-must(launcher.includes('__TAREFAS_LAUNCHER_ICON_242__'),'seletor de ícones ausente');
+must(launcher.includes('__TAREFAS_LAUNCHER_ICON_241__'),'seletor de ícones ausente');
 must(launcher.includes('pinProfileShortcut'),'modo Meu perfil ausente');
 must(launcher.includes('TAREFAS Azul')&&launcher.includes('Militar')&&launcher.includes('Preto & Ouro'),'presets incompletos');
 
@@ -70,7 +70,7 @@ for(const name of html){
   if(!special)must(source.includes('mobile-launcher-icon-v241.js'),name+' não carrega seletor de ícones');
 }
 
-const manifest=JSON.parse(await read('BETA_2_4_1.json'));
+const manifest=JSON.parse(await read('BETA_2_4_2.json'));
 must(manifest.version==='2.4.2'&&manifest.build===277&&manifest.channel==='beta','manifesto Beta inválido');
 must(manifest.webVersion==='7.9.1','base Web não é 7.9.1');
 must(manifest.features?.launcherNativeBridge===true,'ponte nativa do launcher não registrada');
