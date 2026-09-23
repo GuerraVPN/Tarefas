@@ -1,0 +1,46 @@
+name: Android 2.4.3.1 Alpha - Teste
+
+on:
+  push:
+    branches: [app/android-v2431-alpha]
+  workflow_dispatch:
+
+concurrency:
+  group: android-v2431-alpha
+  cancel-in-progress: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Compilar, validar, assinar e publicar 2.4.3.1 Alpha
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          chmod +x scripts/release-mobile-v2431.sh
+          scripts/release-mobile-v2431.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tarefas-android-2.4.3.1-alpha-build-279
+          path: |
+            TAREFAS-2.4.3.1.apk
+            TAREFAS-2.4.3.1.apk.sha256
+            TAREFAS-2.4.3.1-alpha-build-279.zip
+            TAREFAS-2.4.3.1-alpha-build-279.zip.sha256
+            app/release-v2431.txt
+            dist/ALPHA_2_4_3_1.json
+          if-no-files-found: error
