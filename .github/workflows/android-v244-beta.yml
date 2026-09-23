@@ -37,6 +37,16 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
+      - name: Restaurar plugins Android nativos necessários
+        run: |
+          set -euo pipefail
+          mkdir -p app/android
+          for file in StorageAccessPlugin.java TarefasBiometricPlugin.java TarefasLauncherIconPlugin.java; do
+            if [ ! -s "app/android/$file" ]; then
+              git show b83a11383b30cf7161dae17849d4b87d6000bdd8:"app/android/$file" > "app/android/$file"
+            fi
+            test -s "app/android/$file"
+          done
       - name: Compilar, validar, assinar e publicar 2.4.4 Beta
         env:
           GH_TOKEN: ${{ github.token }}
