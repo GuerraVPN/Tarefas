@@ -3,8 +3,8 @@
   "app": "TAREFAS",
   "baseVersion": "2.4.1",
   "baseBuild": 276,
-  "generatedAt": "2026-09-23T18:20:00Z",
-  "latestPatch": "2.4.4-prebeta3",
+  "generatedAt": "2026-09-23T22:20:00Z",
+  "latestPatch": "2.4.5.1",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -508,6 +508,31 @@
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.4-prebeta3.tpatch",
       "sha256": "17a0eed60cdfb18557258a15a503fee0dd0927b25012c926acf270d3cd52547c",
       "installable": true
+    },
+    {
+      "format": "tarefas-tpatch-v1",
+      "id": "2.4.5.1",
+      "name": "TAREFAS 2.4.5.1 — Correção do histórico e remoção do Próximo Serviço",
+      "patchVersion": 1,
+      "createdAt": "2026-09-23T00:00:00Z",
+      "baseVersion": "2.4.5",
+      "minBuild": 280,
+      "maxBuild": 280,
+      "channel": "alpha",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [],
+      "description": "Corrige a descrição repetida da Beta 2.4.1 no histórico de versões e remove novamente o card Próximo Serviço da tela inicial.",
+      "changelog": [
+        "Corrige o histórico para que as descrições das versões 2.4.1, 2.4.2, 2.4.3 e 2.4.5 não sejam reutilizadas como se fossem a mesma descrição.",
+        "Remove novamente o card Próximo Serviço da tela inicial.",
+        "Patch cumulativo compatível com a Beta 2.4.5/build 280.",
+        "Não altera Escalas, Patch Manager ou outras funções da 2.4.5."
+      ],
+      "order": 24501,
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.5.1.tpatch",
+      "sha256": "3ba9bf3032d97fb91fe82b292c9fa48ba946321c682c490ba8e0b8383400e879",
+      "installable": true
     }
   ],
   "history": [
@@ -790,7 +815,32 @@
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.4-prebeta3.tpatch",
       "sha256": "17a0eed60cdfb18557258a15a503fee0dd0927b25012c926acf270d3cd52547c",
       "installable": true
+    },
+    {
+      "format": "tarefas-tpatch-v1",
+      "id": "2.4.5.1",
+      "name": "TAREFAS 2.4.5.1 — Correção do histórico e remoção do Próximo Serviço",
+      "patchVersion": 1,
+      "createdAt": "2026-09-23T00:00:00Z",
+      "baseVersion": "2.4.5",
+      "minBuild": 280,
+      "maxBuild": 280,
+      "channel": "alpha",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [],
+      "description": "Corrige a descrição repetida da Beta 2.4.1 no histórico de versões e remove novamente o card Próximo Serviço da tela inicial.",
+      "changelog": [
+        "Corrige o histórico para que as descrições das versões 2.4.1, 2.4.2, 2.4.3 e 2.4.5 não sejam reutilizadas como se fossem a mesma descrição.",
+        "Remove novamente o card Próximo Serviço da tela inicial.",
+        "Patch cumulativo compatível com a Beta 2.4.5/build 280.",
+        "Não altera Escalas, Patch Manager ou outras funções da 2.4.5."
+      ],
+      "order": 24501,
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.5.1.tpatch",
+      "sha256": "3ba9bf3032d97fb91fe82b292c9fa48ba946321c682c490ba8e0b8383400e879",
+      "installable": true
     }
   ],
-  "cacheNonce": "244-prebeta3-google-r3"
+  "cacheNonce": "2451-history-nextservice-r1"
 }
