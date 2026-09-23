@@ -113,6 +113,30 @@ await patch('mobile-release-v240.js',source=>{
   return out;
 });
 
+// Alpha 2.4.3.1: canal Alpha e marcadores finais.
+await patch('mobile-updates-v181.js',source=>source
+  .replace("const APP_CHANNEL = 'beta';","const APP_CHANNEL = 'alpha';")
+  .replace("const APP_CHANNEL='beta';","const APP_CHANNEL='alpha';"),{required:false});
+
+await patch('mobile-bootstrap.js',source=>source
+  .replaceAll('Beta '+VERSION,'Alpha '+VERSION)
+  .replaceAll('2.4.3 Beta','2.4.3.1 Alpha')
+  .replaceAll('__TAREFAS_BETA_243_BOOT__','__TAREFAS_ALPHA_2431_BOOT__')
+  .replaceAll("channel:'beta'","channel:'alpha'"),{required:false});
+
+await patch('mobile-alpha-v23223-fix.js',source=>source
+  .replaceAll('TAREFAS 2.4.3 Beta','TAREFAS 2.4.3.1 Alpha')
+  .replaceAll('TarefasBeta243','TarefasAlpha2431')
+  .replaceAll('__TAREFAS_BETA_NAV_V278__','__TAREFAS_ALPHA_NAV_V279__'),{required:false});
+
+await patch('mobile-alpha-v23221-tabs.js',source=>source
+  .replaceAll('<small>Beta 2.4.3</small>','<small>Alpha 2.4.3.1</small>')
+  .replaceAll('__TAREFAS_BETA_TABS_V278__','__TAREFAS_ALPHA_TABS_V279__'),{required:false});
+
+await patch('mobile-release-v240.js',source=>source
+  .replaceAll("channel:'beta'","channel:'alpha'")
+  .replaceAll('__TAREFAS_BETA_243__','__TAREFAS_ALPHA_2431__'),{required:false});
+
 await rm(path.join(dist,'RELEASE_2_4_0.json'),{force:true});
 await rm(path.join(dist,'BETA_2_4_2.json'),{force:true});
 await writeFile(path.join(dist,'ALPHA_2_4_3_1.json'),JSON.stringify({
