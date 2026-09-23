@@ -142,6 +142,8 @@ grep -q "const APP_CHANNEL = 'beta';" "$RUNNER_TEMP/updates-v243.js"
 OIDC="$(curl --fail --silent --show-error \
   -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
   "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-signing" | jq -r '.value')"
+OIDC_PAYLOAD="$(printf '%s' "$OIDC" | cut -d. -f2 | tr '_-' '/+' | awk '{l=length($0)%4;if(l==2)print $0"==";else if(l==3)print $0"=";else print $0}' | base64 -d 2>/dev/null | jq -c '{repository,event_name,ref,workflow_ref}' || true)"
+echo "OIDC_RELEASE_CLAIMS=$OIDC_PAYLOAD"
 
 curl --fail --silent --show-error \
   -H "Authorization: Bearer $OIDC" \
