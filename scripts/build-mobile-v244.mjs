@@ -68,7 +68,8 @@ await patch('mobile-bootstrap.js',source=>{
 await patch('mobile-alpha-v23223-fix.js',source=>source
   .replace("const VERSION='2.4.2',BUILD=277,MARK='__TAREFAS_BETA_NAV_V277__';","const VERSION='"+VERSION+"',BUILD="+BUILD+",MARK='__TAREFAS_BETA_NAV_V279__';")
   .replaceAll('TAREFAS 2.4.2 Beta','TAREFAS '+VERSION+' Beta')
-  .replaceAll('TarefasBeta242','TarefasBeta244'),{required:false});
+  .replaceAll('TarefasBeta242','TarefasBeta244')
+  .concat("\n;globalThis.__TAREFAS_BETA_NAV_V279__={version:'"+VERSION+"',build:"+BUILD+",channel:'beta'};"),{required:false});
 
 await patch('mobile-alpha-v23221.js',source=>source
   .replace("const VERSION='2.4.2',BUILD=277","const VERSION='"+VERSION+"',BUILD="+BUILD)
@@ -78,7 +79,8 @@ await patch('mobile-alpha-v23221.js',source=>source
 
 await patch('mobile-alpha-v23221-tabs.js',source=>source
   .replace("const MARK='__TAREFAS_BETA_TABS_V277__',VERSION='2.4.2',BUILD=277","const MARK='__TAREFAS_BETA_TABS_V279__',VERSION='"+VERSION+"',BUILD="+BUILD)
-  .replace('<small>Beta 2.4.2</small>','<small>Beta '+VERSION+'</small>'),{required:false});
+  .replace('<small>Beta 2.4.2</small>','<small>Beta '+VERSION+'</small>')
+  .concat("\n;globalThis.__TAREFAS_BETA_TABS_V279__={version:'"+VERSION+"',build:"+BUILD+",channel:'beta'};"),{required:false});
 
 await patch('mobile-preload.js',source=>{
   const out=source
