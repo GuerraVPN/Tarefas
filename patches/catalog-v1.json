@@ -3,7 +3,7 @@
   "app": "TAREFAS",
   "baseVersion": "2.4.1",
   "baseBuild": 276,
-  "generatedAt": "2026-09-23T07:25:00Z",
+  "generatedAt": "2026-09-23T07:30:00Z",
   "latestPatch": "2.4.1.10",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
@@ -217,7 +217,7 @@
       "installable": true,
       "description": "Corrige o carregamento do Gerenciador de Patches após a 2.4.1.9, removendo o observador que causava atualizações contínuas na tela.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.10.tpatch",
-      "sha256": "b50ea0ef46f59ab34eb73ed398ee8bafa6e27c2e54cff8e240b72427bb9cc55b",
+      "sha256": "efcfa50dec03cb47ba39c9e5f6eb6c1bd454c4334a4736c5285c1ab24cbbaa2d",
       "changelog": [
         "Desativa o observador introduzido pela 2.4.1.9.",
         "Remove o estado de carregamento contínuo causado pelo loop de mutações.",
@@ -1004,7 +1004,7 @@
       "installable": true,
       "description": "Corrige o carregamento do Gerenciador de Patches após a 2.4.1.9, removendo o observador que causava atualizações contínuas na tela.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.10.tpatch",
-      "sha256": "b50ea0ef46f59ab34eb73ed398ee8bafa6e27c2e54cff8e240b72427bb9cc55b",
+      "sha256": "efcfa50dec03cb47ba39c9e5f6eb6c1bd454c4334a4736c5285c1ab24cbbaa2d",
       "changelog": [
         "Desativa o observador introduzido pela 2.4.1.9.",
         "Remove o estado de carregamento contínuo causado pelo loop de mutações.",
@@ -1013,5 +1013,5 @@
       ]
     }
   ],
-  "cacheNonce": "24110-sha-fix-r3"
+  "cacheNonce": "24110-sha-fix-r4"
 }
