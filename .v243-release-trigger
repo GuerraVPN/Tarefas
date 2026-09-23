@@ -1,1 +1,2 @@
 release=2.4.3-build-278\nstatus=ready-to-build\ntrigger=build-script-fixed\n
+dispatch=main-workflow-ready
