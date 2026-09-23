@@ -3,8 +3,8 @@
   "app": "TAREFAS",
   "baseVersion": "2.4.1",
   "baseBuild": 276,
-  "generatedAt": "2026-09-22T19:57:00Z",
-  "latestPatch": "2.4.1.7",
+  "generatedAt": "2026-09-23T06:38:00-03:00",
+  "latestPatch": "2.4.1.8",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -128,6 +128,38 @@
         "Mantém Missões removida da navegação.",
         "Mantém a IA consultando as três planilhas em modo somente leitura.",
         "Mantém as correções cumulativas das Alphas anteriores."
+      ]
+    },
+    {
+      "id": "2.4.1.8",
+      "name": "TAREFAS 2.4.1.8 — Correção do menu Escalas",
+      "baseVersion": "2.4.1",
+      "minBuild": 276,
+      "maxBuild": 276,
+      "channel": "alpha",
+      "publishedAt": "2026-09-23T06:35:00-03:00",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.4.1.1",
+        "2.4.1.2",
+        "2.4.1.3",
+        "2.4.1.4",
+        "2.4.1.5",
+        "2.4.1.6",
+        "2.4.1.7"
+      ],
+      "installable": true,
+      "description": "Corrige o menu móvel para remover definitivamente Pessoal / Escalas e Missões e deixar apenas Escalas, com as três planilhas oficiais.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.8.tpatch",
+      "sha256": "5cf223d34b081e4f330f7833569a95b0b26235df3d5cc458285cb8435a124921",
+      "changelog": [
+        "Remove Pessoal / Escalas do menu móvel.",
+        "Remove Missões do menu móvel.",
+        "Adiciona somente Escalas em Serviços e pessoal.",
+        "Escalas abre Motorista, Patrulheiro e Permanência.",
+        "Mantém as três URLs oficiais das planilhas.",
+        "Não altera a navegação base do app e não usa observador recursivo."
       ]
     }
   ],
@@ -788,5 +820,5 @@
       "supersededBy": "2.4.1.7"
     }
   ],
-  "cacheNonce": "2417-freeze-fix"
+  "cacheNonce": "2418-drawer-only-r2"
 }
