@@ -1,0 +1,31 @@
+name: Dispatch Android 2.4.3 Beta
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+    paths:
+      - '.v243-release-trigger'
+      - 'scripts/build-mobile-v243.mjs'
+      - 'scripts/verify-mobile-v243.mjs'
+      - 'scripts/release-mobile-v243.sh'
+      - '.github/workflows/android-v243-beta.yml'
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: dispatch-android-v243-\${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  dispatch:
+    if: \${{ github.event.pull_request.head.ref == 'app/android-v243-prep' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Disparar build oficial no branch de preparação
+        env:
+          GH_TOKEN: \${{ github.token }}
+        run: |
+          gh workflow run android-v243-beta.yml --repo GuerraVPN/Tarefas --ref app/android-v243-prep
