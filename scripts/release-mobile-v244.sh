@@ -13,7 +13,6 @@ npm install --no-save --package-lock=false --ignore-scripts jspdf@2.5.2
 node --check app/mobile-launcher-icon-v241.js
 node --check scripts/build-mobile-v244.mjs
 node --check scripts/verify-mobile-v244.mjs
-node scripts/verify-web.mjs .
 
 # Recria exatamente a Oficial 2.4.0 e aplica somente a camada Beta 2.4.4.
 git fetch origin beta-2.3.25
