@@ -13,7 +13,7 @@ npm install --no-save --package-lock=false --ignore-scripts jspdf@2.5.2
 node --check app/mobile-launcher-icon-v241.js
 node --check scripts/build-mobile-v243.mjs
 node --check scripts/build-mobile-v245.mjs
-node --check scripts/verify-mobile-v245.mjs
+node --check scripts/verify-mobile-v2451.mjs
 node --check scripts/build-mobile-v2451.mjs
 node --check scripts/verify-mobile-v2451.mjs
 node scripts/verify-web.mjs .
@@ -34,6 +34,7 @@ node scripts/build-mobile-v240.mjs
 node scripts/build-mobile-v242.mjs
 node scripts/build-mobile-v243.mjs
 node scripts/build-mobile-v245.mjs
+node scripts/build-mobile-v2451.mjs
 node scripts/build-mobile-v2451.mjs
 node scripts/verify-mobile-v2451.mjs dist
 
@@ -128,8 +129,8 @@ python3 - <<'PY'
 import json
 with open('android/app/build/outputs/apk/release/output-metadata.json',encoding='utf-8') as f:
     e=json.load(f)['elements'][0]
-assert int(e['versionCode']) == 280, e
-assert str(e['versionName']) == '2.4.5', e
+assert int(e['versionCode']) == 281, e
+assert str(e['versionName']) == '2.4.5.1', e
 PY
 
 unzip -p "$UNSIGNED" assets/public/mobile-launcher-icon-v241.js > "$RUNNER_TEMP/launcher-v245.js"
@@ -138,20 +139,20 @@ unzip -p "$UNSIGNED" assets/public/mobile-patch-manager-v240.js > "$RUNNER_TEMP/
 unzip -p "$UNSIGNED" assets/public/mobile-updates-v181.js > "$RUNNER_TEMP/updates-v245.js"
 grep -q '__TAREFAS_LAUNCHER_ICON_241__' "$RUNNER_TEMP/launcher-v245.js"
 grep -q 'pinProfileShortcut' "$RUNNER_TEMP/launcher-v245.js"
-grep -q '__TAREFAS_BETA_245_BOOT__' "$RUNNER_TEMP/bootstrap-v245.js"
+grep -q '__TAREFAS_ALPHA_2451_BOOT__' "$RUNNER_TEMP/bootstrap-v245.js"
 grep -q '__TAREFAS_PATCH_MANAGER_V280__' "$RUNNER_TEMP/pm-v245.js"
 grep -q "v1_8_get_beta_updates" "$RUNNER_TEMP/pm-v245.js"
 grep -q "v2_3_21_alpha_context" "$RUNNER_TEMP/pm-v245.js"
-grep -q "const APP_CHANNEL = 'beta';" "$RUNNER_TEMP/updates-v245.js"
-grep -q "const APP_VERSION = '2.4.5';" "$RUNNER_TEMP/bootstrap-v245.js"
-grep -q "const APP_BUILD = 280;" "$RUNNER_TEMP/bootstrap-v245.js"
-grep -q "basedOn:'2.4.3'" "$RUNNER_TEMP/bootstrap-v245.js"
-grep -q "const APP_VERSION='2.4.5.1',APP_BUILD=280,APP_CHANNEL='beta';" "$RUNNER_TEMP/pm-v245.js"
+grep -q "const APP_CHANNEL = 'alpha';" "$RUNNER_TEMP/updates-v245.js"
+grep -q "const APP_VERSION = '2.4.5.1';" "$RUNNER_TEMP/bootstrap-v245.js"
+grep -q "const APP_BUILD = 281;" "$RUNNER_TEMP/bootstrap-v245.js"
+grep -q "basedOn:'2.4.5'" "$RUNNER_TEMP/bootstrap-v245.js"
+grep -q "const APP_VERSION='2.4.5.1',APP_BUILD=281,APP_CHANNEL='alpha';" "$RUNNER_TEMP/pm-v245.js"
 grep -q "sha256Bytes" "$RUNNER_TEMP/pm-v245.js"
 grep -q "fetchOfficialBytes" "$RUNNER_TEMP/pm-v245.js"
 grep -q "crypto.subtle.digest" "$RUNNER_TEMP/pm-v245.js"
-grep -q "const APP_VERSION = '2.4.5';" "$RUNNER_TEMP/updates-v245.js"
-grep -q "const APP_BUILD = 280;" "$RUNNER_TEMP/updates-v245.js"
+grep -q "const APP_VERSION = '2.4.5.1';" "$RUNNER_TEMP/updates-v245.js"
+grep -q "const APP_BUILD = 281;" "$RUNNER_TEMP/updates-v245.js"
 unzip -p "$UNSIGNED" assets/public/dashboard.html > "$RUNNER_TEMP/dashboard-v245.html"
 grep -q "mobile-launcher-icon-v241.js" "$RUNNER_TEMP/dashboard-v245.html"
 grep -q "tmScales245" "$RUNNER_TEMP/bootstrap-v245.js"
@@ -198,7 +199,7 @@ mkdir -p "$RUNNER_TEMP/package/app" "$RUNNER_TEMP/package/scripts" "$RUNNER_TEMP
 cp "$APK" "$APK.sha256" "$RUNNER_TEMP/package/"
 cp app/mobile-launcher-icon-v241.js app/release-v2451.txt "$RUNNER_TEMP/package/app/"
 cp app/android/TarefasLauncherIconPlugin.java "$RUNNER_TEMP/package/app/"
-cp scripts/build-mobile-v245.mjs scripts/verify-mobile-v245.mjs "$RUNNER_TEMP/package/scripts/"
+cp scripts/build-mobile-v245.mjs scripts/verify-mobile-v2451.mjs "$RUNNER_TEMP/package/scripts/"
 cp dist/ALPHA_2_4_5_1.json "$RUNNER_TEMP/package/manifest/"
 (cd "$RUNNER_TEMP/package" && zip -qr "$GITHUB_WORKSPACE/$ZIP" .)
 unzip -tq "$ZIP"
@@ -214,12 +215,12 @@ git config user.name 'GuerraVPN Android Build'
 git config user.email '81371258+GuerraVPN@users.noreply.github.com'
 git add downloads/TAREFAS-2.4.5.1*
 if ! git diff --cached --quiet; then
-  git commit -m 'release(android): TAREFAS 2.4.5.1 alpha build 280'
+  git commit -m 'release(android): TAREFAS 2.4.5.1 alpha build 281'
   git push origin HEAD:app/releases
 fi
 cd "$GITHUB_WORKSPACE"
 
-URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.4.5.1.1.apk'
+URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.4.5.1.apk'
 LOCAL_SHA="$(sha256sum "$APK" | awk '{print $1}')"
 for attempt in 1 2 3 4 5 6 7 8; do
   if curl --fail --silent --show-error -L "$URL" -o "$RUNNER_TEMP/published.apk" \
@@ -254,7 +255,7 @@ jq -n \
       "👤 Meu perfil usa a imagem/ícone do usuário no atalho da tela inicial.",
       "🔵 Ícone padrão do APK corrigido para o novo modelo TAREFAS Azul.",
       "🪖 Modelos adicionais: Militar, Preto & Ouro e Sistema.",
-      "🧱 Esta Beta deriva da 2.4.3/build 278; próximas Betas e Alphas continuam em .tpatch quando não exigirem capacidade nativa.",
+      "🧱 Esta Alpha deriva da 2.4.5/build 281; próximas Betas e Alphas continuam em .tpatch quando não exigirem capacidade nativa.",
       "🔔 Patches Beta seguem a mesma preferência de recebimento dos APKs Beta.",
       "🧪 Patches Alpha seguem a mesma elegibilidade e opção de recebimento dos APKs Alpha.",
       "🌐 Web 7.9.1 preservada a partir da base 2.4.5."
@@ -274,4 +275,4 @@ CODE="$(curl --silent --show-error \
 
 cat "$RUNNER_TEMP/result.json"
 test "$CODE" = '200'
-jq -e '.ok == true and .version == "2.4.5.1" and .build == 281 and .channel == "beta"' "$RUNNER_TEMP/result.json" >/dev/null
+jq -e '.ok == true and .version == "2.4.5.1" and .build == 281 and .channel == "alpha"' "$RUNNER_TEMP/result.json" >/dev/null
