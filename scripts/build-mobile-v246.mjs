@@ -21,9 +21,9 @@ for(const name of await readdir(dist)){
   let source=await readFile(file,'utf8');
   source=source.replace(/<script src=["']mobile-launcher-icon-v242\.js[^"']*["'][^>]*><\/script>\s*/gi,'');
   source=source.replace(/<script src=["']mobile-launcher-icon-v241\.js[^"']*["'][^>]*><\/script>\s*/gi,'');
-  source=source.replaceAll('2.4.6-b281','2.4.6-b281');
-  source=source.replaceAll('2.4.6-b281','2.4.6-b281');
-  source=source.replaceAll('2.4.6-b281','2.4.6-b281');
+  source=source.replaceAll('2.4.5-b280','2.4.6-b281');
+  source=source.replaceAll('2.4.5-b280','2.4.6-b281');
+  source=source.replaceAll('2.4.5-b280','2.4.6-b281');
   if(!special.has(name.toLowerCase())){
     const tag='<script src="mobile-launcher-icon-v241.js?v='+VERSION+'-b'+BUILD+'"></script>';
     source=source.includes('</body>')?source.replace('</body>',tag+'\n</body>'):source+'\n'+tag;
@@ -73,19 +73,19 @@ await patch('mobile-preload.js',source=>source
   .replaceAll("tarefasAppBuild = '280'","tarefasAppBuild = '"+BUILD+"'"),{required:false});
 
 await patch('mobile-updates-v181.js',source=>source
-  .replace("const APP_VERSION = '2.4.3';","const APP_VERSION = '"+VERSION+"';")
-  .replace('const APP_BUILD = 278;','const APP_BUILD = '+BUILD+';'),{required:false});
+  .replace("const APP_VERSION = '2.4.5';","const APP_VERSION = '"+VERSION+"';")
+  .replace('const APP_BUILD = 280;','const APP_BUILD = '+BUILD+';'),{required:false});
 
 await patch('mobile-ai-v230.js',source=>source
-  .replaceAll('BETA 2.4.3','BETA '+VERSION)
+  .replaceAll('BETA 2.4.5','BETA '+VERSION)
   .replaceAll("version:'2.4.5'","version:'"+VERSION+"'")
   .replaceAll('build:280','build:'+BUILD),{required:false});
 
 await patch('native-mobile.js',source=>source
   .replaceAll("version:'2.4.5'","version:'"+VERSION+"'")
   .replaceAll('build:280','build:'+BUILD)
-  .replaceAll('"2.4.3"','"'+VERSION+'"')
-  .replaceAll("'2.4.3'","'"+VERSION+"'"),{required:false});
+  .replaceAll('"2.4.5"','"'+VERSION+'"')
+  .replaceAll("'2.4.5'","'"+VERSION+"'"),{required:false});
 
 await patch('mobile-release-v240.js',source=>{
   let out=source
@@ -107,4 +107,4 @@ await writeFile(path.join(dist,'BETA_2_4_6.json'),JSON.stringify({
   features:{basedOnValidated245:true,launcherIconSelector:true,launcherNativeBridge:true,profileAvatarAsHomeIcon:true,launcherPresetBlue:true,launcherPresetMilitary:true,launcherPresetGold:true,launcherPresetSystem:true,defaultLauncherIconFixed:true,patchManager:true,patchBetaChannelUsesApkPreference:true,patchAlphaChannelUsesApkPreference:true,web791:true,biometricColdStartOnly:true,diagnosticTabs:true,drawerScalesOnly:true,officialPatchSha256Bytes:true}
 },null,2)+'\n','utf8');
 
-console.log('TAREFAS Android '+VERSION+' build '+BUILD+' BETA baseada diretamente na build validada 2.4.3/278.');
+console.log('TAREFAS Android '+VERSION+' build '+BUILD+' BETA pré-release baseada na Beta 2.4.5/build 280.');
