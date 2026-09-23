@@ -1,0 +1,39 @@
+{
+  "format": "tarefas-tpatch-v1",
+  "id": "2.4.1.12",
+  "name": "TAREFAS 2.4.1.12 — Teste de SHA-256",
+  "patchVersion": 12,
+  "createdAt": "2026-09-23T07:38:00-03:00",
+  "baseVersion": "2.4.1",
+  "minBuild": 276,
+  "maxBuild": 276,
+  "channel": "alpha",
+  "cumulative": true,
+  "replacementMode": "replace-older-same-base",
+  "replaces": [
+    "2.4.1.1",
+    "2.4.1.2",
+    "2.4.1.3",
+    "2.4.1.4",
+    "2.4.1.5",
+    "2.4.1.6",
+    "2.4.1.7",
+    "2.4.1.8",
+    "2.4.1.9",
+    "2.4.1.10",
+    "2.4.1.11"
+  ],
+  "description": "Patch de teste para validar o cálculo do SHA-256 do arquivo oficial usando os bytes recebidos.",
+  "changelog": [
+    "Patch mínimo e inofensivo para teste de validação SHA-256.",
+    "Não altera a navegação nem as Escalas.",
+    "Define apenas um marcador interno para confirmar a execução do patch.",
+    "Substitui cumulativamente a 2.4.1.11 e os patches anteriores da mesma base."
+  ],
+  "order": 12,
+  "payload": {
+    "js": ";(()=>{globalThis.__TAREFAS_ALPHA_24112_SHA_TEST__=true;})();",
+    "css": ""
+  },
+  "payloadSha256": "81b3b88024dbafddfe3f8ea2ad767c7b588c2b49b0a252cea082c3bd866c3e5e"
+}
