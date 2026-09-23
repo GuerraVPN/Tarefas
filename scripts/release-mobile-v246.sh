@@ -144,7 +144,7 @@ grep -q "v2_3_21_alpha_context" "$RUNNER_TEMP/pm-v246.js"
 grep -q "const APP_CHANNEL = 'beta';" "$RUNNER_TEMP/updates-v246.js"
 grep -q "const APP_VERSION = '2.4.6';" "$RUNNER_TEMP/bootstrap-v246.js"
 grep -q "const APP_BUILD = 281;" "$RUNNER_TEMP/bootstrap-v246.js"
-grep -q "basedOn:'2.4.3'" "$RUNNER_TEMP/bootstrap-v246.js"
+grep -q "basedOn:'2.4.5'" "$RUNNER_TEMP/bootstrap-v246.js"
 grep -q "const APP_VERSION='2.4.6',APP_BUILD=281,APP_CHANNEL='beta';" "$RUNNER_TEMP/pm-v246.js"
 grep -q "sha256Bytes" "$RUNNER_TEMP/pm-v246.js"
 grep -q "fetchOfficialBytes" "$RUNNER_TEMP/pm-v246.js"
@@ -198,7 +198,7 @@ cp "$APK" "$APK.sha256" "$RUNNER_TEMP/package/"
 cp app/mobile-launcher-icon-v241.js app/release-v246.txt "$RUNNER_TEMP/package/app/"
 cp app/android/TarefasLauncherIconPlugin.java "$RUNNER_TEMP/package/app/"
 cp scripts/build-mobile-v246.mjs scripts/verify-mobile-v246.mjs "$RUNNER_TEMP/package/scripts/"
-cp dist/BETA_2_4_5.json "$RUNNER_TEMP/package/manifest/"
+cp dist/BETA_2_4_6.json "$RUNNER_TEMP/package/manifest/"
 (cd "$RUNNER_TEMP/package" && zip -qr "$GITHUB_WORKSPACE/$ZIP" .)
 unzip -tq "$ZIP"
 sha256sum "$ZIP" | tee "$ZIP.sha256"
@@ -239,7 +239,7 @@ jq -n \
   --argjson build "$BUILD" \
   --arg channel 'beta' \
   --arg web_version "$WEB_VERSION" \
-  --arg title 'TAREFAS 2.4.6 Beta — Base 2.4.3' \
+  --arg title 'TAREFAS 2.4.6 Beta — Pré-release baseada na 2.4.5' \
   --arg url "$URL" \
   --arg sha "$SHA" \
   '{
