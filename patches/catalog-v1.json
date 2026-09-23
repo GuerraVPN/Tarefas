@@ -3,7 +3,7 @@
   "app": "TAREFAS",
   "baseVersion": "2.4.1",
   "baseBuild": 276,
-  "generatedAt": "2026-09-23T15:00:00Z",
+  "generatedAt": "2026-09-23T17:27:49.703Z",
   "latestPatch": "2.4.4-prebeta2",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
@@ -461,7 +461,7 @@
       "installable": true,
       "description": "Corrige a 2.4.4-prebeta para voltar a carregar as escalas diretamente das planilhas oficiais do Google, sem tentar sincronizar pelo Supabase/Apps Script.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.4-prebeta2.tpatch",
-      "sha256": "bde2c4a3af53707533828a96080266ec521f3dd6218961b67c5303f0dee71e6d",
+      "sha256": "2e516e0606b469f01dc468db58a6e6cd0db3c62c9a57174d7614597976ec6836",
       "changelog": [
         "Mantém a base cumulativa da 2.4.3.6.",
         "Remove o fluxo de sincronização Google Sheets → Apps Script → Supabase da tela de Escalas.",
@@ -1354,5 +1354,5 @@
       ]
     }
   ],
-  "cacheNonce": "244-prebeta2-google-r1"
+  "cacheNonce": "244-prebeta2-google-r2"
 }
