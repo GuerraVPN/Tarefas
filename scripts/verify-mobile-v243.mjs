@@ -20,7 +20,7 @@ must(bootstrap.includes('function openScales()')&&bootstrap.includes('tmScales24
 must(bootstrap.includes('1T_BM9KY0NLwVhlifetQ6W6AdetujQjx--zOZHa27eQs')&&bootstrap.includes('1_LlfIHx4EuSHkC9BOR2VorvXoaiMyLa028wU6C0dQLs')&&bootstrap.includes('13eEei_JdGjAdVo371BGfPS59QdYySe9lJ47DLjWb_x0'),'links das 3 escalas ausentes');
 must(nav.includes("VERSION='2.4.3',BUILD=278")||nav.includes('__TAREFAS_BETA_NAV_V278__'),'navegação não consolidada');
 must(tabs.includes("VERSION='2.4.3',BUILD=278")||tabs.includes('__TAREFAS_BETA_TABS_V278__'),'abas não consolidadas');
-must(runtime.includes('__TAREFAS_BETA_243__'),'runtime Beta 2.4.3 ausente');
+must(release.includes('__TAREFAS_BETA_243__'),'runtime Beta 2.4.3 ausente');
 must(preload.includes("tarefasAppVersion = '2.4.3'")&&preload.includes("tarefasAppBuild = '278'"),'preload incorreto');
 must(updates.includes("const APP_VERSION = '2.4.3';")&&updates.includes('const APP_BUILD = 278;')&&updates.includes("const APP_CHANNEL = 'beta';"),'updates incorreto');
 const html=(await readdir(dir)).filter(x=>/\.html$/i.test(x));must(html.length>0,'nenhum HTML');
