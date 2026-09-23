@@ -17,9 +17,9 @@ if(globalThis[MARK])return;globalThis[MARK]=true;
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 const hex=buffer=>Array.from(new Uint8Array(buffer)).map(b=>b.toString(16).padStart(2,'0')).join('');
 const sha256=async value=>hex(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(String(value))));
+const sha256Bytes=async bytes=>hex(await crypto.subtle.digest('SHA-256',bytes));
 const payloadText=p=>JSON.stringify({js:String(p?.js||''),css:String(p?.css||'')});
 const payloadSha=p=>sha256(payloadText(p));
-const fileSha=text=>sha256(String(text));
 const now=()=>new Date().toISOString();
 const sessionToken=()=>String(localStorage.getItem('tarefasPushSession17')||'').trim();
 const getClient=()=>{try{return typeof supabaseClient!=='undefined'?supabaseClient:null}catch(_){return null}};
@@ -27,7 +27,7 @@ const getClient=()=>{try{return typeof supabaseClient!=='undefined'?supabaseClie
 function versionParts(v){return String(v||'').split('.').map(n=>Number(n)||0)}
 function compareVersions(a,b){const aa=versionParts(a),bb=versionParts(b),n=Math.max(aa.length,bb.length);for(let i=0;i<n;i++){const d=(aa[i]||0)-(bb[i]||0);if(d)return d}return 0}
 
-async function fetchOfficialText(url){
+async function fetchOfficialBytes(url){
   const href=String(url||'');
   if(href.startsWith(OFFICIAL_RAW_PREFIX)){
     try{
@@ -38,19 +38,22 @@ async function fetchOfficialText(url){
         const meta=await r.json();
         if(meta?.encoding==='base64'&&meta?.content){
           const bin=atob(String(meta.content).replace(/\s+/g,''));
-          const bytes=Uint8Array.from(bin,c=>c.charCodeAt(0));
-          return new TextDecoder('utf-8').decode(bytes);
+          return Uint8Array.from(bin,c=>c.charCodeAt(0));
         }
       }
     }catch(err){console.warn('[TAREFAS PATCH] GitHub API fallback:',err?.message||err)}
     const sep=href.includes('?')?'&':'?';
     const r=await fetch(href+sep+'cb='+Date.now(),{cache:'no-store'});
     if(!r.ok)throw new Error('Download oficial respondeu HTTP '+r.status+'.');
-    return r.text();
+    return new Uint8Array(await r.arrayBuffer());
   }
   const r=await fetch(href,{cache:'no-store'});
   if(!r.ok)throw new Error('Download respondeu HTTP '+r.status+'.');
-  return r.text();
+  return new Uint8Array(await r.arrayBuffer());
+}
+async function fetchOfficialText(url){
+  const bytes=await fetchOfficialBytes(url);
+  return new TextDecoder('utf-8',{fatal:true}).decode(bytes);
 }
 
 function openDb(){
@@ -200,9 +203,10 @@ async function installOfficial(meta){
   const url=String(meta?.url||'');
   if(!url.startsWith(OFFICIAL_RAW_PREFIX))throw new Error('Origem oficial do patch inválida.');
   markPatchSeen(meta?.id);
-  const text=await fetchOfficialText(url);
-  const actual=await fileSha(text);
-  if(String(meta.sha256||'').toLowerCase()!==actual)throw new Error('SHA-256 do arquivo oficial não confere.');
+  const bytes=await fetchOfficialBytes(url);
+  const actual=await sha256Bytes(bytes);
+  if(String(meta.sha256||'').toLowerCase()!==actual)throw new Error('SHA-256 do arquivo oficial não confere. Esperado: '+String(meta.sha256||'')+' • Calculado: '+actual+' • '+bytes.byteLength+' bytes');
+  const text=new TextDecoder('utf-8',{fatal:true}).decode(bytes);
   const p=await parsePatchText(text);
   if(meta.id&&String(meta.id)!==p.id)throw new Error('ID do catálogo não corresponde ao patch.');
   await replaceOlderSameBase(p);
