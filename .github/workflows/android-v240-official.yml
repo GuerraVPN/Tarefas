@@ -1,0 +1,57 @@
+name: Android 2.4.0 Oficial
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [app/android-v240-prep]
+    paths:
+      - '.v240-release-trigger'
+      - 'app/mobile-release-v240.js'
+      - 'app/mobile-patch-manager-v240.js'
+      - 'app/release-v240.txt'
+      - 'scripts/build-mobile-v240.mjs'
+      - 'scripts/verify-mobile-v240.mjs'
+      - 'scripts/release-mobile-v240.sh'
+      - '.github/workflows/android-v240-official.yml'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Compilar, validar, assinar e publicar 2.4.0 Oficial
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          chmod +x scripts/release-mobile-v240.sh
+          scripts/release-mobile-v240.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tarefas-android-2.4.0-official-build-274
+          path: |
+            TAREFAS-2.4.0.apk
+            TAREFAS-2.4.0.apk.sha256
+            TAREFAS-2.4.0-official-build-274.zip
+            TAREFAS-2.4.0-official-build-274.zip.sha256
+            app/release-v240.txt
+            dist/RELEASE_2_4_0.json
+          if-no-files-found: error

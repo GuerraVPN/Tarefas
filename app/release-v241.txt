@@ -1,0 +1,34 @@
+TAREFAS 2.4.1 Beta — build 276
+
+Base:
+- Oficial 2.4.0.
+- Web 7.9.1.
+
+Novidade nativa desta Beta:
+- Novo seletor de ícones dentro de Configurações.
+- Corrigido o ícone padrão do APK.
+- Modelos: TAREFAS Azul, Militar, Preto & Ouro e Sistema.
+- Novo modo Meu perfil, usando a própria imagem/ícone configurado no perfil do usuário no atalho da tela inicial.
+- Na primeira escolha, o Android pode pedir confirmação para adicionar o atalho.
+- Depois de fixado, novas escolhas atualizam o mesmo atalho.
+
+Nova política de versões de teste:
+- Esta 2.4.1 Beta é APK porque adiciona a ponte nativa necessária ao Android.
+- A partir desta base, as próximas Betas e Alphas serão distribuídas como arquivos .tpatch.
+- Patch Beta usa exatamente a mesma preferência/canal de recebimento já usado pelos APKs Beta.
+- Patch Alpha usa exatamente a mesma elegibilidade e opção de recebimento já usada pelos APKs Alpha.
+- Usuário que não recebe Beta não será avisado de patch Beta.
+- Usuário sem elegibilidade/ativação de Alpha não será avisado de patch Alpha.
+- Os patches continuam aparecendo no Gerenciador de Patches quando compatíveis com a base 2.4.1.
+
+Preservado:
+- Base Web 7.9.1.
+- Patch Manager .tpatch v1.
+- Biometria somente em novo início real do app.
+- Central 2.0.
+- Abas para diagnóstico.
+- Todas as funções da Oficial 2.4.0.
+
+Versão: 2.4.1
+Build: 276
+Canal: Beta

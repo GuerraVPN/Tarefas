@@ -1,0 +1,20 @@
+TAREFAS 2.3.23.1 Alpha — build 270
+
+Novidade principal desta Alpha:
+- Primeiro suporte oficial a patches sem reinstalar o APK.
+- Novo formato .tpatch v1 para correções pequenas de JavaScript/CSS e ajustes de comportamento em tempo de execução.
+- Botão "Verificar patches oficiais" no Gerenciador de patches.
+- Importação manual de arquivos .tpatch pelo seletor de arquivos do Android.
+- Verificação SHA-256 do arquivo oficial e do payload interno.
+- Bloqueio automático de patch incompatível com a versão/build instalada.
+- Patches instalados ficam persistidos no aparelho.
+- É possível desativar/reverter, reativar ou remover um patch; o app recarrega para garantir rollback limpo.
+- Patches oficiais ficam separados dos importados manualmente.
+- A Beta 2.3.23 permanece intacta; esta Alpha é baseada diretamente nela.
+
+Limite do Patch Manager v1:
+- Serve para correções de runtime, interface, regras e CSS preparadas para hotfix.
+- Alterações de AndroidManifest, permissões, bibliotecas nativas, Java/Kotlin ou estrutura do APK ainda exigem uma nova instalação.
+
+Base: 2.3.23 Beta / build 269.
+Alpha: 2.3.23.1 / build 270.

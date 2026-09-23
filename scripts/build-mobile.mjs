@@ -1,0 +1,52 @@
+import { cp, mkdir, readdir, readFile, rm, writeFile, appendFile } from 'node:fs/promises';
+import path from 'node:path';
+import { build } from 'esbuild';
+
+const root = process.cwd();
+const dist = path.join(root, 'dist');
+const allowed = new Set(['.html', '.js', '.css', '.png', '.jpg', '.jpeg', '.webp', '.svg', '.ico', '.json', '.webmanifest']);
+const excluded = new Set(['dist', 'android', 'node_modules', '.git', '.github', 'scripts']);
+
+await rm(dist, { recursive: true, force: true });
+await mkdir(dist, { recursive: true });
+for (const entry of await readdir(root, { withFileTypes: true })) {
+  if (excluded.has(entry.name)) continue;
+  const src = path.join(root, entry.name), dst = path.join(dist, entry.name);
+  if (entry.isDirectory()) { if (entry.name === 'assets') await cp(src, dst, { recursive: true }); continue; }
+  if (allowed.has(path.extname(entry.name).toLowerCase())) await cp(src, dst);
+}
+await mkdir(path.join(dist, 'assets', 'icons'), { recursive: true });
+for (const size of [192, 512]) { try { await cp(path.join(root,'app-assets',`icon-${size}.png`),path.join(dist,'assets','icons',`icon-${size}.png`)); } catch (_) {} }
+for (const file of ['manifest.webmanifest','service-worker.js','mobile-bootstrap.js','mobile-preload.js','mobile-login-v17.js','mobile.css','mobile-v12.css','mobile-v16.css','mobile-v18.css','mobile-v181.css','mobile-v12.js','mobile-updates-v181.js','mobile-dashboard-v184.js','mobile-users-inline-v189.js','mobile-notes-v191.js','mobile-v196.js','games.html','games.css','games.js']) {
+  await cp(path.join(root,'app',file),path.join(dist,file));
+}
+async function patch(rel,replacements){const file=path.join(dist,rel);let text=await readFile(file,'utf8');for(const [from,to] of replacements){if(!text.includes(from))throw new Error(`${rel}: trecho esperado não encontrado: ${from}`);text=text.split(from).join(to)}await writeFile(file,text,'utf8')}
+await patch('mobile-bootstrap.js',[["const APP_VERSION = '1.8.0';","const APP_VERSION = '2.0.0';"],['const APP_BUILD = 180;','const APP_BUILD = 200;'],["const WEB_VERSION = '7.5.2';","const WEB_VERSION = '7.6.0';"]]);
+await patch('mobile-preload.js',[["tarefasAppVersion = '1.8.0'","tarefasAppVersion = '2.0.0'"],["tarefasAppBuild = '180'","tarefasAppBuild = '200'"]]);
+await patch('mobile-v12.js',[['1.8.0 • WEB 7.5.2','2.0.0 • WEB 7.6.0']]);
+await patch('mobile-updates-v181.js',[["const APP_VERSION = '1.8.9';","const APP_VERSION = '2.0.0';"],["const APP_BUILD = 189;","const APP_BUILD = 200;"],["const APP_CHANNEL = 'beta';","const APP_CHANNEL = 'official';"]]);
+await patch('v7_5_4_patch.js',[["function usersInline(){\n if(page()!=='usuarios.html')return;","function usersInline(){\n if(page()!=='usuarios.html'||native())return;"]]);
+
+const nativeSourcePath=path.join(root,'app','native-mobile-entry.js');
+let nativeSource=await readFile(nativeSourcePath,'utf8');
+const nativeNeedle="const target=await Filesystem.getUri({directory:Directory.Documents,path:targetPath});await FileTransfer.downloadFile({url:href,path:target.uri,progress:false});let installer={opened:false,error:null};if(options?.autoInstall!==false)installer=await openApkInstaller(target.uri);";
+const nativeProgress=`const target=await Filesystem.getUri({directory:Directory.Documents,path:targetPath});\n let progressHandle=null,lastBytes=0,lastTotal=0,lastAt=Date.now();\n const emitProgress=detail=>window.dispatchEvent(new CustomEvent('tarefas:update-download-progress',{detail:{url:href,filename:name,...detail}}));\n emitProgress({state:'starting',bytes:0,contentLength:0,lengthComputable:false,percent:0,speedBps:0});\n try{progressHandle=await FileTransfer.addListener('progress',progress=>{if(progress?.type!=='download'||String(progress?.url||'')!==href)return;const now=Date.now(),bytes=Math.max(0,Number(progress?.bytes||0)),contentLength=Math.max(0,Number(progress?.contentLength||0)),elapsed=Math.max((now-lastAt)/1000,.001),speedBps=Math.max(0,(bytes-lastBytes)/elapsed),lengthComputable=progress?.lengthComputable!==false&&contentLength>0,percent=lengthComputable?Math.max(0,Math.min(100,bytes/contentLength*100)):0;lastAt=now;lastBytes=bytes;if(contentLength>0)lastTotal=contentLength;emitProgress({state:'downloading',bytes,contentLength,lengthComputable,percent,speedBps})})}catch(err){console.warn('[TAREFAS UPDATE] Progresso nativo indisponível:',err)}\n try{await FileTransfer.downloadFile({url:href,path:target.uri,progress:true});emitProgress({state:'downloaded',bytes:lastTotal||lastBytes,contentLength:lastTotal||lastBytes,lengthComputable:(lastTotal||lastBytes)>0,percent:100,speedBps:0})}finally{if(progressHandle)await progressHandle.remove().catch(()=>{})}\n let installer={opened:false,error:null};if(options?.autoInstall!==false)installer=await openApkInstaller(target.uri);`;
+if(!nativeSource.includes(nativeNeedle))throw new Error('native-mobile-entry.js: ponto do FileTransfer não encontrado');
+nativeSource=nativeSource.replace(nativeNeedle,nativeProgress);
+const tempNative=path.join(root,'scripts','.native-mobile-entry-v200.mjs');
+await writeFile(tempNative,nativeSource,'utf8');
+const nativeOut=path.join(dist,'native-mobile.js');
+try{await build({entryPoints:[tempNative],outfile:nativeOut,bundle:true,minify:true,format:'iife',platform:'browser',target:['es2020'],charset:'utf8'})}finally{await rm(tempNative,{force:true})}
+await patch('native-mobile.js',[["1.8.8","2.0.0"]]);
+await appendFile(nativeOut,"\n;globalThis.__TAREFAS_DOWNLOADS_PATH__='Downloads/TAREFAS';\n",'utf8');
+const htmlFiles=(await readdir(dist)).filter(name=>name.endsWith('.html'));
+for(const name of htmlFiles){
+ const file=path.join(dist,name);let html=await readFile(file,'utf8');
+ if(!html.includes('mobile-preload.js'))html=html.replace(/<head>/i,'<head>\n  <script src="mobile-preload.js"></script>');
+ for(const css of ['mobile.css','mobile-v12.css','mobile-v16.css','mobile-v18.css','mobile-v181.css'])if(!html.includes(css))html=html.replace(/<\/head>/i,`  <link rel="stylesheet" href="${css}">\n</head>`);
+ if(!html.includes('manifest.webmanifest'))html=html.replace(/<\/head>/i,'  <link rel="manifest" href="manifest.webmanifest">\n  <meta name="theme-color" content="#05090b">\n</head>');
+ if(name==='index.html'&&!html.includes('mobile-login-v17.js'))html=html.replace(/<\/body>/i,'  <script src="mobile-login-v17.js"></script>\n</body>');
+ for(const js of ['mobile-bootstrap.js','mobile-v12.js','native-mobile.js','mobile-updates-v181.js','mobile-dashboard-v184.js','mobile-users-inline-v189.js','bloco_notas.js','mobile-notes-v191.js','mobile-v196.js'])if(!html.includes(js))html=html.replace(/<\/body>/i,`  <script src="${js}"></script>\n</body>`);
+ await writeFile(file,html,'utf8');
+}
+console.log(`TAREFAS Android 2.0.0 build 200 OFICIAL: ${htmlFiles.length} páginas preparadas sobre Web 7.6.0 com Jogos, Jogos finalizados, gráficos renovados, trilhas próprias e placares públicos`);

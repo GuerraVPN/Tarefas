@@ -1,0 +1,27 @@
+TAREFAS 2.4.2 Beta — build 277
+
+Base:
+- Beta 2.4.1.
+- Web 7.9.1.
+
+Objetivo desta Beta:
+- Consolidar as correções do Gerenciador de Patches após os testes 2.4.1.7–2.4.1.12.
+- Validar no APK Beta a nova validação SHA-256 diretamente sobre os bytes recebidos.
+- Preservar o Patch Manager .tpatch v1 e os canais Beta/Alpha.
+- Preservar o seletor nativo de ícones e a ponte Android introduzidos na 2.4.1.
+
+Correções incorporadas:
+- Validação SHA-256 de patches oficiais por bytes, antes do decode UTF-8.
+- GitHub Contents API como caminho primário, com fallback raw.
+- Mensagem de erro de SHA com esperado, calculado e tamanho do arquivo.
+- Compatibilidade da base do Patch Manager alinhada a 2.4.2 / build 277.
+
+Política:
+- Esta Beta 2.4.2 é APK para consolidar as correções no runtime nativo/web.
+- A partir desta base, próximas Betas e Alphas continuam distribuídas como .tpatch quando não houver nova capacidade nativa.
+- Patch Beta usa a mesma preferência/canal de recebimento dos APKs Beta.
+- Patch Alpha usa a mesma elegibilidade e opção de recebimento dos APKs Alpha.
+
+Versão: 2.4.2
+Build: 277
+Canal: Beta

@@ -1,0 +1,14 @@
+TAREFAS 2.3.24 Beta — build 271
+
+Consolidação da Alpha 2.3.23.1 + patches 2.3.23.2 até 2.3.23.6.
+
+Principais mudanças:
+- Sistema de patches .tpatch passa a fazer parte nativa do APK.
+- Patches cumulativos substituem automaticamente patches anteriores da mesma base.
+- Gerenciador de Patches fica abaixo da Atualização do aplicativo.
+- Histórico de patches com changelog, canal e estado.
+- Notificações de novos patches respeitam Alpha/Beta e evitam aviso depois da instalação.
+- Consulta oficial de catálogo/arquivos usa GitHub Contents API com fallback sem cache.
+- Versão efetiva do patch aparece no cabeçalho de todas as abas.
+- Persistência de tema corrigida para não voltar sozinho ao modo claro.
+- Nova base para próximos patches: 2.3.24 / build 271.
