@@ -5,7 +5,7 @@ on:
   push:
     branches: [app/android-v244-prep, app/releases]
   pull_request:
-    branches: [main]
+    branches: [main, app/releases]
     paths:
       - '.v244-release-trigger'
       - 'app/android/TarefasLauncherIconPlugin.java'
