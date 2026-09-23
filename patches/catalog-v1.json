@@ -3,8 +3,8 @@
   "app": "TAREFAS",
   "baseVersion": "2.4.1",
   "baseBuild": 276,
-  "generatedAt": "2026-09-23T08:10:00Z",
-  "latestPatch": "2.4.1.11",
+  "generatedAt": "2026-09-23T10:38:00Z",
+  "latestPatch": "2.4.1.12",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -247,7 +247,7 @@
         "2.4.1.9",
         "2.4.1.10"
       ],
-      "installable": true,
+      "installable": false,
       "description": "Corrige a validação de SHA-256 do Gerenciador de Patches para calcular o hash diretamente sobre os bytes baixados, sem conversão bytes→texto→bytes.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.11.tpatch",
       "sha256": "0e90c50d7e8679176ece11f40ae23a62b7d50400cf00ef50e9dc9290cca70f42",
@@ -258,6 +258,40 @@
         "Mostra no erro o SHA esperado, o SHA calculado e o tamanho recebido para diagnóstico.",
         "Desativa o observador problemático da 2.4.1.9 para evitar carregamento contínuo.",
         "Esta Alpha substitui cumulativamente as versões 2.4.1.1 até 2.4.1.10."
+      ]
+    },
+    {
+      "id": "2.4.1.12",
+      "name": "TAREFAS 2.4.1.12 — Teste de SHA-256",
+      "baseVersion": "2.4.1",
+      "minBuild": 276,
+      "maxBuild": 276,
+      "channel": "alpha",
+      "publishedAt": "2026-09-23T10:38:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.4.1.1",
+        "2.4.1.2",
+        "2.4.1.3",
+        "2.4.1.4",
+        "2.4.1.5",
+        "2.4.1.6",
+        "2.4.1.7",
+        "2.4.1.8",
+        "2.4.1.9",
+        "2.4.1.10",
+        "2.4.1.11"
+      ],
+      "installable": true,
+      "description": "Patch de teste para validar o cálculo do SHA-256 do arquivo oficial usando os bytes recebidos.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.12.tpatch",
+      "sha256": "b014cfaaa7a8ca7328673bc3c1c9c03cc25cccf3683a30c431e89a243e4af459",
+      "changelog": [
+        "Patch mínimo e inofensivo para teste de validação SHA-256.",
+        "Não altera a navegação nem as Escalas.",
+        "Define apenas um marcador interno para confirmar a execução do patch.",
+        "Substitui cumulativamente a 2.4.1.11 e os patches anteriores da mesma base."
       ]
     }
   ],
@@ -1070,7 +1104,7 @@
         "2.4.1.9",
         "2.4.1.10"
       ],
-      "installable": true,
+      "installable": false,
       "description": "Corrige a validação de SHA-256 do Gerenciador de Patches para calcular o hash diretamente sobre os bytes baixados, sem conversão bytes→texto→bytes.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.11.tpatch",
       "sha256": "0e90c50d7e8679176ece11f40ae23a62b7d50400cf00ef50e9dc9290cca70f42",
@@ -1081,8 +1115,43 @@
         "Mostra no erro o SHA esperado, o SHA calculado e o tamanho recebido para diagnóstico.",
         "Desativa o observador problemático da 2.4.1.9 para evitar carregamento contínuo.",
         "Esta Alpha substitui cumulativamente as versões 2.4.1.1 até 2.4.1.10."
+      ],
+      "supersededBy": "2.4.1.12"
+    },
+    {
+      "id": "2.4.1.12",
+      "name": "TAREFAS 2.4.1.12 — Teste de SHA-256",
+      "baseVersion": "2.4.1",
+      "minBuild": 276,
+      "maxBuild": 276,
+      "channel": "alpha",
+      "publishedAt": "2026-09-23T10:38:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.4.1.1",
+        "2.4.1.2",
+        "2.4.1.3",
+        "2.4.1.4",
+        "2.4.1.5",
+        "2.4.1.6",
+        "2.4.1.7",
+        "2.4.1.8",
+        "2.4.1.9",
+        "2.4.1.10",
+        "2.4.1.11"
+      ],
+      "installable": true,
+      "description": "Patch de teste para validar o cálculo do SHA-256 do arquivo oficial usando os bytes recebidos.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.12.tpatch",
+      "sha256": "b014cfaaa7a8ca7328673bc3c1c9c03cc25cccf3683a30c431e89a243e4af459",
+      "changelog": [
+        "Patch mínimo e inofensivo para teste de validação SHA-256.",
+        "Não altera a navegação nem as Escalas.",
+        "Define apenas um marcador interno para confirmar a execução do patch.",
+        "Substitui cumulativamente a 2.4.1.11 e os patches anteriores da mesma base."
       ]
     }
   ],
-  "cacheNonce": "24111-byte-sha-r1"
+  "cacheNonce": "24112-sha-test-r1"
 }
