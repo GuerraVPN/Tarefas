@@ -3,8 +3,8 @@
   "app": "TAREFAS",
   "baseVersion": "2.4.1",
   "baseBuild": 276,
-  "generatedAt": "2026-09-23T07:30:00Z",
-  "latestPatch": "2.4.1.10",
+  "generatedAt": "2026-09-23T08:10:00Z",
+  "latestPatch": "2.4.1.11",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -214,7 +214,7 @@
         "2.4.1.8",
         "2.4.1.9"
       ],
-      "installable": true,
+      "installable": false,
       "description": "Corrige o carregamento do Gerenciador de Patches após a 2.4.1.9, removendo o observador que causava atualizações contínuas na tela.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.10.tpatch",
       "sha256": "efcfa50dec03cb47ba39c9e5f6eb6c1bd454c4334a4736c5285c1ab24cbbaa2d",
@@ -223,6 +223,41 @@
         "Remove o estado de carregamento contínuo causado pelo loop de mutações.",
         "Restaura o Gerenciador de Patches para voltar a consultar e exibir os patches normalmente.",
         "Não altera a navegação nem o sistema de Escalas."
+      ]
+    },
+    {
+      "id": "2.4.1.11",
+      "name": "TAREFAS 2.4.1.11 — SHA-256 por bytes",
+      "baseVersion": "2.4.1",
+      "minBuild": 276,
+      "maxBuild": 276,
+      "channel": "alpha",
+      "publishedAt": "2026-09-23T08:10:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.4.1.1",
+        "2.4.1.2",
+        "2.4.1.3",
+        "2.4.1.4",
+        "2.4.1.5",
+        "2.4.1.6",
+        "2.4.1.7",
+        "2.4.1.8",
+        "2.4.1.9",
+        "2.4.1.10"
+      ],
+      "installable": true,
+      "description": "Corrige a validação de SHA-256 do Gerenciador de Patches para calcular o hash diretamente sobre os bytes baixados, sem conversão bytes→texto→bytes.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.11.tpatch",
+      "sha256": "0e90c50d7e8679176ece11f40ae23a62b7d50400cf00ef50e9dc9290cca70f42",
+      "changelog": [
+        "Validação do arquivo oficial passa a usar SHA-256 diretamente sobre os bytes recebidos.",
+        "Leitura do .tpatch só acontece depois da validação do hash.",
+        "Usa a GitHub Contents API em Base64 como fonte primária e preserva fallback para o download raw.",
+        "Mostra no erro o SHA esperado, o SHA calculado e o tamanho recebido para diagnóstico.",
+        "Desativa o observador problemático da 2.4.1.9 para evitar carregamento contínuo.",
+        "Esta Alpha substitui cumulativamente as versões 2.4.1.1 até 2.4.1.10."
       ]
     }
   ],
@@ -734,7 +769,7 @@
         "A versão efetiva do aplicativo passa a aparecer como 2.4.1.1 após a instalação do patch.",
         "Mantidos o seletor nativo de ícones, Base Web 7.9.1 e todas as funções da Beta 2.4.1."
       ],
-      "supersededBy": "2.4.1.2"
+      "supersededBy": "2.4.1.11"
     },
     {
       "id": "2.4.1.2",
@@ -761,7 +796,7 @@
         "Mantém a correção da 2.4.1.1 para sincronização da versão usada nas notificações de atualização.",
         "Mantém Base Web 7.9.1, seletor nativo de ícones e todas as funções da Beta 2.4.1."
       ],
-      "supersededBy": "2.4.1.3"
+      "supersededBy": "2.4.1.11"
     },
     {
       "id": "2.4.1.3",
@@ -788,7 +823,7 @@
         "Mantém a correção da versão registrada para notificações de atualização introduzida na 2.4.1.1.",
         "Preserva o seletor nativo de ícones, Base Web 7.9.1 e todas as funções da Beta 2.4.1."
       ],
-      "supersededBy": "2.4.1.4"
+      "supersededBy": "2.4.1.11"
     },
     {
       "id": "2.4.1.4",
@@ -817,7 +852,7 @@
         "Mantém as correções de EXIT USERS/Reinício e sincronização da versão das Alphas anteriores.",
         "Preserva Base Web 7.9.1, seletor nativo de ícones e todas as funções da Beta 2.4.1."
       ],
-      "supersededBy": "2.4.1.5"
+      "supersededBy": "2.4.1.11"
     },
     {
       "id": "2.4.1.5",
@@ -848,7 +883,7 @@
         "Mantém a correção de login biométrico duplicado da 2.4.1.4 e todas as correções anteriores.",
         "Preserva Férias/Dispensas, Usuários, Base Web 7.9.1 e todas as funções da Beta 2.4.1."
       ],
-      "supersededBy": "2.4.1.6"
+      "supersededBy": "2.4.1.11"
     },
     {
       "id": "2.4.1.6",
@@ -880,7 +915,7 @@
         "Perguntas sobre motorista, patrulheiro e permanência passam a usar os dados das planilhas.",
         "Mantém as correções cumulativas das Alphas anteriores."
       ],
-      "supersededBy": "2.4.1.7"
+      "supersededBy": "2.4.1.11"
     },
     {
       "id": "2.4.1.7",
@@ -913,7 +948,7 @@
         "Mantém a IA consultando as três planilhas em modo somente leitura.",
         "Mantém as correções cumulativas das Alphas anteriores."
       ],
-      "supersededBy": "2.4.1.10"
+      "supersededBy": "2.4.1.11"
     },
     {
       "id": "2.4.1.8",
@@ -946,7 +981,7 @@
         "Mantém as três URLs oficiais das planilhas.",
         "Não altera a navegação base do app e não usa observador recursivo."
       ],
-      "supersededBy": "2.4.1.10"
+      "supersededBy": "2.4.1.11"
     },
     {
       "id": "2.4.1.9",
@@ -978,7 +1013,7 @@
         "Funciona mesmo quando o catálogo antigo ficou preso em cache na interface.",
         "Observador limitado a alterações de conteúdo, sem loop recursivo."
       ],
-      "supersededBy": "2.4.1.10"
+      "supersededBy": "2.4.1.11"
     },
     {
       "id": "2.4.1.10",
@@ -1010,8 +1045,44 @@
         "Remove o estado de carregamento contínuo causado pelo loop de mutações.",
         "Restaura o Gerenciador de Patches para voltar a consultar e exibir os patches normalmente.",
         "Não altera a navegação nem o sistema de Escalas."
+      ],
+      "supersededBy": "2.4.1.11"
+    },
+    {
+      "id": "2.4.1.11",
+      "name": "TAREFAS 2.4.1.11 — SHA-256 por bytes",
+      "baseVersion": "2.4.1",
+      "minBuild": 276,
+      "maxBuild": 276,
+      "channel": "alpha",
+      "publishedAt": "2026-09-23T08:10:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.4.1.1",
+        "2.4.1.2",
+        "2.4.1.3",
+        "2.4.1.4",
+        "2.4.1.5",
+        "2.4.1.6",
+        "2.4.1.7",
+        "2.4.1.8",
+        "2.4.1.9",
+        "2.4.1.10"
+      ],
+      "installable": true,
+      "description": "Corrige a validação de SHA-256 do Gerenciador de Patches para calcular o hash diretamente sobre os bytes baixados, sem conversão bytes→texto→bytes.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.11.tpatch",
+      "sha256": "0e90c50d7e8679176ece11f40ae23a62b7d50400cf00ef50e9dc9290cca70f42",
+      "changelog": [
+        "Validação do arquivo oficial passa a usar SHA-256 diretamente sobre os bytes recebidos.",
+        "Leitura do .tpatch só acontece depois da validação do hash.",
+        "Usa a GitHub Contents API em Base64 como fonte primária e preserva fallback para o download raw.",
+        "Mostra no erro o SHA esperado, o SHA calculado e o tamanho recebido para diagnóstico.",
+        "Desativa o observador problemático da 2.4.1.9 para evitar carregamento contínuo.",
+        "Esta Alpha substitui cumulativamente as versões 2.4.1.1 até 2.4.1.10."
       ]
     }
   ],
-  "cacheNonce": "24110-sha-fix-r4"
+  "cacheNonce": "24111-byte-sha-r1"
 }
