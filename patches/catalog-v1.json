@@ -137,7 +137,7 @@
       "minBuild": 276,
       "maxBuild": 276,
       "channel": "alpha",
-      "publishedAt": "2026-09-23T06:35:00-03:00",
+      "publishedAt": "2026-09-23T09:40:15.732Z",
       "cumulative": true,
       "replacementMode": "replace-older-same-base",
       "replaces": [
@@ -152,7 +152,7 @@
       "installable": true,
       "description": "Corrige o menu móvel para remover definitivamente Pessoal / Escalas e Missões e deixar apenas Escalas, com as três planilhas oficiais.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.8.tpatch",
-      "sha256": "5cf223d34b081e4f330f7833569a95b0b26235df3d5cc458285cb8435a124921",
+      "sha256": "bb86868b1c3a586fed5b84348f0910514b56d90512c93db2e46cd3d95c4ec21f",
       "changelog": [
         "Remove Pessoal / Escalas do menu móvel.",
         "Remove Missões do menu móvel.",
@@ -820,5 +820,5 @@
       "supersededBy": "2.4.1.7"
     }
   ],
-  "cacheNonce": "2418-drawer-only-r2"
+  "cacheNonce": "2418-drawer-only-r3"
 }
