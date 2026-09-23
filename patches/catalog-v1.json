@@ -3,7 +3,7 @@
   "app": "TAREFAS",
   "baseVersion": "2.4.1",
   "baseBuild": 276,
-  "generatedAt": "2026-09-23T18:00:00Z",
+  "generatedAt": "2026-09-23T18:10:00Z",
   "latestPatch": "2.4.4-prebeta3",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
@@ -462,7 +462,7 @@
       "installable": false,
       "description": "Corrige a 2.4.4-prebeta para voltar a carregar as escalas diretamente das planilhas oficiais do Google, sem tentar sincronizar pelo Supabase/Apps Script.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.4-prebeta2.tpatch",
-      "sha256": "2e516e0606b469f01dc468db58a6e6cd0db3c62c9a57174d7614597976ec6836",
+      "sha256": "fd39bed4f690978c80dba1e605c884c35eb18203ba64bb80b90ba71b048ba009",
       "changelog": [
         "Mantém a base cumulativa da 2.4.3.6.",
         "Remove o fluxo de sincronização Google Sheets → Apps Script → Supabase da tela de Escalas.",
@@ -506,7 +506,7 @@
       ],
       "order": 2440203,
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.4-prebeta3.tpatch",
-      "sha256": "60735afc20d888e127b841dc6bb69256816c2c4cfed1f4f28d3d1b57aad5b21f",
+      "sha256": "4bbf0f954bea84063ba1230a305cd33b6bd41830fcf694e8b858fc6a410c921d",
       "installable": true
     }
   ],
@@ -788,9 +788,9 @@
       ],
       "order": 2440203,
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.4-prebeta3.tpatch",
-      "sha256": "60735afc20d888e127b841dc6bb69256816c2c4cfed1f4f28d3d1b57aad5b21f",
+      "sha256": "4bbf0f954bea84063ba1230a305cd33b6bd41830fcf694e8b858fc6a410c921d",
       "installable": true
     }
   ],
-  "cacheNonce": "244-prebeta3-google-r1"
+  "cacheNonce": "244-prebeta3-google-r2"
 }
