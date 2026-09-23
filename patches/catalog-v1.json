@@ -4,7 +4,7 @@
   "baseVersion": "2.4.1",
   "baseBuild": 276,
   "generatedAt": "2026-09-23T15:00:00Z",
-  "latestPatch": "2.4.4-prebeta",
+  "latestPatch": "2.4.4-prebeta2",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -440,13 +440,13 @@
       ]
     },
     {
-      "id": "2.4.4-prebeta",
-      "name": "TAREFAS 2.4.4-prebeta — Alpha de teste",
+      "id": "2.4.4-prebeta2",
+      "name": "TAREFAS 2.4.4-prebeta2 — Escalas diretas do Google",
       "baseVersion": "2.4.3",
       "minBuild": 278,
       "maxBuild": 278,
       "channel": "alpha",
-      "publishedAt": "2026-09-23T16:14:17.182Z",
+      "publishedAt": "2026-09-23T16:20:00Z",
       "cumulative": true,
       "replacementMode": "replace-older-same-base",
       "replaces": [
@@ -455,19 +455,20 @@
         "2.4.3.3",
         "2.4.3.4",
         "2.4.3.5",
-        "2.4.3.6"
+        "2.4.3.6",
+        "2.4.4-prebeta"
       ],
       "installable": true,
-      "description": "Alpha 2.4.4-prebeta para testar antes da Beta 2.4.4.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.4-prebeta.tpatch",
-      "sha256": "13be12918bd234f59e574451b8689630d8ee3467b14668dbc6af8002fee27f06",
+      "description": "Corrige a 2.4.4-prebeta para voltar a carregar as escalas diretamente das planilhas oficiais do Google, sem tentar sincronizar pelo Supabase/Apps Script.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.4-prebeta2.tpatch",
+      "sha256": "bde2c4a3af53707533828a96080266ec521f3dd6218961b67c5303f0dee71e6d",
       "changelog": [
-        "Remove o Próximo Serviço.",
-        "Remove interferências da escala antiga.",
-        "Centraliza Escalas em Motorista PA, Patrulheiro e Permanência.",
-        "Usa Google Sheets → Apps Script → Supabase → TAREFAS.",
-        "Limpa patches antigos da base 2.4.3.",
-        "Valida SHA-256 do payload e do arquivo oficial."
+        "Mantém a base cumulativa da 2.4.3.6.",
+        "Remove o fluxo de sincronização Google Sheets → Apps Script → Supabase da tela de Escalas.",
+        "As escalas Motorista PA, Patrulheiro e Permanência passam a abrir diretamente as planilhas oficiais do Google.",
+        "Remove Pessoal / Escalas e Missões da navegação.",
+        "Mantém a remoção do Próximo Serviço.",
+        "Substitui integralmente a 2.4.4-prebeta anterior."
       ]
     }
   ],
@@ -1353,5 +1354,5 @@
       ]
     }
   ],
-  "cacheNonce": "244-prebeta-sha-fix-r1"
+  "cacheNonce": "244-prebeta2-google-r1"
 }
