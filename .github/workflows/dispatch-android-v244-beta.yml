@@ -1,0 +1,32 @@
+name: Dispatch Android 2.4.4 Beta
+
+on:
+  push:
+    branches: [app/releases]
+    paths:
+      - '.v244-release-trigger'
+      - 'scripts/build-mobile-v244.mjs'
+      - 'scripts/verify-mobile-v244.mjs'
+      - 'scripts/release-mobile-v244.sh'
+      - '.github/workflows/android-v244-beta.yml'
+      - '.github/workflows/dispatch-android-v244-beta.yml'
+      - 'app/mobile-alpha-v2436-consolidated.js'
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: dispatch-android-v244-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  dispatch:
+    if: ${{ github.event.pull_request.head.ref == 'app/android-v244-prep' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Disparar build oficial no branch de preparação
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run android-v244-beta.yml --repo GuerraVPN/Tarefas --ref app/android-v244-prep

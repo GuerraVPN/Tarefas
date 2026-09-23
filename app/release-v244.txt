@@ -1,0 +1,27 @@
+TAREFAS 2.4.4 Beta — build 279
+
+Base consolidada:
+- Beta 2.4.3 / build 278.
+- Web 7.9.1.
+
+Correções incorporadas:
+- Alpha 2.4.3.6 consolidada dentro do APK Beta.
+- Escalas usam Google Sheets → Apps Script → Supabase → TAREFAS.
+- Identificação do usuário usa a sessão e o usuário atualmente logado.
+- Motorista PA, Patrulheiro e Permanência disponíveis em uma única tela Escalas.
+- Remoção definitiva do card Próximo Serviço da tela inicial.
+- Limpeza dos acessos antigos Pessoal / Escalas, Missões e links diretos das planilhas.
+- Versões antigas dos patches Alpha 2.4.3 ocultadas na base.
+- Validação SHA-256 dos patches oficiais diretamente sobre os bytes recebidos.
+- Seletor nativo de ícones e ponte Android preservados.
+- Preferências de Patch Beta/Alpha continuam alinhadas aos canais dos APKs.
+
+Política:
+- 2.4.4 é a nova base Beta consolidada.
+- Próximas Betas e Alphas, quando não exigirem nova capacidade nativa, serão .tpatch.
+- Patches Beta seguem a preferência de recebimento Beta.
+- Patches Alpha seguem a elegibilidade e opção de recebimento Alpha.
+
+Versão: 2.4.4
+Build: 279
+Canal: Beta
