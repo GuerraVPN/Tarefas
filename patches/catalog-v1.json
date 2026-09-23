@@ -3,8 +3,8 @@
   "app": "TAREFAS",
   "baseVersion": "2.4.1",
   "baseBuild": 276,
-  "generatedAt": "2026-09-23T14:15:00Z",
-  "latestPatch": "2.4.3.4",
+  "generatedAt": "2026-09-23T14:30:00Z",
+  "latestPatch": "2.4.3.5",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -377,6 +377,36 @@
         "Aceita Guerra, Sd Guerra, SD GUERRA e o nome completo como formas de identificação.",
         "Mantém Motorista PA, Patrulheiro e Permanência.",
         "Substitui cumulativamente a 2.4.3.3, 2.4.3.2 e os patches anteriores da mesma base."
+      ],
+      "supersededBy": "2.4.3.5"
+    },
+    {
+      "id": "2.4.3.5",
+      "name": "TAREFAS 2.4.3.5 — Correção do Próximo Serviço na Tela Inicial",
+      "baseVersion": "2.4.3",
+      "minBuild": 278,
+      "maxBuild": 278,
+      "channel": "alpha",
+      "publishedAt": "2026-09-23T14:30:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.4.3.1",
+        "2.4.3.2",
+        "2.4.3.3",
+        "2.4.3.4"
+      ],
+      "installable": true,
+      "description": "Corrige exclusivamente o card Próximo serviço da tela inicial para buscar o próximo serviço confirmado do usuário logado diretamente em escala_servicos. A tela Escalas permanece com a integração Google Planilhas → Apps Script → Supabase.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.3.5.tpatch",
+      "sha256": "2935c0a16cd2c97755e5074dcec9c769d71629413bf22f06e22c7eda9f3b2860",
+      "changelog": [
+        "Corrige o Próximo serviço da tela inicial que podia calcular/puxar a pessoa errada.",
+        "A tela inicial agora consulta escala_servicos filtrando diretamente pelo usuario_id do usuário logado.",
+        "Seleciona a menor data futura do próprio usuário.",
+        "Ao clicar, mantém a abertura da tela Escalas/Pessoal no dia correto e grava o usuário e serviço alvo para permitir seleção correta.",
+        "Não altera a tela Escalas nem remove o acesso às planilhas Google.",
+        "Mantém a correção de identificação de nome das versões anteriores."
       ]
     }
   ],
@@ -1262,5 +1292,5 @@
       ]
     }
   ],
-  "cacheNonce": "2434-sha-fix-r1"
+  "cacheNonce": "2435-dashboard-service-r1"
 }
