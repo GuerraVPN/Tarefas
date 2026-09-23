@@ -4,6 +4,8 @@ on:
   workflow_dispatch:
   push:
     branches: [app/android-v243-prep]
+  pull_request:
+    branches: [main]
     paths:
       - '.v243-release-trigger'
       - 'app/android/TarefasLauncherIconPlugin.java'
