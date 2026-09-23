@@ -1,0 +1,37 @@
+{
+  "format": "tarefas-tpatch-v1",
+  "id": "2.4.1.10",
+  "name": "TAREFAS 2.4.1.10 — Correção do Gerenciador de Patches",
+  "patchVersion": 10,
+  "createdAt": "2026-09-23T06:50:00Z",
+  "baseVersion": "2.4.1",
+  "minBuild": 276,
+  "maxBuild": 276,
+  "channel": "alpha",
+  "cumulative": true,
+  "replacementMode": "replace-older-same-base",
+  "replaces": [
+    "2.4.1.1",
+    "2.4.1.2",
+    "2.4.1.3",
+    "2.4.1.4",
+    "2.4.1.5",
+    "2.4.1.6",
+    "2.4.1.7",
+    "2.4.1.8",
+    "2.4.1.9"
+  ],
+  "description": "Corrige o carregamento do Gerenciador de Patches após a 2.4.1.9, removendo o observador que causava atualizações contínuas na tela.",
+  "changelog": [
+    "Desativa o observador introduzido pela 2.4.1.9.",
+    "Remove o estado de carregamento contínuo causado pelo loop de mutações.",
+    "Restaura o Gerenciador de Patches para voltar a consultar e exibir os patches normalmente.",
+    "Não altera a navegação nem o sistema de Escalas."
+  ],
+  "order": 10,
+  "payload": {
+    "js": ";(()=>{const M='__TAREFAS_ALPHA_2419_HIDE_SUPERSEDED__';try{if(globalThis.__tm2419Observer){globalThis.__tm2419Observer.disconnect();globalThis.__tm2419Observer=null}}catch(_){}document.querySelectorAll('.tm-patch-empty').forEach(e=>{if(e.textContent==='Nenhum patch oficial novo para esta Beta.')e.remove()});globalThis[M]=null})();",
+    "css": ""
+  },
+  "payloadSha256": "5639e561b8af9b85cef2f3c9d3b34b9ad0134891d6fbeeb51a670a54d8e35db2"
+}
