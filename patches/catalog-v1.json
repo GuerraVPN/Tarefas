@@ -3,7 +3,7 @@
   "app": "TAREFAS",
   "baseVersion": "2.4.1",
   "baseBuild": 276,
-  "generatedAt": "2026-09-23T18:10:00Z",
+  "generatedAt": "2026-09-23T18:20:00Z",
   "latestPatch": "2.4.4-prebeta3",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
@@ -506,11 +506,38 @@
       ],
       "order": 2440203,
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.4-prebeta3.tpatch",
-      "sha256": "4bbf0f954bea84063ba1230a305cd33b6bd41830fcf694e8b858fc6a410c921d",
+      "sha256": "17a0eed60cdfb18557258a15a503fee0dd0927b25012c926acf270d3cd52547c",
       "installable": true
     }
   ],
   "history": [
+    {
+      "format": "tarefas-tpatch-v1",
+      "id": "2.4.3.1",
+      "name": "TAREFAS 2.4.3.1 — Correção do menu Escalas",
+      "patchVersion": 1,
+      "createdAt": "2026-09-23T13:30:00Z",
+      "baseVersion": "2.4.3",
+      "minBuild": 278,
+      "maxBuild": 278,
+      "channel": "alpha",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [],
+      "description": "Patch Alpha cumulativo para remover definitivamente Pessoal / Escalas e Missões do menu móvel da base 2.4.3 e deixar somente Escalas.",
+      "changelog": [
+        "Remove do menu móvel Pessoal / Escalas.",
+        "Remove do menu móvel Missões.",
+        "Preserva a entrada Escalas já existente na base 2.4.3.",
+        "Executa a limpeza somente sobre itens de menu, sem alterar páginas de conteúdo.",
+        "Patch cumulativo da base 2.4.3."
+      ],
+      "order": 24301,
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.3.1.tpatch",
+      "sha256": "6f4c5ad00fc0ca95213bf46bebae5cfab2c582f1f8e876edefc1ab2f38de34c6",
+      "installable": false,
+      "supersededBy": "2.4.4-prebeta3"
+    },
     {
       "id": "2.4.3.2",
       "name": "TAREFAS 2.4.3.2 — Escalas integradas ao Supabase",
@@ -659,33 +686,6 @@
     },
     {
       "format": "tarefas-tpatch-v1",
-      "id": "2.4.3.1",
-      "name": "TAREFAS 2.4.3.1 — Correção do menu Escalas",
-      "patchVersion": 1,
-      "createdAt": "2026-09-23T13:30:00Z",
-      "baseVersion": "2.4.3",
-      "minBuild": 278,
-      "maxBuild": 278,
-      "channel": "alpha",
-      "cumulative": true,
-      "replacementMode": "replace-older-same-base",
-      "replaces": [],
-      "description": "Patch Alpha cumulativo para remover definitivamente Pessoal / Escalas e Missões do menu móvel da base 2.4.3 e deixar somente Escalas.",
-      "changelog": [
-        "Remove do menu móvel Pessoal / Escalas.",
-        "Remove do menu móvel Missões.",
-        "Preserva a entrada Escalas já existente na base 2.4.3.",
-        "Executa a limpeza somente sobre itens de menu, sem alterar páginas de conteúdo.",
-        "Patch cumulativo da base 2.4.3."
-      ],
-      "order": 24301,
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.3.1.tpatch",
-      "sha256": "6f4c5ad00fc0ca95213bf46bebae5cfab2c582f1f8e876edefc1ab2f38de34c6",
-      "installable": false,
-      "supersededBy": "2.4.4-prebeta3"
-    },
-    {
-      "format": "tarefas-tpatch-v1",
       "id": "2.4.4-prebeta",
       "name": "TAREFAS 2.4.4-prebeta — Alpha de teste",
       "patchVersion": 1,
@@ -788,9 +788,9 @@
       ],
       "order": 2440203,
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.4-prebeta3.tpatch",
-      "sha256": "4bbf0f954bea84063ba1230a305cd33b6bd41830fcf694e8b858fc6a410c921d",
+      "sha256": "17a0eed60cdfb18557258a15a503fee0dd0927b25012c926acf270d3cd52547c",
       "installable": true
     }
   ],
-  "cacheNonce": "244-prebeta3-google-r2"
+  "cacheNonce": "244-prebeta3-google-r3"
 }
