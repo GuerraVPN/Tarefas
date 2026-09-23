@@ -1,8 +1,6 @@
 name: Android 2.4.3.1 Alpha - Teste
 
 on:
-  push:
-    branches: [app/android-v2431-alpha]
   workflow_dispatch:
 
 concurrency:
