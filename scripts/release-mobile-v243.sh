@@ -177,7 +177,7 @@ cp "$APK" "$APK.sha256" "$RUNNER_TEMP/package/"
 cp app/mobile-launcher-icon-v241.js app/release-v243.txt "$RUNNER_TEMP/package/app/"
 cp app/android/TarefasLauncherIconPlugin.java "$RUNNER_TEMP/package/app/"
 cp scripts/build-mobile-v243.mjs scripts/verify-mobile-v243.mjs "$RUNNER_TEMP/package/scripts/"
-cp dist/BETA_2_4_2.json "$RUNNER_TEMP/package/manifest/"
+cp dist/BETA_2_4_3.json "$RUNNER_TEMP/package/manifest/"
 (cd "$RUNNER_TEMP/package" && zip -qr "$GITHUB_WORKSPACE/$ZIP" .)
 unzip -tq "$ZIP"
 sha256sum "$ZIP" | tee "$ZIP.sha256"
