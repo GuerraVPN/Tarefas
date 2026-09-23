@@ -1,0 +1,40 @@
+{
+  "format": "tarefas-tpatch-v1",
+  "id": "2.4.1.11",
+  "name": "TAREFAS 2.4.1.11 — SHA-256 por bytes",
+  "patchVersion": 11,
+  "createdAt": "2026-09-23T08:10:00Z",
+  "baseVersion": "2.4.1",
+  "minBuild": 276,
+  "maxBuild": 276,
+  "channel": "alpha",
+  "cumulative": true,
+  "replacementMode": "replace-older-same-base",
+  "replaces": [
+    "2.4.1.1",
+    "2.4.1.2",
+    "2.4.1.3",
+    "2.4.1.4",
+    "2.4.1.5",
+    "2.4.1.6",
+    "2.4.1.7",
+    "2.4.1.8",
+    "2.4.1.9",
+    "2.4.1.10"
+  ],
+  "description": "Corrige a validação de SHA-256 do Gerenciador de Patches para calcular o hash diretamente sobre os bytes baixados, sem conversão bytes→texto→bytes.",
+  "changelog": [
+    "Validação do arquivo oficial passa a usar SHA-256 diretamente sobre os bytes recebidos.",
+    "Leitura do .tpatch só acontece depois da validação do hash.",
+    "Usa a GitHub Contents API em Base64 como fonte primária e preserva fallback para o download raw.",
+    "Mostra no erro o SHA esperado, o SHA calculado e o tamanho recebido para diagnóstico.",
+    "Desativa o observador problemático da 2.4.1.9 para evitar carregamento contínuo.",
+    "Esta Alpha substitui cumulativamente as versões 2.4.1.1 até 2.4.1.10."
+  ],
+  "order": 11,
+  "payload": {
+    "js": ";(()=>{'use strict';const MARK='__TAREFAS_ALPHA_24111_BYTE_SHA_INSTALLER__';if(globalThis[MARK])return;globalThis[MARK]=true;try{globalThis.__tm2419Observer?.disconnect?.();globalThis.__tm2419Observer=null}catch(_){}document.querySelectorAll('.tm-patch-empty').forEach(e=>{if(e.textContent==='Nenhum patch oficial novo para esta Beta.')e.remove()});const API='https://api.github.com/repos/GuerraVPN/Tarefas/contents/patches/';const OFF='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/';const DB='tarefas-patches-v1',STORE='patches';const hex=b=>Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');const sha=async b=>hex(await crypto.subtle.digest('SHA-256',b));const b64bytes=s=>{const bin=atob(String(s).replace(/\\s+/g,''));return Uint8Array.from(bin,c=>c.charCodeAt(0))};async function bytes(url){const href=String(url||'');if(href.startsWith(OFF)){const name=href.slice(OFF.length).split('?')[0];const r=await fetch(API+encodeURIComponent(name)+'?ref=app%2Freleases&cb='+Date.now(),{cache:'no-store',headers:{Accept:'application/vnd.github+json'}});if(r.ok){const m=await r.json();if(m?.encoding==='base64'&&m?.content)return b64bytes(m.content)}const rr=await fetch(href+(href.includes('?')?'&':'?')+'cb='+Date.now(),{cache:'no-store'});if(!rr.ok)throw new Error('Download oficial respondeu HTTP '+rr.status+'.');return new Uint8Array(await rr.arrayBuffer())}const r=await fetch(href,{cache:'no-store'});if(!r.ok)throw new Error('Download respondeu HTTP '+r.status+'.');return new Uint8Array(await r.arrayBuffer())}function openDb(){return new Promise((resolve,reject)=>{const r=indexedDB.open(DB,1);r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error||new Error('Falha ao abrir patches.'))})}async function getAll(){const db=await openDb();return await new Promise((resolve,reject)=>{const t=db.transaction(STORE,'readonly'),q=t.objectStore(STORE).getAll();q.onsuccess=()=>resolve(q.result||[]);q.onerror=()=>reject(q.error||new Error('Falha ao ler patches.'));t.oncomplete=()=>db.close()})}async function put(p){const db=await openDb();return await new Promise((resolve,reject)=>{const t=db.transaction(STORE,'readwrite');t.objectStore(STORE).put(p);t.oncomplete=()=>{db.close();resolve()};t.onerror=()=>{db.close();reject(t.error||new Error('Falha ao salvar patch.'))}})}function compatible(p){return p&&p.format==='tarefas-tpatch-v1'&&String(p.baseVersion||'')==='2.4.1'&&Number(p.minBuild||0)<=276&&276<=Number(p.maxBuild??Number.MAX_SAFE_INTEGER)}function cmp(a,b){const x=String(a).split('.').map(n=>Number(n)||0),y=String(b).split('.').map(n=>Number(n)||0),n=Math.max(x.length,y.length);for(let i=0;i<n;i++){const d=(x[i]||0)-(y[i]||0);if(d)return d}return 0}async function install(meta){const b=await bytes(meta.url),actual=await sha(b);if(String(meta.sha256||'').toLowerCase()!==actual)throw new Error('SHA-256 do arquivo oficial não confere. Esperado: '+meta.sha256+' • Calculado: '+actual+' • '+b.byteLength+' bytes');const text=new TextDecoder('utf-8',{fatal:true}).decode(b),p=JSON.parse(text);if(String(meta.id)!==String(p.id))throw new Error('ID do catálogo não corresponde ao patch.');if(!compatible(p))throw new Error('Patch incompatível com a Beta 2.4.1 build 276.');const payload=JSON.stringify({js:String(p.payload?.js||''),css:String(p.payload?.css||'')}),psha=await sha(new TextEncoder().encode(payload));if(String(p.payloadSha256||'').toLowerCase()!==psha)throw new Error('SHA-256 interno do patch não confere.');const rows=await getAll();for(const old of rows){if(String(old?.baseVersion||'')==='2.4.1'&&String(old.id)!==String(p.id)&&cmp(old.id,p.id)<0){const db=await openDb();await new Promise((res,rej)=>{const t=db.transaction(STORE,'readwrite');t.objectStore(STORE).delete(old.id);t.oncomplete=()=>{db.close();res()};t.onerror=()=>{db.close();rej(t.error)}})}}await put({...p,enabled:true,source:'official',catalogSha256:actual,installedAt:new Date().toISOString(),order:Number(p.order||Date.now())});location.reload()}function wire(){const old=document.getElementById('tmPatchCheck');if(!old)return false;const btn=old.cloneNode(true);old.replaceWith(btn);btn.addEventListener('click',async()=>{if(btn.dataset.busy==='1')return;btn.dataset.busy='1';btn.disabled=true;btn.textContent='Verificando patches…';const target=document.getElementById('tmPatchOfficial');if(target)target.innerHTML='<div class=\"tm-patch-empty\">Consultando catálogo…</div>';try{const cb=await bytes(OFF+'catalog-v1.json'),c=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(cb)),rows=(c.patches||[]).filter(p=>String(p.baseVersion||'')==='2.4.1'&&276>=Number(p.minBuild||0)&&276<=Number(p.maxBuild??Number.MAX_SAFE_INTEGER)&&p.installable!==false),have=new Set((await getAll()).map(x=>String(x.id)));if(!target)return;target.innerHTML=rows.length?'<div class=\"tm-patch-list\">'+rows.map(p=>'<article class=\"tm-patch-item\"><div class=\"tm-patch-head\"><div><strong>'+String(p.name||p.id)+'</strong><small>'+p.id+' • '+String(p.channel||'alpha').toUpperCase()+'</small></div><span class=\"tm-patch-badge\">OFICIAL</span></div><p>'+String(p.description||'Patch oficial disponível.')+'</p><div class=\"tm-patch-buttons\"><button data-tm24111-install=\"'+p.id+'\" '+(have.has(String(p.id))?'disabled':'')+'>'+(have.has(String(p.id))?'Instalado':'Baixar e aplicar')+'</button></div></article>').join('')+'</div>':'<div class=\"tm-patch-empty\">Nenhum patch oficial novo para esta Beta.</div>';target.querySelectorAll('[data-tm24111-install]').forEach(b=>b.addEventListener('click',async()=>{const p=rows.find(x=>String(x.id)===b.dataset.tm24111Install);if(!p)return;b.disabled=true;b.textContent='Aplicando…';try{await install(p)}catch(e){b.disabled=false;b.textContent='Baixar e aplicar';alert(e?.message||e)}}))}catch(e){if(target)target.innerHTML='<div class=\"tm-patch-empty\">Falha ao consultar patches: '+String(e?.message||e)+'</div>'}finally{delete btn.dataset.busy;btn.disabled=false;btn.textContent='Verificar patches oficiais'}})}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(wire,0),{once:true});else setTimeout(wire,0)})();",
+    "css": ""
+  },
+  "payloadSha256": "f1b0370a88c34ab6f35d291b2b246764b6f232ededfc0ce0b4164e716986665b"
+}
