@@ -1,4 +1,4 @@
-name: Android 2.4.6 Beta - Base 2.4.3
+name: Android 2.4.6 Beta - Pré-release / base 2.4.5
 
 on:
   workflow_dispatch:
@@ -53,5 +53,5 @@ jobs:
             TAREFAS-2.4.6-beta-build-281.zip
             TAREFAS-2.4.6-beta-build-281.zip.sha256
             app/release-v246.txt
-            dist/BETA_2_4_5.json
+            dist/BETA_2_4_6.json
           if-no-files-found: error
