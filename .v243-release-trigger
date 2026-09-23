@@ -1,4 +1,7 @@
-release=2.4.3-build-278\nstatus=ready-to-build\ntrigger=build-script-fixed\n
+release=2.4.3-build-278
+status=ready-to-build
+trigger=post-merge-publication-retry
+
 dispatch=main-workflow-ready
 
 publish-trigger=push-oidc
