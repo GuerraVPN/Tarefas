@@ -3,8 +3,8 @@
   "app": "TAREFAS",
   "baseVersion": "2.4.1",
   "baseBuild": 276,
-  "generatedAt": "2026-09-23T13:44:12.247Z",
-  "latestPatch": "2.4.3.2",
+  "generatedAt": "2026-09-23T14:00:00Z",
+  "latestPatch": "2.4.3.3",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -319,6 +319,35 @@
         "Incluídas as escalas Motorista PA, Patrulheiro e Permanência.",
         "Mantida a remoção de Pessoal / Escalas e Missões.",
         "O patch 2.4.3.2 substitui cumulativamente o 2.4.3.1."
+      ],
+      "supersededBy": "2.4.3.3"
+    },
+    {
+      "id": "2.4.3.3",
+      "name": "TAREFAS 2.4.3.3 — Correção da busca de nome nas Escalas",
+      "baseVersion": "2.4.3",
+      "minBuild": 278,
+      "maxBuild": 278,
+      "channel": "alpha",
+      "publishedAt": "2026-09-23T14:00:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.4.3.1",
+        "2.4.3.2"
+      ],
+      "installable": true,
+      "description": "Corrige a identificação do nome nas escalas, removendo prefixos de posto/graduação como Sd e aceitando o nome de guerra sem a patente. Mantém a integração Google Sheets → Apps Script → Supabase.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.3.3.tpatch",
+      "sha256": "4cc62ef3f4276cd4a3164e0c8f2882fd8449b269477c70b4ae1e66491f6bd11c",
+      "changelog": [
+        "Corrige a busca que procurava 'Sd Guerra' em vez de 'Guerra'.",
+        "Remove automaticamente prefixos comuns de posto/graduação antes de montar os aliases.",
+        "Aceita Guerra, Sd Guerra, SD GUERRA e o nome completo como formas de identificação.",
+        "Corrige a normalização de acentos e espaços usada pela busca.",
+        "Mantém Motorista PA, Patrulheiro e Permanência.",
+        "Mantém Escalas como item único e remove Pessoal / Escalas e Missões.",
+        "Substitui cumulativamente a 2.4.3.2 e os patches anteriores da mesma base."
       ]
     }
   ],
@@ -1204,5 +1233,5 @@
       ]
     }
   ],
-  "cacheNonce": "24112-sha-test-r1"
+  "cacheNonce": "2433-name-fix-r1"
 }
