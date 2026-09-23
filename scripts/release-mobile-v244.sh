@@ -25,6 +25,9 @@ ln -s "$GITHUB_WORKSPACE/node_modules" "$BASE_DIR/node_modules"
 )
 rm -rf "$GITHUB_WORKSPACE/dist"
 cp -a "$BASE_DIR/dist" "$GITHUB_WORKSPACE/dist"
+# A consolidação 2.4.4 parte dos runtimes oficiais 2.4.0, que são mantidos em app/.
+cp app/mobile-patch-manager-v240.js "$GITHUB_WORKSPACE/dist/mobile-patch-manager-v240.js"
+cp app/mobile-release-v240.js "$GITHUB_WORKSPACE/dist/mobile-release-v240.js"
 
 node scripts/build-mobile-v244.mjs
 node scripts/verify-mobile-v244.mjs dist
