@@ -29,9 +29,9 @@ for(const name of await readdir(dist)){
 }
 
 await patch('mobile-patch-manager-v240.js',source=>source
-  .replace("const APP_VERSION='2.4.2',APP_BUILD=277,APP_CHANNEL='beta';","const APP_VERSION='"+VERSION+"',APP_BUILD="+BUILD+",APP_CHANNEL='beta';")
-  .replace("__TAREFAS_PATCH_MANAGER_V277__","__TAREFAS_PATCH_MANAGER_V279__")
-  .replaceAll("source:'beta-2.4.2'","source:'beta-2.4.4'"),{required:true});
+  .replace("const APP_VERSION='2.4.0',APP_BUILD=274,APP_CHANNEL='official';","const APP_VERSION='"+VERSION+"',APP_BUILD="+BUILD+",APP_CHANNEL='beta';")
+  .replace("__TAREFAS_PATCH_MANAGER_V274__","__TAREFAS_PATCH_MANAGER_V279__")
+  .replaceAll("source:'beta-2.4.2'","source:'beta-2.4.4'").replaceAll("source:'beta-2.4.0'","source:'beta-2.4.4'"),{required:true});
 
 await patch('mobile-bootstrap.js',source=>{
   let out=source
