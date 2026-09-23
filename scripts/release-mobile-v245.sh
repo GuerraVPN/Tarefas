@@ -125,21 +125,37 @@ python3 - <<'PY'
 import json
 with open('android/app/build/outputs/apk/release/output-metadata.json',encoding='utf-8') as f:
     e=json.load(f)['elements'][0]
-assert int(e['versionCode']) == 278, e
-assert str(e['versionName']) == '2.4.3', e
+assert int(e['versionCode']) == 280, e
+assert str(e['versionName']) == '2.4.5', e
 PY
 
-unzip -p "$UNSIGNED" assets/public/mobile-launcher-icon-v241.js > "$RUNNER_TEMP/launcher-v243.js"
-unzip -p "$UNSIGNED" assets/public/mobile-bootstrap.js > "$RUNNER_TEMP/bootstrap-v243.js"
-unzip -p "$UNSIGNED" assets/public/mobile-patch-manager-v240.js > "$RUNNER_TEMP/pm-v243.js"
-unzip -p "$UNSIGNED" assets/public/mobile-updates-v181.js > "$RUNNER_TEMP/updates-v243.js"
-grep -q '__TAREFAS_LAUNCHER_ICON_241__' "$RUNNER_TEMP/launcher-v243.js"
-grep -q 'pinProfileShortcut' "$RUNNER_TEMP/launcher-v243.js"
-grep -q '__TAREFAS_BETA_243_BOOT__' "$RUNNER_TEMP/bootstrap-v243.js"
-grep -q '__TAREFAS_PATCH_MANAGER_V278__' "$RUNNER_TEMP/pm-v243.js"
-grep -q "v1_8_get_beta_updates" "$RUNNER_TEMP/pm-v243.js"
-grep -q "v2_3_21_alpha_context" "$RUNNER_TEMP/pm-v243.js"
-grep -q "const APP_CHANNEL = 'beta';" "$RUNNER_TEMP/updates-v243.js"
+unzip -p "$UNSIGNED" assets/public/mobile-launcher-icon-v241.js > "$RUNNER_TEMP/launcher-v245.js"
+unzip -p "$UNSIGNED" assets/public/mobile-bootstrap.js > "$RUNNER_TEMP/bootstrap-v245.js"
+unzip -p "$UNSIGNED" assets/public/mobile-patch-manager-v240.js > "$RUNNER_TEMP/pm-v245.js"
+unzip -p "$UNSIGNED" assets/public/mobile-updates-v181.js > "$RUNNER_TEMP/updates-v245.js"
+grep -q '__TAREFAS_LAUNCHER_ICON_241__' "$RUNNER_TEMP/launcher-v245.js"
+grep -q 'pinProfileShortcut' "$RUNNER_TEMP/launcher-v245.js"
+grep -q '__TAREFAS_BETA_245_BOOT__' "$RUNNER_TEMP/bootstrap-v245.js"
+grep -q '__TAREFAS_PATCH_MANAGER_V280__' "$RUNNER_TEMP/pm-v245.js"
+grep -q "v1_8_get_beta_updates" "$RUNNER_TEMP/pm-v245.js"
+grep -q "v2_3_21_alpha_context" "$RUNNER_TEMP/pm-v245.js"
+grep -q "const APP_CHANNEL = 'beta';" "$RUNNER_TEMP/updates-v245.js"
+grep -q "const APP_VERSION = '2.4.5';" "$RUNNER_TEMP/bootstrap-v245.js"
+grep -q "const APP_BUILD = 280;" "$RUNNER_TEMP/bootstrap-v245.js"
+grep -q "basedOn:'2.4.3'" "$RUNNER_TEMP/bootstrap-v245.js"
+grep -q "const APP_VERSION='2.4.5',APP_BUILD=280,APP_CHANNEL='beta';" "$RUNNER_TEMP/pm-v245.js"
+grep -q "sha256Bytes" "$RUNNER_TEMP/pm-v245.js"
+grep -q "fetchOfficialBytes" "$RUNNER_TEMP/pm-v245.js"
+grep -q "crypto.subtle.digest" "$RUNNER_TEMP/pm-v245.js"
+grep -q "const APP_VERSION = '2.4.5';" "$RUNNER_TEMP/updates-v245.js"
+grep -q "const APP_BUILD = 280;" "$RUNNER_TEMP/updates-v245.js"
+grep -q "mobile-launcher-icon-v241.js" "$RUNNER_TEMP/bootstrap-v245.js"
+grep -q "tmScales245" "$RUNNER_TEMP/bootstrap-v245.js"
+grep -q "1T_BM9KY0NLwVhlifetQ6W6AdetujQjx--zOZHa27eQs" "$RUNNER_TEMP/bootstrap-v245.js"
+grep -q "1_LlfIHx4EuSHkC9BOR2VorvXoaiMyLa028wU6C0dQLs" "$RUNNER_TEMP/bootstrap-v245.js"
+grep -q "13eEei_JdGjAdVo371BGfPS59QdYySe9lJ47DLjWb_x0" "$RUNNER_TEMP/bootstrap-v245.js"
+! grep -q "Pessoal / Escalas" "$RUNNER_TEMP/bootstrap-v245.js"
+! grep -q "Missões" "$RUNNER_TEMP/bootstrap-v245.js"
 
 OIDC="$(curl --fail --silent --show-error \
   -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
@@ -185,7 +201,7 @@ unzip -tq "$ZIP"
 sha256sum "$ZIP" | tee "$ZIP.sha256"
 
 git fetch origin app/releases
-RELEASES_DIR="$RUNNER_TEMP/tarefas-releases-v243"
+RELEASES_DIR="$RUNNER_TEMP/tarefas-releases-v245"
 git worktree add "$RELEASES_DIR" origin/app/releases
 mkdir -p "$RELEASES_DIR/downloads"
 cp "$APK" "$APK.sha256" "$ZIP" "$ZIP.sha256" "$RELEASES_DIR/downloads/"
