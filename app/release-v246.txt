@@ -1,0 +1,22 @@
+TAREFAS 2.4.6 Beta — build 281
+
+Base:
+- 2.4.5 Beta / build 280, validada antes desta pré-release.
+- Web 7.9.1.
+- Canal Beta.
+
+Mantido da base 2.4.5:
+- Menu consolidado com somente Escalas.
+- Motorista, Patrulheiro e Permanência nas três planilhas oficiais.
+- Patch Manager com SHA-256 diretamente sobre bytes.
+- Preferências de recebimento Beta/Alpha.
+- Seletor nativo de ícones, biometria e abas de diagnóstico.
+
+Objetivo:
+- Não introduzir funcionalidades novas; esta é a pré-release de veredito da linha 2.4.x.
+- Publicar a pré-release Beta 2.4.6, build 281, para validação final da base 2.4.5.
+- Base declarada: 2.4.5/build 280.
+
+Versão: 2.4.6
+Build: 281
+Canal: Beta
