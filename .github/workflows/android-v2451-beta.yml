@@ -1,0 +1,56 @@
+name: Android 2.4.5 SHA Diagnostic (OIDC)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [app/android-v2451-prep]
+
+concurrency:
+  group: android-v2451-prep-sha-debug
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Compilar e assinar APK diagnóstico
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          npm ci
+          npm install --no-save --package-lock=false --ignore-scripts jspdf@2.5.2
+          chmod +x scripts/release-mobile-v245.sh
+          sed '/^git fetch origin app\/releases$/,$d' scripts/release-mobile-v245.sh > "$RUNNER_TEMP/build-debug.sh"
+          chmod +x "$RUNNER_TEMP/build-debug.sh"
+          "$RUNNER_TEMP/build-debug.sh"
+          mv TAREFAS-2.4.5.apk Tarefas-2.4.5-beta-280-debug-sha.apk
+          mv TAREFAS-2.4.5.apk.sha256 Tarefas-2.4.5-beta-280-debug-sha.apk.sha256
+          mv TAREFAS-2.4.5-beta-build-280.zip tarefas-2.4.5-beta-280-debug-sha.zip
+          mv TAREFAS-2.4.5-beta-build-280.zip.sha256 tarefas-2.4.5-beta-280-debug-sha.zip.sha256
+          sha256sum Tarefas-2.4.5-beta-280-debug-sha.apk | tee Tarefas-2.4.5-beta-280-debug-sha.apk.sha256
+          sha256sum tarefas-2.4.5-beta-280-debug-sha.zip | tee tarefas-2.4.5-beta-280-debug-sha.zip.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tarefas-2.4.5-beta-280-debug-sha
+          path: |
+            Tarefas-2.4.5-beta-280-debug-sha.apk
+            Tarefas-2.4.5-beta-280-debug-sha.apk.sha256
+            tarefas-2.4.5-beta-280-debug-sha.zip
+            tarefas-2.4.5-beta-280-debug-sha.zip.sha256
+            app/release-v245.txt
+            dist/BETA_2_4_5.json
+          if-no-files-found: error
