@@ -116,7 +116,7 @@
         "2.4.1.5",
         "2.4.1.6"
       ],
-      "installable": true,
+      "installable": false,
       "description": "Corrige o travamento causado pela atualização contínua do menu de Escalas na Alpha 2.4.1.6.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.7.tpatch",
       "sha256": "34e654064ee8e0ea2bff01764a247e63bc556288f3224d6077073ec233aec84f",
@@ -820,5 +820,5 @@
       "supersededBy": "2.4.1.7"
     }
   ],
-  "cacheNonce": "2418-drawer-only-r3"
+  "cacheNonce": "2418-drawer-only-r4"
 }
