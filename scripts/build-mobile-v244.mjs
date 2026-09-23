@@ -90,8 +90,9 @@ await patch('mobile-preload.js',source=>{
 });
 
 await patch('mobile-updates-v181.js',source=>source
-  .replace("const APP_VERSION = '2.4.2';","const APP_VERSION = '"+VERSION+"';")
-  .replace('const APP_BUILD = 277;','const APP_BUILD = '+BUILD+';'),{required:false});
+  .replace(/const APP_VERSION = '[^']+';/,"const APP_VERSION = '"+VERSION+"';")
+  .replace(/const APP_BUILD = \d+;/,'const APP_BUILD = '+BUILD+';')
+  .replace(/const APP_CHANNEL = '[^']+';/,"const APP_CHANNEL = 'beta';"),{required:true});
 
 await patch('mobile-ai-v230.js',source=>source
   .replaceAll('BETA 2.4.2','BETA '+VERSION)
