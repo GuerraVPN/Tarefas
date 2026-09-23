@@ -7,4 +7,4 @@ dispatch=main-workflow-ready
 publish-trigger=push-oidc
 pr-oidc-release=enabled
 
-retry=launcher-restored
+retry=verify-web-restored-v2
