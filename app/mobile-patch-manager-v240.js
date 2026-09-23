@@ -38,14 +38,30 @@ async function fetchOfficialBytes(url){
         const meta=await r.json();
         if(meta?.encoding==='base64'&&meta?.content){
           const bin=atob(String(meta.content).replace(/\s+/g,''));
-          return Uint8Array.from(bin,c=>c.charCodeAt(0));
+          const bytes=Uint8Array.from(bin,c=>c.charCodeAt(0));
+          if(name==='TAREFAS-2.4.5.1.tpatch'){
+            console.log('[TAREFAS SHA DEBUG] DOWNLOAD_SOURCE=CONTENTS_API');
+            console.log('[TAREFAS SHA DEBUG] SOURCE_URL=',api);
+            console.log('[TAREFAS SHA DEBUG] RAW_BYTES_LENGTH=',bytes.length);
+            console.log('[TAREFAS SHA DEBUG] RAW_SHA256=',await sha256Bytes(bytes));
+          }
+          return bytes;
         }
       }
     }catch(err){console.warn('[TAREFAS PATCH] GitHub API fallback:',err?.message||err)}
     const sep=href.includes('?')?'&':'?';
-    const r=await fetch(href+sep+'cb='+Date.now(),{cache:'no-store'});
+    const cb=Date.now();
+    const sourceUrl=href+sep+'cb='+cb;
+    const r=await fetch(sourceUrl,{cache:'no-store'});
     if(!r.ok)throw new Error('Download oficial respondeu HTTP '+r.status+'.');
-    return new Uint8Array(await r.arrayBuffer());
+    const bytes=new Uint8Array(await r.arrayBuffer());
+    if(href.endsWith('TAREFAS-2.4.5.1.tpatch')){
+      console.log('[TAREFAS SHA DEBUG] DOWNLOAD_SOURCE=RAW');
+      console.log('[TAREFAS SHA DEBUG] SOURCE_URL=',sourceUrl);
+      console.log('[TAREFAS SHA DEBUG] RAW_BYTES_LENGTH=',bytes.length);
+      console.log('[TAREFAS SHA DEBUG] RAW_SHA256=',await sha256Bytes(bytes));
+    }
+    return bytes;
   }
   const r=await fetch(href,{cache:'no-store'});
   if(!r.ok)throw new Error('Download respondeu HTTP '+r.status+'.');
@@ -89,8 +105,37 @@ async function validatePatch(p){
   if(!/^[A-Za-z0-9._-]{3,80}$/.test(String(p.id||'')))throw new Error('ID do patch inválido.');
   if(!p.name)throw new Error('Nome do patch ausente.');
   if(!p.payload||typeof p.payload!=='object')throw new Error('Payload do patch ausente.');
+  if(String(p.id||'')==='2.4.5.1'){
+    console.log('[TAREFAS SHA DEBUG] VALIDATION_SOURCE=',String(p.source||'unknown')==='official'?'REMOTE_DOWNLOAD':'INDEXEDDB');
+    console.log('[TAREFAS SHA DEBUG] PATCH_ID=',p.id);
+    console.log('[TAREFAS SHA DEBUG] PATCH_VERSION=',p.patchVersion??p.id);
+    console.log('[TAREFAS SHA DEBUG] BASE_VERSION=',p.baseVersion);
+    console.log('[TAREFAS SHA DEBUG] BUILD=',APP_BUILD);
+    console.log('[TAREFAS SHA DEBUG] PATCH_MANAGER_VERSION=',APP_VERSION);
+    console.log('[TAREFAS SHA DEBUG] DECLARED_PAYLOAD_SHA256=',String(p.payloadSha256||''));
+    console.log('[TAREFAS SHA DEBUG] PAYLOAD_JS_LENGTH=',String(p?.payload?.js||'').length);
+    console.log('[TAREFAS SHA DEBUG] PAYLOAD_CSS_LENGTH=',String(p?.payload?.css||'').length);
+    const serializedPayload=payloadText(p);
+    console.log('[TAREFAS SHA DEBUG] PAYLOAD_SERIALIZED_LENGTH=',serializedPayload.length);
+    console.log('[TAREFAS SHA DEBUG] PAYLOAD_SERIALIZED_SHA256=',await sha256(serializedPayload));
+    console.log('[TAREFAS SHA DEBUG] PAYLOAD_JS_PREFIX=',String(p?.payload?.js||'').slice(0,100));
+    console.log('[TAREFAS SHA DEBUG] PAYLOAD_JS_SUFFIX=',String(p?.payload?.js||'').slice(-100));
+    console.log('[TAREFAS SHA DEBUG] INDEXEDDB_INSTALLED_AT=',p.installedAt??'');
+    console.log('[TAREFAS SHA DEBUG] INDEXEDDB_ENABLED=',p.enabled??'');
+    console.log('[TAREFAS SHA DEBUG] INDEXEDDB_LAST_ERROR=',p.lastError??'');
+    console.log('[TAREFAS SHA DEBUG] INDEXEDDB_CATALOG_SHA256=',p.catalogSha256??'');
+  }
   const actual=await payloadSha(p.payload);
-  if(String(p.payloadSha256||'').toLowerCase()!==actual)throw new Error('SHA-256 interno do patch não confere.');
+  if(String(p.id||'')==='2.4.5.1'){
+    console.log('[TAREFAS SHA DEBUG] CALCULATED_PAYLOAD_SHA256=',actual);
+  }
+  if(String(p.payloadSha256||'').toLowerCase()!==actual){
+    if(String(p.id||'')==='2.4.5.1'){
+      console.error('[TAREFAS SHA DEBUG] EXPECTED_PAYLOAD=',String(p.payloadSha256||''));
+      console.error('[TAREFAS SHA DEBUG] ACTUAL_PAYLOAD=',actual);
+    }
+    throw new Error('SHA-256 interno do patch não confere.');
+  }
   if(!compatible(p))throw new Error(`Patch incompatível. Ele exige ${p.baseVersion||'?'} / build ${p.minBuild||'?'}–${p.maxBuild??'+'}; este app é ${APP_VERSION} / build ${APP_BUILD}.`);
   return {...p,payloadSha256:actual};
 }
@@ -143,10 +188,12 @@ function installVersionObserver(){
   window.addEventListener('pageshow',schedule);
 }
 async function applyInstalled(){
+  console.log('[TAREFAS SHA DEBUG] FLOW=APPLY_INSTALLED');
   const all=await getAll().catch(()=>[]);
   const enabled=all.filter(p=>p.enabled!==false&&compatible(p)).sort((a,b)=>Number(a.order||0)-Number(b.order||0));
   const applied=[];
   for(const p of enabled){
+    if(String(p.id||'')==='2.4.5.1')console.log('[TAREFAS SHA DEBUG] VALIDATION_SOURCE=INDEXEDDB');
     try{await validatePatch(p);runPatch(p);applied.push(p.id)}
     catch(err){console.error('[TAREFAS PATCH]',p.id,err);p.lastError=String(err?.message||err);p.enabled=false;await put(p).catch(()=>{})}
   }
@@ -203,9 +250,31 @@ async function installOfficial(meta){
   const url=String(meta?.url||'');
   if(!url.startsWith(OFFICIAL_RAW_PREFIX))throw new Error('Origem oficial do patch inválida.');
   markPatchSeen(meta?.id);
+  if(String(meta?.id||'')==='2.4.5.1'){
+    console.log('[TAREFAS SHA DEBUG] FLOW=INSTALL_OFFICIAL');
+    console.log('[TAREFAS SHA DEBUG] PATCH_ID=',meta.id);
+    console.log('[TAREFAS SHA DEBUG] PATCH_VERSION=',meta.patchVersion??meta.id);
+    console.log('[TAREFAS SHA DEBUG] BASE_VERSION=',meta.baseVersion);
+    console.log('[TAREFAS SHA DEBUG] BUILD=',APP_BUILD);
+    console.log('[TAREFAS SHA DEBUG] PATCH_MANAGER_VERSION=',APP_VERSION);
+    console.log('[TAREFAS SHA DEBUG] SOURCE_URL=',url);
+    console.log('[TAREFAS SHA DEBUG] CATALOG_EXPECTED_RAW_SHA256=',String(meta.sha256||''));
+  }
   const bytes=await fetchOfficialBytes(url);
   const actual=await sha256Bytes(bytes);
-  if(String(meta.sha256||'').toLowerCase()!==actual)throw new Error('SHA-256 do arquivo oficial não confere. Esperado: '+String(meta.sha256||'')+' • Calculado: '+actual+' • '+bytes.byteLength+' bytes');
+  if(String(meta?.id||'')==='2.4.5.1'){
+    console.log('[TAREFAS SHA DEBUG] VALIDATION_SOURCE=REMOTE_DOWNLOAD');
+    console.log('[TAREFAS SHA DEBUG] RAW_BYTES_LENGTH=',bytes.length);
+    console.log('[TAREFAS SHA DEBUG] RAW_SHA256=',actual);
+    console.log('[TAREFAS SHA DEBUG] RAW_EXPECTED_MATCH=',String(meta.sha256||'').toLowerCase()===actual);
+  }
+  if(String(meta.sha256||'').toLowerCase()!==actual){
+    if(String(meta?.id||'')==='2.4.5.1'){
+      console.error('[TAREFAS SHA DEBUG] EXPECTED_RAW=',String(meta.sha256||''));
+      console.error('[TAREFAS SHA DEBUG] ACTUAL_RAW=',actual);
+    }
+    throw new Error('SHA-256 do arquivo oficial não confere. Esperado: '+String(meta.sha256||'')+' • Calculado: '+actual+' • '+bytes.byteLength+' bytes');
+  }
   const text=new TextDecoder('utf-8',{fatal:true}).decode(bytes);
   const p=await parsePatchText(text);
   if(meta.id&&String(meta.id)!==p.id)throw new Error('ID do catálogo não corresponde ao patch.');
