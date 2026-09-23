@@ -80,7 +80,7 @@ await patch('mobile-alpha-v23221-tabs.js',source=>source
   .replace("const MARK='__TAREFAS_BETA_TABS_V277__',VERSION='2.4.2',BUILD=277","const MARK='__TAREFAS_BETA_TABS_V279__',VERSION='"+VERSION+"',BUILD="+BUILD)
   .replace('<small>Beta 2.4.2</small>','<small>Beta '+VERSION+'</small>'),{required:false});
 
-await patch('mobile-preload.js',source=>source=>{
+await patch('mobile-preload.js',source=>{
   const out=source
     .replace(/tarefasAppVersion\s*=\s*'[^']+'/g,"tarefasAppVersion = '"+VERSION+"'")
     .replace(/tarefasAppBuild\s*=\s*'[^']+'/g,"tarefasAppBuild = '"+BUILD+"'");
