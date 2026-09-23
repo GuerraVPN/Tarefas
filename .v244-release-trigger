@@ -6,3 +6,5 @@ trigger=alpha-2.4.3.6-consolidation
 dispatch=main-workflow-ready
 publish-trigger=push-oidc
 pr-oidc-release=enabled
+
+retry=setup-node-cache-off
