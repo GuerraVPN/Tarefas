@@ -7,7 +7,7 @@ WEB_VERSION='7.9.1'
 APK="TAREFAS-${VERSION}.apk"
 ZIP="TAREFAS-${VERSION}-beta-build-${BUILD}.zip"
 
-npm ci
+npm install
 npm install --no-save --package-lock=false --ignore-scripts jspdf@2.5.2
 
 node --check app/mobile-launcher-icon-v241.js
