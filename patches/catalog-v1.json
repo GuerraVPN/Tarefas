@@ -3,8 +3,8 @@
   "app": "TAREFAS",
   "baseVersion": "2.4.1",
   "baseBuild": 276,
-  "generatedAt": "2026-09-23T06:38:00-03:00",
-  "latestPatch": "2.4.1.8",
+  "generatedAt": "2026-09-23T06:45:00Z",
+  "latestPatch": "2.4.1.9",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -160,6 +160,37 @@
         "Escalas abre Motorista, Patrulheiro e Permanência.",
         "Mantém as três URLs oficiais das planilhas.",
         "Não altera a navegação base do app e não usa observador recursivo."
+      ]
+    },
+    {
+      "id": "2.4.1.9",
+      "name": "TAREFAS 2.4.1.9 — Ocultar patches antigos já substituídos",
+      "baseVersion": "2.4.1",
+      "minBuild": 276,
+      "maxBuild": 276,
+      "channel": "alpha",
+      "publishedAt": "2026-09-23T06:45:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.4.1.1",
+        "2.4.1.2",
+        "2.4.1.3",
+        "2.4.1.4",
+        "2.4.1.5",
+        "2.4.1.6",
+        "2.4.1.7",
+        "2.4.1.8"
+      ],
+      "installable": true,
+      "description": "Corrige o Gerenciador de Patches para não exibir patches antigos que já foram substituídos por um patch cumulativo instalado.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.9.tpatch",
+      "sha256": "1951e374c6b8f71b342f0421b3661292751892605c475ca7df8f89dacb70553b",
+      "changelog": [
+        "Oculta patches oficiais anteriores ao patch cumulativo atualmente instalado.",
+        "Impede que a Alpha 2.4.1.7 continue aparecendo depois da instalação da 2.4.1.8.",
+        "Funciona mesmo quando o catálogo antigo ficou preso em cache na interface.",
+        "Observador limitado a alterações de conteúdo, sem loop recursivo."
       ]
     }
   ],
@@ -820,5 +851,5 @@
       "supersededBy": "2.4.1.7"
     }
   ],
-  "cacheNonce": "2418-drawer-only-r4"
+  "cacheNonce": "2419-hide-superseded-r1"
 }
