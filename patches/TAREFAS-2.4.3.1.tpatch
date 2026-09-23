@@ -1,0 +1,28 @@
+{
+  "format": "tarefas-tpatch-v1",
+  "id": "2.4.3.1",
+  "name": "TAREFAS 2.4.3.1 — Correção do menu Escalas",
+  "patchVersion": 1,
+  "createdAt": "2026-09-23T13:30:00Z",
+  "baseVersion": "2.4.3",
+  "minBuild": 278,
+  "maxBuild": 278,
+  "channel": "alpha",
+  "cumulative": true,
+  "replacementMode": "replace-older-same-base",
+  "replaces": [],
+  "description": "Patch Alpha cumulativo para remover definitivamente Pessoal / Escalas e Missões do menu móvel da base 2.4.3 e deixar somente Escalas.",
+  "changelog": [
+    "Remove do menu móvel Pessoal / Escalas.",
+    "Remove do menu móvel Missões.",
+    "Preserva a entrada Escalas já existente na base 2.4.3.",
+    "Executa a limpeza somente sobre itens de menu, sem alterar páginas de conteúdo.",
+    "Patch cumulativo da base 2.4.3."
+  ],
+  "order": 24301,
+  "payload": {
+    "js": "(()=>{\n  'use strict';\n  const MARK='__TAREFAS_ALPHA_2431_MENU_FIX__';\n  if(globalThis[MARK])return;\n  globalThis[MARK]=true;\n\n  const norm=s=>String(s||'').replace(/\\s+/g,' ').trim().toLowerCase();\n\n  function isOld(el){\n    const a=el.matches?.('a')?el:el.querySelector?.('a[href]');\n    const href=norm(a?.getAttribute?.('href'));\n    const text=norm(el.textContent);\n    return href.includes('pessoal.html') || href.includes('missao.html') || text==='pessoal / escalas' || text==='missões';\n  }\n\n  function cleanup(root=document){\n    const candidates=root.querySelectorAll?.('a[href*="pessoal.html"],a[href*="missao.html"],button,li,[role="menuitem"]')||[];\n    candidates.forEach(el=>{\n      if(isOld(el)){\n        const item=el.closest('li,[role="menuitem"]')||el;\n        item.style.display='none';\n        item.setAttribute('data-tarefas-hidden-old-menu','true');\n      }\n    });\n    const direct=[...root.querySelectorAll?.('a,button,li,[role="menuitem"]')||[]];\n    direct.forEach(el=>{\n      if(norm(el.textContent)==='pessoal / escalas'||norm(el.textContent)==='missões'){\n        const item=el.closest('li,[role="menuitem"]')||el;\n        item.style.display='none';\n        item.setAttribute('data-tarefas-hidden-old-menu','true');\n      }\n    });\n  }\n\n  function run(){\n    cleanup(document);\n    setTimeout(()=>cleanup(document),80);\n    setTimeout(()=>cleanup(document),300);\n    setTimeout(()=>cleanup(document),800);\n  }\n\n  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',run,{once:true}); else run();\n  document.addEventListener('click',()=>setTimeout(()=>cleanup(document),0),true);\n\n  let timer=0;\n  const obs=new MutationObserver(()=>{\n    if(timer)return;\n    timer=setTimeout(()=>{\n      timer=0;\n      obs.disconnect();\n      cleanup(document);\n      obs.observe(document.body||document.documentElement,{childList:true,subtree:true});\n    },50);\n  });\n  const start=()=>obs.observe(document.body||document.documentElement,{childList:true,subtree:true});\n  if(document.body)start(); else document.addEventListener('DOMContentLoaded',start,{once:true});\n  document.documentElement.dataset.tarefasAlpha2431='menu-fix';\n})();",
+    "css": ""
+  },
+  "payloadSha256": "96223f36629f3e0cdfc3f9fa7d7da196727e4e01a79a3063306ab425d6b46986"
+}
