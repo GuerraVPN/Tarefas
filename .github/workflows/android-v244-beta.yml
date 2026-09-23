@@ -14,6 +14,7 @@ on:
       - 'scripts/build-mobile-v244.mjs'
       - 'scripts/verify-mobile-v244.mjs'
       - 'scripts/release-mobile-v244.sh'
+      - '.github/workflows/dispatch-android-v244-beta.yml'
       - '.github/workflows/android-v244-beta.yml'
 
 concurrency:
@@ -53,5 +54,5 @@ jobs:
             TAREFAS-2.4.4-beta-build-279.zip
             TAREFAS-2.4.4-beta-build-279.zip.sha256
             app/release-v244.txt
-            dist/BETA_2_4_3.json
+            dist/BETA_2_4_4.json
           if-no-files-found: error
