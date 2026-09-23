@@ -17,12 +17,12 @@ permissions:
   contents: read
 
 concurrency:
-  group: dispatch-android-v244-${{ github.event.pull_request.number }}
+  group: dispatch-android-v244
   cancel-in-progress: true
 
 jobs:
   dispatch:
-    if: ${{ github.event.pull_request.head.ref == 'app/android-v244-prep' }}
+    if: ${{ github.ref == 'refs/heads/app/releases' }}
     runs-on: ubuntu-latest
     steps:
       - name: Disparar build oficial no branch de preparação
