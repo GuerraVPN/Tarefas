@@ -1,9 +1,8 @@
 name: Dispatch Android 2.4.4 Beta
 
 on:
-  pull_request:
+  push:
     branches: [app/releases]
-    types: [opened, synchronize, reopened]
     paths:
       - '.v244-release-trigger'
       - 'scripts/build-mobile-v244.mjs'
