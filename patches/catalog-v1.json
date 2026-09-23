@@ -531,7 +531,7 @@
       ],
       "order": 24501,
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.5.1.tpatch",
-      "sha256": "c53d708063f9a3ec926f63a977b7b2cd8e8c622af776ee59f85e11df60548c50",
+      "sha256": "dde1c88d536751a643dd3821807cb9981ffc44c77d7d67a426ff9d93bf9b047d",
       "installable": true
     }
   ],
@@ -838,7 +838,7 @@
       ],
       "order": 24501,
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.5.1.tpatch",
-      "sha256": "c53d708063f9a3ec926f63a977b7b2cd8e8c622af776ee59f85e11df60548c50",
+      "sha256": "dde1c88d536751a643dd3821807cb9981ffc44c77d7d67a426ff9d93bf9b047d",
       "installable": true
     }
   ],
