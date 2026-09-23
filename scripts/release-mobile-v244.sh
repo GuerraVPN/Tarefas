@@ -26,8 +26,6 @@ ln -s "$GITHUB_WORKSPACE/node_modules" "$BASE_DIR/node_modules"
 rm -rf "$GITHUB_WORKSPACE/dist"
 cp -a "$BASE_DIR/dist" "$GITHUB_WORKSPACE/dist"
 
-node scripts/build-mobile-v240.mjs
-node scripts/build-mobile-v242.mjs
 node scripts/build-mobile-v244.mjs
 node scripts/verify-mobile-v244.mjs dist
 
