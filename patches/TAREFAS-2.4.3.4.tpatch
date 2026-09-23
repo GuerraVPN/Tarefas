@@ -1,0 +1,33 @@
+{
+  "format": "tarefas-tpatch-v1",
+  "id": "2.4.3.4",
+  "name": "TAREFAS 2.4.3.4 — Correção definitiva da validação SHA-256",
+  "patchVersion": 1,
+  "createdAt": "2026-09-23T14:15:00Z",
+  "baseVersion": "2.4.3",
+  "minBuild": 278,
+  "maxBuild": 278,
+  "channel": "alpha",
+  "cumulative": true,
+  "replacementMode": "replace-older-same-base",
+  "replaces": [
+    "2.4.3.1",
+    "2.4.3.2",
+    "2.4.3.3"
+  ],
+  "description": "Corrige a assinatura SHA-256 interna do patch e mantém a correção da identificação do nome nas Escalas.",
+  "changelog": [
+    "Corrige o SHA-256 interno do payload para coincidir exatamente com a validação do Gerenciador de Patches.",
+    "Corrige a busca que procurava 'Sd Guerra' em vez de 'Guerra'.",
+    "Remove automaticamente prefixos comuns de posto/graduação antes de montar os aliases.",
+    "Aceita Guerra, Sd Guerra, SD GUERRA e o nome completo como formas de identificação.",
+    "Mantém Motorista PA, Patrulheiro e Permanência.",
+    "Substitui cumulativamente a 2.4.3.3, 2.4.3.2 e os patches anteriores da mesma base."
+  ],
+  "order": 24304,
+  "payload": {
+    "js": "(()=>{'use strict';const MARK='__TAREFAS_ALPHA_2433_ESCALAS__';if(globalThis[MARK])return;globalThis[MARK]=true;const API='https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/tarefas-escalas';const norm=v=>String(v??'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/\\s+/g,' ').trim().toLowerCase();function user(){try{return JSON.parse(localStorage.getItem('usuarioLogado')||'null')}catch(_){return null}}function session(){return String(localStorage.getItem('tarefasPushSession17')||'').trim()}function hideOldMenu(root=document){[...root.querySelectorAll?.('a,button,li,[role=\"menuitem\"]')||[]].forEach(el=>{const h=norm(el.getAttribute?.('href')||el.dataset?.href||''),t=norm(el.textContent);if(h.includes('pessoal.html')||h.includes('missao.html')||t==='pessoal / escalas'||t==='missões'){const i=el.closest?.('li,[role=\"menuitem\"]')||el;i.style.display='none';i.setAttribute('data-tarefas-hidden-old-menu','true')}})}function esc(v){return String(v??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',\"'\":'&#039;'}[c]))}function style(){if(document.getElementById('tm2433-scale-style'))return;const s=document.createElement('style');s.id='tm2433-scale-style';s.textContent='.tm2433-back{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:2147483000;display:flex;align-items:flex-end;justify-content:center}.tm2433-panel{width:min(680px,100%);max-height:92vh;background:var(--card,#10151b);color:var(--text,#fff);border-radius:24px 24px 0 0;overflow:auto;padding:18px}.tm2433-head{display:flex;align-items:center;justify-content:space-between;gap:12px}.tm2433-tabs{display:flex;gap:8px;overflow:auto;margin:12px 0}.tm2433-tab,.tm2433-sync{border:0;border-radius:14px;padding:11px 14px;background:rgba(85,199,255,.14);color:inherit;font-weight:800}.tm2433-tab.active{background:rgba(85,199,255,.28)}.tm2433-card,.tm2433-empty,.tm2433-error{border:1px solid rgba(127,127,127,.2);border-radius:16px;padding:14px;margin:10px 0}.tm2433-empty{text-align:center;opacity:.78}.tm2433-error{background:rgba(220,80,80,.08)}.tm2433-meta{font-size:12px;opacity:.65;margin-top:4px}.tm2433-values{font-size:13px;margin-top:8px;word-break:break-word}';document.head.appendChild(s)}async function requestScale(kind){const token=session();if(token.length<32)throw new Error('Sessão do TAREFAS ausente ou expirada. Faça login novamente.');const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','x-tarefas-session':token},body:JSON.stringify({escala:kind})});let d=null;try{d=await r.json()}catch(_){}if(!r.ok||!d?.ok)throw new Error(d?.error||('Falha ao consultar a escala (HTTP '+r.status+').'));return d}function render(root,k,d){const b=root.querySelector('.tm2433-body'),m=Array.isArray(d?.escalas?.[k]?.matches)?d.escalas[k].matches:[];if(!m.length){b.innerHTML='<div class=\"tm2433-empty\">Não encontrei seu nome nesta escala.<div class=\"tm2433-meta\">Usuário: '+esc((d?.usuario?.patente||'')+' '+(d?.usuario?.nome_guerra||''))+'</div></div>';return}b.innerHTML=m.map(x=>'<div class=\"tm2433-card\"><b>'+esc(x.date||'Data não identificada')+'</b><div class=\"tm2433-meta\">'+esc(x.aba||'')+' · linha '+esc(x.row)+' · coluna '+esc(x.col)+'</div><div class=\"tm2433-values\">'+esc(x.cell)+' — '+(x.values||[]).map(v=>esc(v.value||'')).join(' · ')+'</div></div>').join('')}function openScale(kind='patrulheiro'){style();document.getElementById('tm2433-scale-back')?.remove();const u=user()||{},r=document.createElement('div');r.id='tm2433-scale-back';r.className='tm2433-back';r.innerHTML='<section class=\"tm2433-panel\"><div class=\"tm2433-head\"><div><b>Escalas</b><div class=\"tm2433-meta\">'+esc((u.patente||'')+' '+(u.nome_guerra||''))+'</div></div><button class=\"tm2433-close\">×</button></div><div class=\"tm2433-tabs\"><button class=\"tm2433-tab\" data-k=\"motorista_pa\">Motorista PA</button><button class=\"tm2433-tab\" data-k=\"patrulheiro\">Patrulheiro</button><button class=\"tm2433-tab\" data-k=\"permanencia\">Permanência</button></div><button class=\"tm2433-sync\">Sincronizar agora</button><div class=\"tm2433-body\"><div class=\"tm2433-empty\">Carregando escala…</div></div></section>';document.body.appendChild(r);const tabs=[...r.querySelectorAll('.tm2433-tab')],b=r.querySelector('.tm2433-body'),sync=r.querySelector('.tm2433-sync');r.querySelector('.tm2433-close').onclick=()=>r.remove();async function load(k){tabs.forEach(t=>t.classList.toggle('active',t.dataset.k===k));b.innerHTML='<div class=\"tm2433-empty\">Sincronizando com a planilha…</div>';try{render(r,k,await requestScale(k))}catch(e){b.innerHTML='<div class=\"tm2433-error\">'+esc(e?.message||e)+'</div>'}}tabs.forEach(t=>t.onclick=()=>load(t.dataset.k));sync.onclick=()=>load(r.querySelector('.tm2433-tab.active')?.dataset.k||kind);load(kind)}document.addEventListener('click',e=>{const el=e.target?.closest?.('[data-href=\"#escalas\"],a[href=\"#escalas\"]');if(!el)return;e.preventDefault();e.stopPropagation();e.stopImmediatePropagation?.();openScale()},true);hideOldMenu();new MutationObserver(()=>hideOldMenu()).observe(document.documentElement,{childList:true,subtree:true});document.documentElement.dataset.tarefasAlpha2433='google-sheets-supabase-name-fix'})();",
+    "css": ""
+  },
+  "payloadSha256": "4c8668a74846c19f72b04a2b8a3e8ecb25b6df21d0d51354c2221fa39ae05270"
+}
