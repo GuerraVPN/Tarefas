@@ -28,7 +28,7 @@ const html=(await readdir(dir)).filter(x=>/\.html$/i.test(x));must(html.length>0
 for(const name of html){const s=await read(name);if(!['reiniciar.html','desligado.html'].includes(name.toLowerCase()))must(s.includes('mobile-launcher-icon-v241.js'),name+' sem launcher bridge')}
 const manifest=JSON.parse(await read('BETA_2_4_6.json'));
 must(manifest.version==='2.4.6'&&manifest.build===281&&manifest.channel==='beta','manifesto inválido');
-must(manifest.base==='2.4.3','manifesto não deriva da 2.4.5');
+must(manifest.base==='2.4.5','manifesto não deriva da 2.4.5');
 must(manifest.webVersion==='7.9.1','Web 7.9.1 ausente');
 must(manifest.futureDelivery.beta==='tpatch'&&manifest.futureDelivery.alpha==='tpatch','futuro não está em tpatch');
 must(manifest.features.basedOnValidated245===true&&manifest.features.drawerScalesOnly===true&&manifest.features.officialPatchSha256Bytes===true,'recursos/base consolidados ausentes');
