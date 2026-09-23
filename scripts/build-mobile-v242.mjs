@@ -95,7 +95,7 @@ await patch('mobile-release-v240.js',source=>{
 });
 
 await rm(path.join(dist,'RELEASE_2_4_0.json'),{force:true});
-await writeFile(path.join(dist,'BETA_2_4_1.json'),JSON.stringify({
+await writeFile(path.join(dist,'BETA_2_4_2.json'),JSON.stringify({
   version:VERSION,
   build:BUILD,
   channel:'beta',
