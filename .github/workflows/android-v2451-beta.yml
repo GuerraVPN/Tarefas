@@ -1,4 +1,4 @@
-name: Android 2.4.5 SHA Diagnostic (OIDC)
+name: Android 2.4.5 SHA Diagnostic (OIDC) # temporary hash check
 
 on:
   workflow_dispatch:
