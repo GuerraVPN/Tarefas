@@ -3,8 +3,8 @@
   "app": "TAREFAS",
   "baseVersion": "2.4.1",
   "baseBuild": 276,
-  "generatedAt": "2026-09-23T06:45:00Z",
-  "latestPatch": "2.4.1.9",
+  "generatedAt": "2026-09-23T06:50:00Z",
+  "latestPatch": "2.4.1.10",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -149,7 +149,7 @@
         "2.4.1.6",
         "2.4.1.7"
       ],
-      "installable": true,
+      "installable": false,
       "description": "Corrige o menu móvel para remover definitivamente Pessoal / Escalas e Missões e deixar apenas Escalas, com as três planilhas oficiais.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.8.tpatch",
       "sha256": "bb86868b1c3a586fed5b84348f0910514b56d90512c93db2e46cd3d95c4ec21f",
@@ -182,7 +182,7 @@
         "2.4.1.7",
         "2.4.1.8"
       ],
-      "installable": true,
+      "installable": false,
       "description": "Corrige o Gerenciador de Patches para não exibir patches antigos que já foram substituídos por um patch cumulativo instalado.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.9.tpatch",
       "sha256": "1951e374c6b8f71b342f0421b3661292751892605c475ca7df8f89dacb70553b",
@@ -191,6 +191,38 @@
         "Impede que a Alpha 2.4.1.7 continue aparecendo depois da instalação da 2.4.1.8.",
         "Funciona mesmo quando o catálogo antigo ficou preso em cache na interface.",
         "Observador limitado a alterações de conteúdo, sem loop recursivo."
+      ]
+    },
+    {
+      "id": "2.4.1.10",
+      "name": "TAREFAS 2.4.1.10 — Correção do Gerenciador de Patches",
+      "baseVersion": "2.4.1",
+      "minBuild": 276,
+      "maxBuild": 276,
+      "channel": "alpha",
+      "publishedAt": "2026-09-23T06:50:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.4.1.1",
+        "2.4.1.2",
+        "2.4.1.3",
+        "2.4.1.4",
+        "2.4.1.5",
+        "2.4.1.6",
+        "2.4.1.7",
+        "2.4.1.8",
+        "2.4.1.9"
+      ],
+      "installable": true,
+      "description": "Corrige o carregamento do Gerenciador de Patches após a 2.4.1.9, removendo o observador que causava atualizações contínuas na tela.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.1.10.tpatch",
+      "sha256": "814c00302c5278eab4081bf2321343320b2abe63ca92bf7a9f2ad1e64652c041",
+      "changelog": [
+        "Desativa o observador introduzido pela 2.4.1.9.",
+        "Remove o estado de carregamento contínuo causado pelo loop de mutações.",
+        "Restaura o Gerenciador de Patches para voltar a consultar e exibir os patches normalmente.",
+        "Não altera a navegação nem o sistema de Escalas."
       ]
     }
   ],
@@ -851,5 +883,5 @@
       "supersededBy": "2.4.1.7"
     }
   ],
-  "cacheNonce": "2419-hide-superseded-r1"
+  "cacheNonce": "24110-manager-loop-fix-r1"
 }
