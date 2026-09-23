@@ -3,8 +3,8 @@
   "app": "TAREFAS",
   "baseVersion": "2.4.1",
   "baseBuild": 276,
-  "generatedAt": "2026-09-23T14:30:00Z",
-  "latestPatch": "2.4.3.5",
+  "generatedAt": "2026-09-23T15:00:00Z",
+  "latestPatch": "2.4.3.6",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -307,7 +307,7 @@
       "replaces": [
         "2.4.3.1"
       ],
-      "installable": true,
+      "installable": false,
       "description": "Integra a tela Escalas ao Supabase, que valida a sessão do TAREFAS e consulta em tempo real os dados das planilhas Google via Apps Script, identificando o nome do usuário logado.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.3.2.tpatch",
       "sha256": "ea3c6879c2c25f36760da0742fe45628cd52f435b6eb7ef9e1636cd4eebd7778",
@@ -320,7 +320,7 @@
         "Mantida a remoção de Pessoal / Escalas e Missões.",
         "O patch 2.4.3.2 substitui cumulativamente o 2.4.3.1."
       ],
-      "supersededBy": "2.4.3.3"
+      "supersededBy": "2.4.3.6"
     },
     {
       "id": "2.4.3.3",
@@ -336,7 +336,7 @@
         "2.4.3.1",
         "2.4.3.2"
       ],
-      "installable": true,
+      "installable": false,
       "description": "Corrige a identificação do nome nas escalas, removendo prefixos de posto/graduação como Sd e aceitando o nome de guerra sem a patente. Mantém a integração Google Sheets → Apps Script → Supabase.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.3.3.tpatch",
       "sha256": "4cc62ef3f4276cd4a3164e0c8f2882fd8449b269477c70b4ae1e66491f6bd11c",
@@ -349,7 +349,7 @@
         "Mantém Escalas como item único e remove Pessoal / Escalas e Missões.",
         "Substitui cumulativamente a 2.4.3.2 e os patches anteriores da mesma base."
       ],
-      "supersededBy": "2.4.3.4"
+      "supersededBy": "2.4.3.6"
     },
     {
       "id": "2.4.3.4",
@@ -366,7 +366,7 @@
         "2.4.3.2",
         "2.4.3.3"
       ],
-      "installable": true,
+      "installable": false,
       "description": "Corrige a assinatura SHA-256 interna do patch e mantém a correção da identificação do nome nas Escalas.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.3.4.tpatch",
       "sha256": "938f96b4d40be0fe6731ea808fb1a383d18f8bd126256ead6f3862144198b548",
@@ -378,7 +378,7 @@
         "Mantém Motorista PA, Patrulheiro e Permanência.",
         "Substitui cumulativamente a 2.4.3.3, 2.4.3.2 e os patches anteriores da mesma base."
       ],
-      "supersededBy": "2.4.3.5"
+      "supersededBy": "2.4.3.6"
     },
     {
       "id": "2.4.3.5",
@@ -396,7 +396,7 @@
         "2.4.3.3",
         "2.4.3.4"
       ],
-      "installable": true,
+      "installable": false,
       "description": "Corrige exclusivamente o card Próximo serviço da tela inicial para buscar o próximo serviço confirmado do usuário logado diretamente em escala_servicos. A tela Escalas permanece com a integração Google Planilhas → Apps Script → Supabase.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.3.5.tpatch",
       "sha256": "2935c0a16cd2c97755e5074dcec9c769d71629413bf22f06e22c7eda9f3b2860",
@@ -407,6 +407,36 @@
         "Ao clicar, mantém a abertura da tela Escalas/Pessoal no dia correto e grava o usuário e serviço alvo para permitir seleção correta.",
         "Não altera a tela Escalas nem remove o acesso às planilhas Google.",
         "Mantém a correção de identificação de nome das versões anteriores."
+      ],
+      "supersededBy": "2.4.3.6"
+    },
+    {
+      "id": "2.4.3.6",
+      "name": "TAREFAS 2.4.3.6 — Escalas nova, remoção do Próximo Serviço e limpeza de patches antigos",
+      "baseVersion": "2.4.3",
+      "minBuild": 278,
+      "maxBuild": 278,
+      "channel": "alpha",
+      "publishedAt": "2026-09-23T15:00:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.4.3.1",
+        "2.4.3.2",
+        "2.4.3.3",
+        "2.4.3.4",
+        "2.4.3.5"
+      ],
+      "installable": true,
+      "description": "Remove a interferência da escala antiga com a nova integração de Escalas, retira o card Próximo serviço da tela inicial e oculta versões antigas de patches 2.4.3 no verificador oficial.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.3.6.tpatch",
+      "sha256": "db1f47b1caba39ccaec99d0363bc7c608aa3f500ce3ac56da2e7abf16cc0fc24",
+      "changelog": [
+        "Remove da navegação e da interface os acessos antigos às escalas/planilhas, mantendo somente a nova tela Escalas integrada.",
+        "Remove completamente o card Próximo serviço da tela inicial.",
+        "Limpa o estado local usado pelo antigo Próximo serviço para evitar reabertura de dados antigos.",
+        "Filtra a lista de patches oficiais da base 2.4.3 para exibir somente o 2.4.3.6.",
+        "Mantém a integração nova das Escalas e as correções cumulativas anteriores."
       ]
     }
   ],
@@ -1292,5 +1322,5 @@
       ]
     }
   ],
-  "cacheNonce": "2435-dashboard-service-r1"
+  "cacheNonce": "2436-scales-cleanup-r1"
 }
