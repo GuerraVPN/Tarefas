@@ -20,3 +20,5 @@ Objetivo:
 Versão: 2.4.6
 Build: 281
 Canal: Beta
+
+Status: pré-release preparada para compilação, validação, assinatura e publicação automática da Beta 2.4.6.
