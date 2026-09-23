@@ -249,14 +249,14 @@ jq -n \
     web_version:$web_version,
     title:$title,
     changelog:[
-      "🎨 Novo seletor nativo de ícones dentro das Configurações.",
-      "👤 Meu perfil usa a imagem/ícone do usuário no atalho da tela inicial.",
-      "🔵 Ícone padrão do APK corrigido para o novo modelo TAREFAS Azul.",
-      "🪖 Modelos adicionais: Militar, Preto & Ouro e Sistema.",
-      "🧱 Esta Beta deriva da 2.4.3/build 278; próximas Betas e Alphas continuam em .tpatch quando não exigirem capacidade nativa.",
-      "🔔 Patches Beta seguem a mesma preferência de recebimento dos APKs Beta.",
-      "🧪 Patches Alpha seguem a mesma elegibilidade e opção de recebimento dos APKs Alpha.",
-      "🌐 Web 7.9.1 preservada a partir da base 2.4.3."
+      "🧪 Pré-release de veredito da linha 2.4.x, baseada na Beta 2.4.5/build 280.",
+      "🔒 Sem funcionalidades novas: foco em estabilidade e regressão.",
+      "📋 Escalas permanece como única seção, sem Pessoal / Escalas e sem Missões.",
+      "🔐 Patch Manager mantém validação SHA-256 diretamente sobre os bytes do .tpatch.",
+      "📜 Histórico de versões e remoção do Próximo Serviço preservados.",
+      "🌐 Web 7.9.1 preservada.",
+      "🔔 Preferências de recebimento de patches Beta/Alpha preservadas.",
+      "🧪 Objetivo: dar o veredito final da base antes da próxima etapa."
     ],
     mandatory:false,
     download_url:$url,
