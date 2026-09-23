@@ -123,21 +123,21 @@ python3 - <<'PY'
 import json
 with open('android/app/build/outputs/apk/release/output-metadata.json',encoding='utf-8') as f:
     e=json.load(f)['elements'][0]
-assert int(e['versionCode']) == 278, e
-assert str(e['versionName']) == '2.4.3', e
+assert int(e['versionCode']) == 279, e
+assert str(e['versionName']) == '2.4.3.1', e
 PY
 
-unzip -p "$UNSIGNED" assets/public/mobile-launcher-icon-v241.js > "$RUNNER_TEMP/launcher-v243.js"
-unzip -p "$UNSIGNED" assets/public/mobile-bootstrap.js > "$RUNNER_TEMP/bootstrap-v243.js"
-unzip -p "$UNSIGNED" assets/public/mobile-patch-manager-v240.js > "$RUNNER_TEMP/pm-v243.js"
-unzip -p "$UNSIGNED" assets/public/mobile-updates-v181.js > "$RUNNER_TEMP/updates-v243.js"
+unzip -p "$UNSIGNED" assets/public/mobile-launcher-icon-v241.js > "$RUNNER_TEMP/launcher-v2431.js"
+unzip -p "$UNSIGNED" assets/public/mobile-bootstrap.js > "$RUNNER_TEMP/bootstrap-v2431.js"
+unzip -p "$UNSIGNED" assets/public/mobile-patch-manager-v240.js > "$RUNNER_TEMP/pm-v2431.js"
+unzip -p "$UNSIGNED" assets/public/mobile-updates-v181.js > "$RUNNER_TEMP/updates-v2431.js"
 grep -q '__TAREFAS_LAUNCHER_ICON_241__' "$RUNNER_TEMP/launcher-v243.js"
 grep -q 'pinProfileShortcut' "$RUNNER_TEMP/launcher-v243.js"
-grep -q '__TAREFAS_BETA_243_BOOT__' "$RUNNER_TEMP/bootstrap-v243.js"
-grep -q '__TAREFAS_PATCH_MANAGER_V278__' "$RUNNER_TEMP/pm-v243.js"
+grep -q '__TAREFAS_ALPHA_2431_BOOT__' "$RUNNER_TEMP/bootstrap-v243.js"
+grep -q '__TAREFAS_PATCH_MANAGER_V279__' "$RUNNER_TEMP/pm-v243.js"
 grep -q "v1_8_get_beta_updates" "$RUNNER_TEMP/pm-v243.js"
 grep -q "v2_3_21_alpha_context" "$RUNNER_TEMP/pm-v243.js"
-grep -q "const APP_CHANNEL = 'beta';" "$RUNNER_TEMP/updates-v243.js"
+grep -q "const APP_CHANNEL = 'alpha';" "$RUNNER_TEMP/updates-v243.js"
 
 OIDC="$(curl --fail --silent --show-error \
   -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
