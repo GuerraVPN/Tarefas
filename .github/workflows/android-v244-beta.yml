@@ -3,7 +3,7 @@ name: Android 2.4.4 Beta - Patch Consolidation
 on:
   workflow_dispatch:
   push:
-    branches: [app/android-v244-prep]
+    branches: [app/android-v244-prep, app/releases]
   pull_request:
     branches: [main]
     paths:
