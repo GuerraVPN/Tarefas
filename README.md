@@ -12,7 +12,7 @@ Os APKs públicos ficam na seção **Releases** do GitHub. As versões de teste 
 |---|---:|---:|---:|---|
 | **Release / Oficial** | **2.4.0** | **274** | **7.9.1** | Uso normal |
 | **Pré-release / Beta** | **2.4.1** | **276** | **7.9.1** | Base nativa atual de testes |
-| **Alpha / Patch** | **2.4.1.8** — corrige o menu móvel para deixar somente **Escalas**, removendo **Pessoal / Escalas** e **Missões** e mantendo os links de Motorista, Patrulheiro e Permanência.
+| **Alpha / Patch** | **2.4.1.9** — corrige o menu móvel para deixar somente **Escalas**, removendo **Pessoal / Escalas** e **Missões** e mantendo os links de Motorista, Patrulheiro e Permanência.
 
 ### Download
 
@@ -43,7 +43,7 @@ Ao atualizar uma instalação existente, mantenha o APK assinado do projeto para
 
 ### Patch Alpha atual
 
-**2.4.1.8** — corrige o menu móvel para deixar somente **Escalas**, removendo **Pessoal / Escalas** e **Missões** e mantendo os links de Motorista, Patrulheiro e Permanência.
+**2.4.1.9** — corrige o menu móvel para deixar somente **Escalas**, removendo **Pessoal / Escalas** e **Missões** e mantendo os links de Motorista, Patrulheiro e Permanência.
 
 ## Web
 
