@@ -36,12 +36,7 @@ jobs:
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: '21'
-      - name: Diagnóstico SHA-256 2.4.5.1
-        run: |
-          set -euo pipefail
-          sha256sum patches/TAREFAS-2.4.5.1.tpatch
-      - name: Compilar, validar, assinar e publicar 2.4.4 Beta
+          java-version: '21'      - name: Compilar, validar, assinar e publicar 2.4.4 Beta
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
