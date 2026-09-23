@@ -3,8 +3,8 @@
   "app": "TAREFAS",
   "baseVersion": "2.4.1",
   "baseBuild": 276,
-  "generatedAt": "2026-09-23T14:00:00Z",
-  "latestPatch": "2.4.3.3",
+  "generatedAt": "2026-09-23T14:15:00Z",
+  "latestPatch": "2.4.3.4",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -348,6 +348,35 @@
         "Mantém Motorista PA, Patrulheiro e Permanência.",
         "Mantém Escalas como item único e remove Pessoal / Escalas e Missões.",
         "Substitui cumulativamente a 2.4.3.2 e os patches anteriores da mesma base."
+      ],
+      "supersededBy": "2.4.3.4"
+    },
+    {
+      "id": "2.4.3.4",
+      "name": "TAREFAS 2.4.3.4 — Correção definitiva da validação SHA-256",
+      "baseVersion": "2.4.3",
+      "minBuild": 278,
+      "maxBuild": 278,
+      "channel": "alpha",
+      "publishedAt": "2026-09-23T14:15:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.4.3.1",
+        "2.4.3.2",
+        "2.4.3.3"
+      ],
+      "installable": true,
+      "description": "Corrige a assinatura SHA-256 interna do patch e mantém a correção da identificação do nome nas Escalas.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.3.4.tpatch",
+      "sha256": "938f96b4d40be0fe6731ea808fb1a383d18f8bd126256ead6f3862144198b548",
+      "changelog": [
+        "Corrige o SHA-256 interno do payload para coincidir exatamente com a validação do Gerenciador de Patches.",
+        "Corrige a busca que procurava 'Sd Guerra' em vez de 'Guerra'.",
+        "Remove automaticamente prefixos comuns de posto/graduação antes de montar os aliases.",
+        "Aceita Guerra, Sd Guerra, SD GUERRA e o nome completo como formas de identificação.",
+        "Mantém Motorista PA, Patrulheiro e Permanência.",
+        "Substitui cumulativamente a 2.4.3.3, 2.4.3.2 e os patches anteriores da mesma base."
       ]
     }
   ],
@@ -1233,5 +1262,5 @@
       ]
     }
   ],
-  "cacheNonce": "2433-name-fix-r1"
+  "cacheNonce": "2434-sha-fix-r1"
 }
