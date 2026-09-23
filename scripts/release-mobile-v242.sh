@@ -126,11 +126,11 @@ assert int(e['versionCode']) == 277, e
 assert str(e['versionName']) == '2.4.2', e
 PY
 
-unzip -p "$UNSIGNED" assets/public/mobile-launcher-icon-v242.js > "$RUNNER_TEMP/launcher-v242.js"
+unzip -p "$UNSIGNED" assets/public/mobile-launcher-icon-v241.js > "$RUNNER_TEMP/launcher-v242.js"
 unzip -p "$UNSIGNED" assets/public/mobile-bootstrap.js > "$RUNNER_TEMP/bootstrap-v242.js"
 unzip -p "$UNSIGNED" assets/public/mobile-patch-manager-v240.js > "$RUNNER_TEMP/pm-v242.js"
 unzip -p "$UNSIGNED" assets/public/mobile-updates-v181.js > "$RUNNER_TEMP/updates-v242.js"
-grep -q '__TAREFAS_LAUNCHER_ICON_242__' "$RUNNER_TEMP/launcher-v242.js"
+grep -q '__TAREFAS_LAUNCHER_ICON_241__' "$RUNNER_TEMP/launcher-v242.js"
 grep -q 'pinProfileShortcut' "$RUNNER_TEMP/launcher-v242.js"
 grep -q '__TAREFAS_BETA_242_BOOT__' "$RUNNER_TEMP/bootstrap-v242.js"
 grep -q '__TAREFAS_PATCH_MANAGER_V277__' "$RUNNER_TEMP/pm-v242.js"
@@ -174,7 +174,7 @@ cp "$APK" "$APK.sha256" "$RUNNER_TEMP/package/"
 cp app/mobile-launcher-icon-v241.js app/release-v242.txt "$RUNNER_TEMP/package/app/"
 cp app/android/TarefasLauncherIconPlugin.java "$RUNNER_TEMP/package/app/"
 cp scripts/build-mobile-v242.mjs scripts/verify-mobile-v242.mjs "$RUNNER_TEMP/package/scripts/"
-cp dist/BETA_2_4_1.json "$RUNNER_TEMP/package/manifest/"
+cp dist/BETA_2_4_2.json "$RUNNER_TEMP/package/manifest/"
 (cd "$RUNNER_TEMP/package" && zip -qr "$GITHUB_WORKSPACE/$ZIP" .)
 unzip -tq "$ZIP"
 sha256sum "$ZIP" | tee "$ZIP.sha256"
