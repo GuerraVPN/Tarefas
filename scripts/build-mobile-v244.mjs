@@ -37,6 +37,8 @@ await patch('mobile-bootstrap.js',source=>{
   let out=source
     .replace("const APP_VERSION = '2.4.2';","const APP_VERSION = '"+VERSION+"';")
     .replace('const APP_BUILD = 277;','const APP_BUILD = '+BUILD+';')
+    .replace("const APP_VERSION = '2.4.0';","const APP_VERSION = '"+VERSION+"';")
+    .replace('const APP_BUILD = 274;','const APP_BUILD = '+BUILD+';')
     .replaceAll('Beta 2.4.2','Beta '+VERSION)
     .replaceAll('2.4.2 Beta',VERSION+' Beta')
     .replaceAll('__TAREFAS_BETA_242_BOOT__','__TAREFAS_BETA_244_BOOT__')
