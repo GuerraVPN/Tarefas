@@ -4,7 +4,7 @@
   "baseVersion": "2.4.1",
   "baseBuild": 276,
   "generatedAt": "2026-09-23T15:00:00Z",
-  "latestPatch": "2.4.3.6",
+  "latestPatch": "2.4.4-prebeta",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -437,6 +437,37 @@
         "Limpa o estado local usado pelo antigo Próximo serviço para evitar reabertura de dados antigos.",
         "Filtra a lista de patches oficiais da base 2.4.3 para exibir somente o 2.4.3.6.",
         "Mantém a integração nova das Escalas e as correções cumulativas anteriores."
+      ]
+    },
+    {
+      "id": "2.4.4-prebeta",
+      "name": "TAREFAS 2.4.4-prebeta — Alpha de teste",
+      "baseVersion": "2.4.3",
+      "minBuild": 278,
+      "maxBuild": 278,
+      "channel": "alpha",
+      "publishedAt": "2026-09-23T16:14:17.182Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.4.3.1",
+        "2.4.3.2",
+        "2.4.3.3",
+        "2.4.3.4",
+        "2.4.3.5",
+        "2.4.3.6"
+      ],
+      "installable": true,
+      "description": "Alpha 2.4.4-prebeta para testar antes da Beta 2.4.4.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.4-prebeta.tpatch",
+      "sha256": "13be12918bd234f59e574451b8689630d8ee3467b14668dbc6af8002fee27f06",
+      "changelog": [
+        "Remove o Próximo Serviço.",
+        "Remove interferências da escala antiga.",
+        "Centraliza Escalas em Motorista PA, Patrulheiro e Permanência.",
+        "Usa Google Sheets → Apps Script → Supabase → TAREFAS.",
+        "Limpa patches antigos da base 2.4.3.",
+        "Valida SHA-256 do payload e do arquivo oficial."
       ]
     }
   ],
@@ -1322,5 +1353,5 @@
       ]
     }
   ],
-  "cacheNonce": "2436-scales-cleanup-r1"
+  "cacheNonce": "244-prebeta-sha-fix-r1"
 }
