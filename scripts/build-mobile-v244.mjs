@@ -80,11 +80,12 @@ await patch('mobile-alpha-v23221-tabs.js',source=>source
   .replace("const MARK='__TAREFAS_BETA_TABS_V277__',VERSION='2.4.2',BUILD=277","const MARK='__TAREFAS_BETA_TABS_V279__',VERSION='"+VERSION+"',BUILD="+BUILD)
   .replace('<small>Beta 2.4.2</small>','<small>Beta '+VERSION+'</small>'),{required:false});
 
-await patch('mobile-preload.js',source=>source
-  .replaceAll("tarefasAppVersion = '2.4.2'","tarefasAppVersion = '"+VERSION+"'")
-  .replaceAll("tarefasAppBuild = '277'","tarefasAppBuild = '"+BUILD+"'")
-  .replaceAll("tarefasAppVersion = '2.4.0'","tarefasAppVersion = '"+VERSION+"'")
-  .replaceAll("tarefasAppBuild = '274'","tarefasAppBuild = '"+BUILD+"'"));
+await patch('mobile-preload.js',source=>source=>{
+  const out=source
+    .replace(/tarefasAppVersion\s*=\s*'[^']+'/g,"tarefasAppVersion = '"+VERSION+"'")
+    .replace(/tarefasAppBuild\s*=\s*'[^']+'/g,"tarefasAppBuild = '"+BUILD+"'");
+  return out;
+});
 
 await patch('mobile-updates-v181.js',source=>source
   .replace("const APP_VERSION = '2.4.2';","const APP_VERSION = '"+VERSION+"';")
