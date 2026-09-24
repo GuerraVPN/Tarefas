@@ -18,4 +18,6 @@ jobs:
           console.log('payloadSha256',crypto.createHash('sha256').update(t,'utf8').digest('hex'));
           console.log('payloadTextBytes',Buffer.byteLength(t,'utf8'));
           console.log('declared',p.payloadSha256);
+          console.log('rawSha256',crypto.createHash('sha256').update(fs.readFileSync('patches/TAREFAS-2.4.6.4.tpatch')).digest('hex'));
+          console.log('rawBytes',fs.statSync('patches/TAREFAS-2.4.6.4.tpatch').size);
           NODE
