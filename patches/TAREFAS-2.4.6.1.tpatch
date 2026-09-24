@@ -1,0 +1,30 @@
+{
+  "format": "tarefas-tpatch-v1",
+  "id": "2.4.6.1",
+  "name": "TAREFAS 2.4.6.1 — Correção do Próximo Serviço e Escalas do Google",
+  "patchVersion": 1,
+  "createdAt": "2026-09-23T20:00:00Z",
+  "baseVersion": "2.4.6",
+  "minBuild": 281,
+  "maxBuild": 281,
+  "channel": "alpha",
+  "cumulative": true,
+  "replacementMode": "replace-older-same-base",
+  "replaces": [],
+  "description": "Corrige a remoção do Próximo Serviço e faz a opção Escalas da hotbar abrir as três escalas oficiais do Google.",
+  "changelog": [
+    "Remove novamente e de forma persistente o card Próximo Serviço da tela inicial.",
+    "A opção Escalas da hotbar abre a tela com os links oficiais do Google para Motorista PA, Patrulheiro e Permanência.",
+    "Remove da hotbar eventuais entradas antigas Pessoal / Escalas e Missões.",
+    "Patch cumulativo compatível com a Beta 2.4.6/build 281.",
+    "Não altera o Patch Manager nem a validação SHA-256."
+  ],
+  "order": 24601,
+  "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.6.1.tpatch",
+  "installable": true,
+  "payload": {
+    "js": "(()=>{'use strict';\nconst MARK='__TAREFAS_ALPHA_2461_PATCH__';\nif(globalThis[MARK])return;\nglobalThis[MARK]=true;\n\nconst LINKS=[\n  ['Motorista PA','https://docs.google.com/spreadsheets/d/1T_BM9KY0NLwVhlifetQ6W6AdetujQjx--zOZHa27eQs/edit?usp=drivesdk'],\n  ['Patrulheiro','https://docs.google.com/spreadsheets/d/1_LlfIHx4EuSHkC9BOR2VorvXoaiMyLa028wU6C0dQLs/edit?usp=drivesdk'],\n  ['Permanência','https://docs.google.com/spreadsheets/d/13eEei_JdGjAdVo371BGfPS59QdYySe9lJ47DLjWb_x0/edit?usp=drivesdk']\n];\n\nfunction removeNext(){\n  for(const e of document.querySelectorAll('#kNextServiceCard,#kNextService,.tm-next-service-kpi,[data-tarefas-next-service],[data-next-service],.next-service-card'))e.remove();\n  for(const el of document.querySelectorAll('h1,h2,h3,h4,h5,h6,strong,b,p,span,button,a')){\n    if(!el.children.length&&String(el.textContent||'').normalize('NFD').replace(/[̀-ͯ]/g,'').trim().toLowerCase()==='proximo servico'){\n      const c=el.closest('.tm-next-service-kpi,#kNextServiceCard,#kNextService,.dashboard-card,.v4-card,.card,article,section');if(c)c.remove();\n    }\n  }\n}\n\nfunction openScales(){\n  const old=document.getElementById('tmScales2461');\n  if(old){old.remove();return}\n  const wrap=document.createElement('div');\n  wrap.id='tmScales2461';\n  wrap.style.cssText='position:fixed;inset:0;z-index:2147483646;background:rgba(0,0,0,.58);display:flex;align-items:flex-end;justify-content:center;padding:12px';\n  const box=document.createElement('div');\n  box.style.cssText='width:min(560px,100%);max-height:82vh;overflow:auto;background:var(--v4-card,#101816);color:var(--v4-text,#fff);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:18px;box-shadow:0 20px 70px rgba(0,0,0,.5)';\n  box.innerHTML='<div style=\"display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px\"><strong style=\"font-size:20px\">Escalas</strong><button type=\"button\" data-close-scale style=\"border:0;background:transparent;color:inherit;font-size:24px;cursor:pointer\">×</button></div><div style=\"display:grid;gap:8px\"></div>';\n  const list=box.querySelector('div:last-child');\n  for(const [label,url] of LINKS){\n    const a=document.createElement('a');\n    a.href=url;a.target='_blank';a.rel='noopener noreferrer external';a.textContent=label;\n    a.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 14px;border:1px solid rgba(255,255,255,.1);border-radius:12px;color:inherit;text-decoration:none;font-weight:800';\n    const s=document.createElement('span');s.textContent='↗';s.style.opacity='.65';a.appendChild(s);list.appendChild(a);\n  }\n  wrap.appendChild(box);document.documentElement.appendChild(wrap);\n  const close=()=>wrap.remove();\n  wrap.addEventListener('click',e=>{if(e.target===wrap||e.target.closest('[data-close-scale]'))close()});\n}\n\nfunction wireScales(){\n  for(const el of document.querySelectorAll('a,button,[role=\"button\"],[data-target],.nav-item,.tab-item')){\n    const txt=String(el.textContent||'').trim().normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();\n    const href=String(el.getAttribute?.('href')||'').toLowerCase();\n    if(txt==='escalas'||href==='#escalas'){\n      if(el.dataset.tarefasScale2461==='1')continue;\n      el.dataset.tarefasScale2461='1';\n      el.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();openScales()},true);\n    }\n  }\n  for(const el of document.querySelectorAll('a,button,[role=\"button\"],li,span')){\n    const txt=String(el.textContent||'').trim().normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();\n    if(txt==='pessoal / escalas'||txt==='missões'||txt==='missoes'){\n      const item=el.closest('li,.nav-item,.menu-item,.tab-item')||el;\n      if(item)item.remove();\n    }\n  }\n}\n\nfunction boot(){\n  removeNext();wireScales();\n  let n=0;\n  const tm=setInterval(()=>{removeNext();wireScales();if(++n>120)clearInterval(tm)},250);\n  window.addEventListener('focus',()=>{removeNext();wireScales()});\n  window.addEventListener('pageshow',()=>{removeNext();wireScales()});\n}\nif(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();\nnew MutationObserver(()=>{removeNext();wireScales()}).observe(document.documentElement,{childList:true,subtree:true});\nglobalThis.TarefasAlpha2461Patch=Object.freeze({version:'2.4.6.1',base:'2.4.6',removeNextService:true,scalesGoogleLinks:true});\n})();",
+    "css": ""
+  },
+  "payloadSha256": "ef31aa6d73f82da1919e85be1b343a2f5a3374666605c3d792b167efaa52aa77"
+}
