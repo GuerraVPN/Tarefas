@@ -684,6 +684,40 @@
       "sha256": "f945c53a0468cb280ad5d2a62bbf0d55e69290b7ce6457653e7dffd62648dc71",
       "installable": false,
       "supersededBy": "2.4.6.6"
+    },
+    {
+      "format": "tarefas-tpatch-v1",
+      "id": "2.4.6.6",
+      "name": "TAREFAS 2.4.6.6 — Serviços e Escalas unificados",
+      "patchVersion": 1,
+      "createdAt": "2026-09-24T01:30:00Z",
+      "baseVersion": "2.4.6",
+      "minBuild": 281,
+      "maxBuild": 281,
+      "channel": "alpha",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.4.6.1",
+        "2.4.6.2",
+        "2.4.6.3",
+        "2.4.6.4",
+        "2.4.6.5"
+      ],
+      "description": "Restaura o atalho Serviços na hotbar e unifica o acesso às três escalas oficiais através da mesma API dinâmica, removendo abas e componentes legados duplicados.",
+      "changelog": [
+        "Restaura o atalho Serviços na hotbar.",
+        "Serviços abre diretamente o mesmo componente de Escalas usado pela aba principal.",
+        "Mantém somente uma aba Escalas no grupo de Serviços.",
+        "Remove abas, componentes e navegações de escala legados ou duplicados.",
+        "Motorista PA, Patrulheiro e Permanência continuam vindo exclusivamente da API tarefas-escalas.",
+        "Mantém somente leitura e elimina edição/gravação da interface.",
+        "Mantém a remoção do Próximo Serviço."
+      ],
+      "order": 24606,
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.6.6.tpatch",
+      "sha256": "eb4be8591ceedd387e69aca41d3f73a8474b8e8120ae6457c241d04a0dc40562",
+      "installable": true
     }
   ],
   "history": [
@@ -1089,5 +1123,5 @@
       "publishedAt": "2026-09-24T01:06:40Z"
     }
   ],
-  "cacheNonce": "2466-sha-r1"
+  "cacheNonce": "2466-sha-r2"
 }
