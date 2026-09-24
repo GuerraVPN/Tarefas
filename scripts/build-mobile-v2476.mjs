@@ -43,7 +43,7 @@ await rm(path.join(dist,'mobile-dashboard-v184.js'),{force:true});
 await rm(path.join(dist,'mobile-dashboard-v185.js'),{force:true});
 await rm(path.join(dist,'RELEASE_2_4_0.json'),{force:true});
 await rm(path.join(dist,'BETA_2_4_3.json'),{force:true});
-await writeFile(path.join(dist,'ALPHA_2_4_7_5.json'),JSON.stringify({
+await writeFile(path.join(dist,'ALPHA_2_4_7_6.json'),JSON.stringify({
  version:VERSION,build:BUILD,channel:'alpha',base:'2.4.6',basedOn:PREVIOUS_ALPHA,incorporatedPatch:PATCH_ID,webVersion:WEB_VERSION,
  features:{only2468:true,scalesPatch2467:false,servicesHotbar2468:true,dashboardPathRebuilt:true,legacyDashboardModuleRemoved:true,cacheBustedDashboardEntry:true,patchManagerPreserved:true,patchManagerV1:true}
 },null,2)+'\n');
