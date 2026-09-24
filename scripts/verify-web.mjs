@@ -88,6 +88,13 @@ const cargaSql=await readFile(path.join(root,'supabase_v7_7_0_material_carga.sql
 for(const marker of ['v7_7_0_criar_pendencia_carga','v7_7_0_pedido_carga_trigger','v7_7_0_movimentacao_carga_trigger',"new.status='pronto'","set status='resolvida'"])
   if(!cargaSql.includes(marker))errors.push(`supabase_v7_7_0_material_carga.sql: automação de pendências ausente: ${marker}`);
 
+const nav=await readFile(path.join(root,'v7_9_2_web.js'),'utf8');
+for(const forbidden of ["Pessoal / Serviços","['Missão','missao.html','Serviços']","Pessoal / Escalas"])if(nav.includes(forbidden))errors.push('v7_9_2_web.js: navegação legada presente: '+forbidden);
+const escala=await readFile(path.join(root,'pessoal_v7.js'),'utf8').catch(()=> '');
+for(const marker of ['escala_integrantes','escala_servicos','function loadScale','Motorista','Patrulheiro','Permanência'])if(!escala.includes(marker))errors.push('pessoal_v7.js: Escalas incompleta: '+marker);
+const pedidos=await readFile(path.join(root,'pedidos_v6.js'),'utf8');
+for(const marker of ['v5_4_2_mover_distribuicao','let moving=false','p_mensagem:note||null','ambiguous|column reference.*motivo'])if(!pedidos.includes(marker))errors.push('pedidos_v6.js: correção Distribuição ausente: '+marker);
+
 console.log(`Verificados ${htmlFiles.length} HTML e ${jsFiles.length} JavaScript.`);
 if (errors.length) {
   for (const error of errors) console.error(`ERRO: ${error}`);
@@ -95,9 +102,3 @@ if (errors.length) {
 }
 console.log('OK: 3/3 conferências concluídas; sintaxe, desempenho e regras do Orçamentário válidos.');
 
-const nav=await readFile(path.join(root,'v7_9_2_web.js'),'utf8');
-for(const forbidden of ["Pessoal / Serviços","['Missão','missao.html','Serviços']","Pessoal / Escalas"])if(nav.includes(forbidden))errors.push('v7_9_2_web.js: navegação legada presente: '+forbidden);
-const escala=await readFile(path.join(root,'pessoal_v7.js'),'utf8').catch(()=> '');
-for(const marker of ['escala_integrantes','escala_servicos','function loadScale','Motorista','Patrulheiro','Permanência'])if(!escala.includes(marker))errors.push('pessoal_v7.js: Escalas incompleta: '+marker);
-const pedidos=await readFile(path.join(root,'pedidos_v6.js'),'utf8');
-for(const marker of ['v5_4_2_mover_distribuicao','let moving=false','p_mensagem:note||null','ambiguous|column reference.*motivo'])if(!pedidos.includes(marker))errors.push('pedidos_v6.js: correção Distribuição ausente: '+marker);
