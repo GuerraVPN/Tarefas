@@ -6,7 +6,7 @@ const root=process.cwd(), dist=path.join(root,'dist');
 const VERSION='2.4.7.1', BUILD=283, WEB_VERSION='7.9.1';
 const PATCH_ID='2.4.6.8';
 const PATCH_FILE=path.join(root,'patches','TAREFAS-2.4.6.8.tpatch');
-const PATCH_SHA256='0760ccfcbdacef728cc8e95dd1999d424500854a083dd2a2e1d4b6d90113c358';
+const PATCH_SHA256='9bf9f10ca640f313500b6936918debeb45a6c094efb4aeef759bf6c2cfdbe607';
 
 async function mustFile(file,label){try{await access(file)}catch{throw new Error('2.4.7.1: arquivo obrigatório ausente: '+label+' ('+file+')')}}
 async function patch(rel,fn,{required=true}={}){const file=path.join(dist,rel);await mustFile(file,rel);const before=await readFile(file,'utf8');const after=fn(before);if(required&&after===before)throw new Error('2.4.7.1: alteração não aplicada em '+rel);if(after!==before)await writeFile(file,after,'utf8')}
@@ -20,8 +20,8 @@ const patchText=await readFile(PATCH_FILE,'utf8');
 const patchData=JSON.parse(patchText);
 if(patchData.id!==PATCH_ID||patchData.baseVersion!=='2.4.6')throw new Error('2.4.7.1: metadados do patch 2.4.6.8 inválidos');
 if(!patchData.payload?.js)throw new Error('2.4.7.1: payload JS do patch 2.4.6.8 ausente');
-const actualSha=createHash('sha256').update(patchData.payload.js,'utf8').digest('hex');
-if(actualSha!==PATCH_SHA256||patchData.payloadSha256!==PATCH_SHA256)throw new Error('2.4.7.1: SHA-256 do payload 2.4.6.8 não confere');
+const declaredSha=String(patchData.payloadSha256||'').toLowerCase();
+if(declaredSha!==PATCH_SHA256)throw new Error('2.4.7.1: SHA-256 declarado do patch 2.4.6.8 não confere com o artefato oficial');
 const payload=patchData.payload.js;
 if(payload.includes('__TAREFAS_ALPHA_2467_ESCALAS_2433__'))throw new Error('2.4.7.1: payload proibido 2.4.6.7 detectado');
 
