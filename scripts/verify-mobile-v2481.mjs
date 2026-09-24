@@ -4,7 +4,7 @@ const dir=path.resolve(process.argv[2]||'dist'),root=process.cwd();
 const read=f=>readFile(path.join(dir,f),'utf8');
 const must=(x,m)=>{if(!x)throw new Error('2.4.8.1 verify: '+m)};
 for(const f of ['mobile-bootstrap.js','mobile-login-v17.js','mobile-patch-manager-v240.js','dashboard.html','dashboard.js','about.html','ALPHA_2_4_8_1.json'])await access(path.join(dir,f));
-const b=await read('mobile-bootstrap.js'),pm=await read('mobile-patch-manager-v240.js'),m=JSON.parse(await read('ALPHA_2_4_8_1.json')),patch=JSON.parse(await read(path.join(root,'patches/TAREFAS-2.4.8.1.tpatch')));
+const b=await read('mobile-bootstrap.js'),pm=await read('mobile-patch-manager-v240.js'),m=JSON.parse(await read('ALPHA_2_4_8_1.json')),patch=JSON.parse(await readFile(path.join(root,'patches/TAREFAS-2.4.8.1.tpatch'),'utf8'));
 must(b.includes("const APP_VERSION = '2.4.8.1';")&&b.includes('const APP_BUILD = 291;'),'versão/build incorretos');
 must(b.includes('__TAREFAS_ALPHA_2468_SERVICOS_HOTBAR_FIX__'),'2.4.6.8 ausente');
 must(!b.includes('__TAREFAS_ALPHA_2467_ESCALAS_2433__'),'2.4.6.7 detectado');
