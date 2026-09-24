@@ -1,0 +1,57 @@
+name: Android 2.4.7 Beta - Base Alpha 2.4.6.8
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [app/android-v247-prep]
+  pull_request:
+    branches: [main]
+    paths:
+      - 'app/android/TarefasLauncherIconPlugin.java'
+      - 'app/mobile-launcher-icon-v241.js'
+      - 'app/release-v247.txt'
+      - 'scripts/build-mobile-v246.mjs'
+      - 'scripts/build-mobile-v247.mjs'
+      - 'scripts/verify-mobile-v247.mjs'
+      - 'scripts/release-mobile-v247.sh'
+      - '.github/workflows/android-v247-beta.yml'
+
+concurrency:
+  group: android-v247-beta
+  cancel-in-progress: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Compilar, validar, assinar e publicar 2.4.7 Beta
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          chmod +x scripts/release-mobile-v247.sh
+          scripts/release-mobile-v247.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tarefas-android-2.4.7-beta-build-282
+          path: |
+            TAREFAS-2.4.7.apk
+            TAREFAS-2.4.7.apk.sha256
+            TAREFAS-2.4.7-beta-build-282.zip
+            TAREFAS-2.4.7-beta-build-282.zip.sha256
+            app/release-v247.txt
+            dist/BETA_2_4_7.json
+          if-no-files-found: error
