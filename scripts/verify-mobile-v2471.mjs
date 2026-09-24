@@ -18,7 +18,7 @@ must(b.includes('__TAREFAS_ALPHA_2468_SERVICOS_HOTBAR_FIX__'),'patch 2.4.6.8 aus
 must(!b.includes('__TAREFAS_ALPHA_2467_ESCALAS_2433__'),'patch 2.4.6.7 detectado no dist');
 must(b.includes("const APP_VERSION = '2.4.7.1';")&&b.includes('const APP_BUILD = 283;'),'versão/build incorretos');
 must(pm.includes("APP_VERSION='2.4.7.1',APP_BUILD=283,APP_CHANNEL='alpha'"),'Patch Manager alpha incorreto');
-must(u.includes("const APP_VERSION = '2.4.7.1';")&&u.includes('const APP_BUILD = 283;')&&u.includes("const APP_CHANNEL = 'alpha';"),'updates incorreto');
+must(u.includes("const APP_VERSION = '2.4.7.1';")&&u.includes('const APP_BUILD = 283;')&&(u.includes("const APP_CHANNEL = 'alpha';")||u.includes("const APP_CHANNEL='alpha';")),'updates incorreto');
 const man=JSON.parse(m);
 must(man.version==='2.4.7.1'&&man.build===283&&man.channel==='alpha'&&man.incorporatedPatch==='2.4.6.8'&&man.features?.only2468===true&&man.features?.scalesPatch2467===false,'manifesto incorreto');
 console.log('VERIFY 2.4.7.1 ALPHA OK: tpatch oficial 2.4.6.8 validado; 2.4.6.7 não incorporado.');
