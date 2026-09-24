@@ -1,0 +1,24 @@
+name: temp-verify-sha-2465
+on:
+  push:
+    branches: [app/releases]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify JSON, syntax and SHA-256
+        run: |
+          node --input-type=module <<'NODE'
+          import fs from 'node:fs';
+          import crypto from 'node:crypto';
+          const path='patches/TAREFAS-2.4.6.5.tpatch';
+          const raw=fs.readFileSync(path);
+          const text=raw.toString('utf8');
+          const p=JSON.parse(text);
+          new Function(p.payload.js);
+          const payloadText=JSON.stringify({js:String(p?.payload?.js||''),css:String(p?.payload?.css||'')});
+          const payloadSha=crypto.createHash('sha256').update(payloadText,'utf8').digest('hex');
+          const rawSha=crypto.createHash('sha256').update(raw).digest('hex');
+          console.log(JSON.stringify({payloadSha,rawSha,rawBytes:raw.length,payloadTextBytes:Buffer.byteLength(payloadText,'utf8'),docs:p.payload.js.includes('docs.google.com'),api:p.payload.js.includes('/functions/v1/tarefas-escalas'),marker:p.payload.js.includes('__TAREFAS_ALPHA_2465_PATCH__')}));
+          NODE
