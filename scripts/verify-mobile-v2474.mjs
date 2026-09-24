@@ -21,10 +21,12 @@ must(!b.includes('__TAREFAS_ALPHA_2467_ESCALAS_2433__'),'patch 2.4.6.7 detectado
 must(b.includes("const APP_VERSION = '2.4.7.4';")&&b.includes('const APP_BUILD = 286;'),'versão/build do bootstrap incorretos');
 must(pm.includes("APP_VERSION='2.4.7.4',APP_BUILD=286,APP_CHANNEL='alpha'"),'Patch Manager alpha incorreto');
 must(u.includes("const APP_VERSION = '2.4.7.4';")&&u.includes('const APP_BUILD = 286;')&&(u.includes("const APP_CHANNEL = 'alpha';")||u.includes("const APP_CHANNEL='alpha';")),'updates incorreto');
-must(d.includes('kNextServiceCard')===false,'dashboard v184 ainda contém referência ao cartão Próximo Serviço');
-must(d.includes('tm-next-service-kpi')===false,'dashboard v184 ainda contém classe do cartão Próximo Serviço');
+must(d.includes('function ensureCard')===false,'dashboard v184 ainda contém o criador original do cartão');
+must(!d.includes("card=document.createElement('article')"),'dashboard v184 ainda contém criação dinâmica do cartão');
+must(!d.includes('Próximo serviço previsto'),'dashboard v184 ainda contém lógica de previsão do cartão');
+must(d.includes('removeNextServiceCard'),'dashboard v184 não contém o neutralizador defensivo');
 for(const html of ['dashboard.html','index.html','pessoal.html']){try{const h=await readFile(path.join(dir,html),'utf8');must(h.includes('mobile-dashboard-v185.js?v=2.4.7.4-b286'),html+' sem referência ao dashboard v185');must(!h.includes('mobile-dashboard-v184.js'),html+' ainda aponta para dashboard v184')}catch(e){if(e.code!=='ENOENT')throw e}}
-must(d185.includes('kNextServiceCard')===false&&d185.includes('tm-next-service-kpi')===false,'dashboard v185 neutralizador inválido');
+must(d185.includes('function ensureCard')===false&&d185.includes("card=document.createElement('article')")===false&&d185.includes('Próximo serviço previsto')===false,'dashboard v185 ainda contém lógica do cartão');must(d185.includes('removeNextServiceCard'),'dashboard v185 neutralizador inválido');
 
 const man=JSON.parse(m);
 must(man.version==='2.4.7.4'&&man.build===286&&man.channel==='alpha'&&man.base==='2.4.6'&&man.basedOn==='2.4.7.3'&&man.incorporatedPatch==='2.4.6.8','manifesto incorreto');
