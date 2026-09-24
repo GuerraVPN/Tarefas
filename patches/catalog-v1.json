@@ -584,8 +584,8 @@
         "Substitui integralmente a Alpha 2.4.6.1 para a base 2.4.6/build 281."
       ],
       "order": 24602,
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.6.2.tpatch",
-      "sha256": "e3800a3f36864291b1a122824518ead04ba848b8cf46f1356e1d274469f1a92d",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.6.2-r2.tpatch",
+      "sha256": "756e4627ccaa67d12337763b2bf4fa9880c86550938cf4b4222c63fd629887bc",
       "installable": true
     }
   ],
@@ -896,5 +896,5 @@
       "installable": true
     }
   ],
-  "cacheNonce": "2462-node-final"
+  "cacheNonce": "2462-r2-final"
 }
