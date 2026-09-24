@@ -143,7 +143,7 @@ t=Path(os.environ['RUNNER_TEMP'])
 checks={
  'bootstrap':['__TAREFAS_ALPHA_2468_SERVICOS_HOTBAR_FIX__',"const APP_VERSION = '2.4.7.1';",'const APP_BUILD = 283;'],
  'pm':["APP_VERSION='2.4.7.1',APP_BUILD=283,APP_CHANNEL='alpha'"],
- 'updates':["const APP_VERSION = '2.4.7.1';",'const APP_BUILD = 283;',\"const APP_CHANNEL = 'alpha';\"]
+ 'updates':["const APP_VERSION = '2.4.7.1';",'const APP_BUILD = 283;',"const APP_CHANNEL = 'alpha';"]
 }
 for f,needles in checks.items():
  p=t/({'bootstrap':'bootstrap-v2471.js','pm':'pm-v2471.js','updates':'updates-v2471.js'}[f])
