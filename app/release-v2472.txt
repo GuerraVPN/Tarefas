@@ -1,0 +1,5 @@
+TAREFAS Android 2.4.7.2 build 284 ALPHA
+Base: Alpha 2.4.7.1 / Web 7.9.1
+Correção: remove o cartão “Próximo Serviço” do Dashboard do aplicativo.
+Preserva a navegação Serviços → Escalas e o patch oficial 2.4.6.8.
+Não incorpora a implementação do patch 2.4.6.7.
