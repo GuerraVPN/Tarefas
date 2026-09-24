@@ -169,9 +169,10 @@ dash185=(t/'dashboard-v2474-v185.js').read_text()
 html=(t/'dashboard-v2474.html').read_text()
 assert '__TAREFAS_ALPHA_2467_ESCALAS_2433__' not in boot
 for name,dash in [('v184',dash184),('v185',dash185)]:
- assert 'kNextServiceCard' not in dash,(name,'card id still present')
- assert 'tm-next-service-kpi' not in dash,(name,'card class still present')
+ assert 'function ensureCard' not in dash,(name,'old card creator still present')
  assert "card=document.createElement('article')" not in dash,(name,'old card creator still present')
+ assert 'Próximo serviço previsto' not in dash,(name,'old card logic still present')
+ assert 'removeNextServiceCard' in dash,(name,'neutralizer missing')
 assert 'mobile-dashboard-v185.js?v=2.4.7.4-b286' in html
 assert 'mobile-dashboard-v184.js' not in html
 print('APK CHECK OK: Alpha 2.4.7.4 com somente 2.4.6.8, dashboard v185 e neutralização v184/v185.')
