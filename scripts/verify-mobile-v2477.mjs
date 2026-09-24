@@ -30,7 +30,7 @@ must(nextHits.length===0,'código aberto empacotado ainda contém origem do cart
 const v756=await read('v7_5_6_patch.js');
 must(v756.includes('loadCalendarServices')&&v756.includes('applyCalendarServices'),'correções de calendário do v7.5.6 foram removidas junto com a limpeza do Dashboard');
 
-must(m.version==='2.4.7.7'&&m.build===289&&m.channel==='alpha'&&m.base==='2.4.6'&&m.basedOn==='2.4.7.4'&&m.incorporatedPatch==='2.4.6.8','manifesto incorreto');
+must(m.version==='2.4.7.7'&&m.build===289&&m.channel==='alpha'&&m.base==='2.4.6'&&m.basedOn==='2.4.7.6'&&m.incorporatedPatch==='2.4.6.8','manifesto incorreto');
 must(m.features?.dashboardPathRebuilt===true&&m.features?.legacyDashboardModuleRemoved===true&&m.features?.cacheBustedDashboardEntry===true,'flags da reestruturação ausentes');
 must(pm.includes("const APP_VERSION='2.4.7.7',APP_BUILD=289,APP_CHANNEL='alpha';"),'Patch Manager não foi preservado/atualizado');
 must(pm.includes("const FORMAT='tarefas-tpatch-v1'"),'formato .tpatch v1 ausente');
