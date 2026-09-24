@@ -533,6 +533,32 @@
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.5.1.tpatch",
       "sha256": "dde1c88d536751a643dd3821807cb9981ffc44c77d7d67a426ff9d93bf9b047d",
       "installable": true
+    },
+    {
+      "format": "tarefas-tpatch-v1",
+      "id": "2.4.6.1",
+      "name": "TAREFAS 2.4.6.1 — Correção do Próximo Serviço e Escalas do Google",
+      "patchVersion": 1,
+      "createdAt": "2026-09-23T20:00:00Z",
+      "baseVersion": "2.4.6",
+      "minBuild": 281,
+      "maxBuild": 281,
+      "channel": "alpha",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [],
+      "description": "Corrige a remoção do Próximo Serviço e faz a opção Escalas da hotbar abrir as três escalas oficiais do Google.",
+      "changelog": [
+        "Remove novamente e de forma persistente o card Próximo Serviço da tela inicial.",
+        "A opção Escalas da hotbar abre a tela com os links oficiais do Google para Motorista PA, Patrulheiro e Permanência.",
+        "Remove da hotbar eventuais entradas antigas Pessoal / Escalas e Missões.",
+        "Patch cumulativo compatível com a Beta 2.4.6/build 281.",
+        "Não altera o Patch Manager nem a validação SHA-256."
+      ],
+      "order": 24601,
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.6.1.tpatch",
+      "sha256": "",
+      "installable": true
     }
   ],
   "history": [
@@ -842,5 +868,5 @@
       "installable": true
     }
   ],
-  "cacheNonce": "2451-internal-sha-r3"
+  "cacheNonce": "2461-r1"
 }
