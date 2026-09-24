@@ -146,6 +146,7 @@ PY
 unzip -p "$UNSIGNED" assets/public/mobile-bootstrap.js > "$RUNNER_TEMP/bootstrap-v2472.js"
 unzip -p "$UNSIGNED" assets/public/mobile-patch-manager-v240.js > "$RUNNER_TEMP/pm-v2472.js"
 unzip -p "$UNSIGNED" assets/public/mobile-updates-v181.js > "$RUNNER_TEMP/updates-v2472.js"
+unzip -p "$UNSIGNED" assets/public/mobile-dashboard-v184.js > "$RUNNER_TEMP/dashboard-v2472.js"
 python3 - <<'PY'
 from pathlib import Path
 import json, os
@@ -161,8 +162,11 @@ for f,needles in checks.items():
  for n in needles:
   assert n in x,(f,n)
 boot=(t/'bootstrap-v2472.js').read_text()
+dash=(t/'dashboard-v2472.js').read_text()
 assert '__TAREFAS_ALPHA_2467_ESCALAS_2433__' not in boot
-print('APK CHECK OK: Alpha 2.4.7.2 com somente 2.4.6.8')
+assert 'function ensureCard(){ return null; }' in dash
+assert "card=document.createElement('article')" not in dash
+print('APK CHECK OK: Alpha 2.4.7.2 com somente 2.4.6.8 e sem cartão Próximo Serviço')
 PY
 OIDC="$(curl --fail --silent --show-error \
   -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
@@ -206,6 +210,7 @@ mkdir -p "$RUNNER_TEMP/package/app" "$RUNNER_TEMP/package/scripts" "$RUNNER_TEMP
 cp "$APK" "$APK.sha256" "$RUNNER_TEMP/package/"
 cp app/mobile-launcher-icon-v241.js app/release-v2472.txt "$RUNNER_TEMP/package/app/"
 cp app/android/TarefasLauncherIconPlugin.java "$RUNNER_TEMP/package/app/"
+cp dist/mobile-dashboard-v184.js "$RUNNER_TEMP/package/app/"
 cp scripts/build-mobile-v246.mjs scripts/build-mobile-v2472.mjs scripts/verify-mobile-v2472.mjs "$RUNNER_TEMP/package/scripts/"
 cp dist/ALPHA_2_4_7_2.json "$RUNNER_TEMP/package/manifest/"
 (cd "$RUNNER_TEMP/package" && zip -qr "$GITHUB_WORKSPACE/$ZIP" .)
@@ -248,7 +253,7 @@ jq -n \
   --argjson build "$BUILD" \
   --arg channel 'alpha' \
   --arg web_version "$WEB_VERSION" \
-  --arg title 'TAREFAS 2.4.7.2 Alpha — teste somente do patch 2.4.6.8' \
+  --arg title 'TAREFAS 2.4.7.2 Alpha — remoção do cartão Próximo Serviço' \
   --arg url "$URL" \
   --arg sha "$SHA" \
   '{
@@ -258,8 +263,8 @@ jq -n \
     web_version:$web_version,
     title:$title,
     changelog:[
-      "🧪 Alpha 2.4.7.2 para testar somente a incorporação do patch 2.4.6.8.",
-      "🔒 Sem funcionalidades novas: foco em estabilidade e regressão.",
+      "🧪 Alpha 2.4.7.2 para remover o cartão Próximo Serviço do Dashboard.",
+      "🧹 Remove somente o cartão Próximo Serviço do Dashboard; demais recursos ficam preservados.",
       "🧩 Patch incorporado: somente 2.4.6.8; 2.4.6.7 não foi incorporado.",
       "🔐 Patch Manager mantém validação SHA-256 diretamente sobre os bytes do .tpatch.",
       "📜 Histórico de versões e remoção do Próximo Serviço preservados.",
