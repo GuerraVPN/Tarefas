@@ -14,6 +14,7 @@ on:
       - 'scripts/build-mobile-v2471.mjs'
       - 'scripts/verify-mobile-v2471.mjs'
       - 'scripts/release-mobile-v2471.sh'
+      - 'patches/TAREFAS-2.4.6.8.tpatch'
       - '.github/workflows/android-v2471-alpha.yml'
 
 concurrency:
