@@ -1,6 +1,10 @@
 name: Verify patch 2.4.6.2
 on:
   workflow_dispatch:
+  push:
+    branches: [app/releases]
+    paths:
+      - '.github/workflows/verify-patch-2462.yml'
 permissions:
   contents: write
 jobs:
