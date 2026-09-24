@@ -557,7 +557,7 @@
       ],
       "order": 24601,
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.6.1.tpatch",
-      "sha256": "",
+      "sha256": "90f28a87820f03427dcb80af247cbfe92da5d5b80adeb5b802f5e945ee191e91",
       "installable": true
     }
   ],
@@ -868,5 +868,5 @@
       "installable": true
     }
   ],
-  "cacheNonce": "2461-r1"
+  "cacheNonce": "2461-r2"
 }
