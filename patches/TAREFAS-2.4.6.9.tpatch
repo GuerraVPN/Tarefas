@@ -1,0 +1,39 @@
+{
+  "format": "tarefas-tpatch-v1",
+  "id": "2.4.6.9",
+  "name": "TAREFAS 2.4.6.9 — Escalas lateral igual à Hotbar + ícone Serviços",
+  "patchVersion": 1,
+  "createdAt": "2026-09-24T02:45:00Z",
+  "baseVersion": "2.4.6",
+  "minBuild": 281,
+  "maxBuild": 281,
+  "channel": "alpha",
+  "cumulative": true,
+  "replacementMode": "replace-older-same-base",
+  "replaces": [
+    "2.4.6.1",
+    "2.4.6.2",
+    "2.4.6.3",
+    "2.4.6.4",
+    "2.4.6.5",
+    "2.4.6.6",
+    "2.4.6.7",
+    "2.4.6.8"
+  ],
+  "description": "Corrige o acesso a Escalas no menu lateral para usar exatamente o mesmo caminho da Escalas da Hotbar e restaura o ícone original de Serviços.",
+  "changelog": [
+    "Menu lateral → Escalas passa a acionar exatamente o mesmo acesso da Hotbar → Serviços → Escalas.",
+    "Elimina o acionamento duplicado da implementação antiga/nova no item lateral.",
+    "Restaura o ícone original de Serviços usado pela Hotbar.",
+    "Não altera a implementação da Escalas da Hotbar.",
+    "Mantém Motorista PA, Patrulheiro e Permanência."
+  ],
+  "order": 24609,
+  "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.6.9.tpatch",
+  "installable": true,
+  "payloadSha256": "19c4be22075b362c49a8895580c7b891c5552cedc8b28a399e8c83377dd27cb5",
+  "payload": {
+    "js": "(()=>{'use strict';\nconst MARK='__TAREFAS_ALPHA_2469_PATCH__';\nif(globalThis[MARK])return;\nglobalThis[MARK]=true;\nconst norm=v=>String(v??'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/\\s+/g,' ').trim().toLowerCase();\nconst SERVICES_SVG='<svg viewBox=\"0 0 24 24\"><path d=\"M8 4h8M9 2h6v4H9zM6 7h12l1 14H5z\"/><path d=\"M9 11h6M9 15h6\"/></svg>';\nfunction closeOldScaleViews(){['tm2433-scale-back','tmScales2466','tmScales2464','tmScales2465','tmScales2463','tmScales2462','tmScales2461'].forEach(id=>document.getElementById(id)?.remove());}\nfunction wireLeftScales(){\n const candidates=[...document.querySelectorAll('#tmDrawer a,#tmDrawer button,.tm-drawer-item,a,button,[role=\"button\"]')];\n const items=candidates.filter(el=>{const t=norm(el.textContent),h=norm(el.getAttribute?.('href')||el.dataset?.href||'');return t==='escalas'||h==='#escalas';});\n if(!items.length)return false;\n const item=items[0],row=item.closest('li,.nav-item,.menu-item,.tab-item,.drawer-item,.tm-drawer-item')||item;\n if(row.dataset.tarefas2469Left==='1')return true;\n const clean=row.cloneNode(true);clean.dataset.tarefas2469Left='1';clean.removeAttribute('onclick');clean.querySelectorAll?.('[onclick]').forEach(x=>x.removeAttribute('onclick'));row.replaceWith(clean);\n clean.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();closeOldScaleViews();const services=document.querySelector('.tm-bottom-nav [data-key=\"services\"]');if(services){services.click();return;}},true);\n return true;\n}\nfunction wireServicesIcon(){\n const btn=document.querySelector('.tm-bottom-nav [data-key=\"services\"]');if(!btn)return false;\n let icon=btn.querySelector('svg');\n if(!icon){const holder=document.createElement('span');holder.innerHTML=SERVICES_SVG;const svg=holder.firstElementChild;if(svg)btn.insertBefore(svg,btn.firstChild);}\n const svg=btn.querySelector('svg');if(svg){svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('aria-hidden','true');}\n const label=btn.querySelector('span');if(label)label.textContent='Serviços';btn.setAttribute('aria-label','Serviços');return true;\n}\nfunction boot(){wireServicesIcon();wireLeftScales();let n=0;const timer=setInterval(()=>{wireServicesIcon();wireLeftScales();if(++n>=120)clearInterval(timer)},250);window.addEventListener('focus',()=>{wireServicesIcon();wireLeftScales()});window.addEventListener('pageshow',()=>{wireServicesIcon();wireLeftScales()});}\nif(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();\nglobalThis.TarefasAlpha2469Patch=Object.freeze({version:'2.4.6.9',base:'2.4.6',leftScalesUsesHotbar:true,servicesOriginalIcon:true});\n})();",
+    "css": ""
+  }
+}
