@@ -4,7 +4,7 @@
   "baseVersion": "2.4.1",
   "baseBuild": 276,
   "generatedAt": "2026-09-24T02:25:00.000Z",
-  "latestPatch": "2.4.6.9",
+  "latestPatch": "2.4.6.8",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -772,38 +772,6 @@
         "Não altera nem recria a implementação de Escalas da 2.4.6.7.",
         "Mantém Motorista PA, Patrulheiro e Permanência exatamente como já estão."
       ]
-    },
-    {
-      "id": "2.4.6.9",
-      "name": "TAREFAS 2.4.6.9 — Escalas lateral igual à Hotbar + ícone Serviços",
-      "baseVersion": "2.4.6",
-      "minBuild": 281,
-      "maxBuild": 281,
-      "channel": "alpha",
-      "publishedAt": "2026-09-24T02:45:00Z",
-      "cumulative": true,
-      "replacementMode": "replace-older-same-base",
-      "replaces": [
-        "2.4.6.1",
-        "2.4.6.2",
-        "2.4.6.3",
-        "2.4.6.4",
-        "2.4.6.5",
-        "2.4.6.6",
-        "2.4.6.7",
-        "2.4.6.8"
-      ],
-      "installable": true,
-      "description": "Corrige o acesso a Escalas no menu lateral para usar exatamente o mesmo caminho da Escalas da Hotbar e restaura o ícone original de Serviços.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.6.9.tpatch",
-      "sha256": "5da8f2ee522bffe277c2f759200bc6e158475409c70979f2cdab474bb94e40ef",
-      "changelog": [
-        "Menu lateral → Escalas passa a acionar exatamente o mesmo acesso da Hotbar → Serviços → Escalas.",
-        "Elimina o acionamento duplicado da implementação antiga/nova no item lateral.",
-        "Restaura o ícone original de Serviços usado pela Hotbar.",
-        "Não altera a implementação da Escalas da Hotbar.",
-        "Mantém Motorista PA, Patrulheiro e Permanência."
-      ]
     }
   ],
   "history": [
@@ -1273,43 +1241,7 @@
         "Remove acessos legados e o Próximo Serviço sem usar MutationObserver.",
         "Não cria uma nova implementação de Escalas."
       ]
-    },
-    {
-      "format": "tarefas-tpatch-v1",
-      "id": "2.4.6.9",
-      "name": "TAREFAS 2.4.6.9 — Escalas lateral igual à Hotbar + ícone Serviços",
-      "baseVersion": "2.4.6",
-      "minBuild": 281,
-      "maxBuild": 281,
-      "channel": "alpha",
-      "publishedAt": "2026-09-24T02:45:00Z",
-      "cumulative": true,
-      "replacementMode": "replace-older-same-base",
-      "replaces": [
-        "2.4.6.1",
-        "2.4.6.2",
-        "2.4.6.3",
-        "2.4.6.4",
-        "2.4.6.5",
-        "2.4.6.6",
-        "2.4.6.7",
-        "2.4.6.8"
-      ],
-      "installable": true,
-      "description": "Corrige o acesso a Escalas no menu lateral para usar exatamente o mesmo caminho da Escalas da Hotbar e restaura o ícone original de Serviços.",
-      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.6.9.tpatch",
-      "sha256": "5da8f2ee522bffe277c2f759200bc6e158475409c70979f2cdab474bb94e40ef",
-      "changelog": [
-        "Menu lateral → Escalas passa a acionar exatamente o mesmo acesso da Hotbar → Serviços → Escalas.",
-        "Elimina o acionamento duplicado da implementação antiga/nova no item lateral.",
-        "Restaura o ícone original de Serviços usado pela Hotbar.",
-        "Não altera a implementação da Escalas da Hotbar.",
-        "Mantém Motorista PA, Patrulheiro e Permanência."
-      ],
-      "patchVersion": 1,
-      "createdAt": "2026-09-24T02:45:00Z",
-      "payloadSha256": "19c4be22075b362c49a8895580c7b891c5552cedc8b28a399e8c83377dd27cb5"
     }
   ],
-  "cacheNonce": "2469"
+  "cacheNonce": "2468"
 }
