@@ -1,0 +1,28 @@
+{
+  "format": "tarefas-tpatch-v1",
+  "id": "2.4.8.1",
+  "name": "TAREFAS 2.4.8.1 — Correção da aprovação da Distribuição na Fiscalização",
+  "patchVersion": 1,
+  "createdAt": "2026-09-24T13:30:00Z",
+  "baseVersion": "2.4.8",
+  "minBuild": 290,
+  "maxBuild": 290,
+  "channel": "alpha",
+  "cumulative": false,
+  "replacementMode": "",
+  "replaces": [],
+  "description": "Corrige o fluxo de aprovação/retorno da Distribuição na Fiscalização e acompanha a correção da função Supabase que causava a referência ambígua em motivo.",
+  "changelog": [
+    "Corrige o erro 'column reference motivo is ambiguous' ao aprovar uma Distribuição.",
+    "A função Supabase v5_4_2_mover_distribuicao passa a usar a variável v_motivo, eliminando o conflito com a coluna motivo.",
+    "Mantém o fluxo Chefe/Auxiliar da Fiscalização → Aguardando DIEx → Base → Pronto.",
+    "O cliente normaliza mensagem vazia para null antes da chamada de aprovação.",
+    "Patch Manager .tpatch v1 e SHA-256 permanecem preservados."
+  ],
+  "order": 24801,
+  "payload": {
+    "js": "(()=>{'use strict';\nconst MARK='__TAREFAS_ALPHA_2481_DISTRIBUICAO_FISCAL_FIX__';\nif(globalThis[MARK])return;\nglobalThis[MARK]=true;\nconst originalRpc=globalThis.supabaseClient?.rpc?.bind(globalThis.supabaseClient);\nif(originalRpc&&globalThis.supabaseClient){\n  globalThis.supabaseClient.rpc=(fn,args,...rest)=>{\n    if(fn==='v5_4_2_mover_distribuicao'&&args&&args.p_acao==='aprovar_fiscal'&&args.p_mensagem==='')args={...args,p_mensagem:null};\n    return originalRpc(fn,args,...rest);\n  };\n}\nglobalThis.TarefasAlpha2481Fix=Object.freeze({version:'2.4.8.1',distributionFiscalRpcFix:true});\n})();",
+    "css": ""
+  },
+  "payloadSha256": "012d095f40b85267539be531a775105744508f35e4228a616eabe726b709546b"
+}
