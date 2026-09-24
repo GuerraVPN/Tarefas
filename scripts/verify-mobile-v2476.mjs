@@ -10,7 +10,7 @@ const patchData=JSON.parse(await readFile(patchFile,'utf8'));
 must(patchData.id==='2.4.6.8'&&patchData.baseVersion==='2.4.6','tpatch 2.4.6.8 inválido');
 must(String(patchData.payloadSha256||'').toLowerCase()==='9bf9f10ca640f313500b6936918debeb45a6c094efb4aeef759bf6c2cfdbe607','SHA-256 do 2.4.6.8 inválido');
 must(!JSON.stringify(patchData).includes('__TAREFAS_ALPHA_2467_ESCALAS_2433__'),'2.4.6.7 detectado no tpatch');
-const b=await read('mobile-bootstrap.js'),login=await read('mobile-login-v17.js'),d=await read('dashboard.js'),h=await read('dashboard.html'),pm=await read('mobile-patch-manager-v240.js'),m=JSON.parse(await read('ALPHA_2_4_7_5.json'));
+const b=await read('mobile-bootstrap.js'),login=await read('mobile-login-v17.js'),d=await read('dashboard.js'),h=await read('dashboard.html'),pm=await read('mobile-patch-manager-v240.js'),m=JSON.parse(await read('ALPHA_2_4_7_6.json'));
 must(b.includes('__TAREFAS_ALPHA_2468_SERVICOS_HOTBAR_FIX__'),'2.4.6.8 ausente');
 must(!b.includes('__TAREFAS_ALPHA_2467_ESCALAS_2433__'),'2.4.6.7 incorporado');
 must(b.includes("const APP_VERSION = '2.4.7.6';")&&b.includes('const APP_BUILD = 288;'),'versão/build incorretos');
