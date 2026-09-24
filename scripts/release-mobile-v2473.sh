@@ -147,6 +147,7 @@ unzip -p "$UNSIGNED" assets/public/mobile-bootstrap.js > "$RUNNER_TEMP/bootstrap
 unzip -p "$UNSIGNED" assets/public/mobile-patch-manager-v240.js > "$RUNNER_TEMP/pm-v2473.js"
 unzip -p "$UNSIGNED" assets/public/mobile-updates-v181.js > "$RUNNER_TEMP/updates-v2473.js"
 unzip -p "$UNSIGNED" assets/public/mobile-dashboard-v184.js > "$RUNNER_TEMP/dashboard-v2473.js"
+unzip -p "$UNSIGNED" assets/public/dashboard.html > "$RUNNER_TEMP/dashboard-v2473.html"
 python3 - <<'PY'
 from pathlib import Path
 import json, os
