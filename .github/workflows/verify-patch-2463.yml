@@ -1,0 +1,40 @@
+name: Verify patch 2.4.6.3
+on:
+  workflow_dispatch:
+  push:
+    branches: [app/releases]
+    paths:
+      - '.github/workflows/verify-patch-2463.yml'
+permissions:
+  contents: write
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: app/releases
+      - name: Compute exact Patch Manager SHA
+        run: |
+          node <<'NODE'
+          const fs=require('fs'),crypto=require('crypto');
+          const path='patches/TAREFAS-2.4.6.3.tpatch';
+          const p=JSON.parse(fs.readFileSync(path,'utf8'));
+          const payloadText=p=>JSON.stringify({js:String(p?.js||''),css:String(p?.css||'')});
+          const payloadSha=crypto.createHash('sha256').update(new TextEncoder().encode(payloadText(p.payload))).digest('hex');
+          p.payloadSha256=payloadSha;
+          fs.writeFileSync(path,JSON.stringify(p,null,2)+'\n');
+          const raw=crypto.createHash('sha256').update(fs.readFileSync(path)).digest('hex');
+          const cpath='patches/catalog-v1.json';
+          const c=JSON.parse(fs.readFileSync(cpath,'utf8'));
+          for(const x of c.patches||[]) if(x.id==='2.4.6.3'){x.sha256=raw;x.url='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.6.3.tpatch';}
+          c.cacheNonce='2463-final';
+          fs.writeFileSync(cpath,JSON.stringify(c,null,2)+'\n');
+          console.log('PAYLOAD_SHA='+payloadSha);
+          console.log('RAW_SHA='+raw);
+          NODE
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add patches/TAREFAS-2.4.6.3.tpatch patches/catalog-v1.json
+          git commit -m "fix(patch): finalizar SHA da 2.4.6.3"
+          git push
