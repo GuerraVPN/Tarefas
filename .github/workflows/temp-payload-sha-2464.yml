@@ -1,0 +1,21 @@
+name: temp-payload-sha-2464
+on:
+  push:
+    branches: [app/releases]
+permissions:
+  contents: read
+jobs:
+  hash:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: hash payload
+        run: |
+          node - <<'NODE'
+          const fs=require('fs'), crypto=require('crypto');
+          const p=JSON.parse(fs.readFileSync('patches/TAREFAS-2.4.6.4.tpatch','utf8'));
+          const t=JSON.stringify({js:String(p?.payload?.js||''),css:String(p?.payload?.css||'')});
+          console.log('payloadSha256',crypto.createHash('sha256').update(t,'utf8').digest('hex'));
+          console.log('payloadTextBytes',Buffer.byteLength(t,'utf8'));
+          console.log('declared',p.payloadSha256);
+          NODE
