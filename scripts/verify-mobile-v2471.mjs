@@ -1,0 +1,11 @@
+import { access, readFile } from 'node:fs/promises'; import path from 'node:path';
+const dir=path.resolve(process.argv[2]||'dist'); const read=f=>readFile(path.join(dir,f),'utf8'); const must=(x,m)=>{if(!x)throw new Error('2.4.7.1 verify: '+m)};
+for(const f of ['mobile-bootstrap.js','mobile-patch-manager-v240.js','mobile-updates-v181.js','mobile-release-v240.js','ALPHA_2_4_7_1.json']) await access(path.join(dir,f));
+const [b,pm,u,r,m]=await Promise.all(['mobile-bootstrap.js','mobile-patch-manager-v240.js','mobile-updates-v181.js','mobile-release-v240.js','ALPHA_2_4_7_1.json'].map(read));
+must(b.includes('__TAREFAS_ALPHA_2468_SERVICOS_HOTBAR_FIX__'),'patch 2.4.6.8 ausente');
+must(b.includes('__TAREFAS_ALPHA_2468_SERVICOS_HOTBAR_FIX__')&&!b.includes('__TAREFAS_ALPHA_2467_ESCALAS_2433__'),'somente 2.4.6.8 deve estar incorporado');
+must(b.includes("const APP_VERSION = '2.4.7.1';")&&b.includes('const APP_BUILD = 283;'),'versão/build incorretos');
+must(pm.includes("APP_VERSION='2.4.7.1',APP_BUILD=283,APP_CHANNEL='alpha'"),'Patch Manager alpha incorreto');
+must(u.includes("const APP_VERSION = '2.4.7.1';")&&u.includes('const APP_BUILD = 283;')&&u.includes("const APP_CHANNEL = 'alpha';"),'updates incorreto');
+const man=JSON.parse(m); must(man.version==='2.4.7.1'&&man.build===283&&man.channel==='alpha'&&man.incorporatedPatch==='2.4.6.8','manifesto incorreto');
+console.log('VERIFY 2.4.7.1 ALPHA OK: somente patch 2.4.6.8 incorporado.');
