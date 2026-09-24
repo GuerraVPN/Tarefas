@@ -35,7 +35,7 @@ node scripts/build-mobile-v242.mjs
 node scripts/build-mobile-v243.mjs
 node scripts/build-mobile-v245.mjs
 node scripts/build-mobile-v246.mjs
-node scripts/build-mobile-v2471.mjs
+node --check scripts/build-mobile-v2471.mjs
 node scripts/verify-mobile-v2471.mjs dist
 
 curl --fail --silent --show-error --retry 3 \
