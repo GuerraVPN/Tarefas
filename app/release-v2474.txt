@@ -1,0 +1,7 @@
+TAREFAS Android 2.4.7.4 build 286 ALPHA
+Base: Alpha 2.4.7.3 / Web 7.9.1
+Correção: remoção definitiva do cartão “Próximo Serviço” do Dashboard.
+A correção neutraliza tanto o módulo v184 legado quanto o novo v185 e atualiza todas as páginas para carregar v185 com cache-bust.
+Também remove qualquer cartão/estilo residual no DOM em inicialização, foco, pageshow e retorno à visibilidade, sem MutationObserver.
+Preserva Serviços → Escalas e incorpora somente o patch oficial 2.4.6.8.
+Não incorpora 2.4.6.7.
