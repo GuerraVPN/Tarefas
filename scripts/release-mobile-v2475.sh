@@ -144,38 +144,29 @@ assert str(e['versionName']) == '2.4.7.5', e
 PY
 
 unzip -p "$UNSIGNED" assets/public/mobile-bootstrap.js > "$RUNNER_TEMP/bootstrap-v2475.js"
-unzip -p "$UNSIGNED" assets/public/mobile-patch-manager-v240.js > "$RUNNER_TEMP/pm-v2475.js"
-unzip -p "$UNSIGNED" assets/public/mobile-updates-v181.js > "$RUNNER_TEMP/updates-v2475.js"
-unzip -p "$UNSIGNED" assets/public/mobile-dashboard-v184.js > "$RUNNER_TEMP/dashboard-v2475-v184.js"
-unzip -p "$UNSIGNED" assets/public/mobile-dashboard-v185.js > "$RUNNER_TEMP/dashboard-v2475-v185.js"
+unzip -p "$UNSIGNED" assets/public/mobile-login-v17.js > "$RUNNER_TEMP/login-v2475.js"
 unzip -p "$UNSIGNED" assets/public/dashboard.html > "$RUNNER_TEMP/dashboard-v2475.html"
+unzip -p "$UNSIGNED" assets/public/dashboard.js > "$RUNNER_TEMP/dashboard-js-v2475.js"
 python3 - <<'PY'
 from pathlib import Path
-import json, os
+import os
 t=Path(os.environ['RUNNER_TEMP'])
-checks={
- 'bootstrap':['__TAREFAS_ALPHA_2468_SERVICOS_HOTBAR_FIX__',"const APP_VERSION = '2.4.7.5';",'const APP_BUILD = 287;'],
- 'pm':["APP_VERSION='2.4.7.5',APP_BUILD=287,APP_CHANNEL='alpha'"],
- 'updates':["const APP_VERSION = '2.4.7.5';",'const APP_BUILD = 287;',"const APP_CHANNEL = 'alpha';"]
-}
-for f,needles in checks.items():
- p=t/({'bootstrap':'bootstrap-v2475.js','pm':'pm-v2475.js','updates':'updates-v2475.js'}[f])
- x=p.read_text()
- for n in needles:
-  assert n in x,(f,n)
 boot=(t/'bootstrap-v2475.js').read_text()
-dash184=(t/'dashboard-v2475-v184.js').read_text()
-dash185=(t/'dashboard-v2475-v185.js').read_text()
+login=(t/'login-v2475.js').read_text()
 html=(t/'dashboard-v2475.html').read_text()
-assert '__TAREFAS_ALPHA_2467_ESCALAS_2433__' not in boot
-for name,dash in [('v184',dash184),('v185',dash185)]:
- assert 'function ensureCard' not in dash,(name,'old card creator still present')
- assert "card=document.createElement('article')" not in dash,(name,'old card creator still present')
- assert 'Próximo serviço previsto' not in dash,(name,'old card logic still present')
- assert 'removeNextServiceCard' in dash,(name,'neutralizer missing')
-assert 'mobile-dashboard-v185.js?v=2.4.7.5-b287' in html
-assert 'mobile-dashboard-v184.js' not in html
-print('APK CHECK OK: Alpha 2.4.7.5 com somente 2.4.6.8, dashboard v185 e neutralização v184/v185.')
+dash=(t/'dashboard-js-v2475.js').read_text()
+assert "__TAREFAS_ALPHA_2468_SERVICOS_HOTBAR_FIX__" in boot
+assert "__TAREFAS_ALPHA_2467_ESCALAS_2433__" not in boot
+assert "const APP_VERSION = '2.4.7.5';" in boot
+assert "const APP_BUILD = 287;" in boot
+assert "dashboard.html?app=2.4.7.5" in boot
+assert "dashboard.html?app=2.4.7.5" in login
+assert "mobile-dashboard-v184.js" not in html
+assert "mobile-dashboard-v185.js" not in html
+assert "kNextService" not in dash
+assert "Próximo Serviço" not in dash
+assert "Próximo serviço" not in dash
+print("APK DASHBOARD CHECK OK: caminho novo, sem módulos mobile-dashboard v184/v185 e sem Próximo Serviço.")
 PY
 OIDC="$(curl --fail --silent --show-error \
   -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
