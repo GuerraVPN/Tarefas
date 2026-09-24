@@ -1,0 +1,33 @@
+# TAREFAS 2.4.8 Beta — build 290
+
+## Promoção da Alpha 2.4.7.7 para os testadores Beta 💪🏼
+
+A Beta 2.4.8 nasce diretamente da **Alpha 2.4.7.7**, que foi a primeira build em que o cartão **Próximo Serviço** desapareceu no aparelho após a remoção da origem dentro de `v7_5_6_patch.js`.
+
+### Base
+- Base funcional: **Alpha 2.4.7.7 / build 289**.
+- Não utiliza a antiga linha **Beta 2.4.7**.
+- Web: **7.9.1**.
+- Patch incorporado: **somente 2.4.6.8**.
+- Patch 2.4.6.7 continua fora da build.
+- Patch Manager `.tpatch v1`, IndexedDB e SHA-256 preservados.
+- Biometria cold-start e demais correções já validadas na linha 2.4.x são preservadas.
+
+### Dashboard
+- Origem do cartão **Próximo Serviço** removida do código-fonte.
+- Auditoria percorre JS e HTML empacotados para impedir recriação do cartão.
+- `mobile-dashboard-v184.js` e `mobile-dashboard-v185.js` permanecem fora do APK.
+- As correções legítimas de serviços do Calendário em `v7_5_6_patch.js` são mantidas.
+
+### Objetivo desta Beta
+Nenhuma funcionalidade experimental nova foi adicionada nesta promoção. O objetivo é entregar aos testadores Beta a mesma base funcional da Alpha 2.4.7.7, com versionamento/canal Beta e validação completa do APK.
+
+## Verificações obrigatórias
+- Versão Android: **2.4.8**
+- Build: **290**
+- Canal: **beta**
+- Patch Manager preservado e atualizado
+- Patch 2.4.6.8 presente
+- 2.4.6.7 ausente
+- Cartão/origem **Próximo Serviço** ausente em todo JS/HTML empacotado
+- Correções de calendário preservadas
