@@ -56,5 +56,5 @@ jobs:
             TAREFAS-2.4.7.7-alpha-build-289.zip
             TAREFAS-2.4.7.7-alpha-build-289.zip.sha256
             app/release-v2477.txt
-            dist/ALPHA_2_4_7_6.json
+            dist/ALPHA_2_4_7_7.json
           if-no-files-found: error
