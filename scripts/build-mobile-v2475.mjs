@@ -4,7 +4,7 @@ import path from 'node:path';
 const root=process.cwd(), dist=path.join(root,'dist');
 const VERSION='2.4.7.5', BUILD=287, WEB_VERSION='7.9.1';
 const PATCH_ID='2.4.6.8';
-const PREVIOUS_ALPHA='2.4.7.3';
+const PREVIOUS_ALPHA='2.4.7.4';
 const PATCH_FILE=path.join(root,'patches','TAREFAS-2.4.6.8.tpatch');
 const PATCH_SHA256='9bf9f10ca640f313500b6936918debeb45a6c094efb4aeef759bf6c2cfdbe607';
 
