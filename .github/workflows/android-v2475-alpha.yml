@@ -56,5 +56,5 @@ jobs:
             TAREFAS-2.4.7.5-alpha-build-287.zip
             TAREFAS-2.4.7.5-alpha-build-287.zip.sha256
             app/release-v2475.txt
-            dist/ALPHA_2_4_7_4.json
+            dist/ALPHA_2_4_7_5.json
           if-no-files-found: error
