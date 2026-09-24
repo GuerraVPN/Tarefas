@@ -787,7 +787,7 @@
       "installable": true,
       "description": "Corrige o fluxo de aprovação/retorno da Distribuição na Fiscalização e acompanha a correção da função Supabase que causava a referência ambígua em motivo.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.8.1.tpatch",
-      "sha256": "012d095f40b85267539be531a775105744508f35e4228a616eabe726b709546b",
+      "sha256": "691cb5f4137884ae5b7570f326ac728221de5d535ae9b28e22df4ad49edea94f",
       "changelog": [
         "Corrige o erro 'column reference motivo is ambiguous' ao aprovar uma Distribuição.",
         "A função Supabase v5_4_2_mover_distribuicao passa a usar a variável v_motivo, eliminando o conflito com a coluna motivo.",
