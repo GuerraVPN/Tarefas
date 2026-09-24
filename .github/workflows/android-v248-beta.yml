@@ -1,0 +1,64 @@
+name: Android 2.4.8 Beta - promoção da Alpha 2.4.7.7
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [app/android-v248-beta-prep]
+  pull_request:
+    branches: [main]
+    paths:
+      - 'app/android/TarefasLauncherIconPlugin.java'
+      - 'app/mobile-launcher-icon-v241.js'
+      - 'app/release-v248.txt'
+      - 'scripts/build-mobile-v243.mjs'
+      - 'scripts/build-mobile-v245.mjs'
+      - 'scripts/build-mobile-v246.mjs'
+      - 'scripts/build-mobile-v2477.mjs'
+      - 'scripts/verify-mobile-v246.mjs'
+      - 'scripts/build-mobile-v248.mjs'
+      - 'scripts/verify-mobile-v248.mjs'
+      - 'scripts/release-mobile-v248.sh'
+      - 'v7_5_6_patch.js'
+      - 'v6_2_mobile.js'
+      - 'patches/TAREFAS-2.4.6.8.tpatch'
+      - '.github/workflows/android-v248-beta.yml'
+
+concurrency:
+  group: android-v248-beta
+  cancel-in-progress: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Compilar, validar, assinar e publicar 2.4.8 Beta
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          chmod +x scripts/release-mobile-v248.sh
+          scripts/release-mobile-v248.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tarefas-android-2.4.8-beta-build-290
+          path: |
+            TAREFAS-2.4.8.apk
+            TAREFAS-2.4.8.apk.sha256
+            TAREFAS-2.4.8-beta-build-290.zip
+            TAREFAS-2.4.8-beta-build-290.zip.sha256
+            app/release-v248.txt
+            dist/BETA_2_4_8.json
+          if-no-files-found: error
