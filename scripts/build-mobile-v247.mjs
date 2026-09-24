@@ -49,29 +49,29 @@ await patch('mobile-bootstrap.js',source=>{
     .replaceAll('build:281','build:'+BUILD);
   if(!out.includes("['Escalas','#escalas','Motorista, patrulheiro e permanência']"))throw new Error('2.4.7: menu Escalas ausente');
   if(out.includes("['Pessoal / Escalas','pessoal.html'")||out.includes("['Missões','missao.html'"))throw new Error('2.4.7: menu antigo presente');
-  out=out.replaceAll('tmScales246','tmScales247').replaceAll('tm246-scales-list','tm247-scales-list').replace("basedOn:'2.4.6+2.4.6.7+2.4.6.8'","basedOn:'2.4.6+2.4.6.7+2.4.6.8'");
+  out=out.replaceAll('tmScales246','tmScales247').replaceAll('tm246-scales-list','tm247-scales-list').replace("basedOn:'2.4.5'","basedOn:'2.4.6+2.4.6.7+2.4.6.8'");
   out=out.replace("__TAREFAS_BETA_247_BOOT__={version:'"+VERSION+"',build:"+BUILD+",channel:'beta',basedOn:'2.4.6+2.4.6.7+2.4.6.8'", "__TAREFAS_BETA_247_BOOT__={version:'"+VERSION+"',build:"+BUILD+",channel:'beta',basedOn:'2.4.6+2.4.6.7+2.4.6.8'");
   return out;
 },{required:true});
 
 await patch('mobile-alpha-v23223-fix.js',source=>source
-  .replace("const VERSION='2.4.5',BUILD=280,MARK='__TAREFAS_BETA_NAV_V281__';","const VERSION='"+VERSION+"',BUILD="+BUILD+",MARK='__TAREFAS_BETA_NAV_V282__';")
+  .replace("const VERSION='2.4.6',BUILD=281,MARK='__TAREFAS_BETA_NAV_V281__';","const VERSION='"+VERSION+"',BUILD="+BUILD+",MARK='__TAREFAS_BETA_NAV_V282__';")
   .replaceAll('TAREFAS 2.4.6 Beta','TAREFAS '+VERSION+' Beta')
   .replaceAll('TarefasBeta246','TarefasBeta247'),{required:false});
 
 await patch('mobile-alpha-v23221.js',source=>source
-  .replace("const VERSION='2.4.5',BUILD=280","const VERSION='"+VERSION+"',BUILD="+BUILD)
+  .replace("const VERSION='2.4.6',BUILD=281","const VERSION='"+VERSION+"',BUILD="+BUILD)
   .replaceAll('Central Beta 2.4.6','Central Beta '+VERSION)
   .replaceAll('Ferramentas Beta 2.4.6','Ferramentas Beta '+VERSION)
-  .replaceAll('BETA 245','BETA 246'),{required:false});
+  .replaceAll('BETA 246','BETA 246'),{required:false});
 
 await patch('mobile-alpha-v23221-tabs.js',source=>source
-  .replace("const MARK='__TAREFAS_BETA_TABS_V281__',VERSION='2.4.5',BUILD=280","const MARK='__TAREFAS_BETA_TABS_V282__',VERSION='2.4.7',BUILD=282")
+  .replace("const MARK='__TAREFAS_BETA_TABS_V281__',VERSION='2.4.6',BUILD=281","const MARK='__TAREFAS_BETA_TABS_V282__',VERSION='2.4.7',BUILD=282")
   .replace('<small>Beta 2.4.6</small>','<small>Beta '+VERSION+'</small>'),{required:false});
 
 await patch('mobile-preload.js',source=>source
-  .replaceAll("tarefasAppVersion = '2.4.5'","tarefasAppVersion = '"+VERSION+"'")
-  .replaceAll("tarefasAppBuild = '280'","tarefasAppBuild = '"+BUILD+"'"),{required:false});
+  .replaceAll("tarefasAppVersion = '2.4.6'","tarefasAppVersion = '"+VERSION+"'")
+  .replaceAll("tarefasAppBuild = '281'","tarefasAppBuild = '"+BUILD+"'"),{required:false});
 
 await patch('mobile-updates-v181.js',source=>source
   .replace("const APP_VERSION = '2.4.6';","const APP_VERSION = '"+VERSION+"';")
