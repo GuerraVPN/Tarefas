@@ -1,0 +1,24 @@
+TAREFAS 2.4.7 Beta — build 282
+
+Base:
+- Alpha 2.4.6.8 / build 281.
+- Patch 2.4.6.7 incorporado: Escalas original da 2.4.3.3.
+- Patch 2.4.6.8 incorporado: Serviços restaurado na hotbar.
+- Web 7.9.1.
+- Canal Beta.
+
+Mantido:
+- Motorista PA, Patrulheiro e Permanência.
+- Uma única Escalas em Serviços.
+- Remoção de Pessoal / Escalas, Missões e Próximo Serviço.
+- Patch Manager com SHA-256 por bytes.
+- Preferências Beta/Alpha e recursos da base 2.4.6.
+
+Objetivo:
+- Transformar o estado validado da Alpha 2.4.6.8 em APK Beta completo.
+- Não criar uma nova implementação de Escalas.
+- Publicar para os testadores Beta.
+
+Versão: 2.4.7
+Build: 282
+Canal: Beta
