@@ -162,8 +162,8 @@ html=(t/'dashboard-v248.html').read_text()
 dash=(t/'dashboard-js-v248.js').read_text()
 pm=(t/'pm-v248.js').read_text()
 about=(t/'about-v248.html').read_text()
-assert "__TAREFAS_BETA_2468_SERVICOS_HOTBAR_FIX__" in boot
-assert "__TAREFAS_BETA_2467_ESCALAS_2433__" not in boot
+assert "__TAREFAS_ALPHA_2468_SERVICOS_HOTBAR_FIX__" in boot
+assert "__TAREFAS_ALPHA_2467_ESCALAS_2433__" not in boot
 assert "const APP_VERSION = '2.4.8';" in boot and "const APP_BUILD = 290;" in boot
 assert "dashboard.html?app=2.4.8" in boot and "dashboard.html?app=2.4.8" in login
 assert "mobile-dashboard-v184.js" not in html and "mobile-dashboard-v185.js" not in html
@@ -236,7 +236,7 @@ cp app/mobile-launcher-icon-v241.js app/release-v248.txt "$RUNNER_TEMP/package/a
 cp app/android/TarefasLauncherIconPlugin.java "$RUNNER_TEMP/package/app/"
 true
 cp scripts/build-mobile-v246.mjs scripts/build-mobile-v248.mjs scripts/verify-mobile-v248.mjs "$RUNNER_TEMP/package/scripts/"
-cp dist/BETA_2_4_7_7.json "$RUNNER_TEMP/package/manifest/"
+cp dist/BETA_2_4_8.json "$RUNNER_TEMP/package/manifest/"
 (cd "$RUNNER_TEMP/package" && zip -qr "$GITHUB_WORKSPACE/$ZIP" .)
 unzip -tq "$ZIP"
 sha256sum "$ZIP" | tee "$ZIP.sha256"
