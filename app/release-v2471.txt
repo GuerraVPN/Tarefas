@@ -8,3 +8,4 @@ Objetivo: isolar o comportamento do patch 2.4.6.8 e descobrir se ele é a causa 
 
 Canal: Alpha
 Web: 7.9.1
+
