@@ -1,0 +1,27 @@
+{
+  "format": "tarefas-tpatch-v1",
+  "id": "2.4.6.8",
+  "name": "TAREFAS 2.4.6.8 — Restaura Serviços na Hotbar",
+  "patchVersion": 1,
+  "createdAt": "2026-09-24T02:20:00Z",
+  "baseVersion": "2.4.6",
+  "minBuild": 281,
+  "maxBuild": 281,
+  "channel": "alpha",
+  "cumulative": false,
+  "replacementMode": "",
+  "replaces": [],
+  "description": "Hotfix da Alpha 2.4.6.7 para restaurar o botão Serviços na hotbar sem alterar a implementação de Escalas.",
+  "changelog": [
+    "Restaura Serviços na hotbar.",
+    "O botão Serviços abre a mesma entrada Escalas já existente no menu da 2.4.6.7.",
+    "Não altera nem recria a implementação de Escalas da 2.4.6.7.",
+    "Mantém Motorista PA, Patrulheiro e Permanência exatamente como já estão."
+  ],
+  "order": 24608,
+  "payload": {
+    "js": "(()=>{'use strict';\nconst MARK='__TAREFAS_ALPHA_2468_SERVICOS_HOTBAR_FIX__';\nif(globalThis[MARK])return;\nglobalThis[MARK]=true;\nconst norm=v=>String(v??'').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/\\s+/g,' ').trim().toLowerCase();\nasync function openServicesScales(){\n const menu=document.querySelector('.tm-app-header [data-menu]');\n if(!menu)return;\n menu.click();\n for(let i=0;i<20;i++){\n  const item=[...document.querySelectorAll('#tmDrawer a,#tmDrawer button,.tm-drawer-item')].find(el=>norm(el.textContent)==='escalas'||norm(el.getAttribute?.('href')||el.dataset?.href)==='#escalas');\n  if(item){item.click();return}\n  await new Promise(r=>setTimeout(r,50));\n }\n}\nfunction wire(){\n const btn=document.querySelector('.tm-bottom-nav [data-key=\"services\"]');\n if(!btn)return false;\n const span=btn.querySelector('span');if(span)span.textContent='Serviços';\n btn.setAttribute('aria-label','Serviços');\n btn.dataset.href='#escalas';\n if(!btn.__tarefas2468fix){\n  btn.__tarefas2468fix=true;\n  btn.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();openServicesScales()},true);\n }\n return true;\n}\nfunction restore(){\n if(wire())return;\n const nav=document.querySelector('.tm-bottom-nav');if(!nav)return;\n const b=document.createElement('button');\n b.type='button';b.dataset.key='services';b.dataset.href='#escalas';b.setAttribute('aria-label','Serviços');\n b.innerHTML='<span>Serviços</span>';\n b.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();openServicesScales()},true);\n nav.insertBefore(b,nav.lastElementChild||null);\n}\nfunction boot(){restore();let n=0;const timer=setInterval(()=>{restore();if(++n>40)clearInterval(timer)},250);window.addEventListener('focus',restore);window.addEventListener('pageshow',restore)}\nif(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();\nglobalThis.TarefasAlpha2468Fix=Object.freeze({version:'2.4.6.8',base:'2.4.6',hotbarServicesRestored:true,usesExisting2467Scale:true});\n})();",
+    "css": ""
+  },
+  "payloadSha256": "9bf9f10ca640f313500b6936918debeb45a6c094efb4aeef759bf6c2cfdbe607"
+}
