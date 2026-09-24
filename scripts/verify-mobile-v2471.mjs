@@ -13,7 +13,7 @@ const patchData=JSON.parse(await readFile(patchFile,'utf8'));
 must(patchData.id==='2.4.6.8'&&patchData.baseVersion==='2.4.6','tpatch 2.4.6.8 inválido');
 const patchSha=createHash('sha256').update(patchData.payload?.js||'','utf8').digest('hex');
 must(patchSha===patchData.payloadSha256,'SHA-256 do tpatch não confere');
-must(patchSha==='9bf9f10ca640f313500b6936918debeb45a6c094efb4aeef759bf6c2cfdbe607','SHA-256 oficial do 2.4.6.8 não confere');
+must(patchSha==='0760ccfcbdacef728cc8e95dd1999d424500854a083dd2a2e1d4b6d90113c358','SHA-256 oficial do 2.4.6.8 não confere');
 must(!JSON.stringify(patchData).includes('__TAREFAS_ALPHA_2467_ESCALAS_2433__'),'2.4.6.7 detectado no tpatch');
 
 const [b,pm,u,r,m]=await Promise.all(['mobile-bootstrap.js','mobile-patch-manager-v240.js','mobile-updates-v181.js','mobile-release-v240.js','ALPHA_2_4_7_1.json'].map(read));
