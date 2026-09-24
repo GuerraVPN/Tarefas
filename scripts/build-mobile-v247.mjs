@@ -1,3 +1,4 @@
+// TAREFAS 2.4.7: base compilada 2.4.6 + aplicação dos patches 2.4.6.7 e 2.4.6.8
 import { copyFile, readFile, readdir, writeFile, rm } from 'node:fs/promises';
 import path from 'node:path';
 
