@@ -21,9 +21,9 @@ const forbiddenNextService=['kNextServiceCard','kNextService','tm-next-service-k
 must(!d.includes('kNextService')&&!d.includes('Próximo Serviço')&&!d.includes('Próximo serviço'),'dashboard.js contém lógica do Próximo Serviço');
 let nextHits=[];
 for(const name of await readdir(dir)){
+  if(!/\.(?:js|html)$/i.test(name))continue;
   const x=await read(name);
   if(/\.html$/i.test(name))must(!x.includes('mobile-dashboard-v184.js')&&!x.includes('mobile-dashboard-v185.js'),name+' ainda referencia módulo legado do Dashboard');
-  if(!/\.(?:js|html)$/i.test(name))continue;
   for(const token of forbiddenNextService)if(x.includes(token))nextHits.push(name+' :: '+token);
 }
 must(nextHits.length===0,'código aberto empacotado ainda contém origem do cartão Próximo Serviço: '+nextHits.join(' | '));
