@@ -13,6 +13,7 @@ npm install --no-save --package-lock=false --ignore-scripts jspdf@2.5.2
 node --check app/mobile-launcher-icon-v241.js
 node --check scripts/build-mobile-v243.mjs
 node --check scripts/build-mobile-v245.mjs
+node --check scripts/build-mobile-v246.mjs
 node --check scripts/build-mobile-v247.mjs
 node --check scripts/verify-mobile-v247.mjs
 node scripts/verify-web.mjs .
@@ -33,6 +34,7 @@ node scripts/build-mobile-v240.mjs
 node scripts/build-mobile-v242.mjs
 node scripts/build-mobile-v243.mjs
 node scripts/build-mobile-v245.mjs
+node scripts/build-mobile-v246.mjs
 node scripts/build-mobile-v247.mjs
 node scripts/verify-mobile-v247.mjs dist
 
@@ -239,7 +241,7 @@ jq -n \
   --argjson build "$BUILD" \
   --arg channel 'beta' \
   --arg web_version "$WEB_VERSION" \
-  --arg title 'TAREFAS 2.4.7 Beta — Pré-release baseada na 2.4.5' \
+  --arg title 'TAREFAS 2.4.7 Beta — baseada na Alpha 2.4.6.8 + patches 2.4.6.7/2.4.6.8' \
   --arg url "$URL" \
   --arg sha "$SHA" \
   '{
@@ -249,14 +251,14 @@ jq -n \
     web_version:$web_version,
     title:$title,
     changelog:[
-      "🧪 Pré-release de veredito da linha 2.4.x, baseada na Beta 2.4.6/build 281.",
+      "🧪 Beta 2.4.7 baseada no estado final da Alpha 2.4.6.8/build 281.",
       "🔒 Sem funcionalidades novas: foco em estabilidade e regressão.",
       "📋 Escalas permanece como única seção, sem Pessoal / Escalas e sem Missões.",
       "🔐 Patch Manager mantém validação SHA-256 diretamente sobre os bytes do .tpatch.",
       "📜 Histórico de versões e remoção do Próximo Serviço preservados.",
       "🌐 Web 7.9.1 preservada.",
       "🔔 Preferências de recebimento de patches Beta/Alpha preservadas.",
-      "🧪 Objetivo: dar o veredito final da base antes da próxima etapa."
+      "🧩 Escalas 2.4.6.7 e hotbar Serviços 2.4.6.8 incorporadas diretamente no APK."
     ],
     mandatory:false,
     download_url:$url,
