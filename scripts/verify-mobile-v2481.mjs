@@ -10,7 +10,7 @@ must(b.includes('__TAREFAS_ALPHA_2468_SERVICOS_HOTBAR_FIX__'),'2.4.6.8 ausente')
 must(!b.includes('__TAREFAS_ALPHA_2467_ESCALAS_2433__'),'2.4.6.7 detectado');
 must(b.includes('__TAREFAS_ALPHA_2481_DISTRIBUICAO_FISCAL_FIX__'),'fix de Distribuição ausente');
 must(pm.includes("const FORMAT='tarefas-tpatch-v1'")&&pm.includes('crypto.subtle.digest')&&pm.includes('indexedDB.open'),'Patch Manager v1 incompleto');
-must(patch.id==='2.4.8.1'&&patch.baseVersion==='2.4.8'&&patch.payloadSha256==='012d095f40b85267539be531a775105744508f35e4228a616eabe726b709546b','tpatch 2.4.8.1 inválido');
+must(patch.id==='2.4.8.1'&&patch.baseVersion==='2.4.8'&&patch.payloadSha256==='76a24c5ec529a67e2a4ad41a84ed5d2366db6edf49c8ea21fcb554bfd83a0e70','tpatch 2.4.8.1 inválido');
 const forbidden=['kNextServiceCard','kNextService','tm-next-service-kpi','v756-next-service','ensureNextCard','loadDashboardService','v756NextServiceCss','data-v756-next-icon','Próximo serviço</small>','Próximo Serviço</small>'];
 for(const name of await readdir(dir)){if(!/\.(?:js|html)$/i.test(name))continue;const c=await read(name);for(const t of forbidden)must(!c.includes(t),name+' contém '+t)}
 const v756=await read('v7_5_6_patch.js');must(v756.includes('loadCalendarServices')&&v756.includes('applyCalendarServices'),'v7.5.6 de calendário não preservado');
