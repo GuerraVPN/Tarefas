@@ -27,7 +27,7 @@ for(const html of ['dashboard.html','index.html','pessoal.html']){try{const h=aw
 must(!d.includes("card=document.createElement('article')"),'dashboard ainda cria dinamicamente o cartão Próximo Serviço');
 
 const man=JSON.parse(m);
-must(man.version==='2.4.7.3'&&man.build===285&&man.channel==='alpha'&&man.base==='2.4.6'&&man.basedOn==='2.4.7.1'&&man.incorporatedPatch==='2.4.6.8','manifesto incorreto');
+must(man.version==='2.4.7.3'&&man.build===285&&man.channel==='alpha'&&man.base==='2.4.6'&&man.basedOn==='2.4.7.2'&&man.incorporatedPatch==='2.4.6.8','manifesto incorreto');
 must(man.features?.only2468===true&&man.features?.scalesPatch2467===false&&man.features?.nextServiceDashboardCardRemoved===true,'flags de build incorretas');
 
 console.log('VERIFY 2.4.7.3 ALPHA OK: somente patch 2.4.6.8 + cartão Próximo Serviço removido.');
