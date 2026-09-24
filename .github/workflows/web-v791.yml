@@ -1,11 +1,11 @@
-name: Web 7.9.1 - SITE e Estabilizacao
+name: Web 7.9.2 - SITE, Distribuição e Escalas
 
 on:
   push:
-    branches: [web-7.9.1-prep]
+    branches: [web-7.9.2-prep]
     paths:
-      - 'v7_9_1_site.js'
-      - 'v7_9_1_web.js'
+      - 'v7_9_2_site.js'
+      - 'v7_9_2_web.js'
       - 'reiniciar.html'
       - 'desligado.html'
       - 'index.html'
@@ -21,7 +21,7 @@ on:
       - 'scripts/verify-web.mjs'
       - 'README.md'
       - 'README_WEB_7_9_1.txt'
-      - '.github/workflows/web-v791.yml'
+      - '.github/workflows/web-v792.yml'
 
 permissions:
   contents: write
@@ -32,7 +32,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: web-7.9.1-prep
+          ref: web-7.9.2-prep
           fetch-depth: 0
 
       - uses: actions/setup-node@v4
@@ -44,19 +44,19 @@ jobs:
           set -euo pipefail
           node scripts/verify-web.mjs .
 
-      - name: Validar Painel SITE 7.9.1
+      - name: Validar Painel SITE 7.9.2
         run: |
           set -euo pipefail
-          node --check v7_9_1_site.js
-          node --check v7_9_1_web.js
-          grep -q "const VERSION='7.9.1'" v7_9_1_site.js
-          grep -q "v7_4_12_controle_site','v7_4_9_controle_site','v7_4_7_controle_site" v7_9_1_site.js
-          grep -q "index.html?site_action=exit_users" v7_9_1_site.js
-          grep -q "reiniciar.html?site_action=reiniciar" v7_9_1_site.js
-          grep -q "desligado.html?site_action=desligar" v7_9_1_site.js
-          grep -q "if(isAdmin)return" v7_9_1_site.js
-          grep -q "broadcastAction" v7_9_1_site.js
-          grep -q "tarefas_site_791_restart_completed_at" v7_9_1_site.js
+          node --check v7_9_2_site.js
+          node --check v7_9_2_web.js
+          grep -q "const VERSION='7.9.2'" v7_9_2_site.js
+          grep -q "v7_4_12_controle_site','v7_4_9_controle_site','v7_4_7_controle_site" v7_9_2_site.js
+          grep -q "index.html?site_action=exit_users" v7_9_2_site.js
+          grep -q "reiniciar.html?site_action=reiniciar" v7_9_2_site.js
+          grep -q "desligado.html?site_action=desligar" v7_9_2_site.js
+          grep -q "if(isAdmin)return" v7_9_2_site.js
+          grep -q "broadcastAction" v7_9_2_site.js
+          grep -q "tarefas_site_792_restart_completed_at" v7_9_2_site.js
           grep -q "site_action.*exit_users" index.html
           grep -q "TAREFAS — Reiniciando" reiniciar.html
           grep -q "TAREFAS — SITE desligado" desligado.html
@@ -64,20 +64,20 @@ jobs:
       - name: Validar hardening e performance
         run: |
           set -euo pipefail
-          grep -q "schemaVersion:1" v7_9_1_web.js
-          grep -q "data-favrename" v7_9_1_web.js
-          grep -q "data-qretry" v7_9_1_web.js
-          grep -q "TarefasWeb791Lifecycle" v7_9_1_web.js
+          grep -q "schemaVersion:1" v7_9_2_web.js
+          grep -q "data-favrename" v7_9_2_web.js
+          grep -q "data-qretry" v7_9_2_web.js
+          grep -q "TarefasWeb792Lifecycle" v7_9_2_web.js
           ! grep -q "setInterval(()=>{const sig=calendarDomSignature()" v7_5_3_patch.js
           ! grep -q "setInterval(tick,1200)" v7_5_2_service_labels.js
           ! grep -q "setInterval(markEditableCells,2000)" v7_5_service_editor.js
           ! grep -q "uiTimer=setInterval(refreshUi,3000)" v7_4_12_global.js
           ! grep -q "setInterval(sync,30000)" v7_6_5_webfix.js
-          grep -q "v7_9_1_site.js?v=7.9.1" v6_2_mobile.js
-          grep -q "v7_9_1_web.js?v=7.9.1" v6_2_mobile.js
-          grep -q "WEB 7.9.1 · leitura + ações + anexos" v7_8_0_ai.js
+          grep -q "v7_9_2_site.js?v=7.9.2" v6_2_mobile.js
+          grep -q "v7_9_2_web.js?v=7.9.2" v6_2_mobile.js
+          grep -q "WEB 7.9.2 · leitura + ações + anexos" v7_8_0_ai.js
 
-      - name: Publicar Web 7.9.1 no main
+      - name: Publicar Web 7.9.2 no main
         run: |
           set -euo pipefail
           git fetch origin main
