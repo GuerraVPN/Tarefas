@@ -10,6 +10,16 @@ ZIP="TAREFAS-${VERSION}-alpha-build-${BUILD}.zip"
 npm ci
 npm install --no-save --package-lock=false --ignore-scripts jspdf@2.5.2
 
+# Preflight de autorização OIDC para detectar bloqueio de assinatura antes da compilação longa.
+OIDC_PREFLIGHT_FILE="$RUNNER_TEMP/oidc-preflight.json"
+OIDC_PREFLIGHT_CODE="$(curl --silent --show-error -o "$OIDC_PREFLIGHT_FILE" -w '%{http_code}' \
+  -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+  "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-signing")"
+if [ "$OIDC_PREFLIGHT_CODE" != "200" ]; then
+  echo "OIDC_PREFLIGHT_HTTP=$OIDC_PREFLIGHT_CODE"
+  cat "$OIDC_PREFLIGHT_FILE"
+  exit 41
+fi
 node --check app/mobile-launcher-icon-v241.js
 node --check scripts/build-mobile-v243.mjs
 node --check scripts/build-mobile-v245.mjs
@@ -160,10 +170,15 @@ OIDC="$(curl --fail --silent --show-error \
 OIDC_PAYLOAD="$(printf '%s' "$OIDC" | cut -d. -f2 | tr '_-' '/+' | awk '{l=length($0)%4;if(l==2)print $0"==";else if(l==3)print $0"=";else print $0}' | base64 -d 2>/dev/null | jq -c '{repository,event_name,ref,workflow_ref}' || true)"
 echo "OIDC_RELEASE_CLAIMS=$OIDC_PAYLOAD"
 
-curl --fail --silent --show-error \
+SIGNING_FILE="$RUNNER_TEMP/signing.json"
+SIGNING_CODE="$(curl --silent --show-error -o "$SIGNING_FILE" -w '%{http_code}' \
   -H "Authorization: Bearer $OIDC" \
-  'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-signing-material' \
-  -o "$RUNNER_TEMP/signing.json"
+  'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-signing-material')"
+if [ "$SIGNING_CODE" != "200" ]; then
+  echo "SIGNING_HTTP=$SIGNING_CODE"
+  cat "$SIGNING_FILE"
+  exit 42
+fi
 
 jq -r '.keystore_b64' "$RUNNER_TEMP/signing.json" | base64 -d > "$RUNNER_TEMP/GuerraVPN.keystore"
 STORE_PASS="$(jq -r '.store_password' "$RUNNER_TEMP/signing.json")"
