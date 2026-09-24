@@ -656,20 +656,29 @@ async function createPedido(e){
    if(!editingPedidoId)$('pCategoria').disabled=false;
  }
 }
+let moving=false;
 async function move(action){
- if(!selected)return;
+ if(!selected||moving)return;
  const note=$('pedidoActionNote').value.trim();
  if(['retornar','retornar_base','retornar_fiscal'].includes(action)&&!note)return alert('Informe o motivo do retorno.');
-
- const rpcName=selected.tipo==='distribuicao'?'v5_4_2_mover_distribuicao':'v5_3_mover_pedido';
- const args=selected.tipo==='distribuicao'
-   ?{p_pedido_id:selected.id,p_acao:action,p_usuario_id:String(user.id),p_perfil_id:profileId(),p_mensagem:note||null}
-   :{p_pedido_id:selected.id,p_acao:action,p_usuario_id:String(user.id),p_perfil_id:profileId(),p_mensagem:note||null};
-
- const r=await supabaseClient.rpc(rpcName,args);
- if(r.error)return alert(r.error.message);
- $('pedidoActionNote').value='';toast('Andamento atualizado.');
- const id=selected.id;await loadPedidos();await selectPedido(id);
+ moving=true;
+ document.querySelectorAll('[data-pedido-action]').forEach(b=>b.disabled=true);
+ try{
+   const rpcName=selected.tipo==='distribuicao'?'v5_4_2_mover_distribuicao':'v5_3_mover_pedido';
+   const args={p_pedido_id:selected.id,p_acao:action,p_usuario_id:String(user.id),p_perfil_id:profileId(),p_mensagem:note||null};
+   const r=await supabaseClient.rpc(rpcName,args);
+   if(r.error){
+     const msg=String(r.error.message||'Falha ao atualizar o andamento.');
+     if(selected.tipo==='distribuicao'&&/ambiguous|column reference.*motivo/i.test(msg))
+       return alert('A correção da Distribuição ainda não foi carregada no Supabase. Sincronize a versão Web 7.9.2 e tente novamente.');
+     return alert(msg);
+   }
+   $('pedidoActionNote').value='';toast('Andamento atualizado.');
+   const id=selected.id;await loadPedidos();await selectPedido(id);
+ }finally{
+   moving=false;
+   document.querySelectorAll('[data-pedido-action]').forEach(b=>b.disabled=false);
+ }
 }
 async function addUpdate(){
  if(!selected)return;
