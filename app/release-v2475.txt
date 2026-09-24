@@ -1,0 +1,19 @@
+# TAREFAS 2.4.7.5 Alpha — build 287
+
+## Alpha da esperança 👏🏻
+
+Esta Alpha reestrutura o caminho do Dashboard Android em vez de continuar acumulando neutralizadores.
+
+### Mudanças
+- Remove do caminho de carregamento do APK os módulos legados `mobile-dashboard-v184.js` e `mobile-dashboard-v185.js`.
+- Dashboard passa a usar o caminho normal `dashboard.html + dashboard.js + mobile-bootstrap.js`.
+- Entrada do Dashboard recebe cache-bust `?app=2.4.7.5`.
+- Login e botão Início passam a abrir a nova entrada.
+- Validação percorre **todos os HTMLs do dist** para impedir referências aos módulos legados.
+- `Próximo Serviço` não é implementado pelo `dashboard.js`.
+- Patch incorporado: **somente 2.4.6.8**.
+- 2.4.6.7 permanece fora.
+- Web 7.9.1 preservada.
+
+## Objetivo do teste
+Eliminar a origem do carregamento do cartão, não apenas removê-lo depois que aparece.
