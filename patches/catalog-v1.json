@@ -3,8 +3,8 @@
   "app": "TAREFAS",
   "baseVersion": "2.4.1",
   "baseBuild": 276,
-  "generatedAt": "2026-09-24T01:29:00.000Z",
-  "latestPatch": "2.4.6.6",
+  "generatedAt": "2026-09-24T02:05:00.000Z",
+  "latestPatch": "2.4.6.7",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -717,7 +717,39 @@
       "order": 24606,
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.6.6.tpatch",
       "sha256": "eb4be8591ceedd387e69aca41d3f73a8474b8e8120ae6457c241d04a0dc40562",
-      "installable": true
+      "installable": false,
+      "supersededBy": "2.4.6.7"
+    },
+    {
+      "id": "2.4.6.7",
+      "name": "TAREFAS 2.4.6.7 — Restaura a Escala original da 2.4.3",
+      "baseVersion": "2.4.6",
+      "minBuild": 281,
+      "maxBuild": 281,
+      "channel": "alpha",
+      "publishedAt": "2026-09-24T02:05:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.4.6.1",
+        "2.4.6.2",
+        "2.4.6.3",
+        "2.4.6.4",
+        "2.4.6.5",
+        "2.4.6.6"
+      ],
+      "installable": true,
+      "description": "Restaura exatamente a implementação de Escalas usada na Alpha 2.4.3.3, mantendo apenas a correção de navegação necessária na hotbar e no menu.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.6.7.tpatch",
+      "sha256": "89ef9a60596ab32ff0489ce229389c6e8d0e4950c691e86dfada58f9af93a849",
+      "changelog": [
+        "Restaura a mesma interface e lógica de Escalas da 2.4.3.3.",
+        "Mantém Motorista PA, Patrulheiro e Permanência com a mesma consulta POST ao endpoint tarefas-escalas.",
+        "Serviços na hotbar abre exatamente a mesma tela Escalas.",
+        "Mantém uma única entrada Escalas dentro de Serviços.",
+        "Remove acessos legados e o Próximo Serviço sem usar MutationObserver.",
+        "Não cria uma nova implementação de Escalas."
+      ]
     }
   ],
   "history": [
@@ -1156,7 +1188,38 @@
       "sha256": "eb4be8591ceedd387e69aca41d3f73a8474b8e8120ae6457c241d04a0dc40562",
       "installable": true,
       "publishedAt": "2026-09-24T01:29:00Z"
+    },
+    {
+      "id": "2.4.6.7",
+      "name": "TAREFAS 2.4.6.7 — Restaura a Escala original da 2.4.3",
+      "baseVersion": "2.4.6",
+      "minBuild": 281,
+      "maxBuild": 281,
+      "channel": "alpha",
+      "publishedAt": "2026-09-24T02:05:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.4.6.1",
+        "2.4.6.2",
+        "2.4.6.3",
+        "2.4.6.4",
+        "2.4.6.5",
+        "2.4.6.6"
+      ],
+      "installable": true,
+      "description": "Restaura exatamente a implementação de Escalas usada na Alpha 2.4.3.3, mantendo apenas a correção de navegação necessária na hotbar e no menu.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.6.7.tpatch",
+      "sha256": "89ef9a60596ab32ff0489ce229389c6e8d0e4950c691e86dfada58f9af93a849",
+      "changelog": [
+        "Restaura a mesma interface e lógica de Escalas da 2.4.3.3.",
+        "Mantém Motorista PA, Patrulheiro e Permanência com a mesma consulta POST ao endpoint tarefas-escalas.",
+        "Serviços na hotbar abre exatamente a mesma tela Escalas.",
+        "Mantém uma única entrada Escalas dentro de Serviços.",
+        "Remove acessos legados e o Próximo Serviço sem usar MutationObserver.",
+        "Não cria uma nova implementação de Escalas."
+      ]
     }
   ],
-  "cacheNonce": "2466-sha-r2"
+  "cacheNonce": "2467-sha-r1"
 }
