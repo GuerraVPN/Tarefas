@@ -3,8 +3,8 @@
   "app": "TAREFAS",
   "baseVersion": "2.4.1",
   "baseBuild": 276,
-  "generatedAt": "2026-09-24T02:05:00.000Z",
-  "latestPatch": "2.4.6.7",
+  "generatedAt": "2026-09-24T01:49:32.944Z",
+  "latestPatch": "2.4.6.8",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -750,6 +750,38 @@
         "Remove acessos legados e o Próximo Serviço sem usar MutationObserver.",
         "Não cria uma nova implementação de Escalas."
       ]
+    },
+    {
+      "id": "2.4.6.8",
+      "name": "TAREFAS 2.4.6.8 — Restaura Serviços na Hotbar",
+      "baseVersion": "2.4.6",
+      "minBuild": 281,
+      "maxBuild": 281,
+      "channel": "alpha",
+      "publishedAt": "2026-09-24T01:49:32.949Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.4.6.1",
+        "2.4.6.2",
+        "2.4.6.3",
+        "2.4.6.4",
+        "2.4.6.5",
+        "2.4.6.6",
+        "2.4.6.7"
+      ],
+      "installable": true,
+      "description": "Corrige a 2.4.6.7 para que o botão Serviços volte a aparecer na hotbar, preservando a mesma implementação de Escalas da 2.4.3.3.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.6.8.tpatch",
+      "sha256": "b55c9d85746151eb2c1f98c1cfae7e3f56aa1d3c07c0d8d2df4bae1385ef49b8",
+      "changelog": [
+        "Restaura a exibição do botão Serviços na hotbar.",
+        "Impede que a limpeza de Pessoal/Escalas remova o botão Serviços da hotbar.",
+        "Serviços continua abrindo exatamente a mesma Escala da 2.4.3.3 usada na 2.4.6.7.",
+        "Mantém uma única entrada Escalas dentro de Serviços.",
+        "Mantém Motorista PA, Patrulheiro e Permanência e a consulta ao endpoint tarefas-escalas.",
+        "Não recria nem altera a implementação da Escala."
+      ]
     }
   ],
   "history": [
@@ -1221,5 +1253,5 @@
       ]
     }
   ],
-  "cacheNonce": "2467-sha-r1"
+  "cacheNonce": "2468-sha-r1"
 }
