@@ -1,0 +1,21 @@
+# TAREFAS 2.4.7.7 Alpha — build 289
+
+## Correção da origem do “Próximo Serviço” 💪🏼
+
+A Alpha 2.4.7.6 provou no APK que o cartão ainda era recriado por uma origem diferente do Dashboard: o carregador Web 7.9.1 incluía `v7_5_6_patch.js`, e esse patch criava o cartão `kNextServiceCard`.
+
+### O que mudou
+- Removida **a origem do cartão do Dashboard** dentro de `v7_5_6_patch.js`.
+- Mantidas as correções de serviços no Calendário do mesmo patch.
+- A revisão passa a procurar os identificadores do cartão em **todo JS e HTML empacotado**, não somente em `dashboard.js`.
+- O APK é auditado novamente depois da compilação para garantir que nenhuma página/script carregue o criador antigo.
+- `mobile-dashboard-v184.js` e `mobile-dashboard-v185.js` continuam fora do APK.
+- Patch incorporado: **somente 2.4.6.8**; 2.4.6.7 continua fora.
+- Patch Manager `.tpatch v1`, IndexedDB e SHA-256 preservados.
+- Web 7.9.1 preservada.
+
+### Observação
+Os textos e cálculos legítimos de **próximo serviço/previsão dentro da tela Escalas** não foram removidos. O que foi eliminado é o **cartão do Dashboard** e seu código de criação.
+
+## Objetivo
+Fazer a correção na origem, impedir recriação via carregadores Web/cache e validar o APK inteiro antes da publicação.
