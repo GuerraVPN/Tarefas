@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-VERSION='2.4.7.4'
-BUILD='286'
+VERSION='2.4.7.5'
+BUILD='287'
 WEB_VERSION='7.9.1'
 APK="TAREFAS-${VERSION}.apk"
 ZIP="TAREFAS-${VERSION}-alpha-build-${BUILD}.zip"
@@ -24,7 +24,7 @@ node --check app/mobile-launcher-icon-v241.js
 node --check scripts/build-mobile-v243.mjs
 node --check scripts/build-mobile-v245.mjs
 node --check scripts/build-mobile-v246.mjs
-node --check scripts/build-mobile-v2474.mjs
+node --check scripts/build-mobile-v2475.mjs
 node --check scripts/verify-mobile-v246.mjs
 node scripts/verify-web.mjs .
 
@@ -45,8 +45,8 @@ node scripts/build-mobile-v242.mjs
 node scripts/build-mobile-v243.mjs
 node scripts/build-mobile-v245.mjs
 node scripts/build-mobile-v246.mjs
-node scripts/build-mobile-v2474.mjs
-node scripts/verify-mobile-v2474.mjs dist
+node scripts/build-mobile-v2475.mjs
+node scripts/verify-mobile-v2475.mjs dist
 
 curl --fail --silent --show-error --retry 3 \
   'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/firebase-config-v17' \
@@ -55,8 +55,8 @@ test -s app/google-services.json
 
 npx cap add android
 cp app/google-services.json android/app/google-services.json
-sed -i 's/versionCode 1/versionCode 286/' android/app/build.gradle
-sed -i 's/versionName "1.0"/versionName "2.4.7.4"/' android/app/build.gradle
+sed -i 's/versionCode 1/versionCode 287/' android/app/build.gradle
+sed -i 's/versionName "1.0"/versionName "2.4.7.5"/' android/app/build.gradle
 
 npm run assets:android
 npx cap sync android
@@ -123,7 +123,7 @@ cat > android/app/src/main/res/drawable/tarefas_launcher_blue.xml <<'XML'
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path android:fillColor="#08286B" android:pathData="M0,0H108V108H0Z"/>
+    <path android:fillColor="#08287B" android:pathData="M0,0H108V108H0Z"/>
     <path android:fillColor="#55C7FF" android:pathData="M18,20H90V38H63V88H45V38H18Z"/>
     <path android:fillColor="#EAF8FF" android:pathData="M45,45H63V54H45Z"/>
 </vector>
@@ -139,43 +139,43 @@ python3 - <<'PY'
 import json
 with open('android/app/build/outputs/apk/release/output-metadata.json',encoding='utf-8') as f:
     e=json.load(f)['elements'][0]
-assert int(e['versionCode']) == 286, e
-assert str(e['versionName']) == '2.4.7.4', e
+assert int(e['versionCode']) == 287, e
+assert str(e['versionName']) == '2.4.7.5', e
 PY
 
-unzip -p "$UNSIGNED" assets/public/mobile-bootstrap.js > "$RUNNER_TEMP/bootstrap-v2474.js"
-unzip -p "$UNSIGNED" assets/public/mobile-patch-manager-v240.js > "$RUNNER_TEMP/pm-v2474.js"
-unzip -p "$UNSIGNED" assets/public/mobile-updates-v181.js > "$RUNNER_TEMP/updates-v2474.js"
-unzip -p "$UNSIGNED" assets/public/mobile-dashboard-v184.js > "$RUNNER_TEMP/dashboard-v2474-v184.js"
-unzip -p "$UNSIGNED" assets/public/mobile-dashboard-v185.js > "$RUNNER_TEMP/dashboard-v2474-v185.js"
-unzip -p "$UNSIGNED" assets/public/dashboard.html > "$RUNNER_TEMP/dashboard-v2474.html"
+unzip -p "$UNSIGNED" assets/public/mobile-bootstrap.js > "$RUNNER_TEMP/bootstrap-v2475.js"
+unzip -p "$UNSIGNED" assets/public/mobile-patch-manager-v240.js > "$RUNNER_TEMP/pm-v2475.js"
+unzip -p "$UNSIGNED" assets/public/mobile-updates-v181.js > "$RUNNER_TEMP/updates-v2475.js"
+unzip -p "$UNSIGNED" assets/public/mobile-dashboard-v184.js > "$RUNNER_TEMP/dashboard-v2475-v184.js"
+unzip -p "$UNSIGNED" assets/public/mobile-dashboard-v185.js > "$RUNNER_TEMP/dashboard-v2475-v185.js"
+unzip -p "$UNSIGNED" assets/public/dashboard.html > "$RUNNER_TEMP/dashboard-v2475.html"
 python3 - <<'PY'
 from pathlib import Path
 import json, os
 t=Path(os.environ['RUNNER_TEMP'])
 checks={
- 'bootstrap':['__TAREFAS_ALPHA_2468_SERVICOS_HOTBAR_FIX__',"const APP_VERSION = '2.4.7.4';",'const APP_BUILD = 286;'],
- 'pm':["APP_VERSION='2.4.7.4',APP_BUILD=286,APP_CHANNEL='alpha'"],
- 'updates':["const APP_VERSION = '2.4.7.4';",'const APP_BUILD = 286;',"const APP_CHANNEL = 'alpha';"]
+ 'bootstrap':['__TAREFAS_ALPHA_2468_SERVICOS_HOTBAR_FIX__',"const APP_VERSION = '2.4.7.5';",'const APP_BUILD = 287;'],
+ 'pm':["APP_VERSION='2.4.7.5',APP_BUILD=287,APP_CHANNEL='alpha'"],
+ 'updates':["const APP_VERSION = '2.4.7.5';",'const APP_BUILD = 287;',"const APP_CHANNEL = 'alpha';"]
 }
 for f,needles in checks.items():
- p=t/({'bootstrap':'bootstrap-v2474.js','pm':'pm-v2474.js','updates':'updates-v2474.js'}[f])
+ p=t/({'bootstrap':'bootstrap-v2475.js','pm':'pm-v2475.js','updates':'updates-v2475.js'}[f])
  x=p.read_text()
  for n in needles:
   assert n in x,(f,n)
-boot=(t/'bootstrap-v2474.js').read_text()
-dash184=(t/'dashboard-v2474-v184.js').read_text()
-dash185=(t/'dashboard-v2474-v185.js').read_text()
-html=(t/'dashboard-v2474.html').read_text()
+boot=(t/'bootstrap-v2475.js').read_text()
+dash184=(t/'dashboard-v2475-v184.js').read_text()
+dash185=(t/'dashboard-v2475-v185.js').read_text()
+html=(t/'dashboard-v2475.html').read_text()
 assert '__TAREFAS_ALPHA_2467_ESCALAS_2433__' not in boot
 for name,dash in [('v184',dash184),('v185',dash185)]:
  assert 'function ensureCard' not in dash,(name,'old card creator still present')
  assert "card=document.createElement('article')" not in dash,(name,'old card creator still present')
  assert 'Próximo serviço previsto' not in dash,(name,'old card logic still present')
  assert 'removeNextServiceCard' in dash,(name,'neutralizer missing')
-assert 'mobile-dashboard-v185.js?v=2.4.7.4-b286' in html
+assert 'mobile-dashboard-v185.js?v=2.4.7.5-b287' in html
 assert 'mobile-dashboard-v184.js' not in html
-print('APK CHECK OK: Alpha 2.4.7.4 com somente 2.4.6.8, dashboard v185 e neutralização v184/v185.')
+print('APK CHECK OK: Alpha 2.4.7.5 com somente 2.4.6.8, dashboard v185 e neutralização v184/v185.')
 PY
 OIDC="$(curl --fail --silent --show-error \
   -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
@@ -217,31 +217,31 @@ sha256sum "$APK" | tee "$APK.sha256"
 
 mkdir -p "$RUNNER_TEMP/package/app" "$RUNNER_TEMP/package/scripts" "$RUNNER_TEMP/package/manifest"
 cp "$APK" "$APK.sha256" "$RUNNER_TEMP/package/"
-cp app/mobile-launcher-icon-v241.js app/release-v2474.txt "$RUNNER_TEMP/package/app/"
+cp app/mobile-launcher-icon-v241.js app/release-v2475.txt "$RUNNER_TEMP/package/app/"
 cp app/android/TarefasLauncherIconPlugin.java "$RUNNER_TEMP/package/app/"
 cp dist/mobile-dashboard-v184.js dist/mobile-dashboard-v185.js "$RUNNER_TEMP/package/app/"
-cp scripts/build-mobile-v246.mjs scripts/build-mobile-v2474.mjs scripts/verify-mobile-v2474.mjs "$RUNNER_TEMP/package/scripts/"
-cp dist/ALPHA_2_4_7_4.json "$RUNNER_TEMP/package/manifest/"
+cp scripts/build-mobile-v246.mjs scripts/build-mobile-v2475.mjs scripts/verify-mobile-v2475.mjs "$RUNNER_TEMP/package/scripts/"
+cp dist/ALPHA_2_4_7_5.json "$RUNNER_TEMP/package/manifest/"
 (cd "$RUNNER_TEMP/package" && zip -qr "$GITHUB_WORKSPACE/$ZIP" .)
 unzip -tq "$ZIP"
 sha256sum "$ZIP" | tee "$ZIP.sha256"
 
 git fetch origin app/releases
-RELEASES_DIR="$RUNNER_TEMP/tarefas-releases-v2474"
+RELEASES_DIR="$RUNNER_TEMP/tarefas-releases-v2475"
 git worktree add "$RELEASES_DIR" origin/app/releases
 mkdir -p "$RELEASES_DIR/downloads"
 cp "$APK" "$APK.sha256" "$ZIP" "$ZIP.sha256" "$RELEASES_DIR/downloads/"
 cd "$RELEASES_DIR"
 git config user.name 'GuerraVPN Android Build'
 git config user.email '81371258+GuerraVPN@users.noreply.github.com'
-git add downloads/TAREFAS-2.4.7.4*
+git add downloads/TAREFAS-2.4.7.5*
 if ! git diff --cached --quiet; then
-  git commit -m 'release(android): TAREFAS 2.4.7.4 alpha build 286'
+  git commit -m 'release(android): TAREFAS 2.4.7.5 alpha build 287'
   git push origin HEAD:app/releases
 fi
 cd "$GITHUB_WORKSPACE"
 
-URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.4.7.4.apk'
+URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.4.7.5.apk'
 LOCAL_SHA="$(sha256sum "$APK" | awk '{print $1}')"
 for attempt in 1 2 3 4 5 6 7 8; do
   if curl --fail --silent --show-error -L "$URL" -o "$RUNNER_TEMP/published.apk" \
@@ -262,7 +262,7 @@ jq -n \
   --argjson build "$BUILD" \
   --arg channel 'alpha' \
   --arg web_version "$WEB_VERSION" \
-  --arg title 'TAREFAS 2.4.7.4 Alpha — remoção definitiva do cartão Próximo Serviço' \
+  --arg title 'TAREFAS 2.4.7.5 Alpha — remoção definitiva do cartão Próximo Serviço' \
   --arg url "$URL" \
   --arg sha "$SHA" \
   '{
@@ -272,7 +272,7 @@ jq -n \
     web_version:$web_version,
     title:$title,
     changelog:[
-      "🧪 Alpha 2.4.7.4 para remover o cartão Próximo Serviço do Dashboard.",
+      "🧪 Alpha 2.4.7.5 para remover o cartão Próximo Serviço do Dashboard.",
       "🧹 Remove somente o cartão Próximo Serviço do Dashboard; demais recursos ficam preservados.",
       "🧩 Patch incorporado: somente 2.4.6.8; 2.4.6.7 não foi incorporado.",
       "🔐 Patch Manager mantém validação SHA-256 diretamente sobre os bytes do .tpatch.",
@@ -296,4 +296,4 @@ CODE="$(curl --silent --show-error \
 
 cat "$RUNNER_TEMP/result.json"
 test "$CODE" = '200'
-jq -e '.ok == true and .version == "2.4.7.4" and .build == 286 and .channel == "alpha"' "$RUNNER_TEMP/result.json" >/dev/null
+jq -e '.ok == true and .version == "2.4.7.5" and .build == 287 and .channel == "alpha"' "$RUNNER_TEMP/result.json" >/dev/null
