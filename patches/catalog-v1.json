@@ -3,8 +3,8 @@
   "app": "TAREFAS",
   "baseVersion": "2.4.1",
   "baseBuild": 276,
-  "generatedAt": "2026-09-24T01:06:40.000Z",
-  "latestPatch": "2.4.6.5",
+  "generatedAt": "2026-09-24T01:29:00.000Z",
+  "latestPatch": "2.4.6.6",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -682,7 +682,8 @@
       "order": 24605,
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.6.5.tpatch",
       "sha256": "f945c53a0468cb280ad5d2a62bbf0d55e69290b7ce6457653e7dffd62648dc71",
-      "installable": true
+      "installable": false,
+      "supersededBy": "2.4.6.6"
     }
   ],
   "history": [
@@ -1088,5 +1089,5 @@
       "publishedAt": "2026-09-24T01:06:40Z"
     }
   ],
-  "cacheNonce": "2465-sha-r1"
+  "cacheNonce": "2466-sha-r1"
 }
