@@ -156,11 +156,11 @@ python3 - <<'PY'
 from pathlib import Path
 import os,zipfile
 t=Path(os.environ['RUNNER_TEMP'])
-boot=(t/'bootstrap-v248.js').read_text()
-login=(t/'login-v248.js').read_text()
-html=(t/'dashboard-v248.html').read_text()
-dash=(t/'dashboard-js-v248.js').read_text()
-pm=(t/'pm-v248.js').read_text()
+boot=(t/'bootstrap-v2481.js').read_text()
+login=(t/'login-v2481.js').read_text()
+html=(t/'dashboard-v2481.html').read_text()
+dash=(t/'dashboard-js-v2481.js').read_text()
+pm=(t/'pm-v2481.js').read_text()
 about=(t/'about-v248.html').read_text()
 assert "__TAREFAS_ALPHA_2468_SERVICOS_HOTBAR_FIX__" in boot
 assert "__TAREFAS_ALPHA_2467_ESCALAS_2433__" not in boot
