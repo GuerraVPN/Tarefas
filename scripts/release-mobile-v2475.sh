@@ -149,7 +149,7 @@ unzip -p "$UNSIGNED" assets/public/dashboard.html > "$RUNNER_TEMP/dashboard-v247
 unzip -p "$UNSIGNED" assets/public/dashboard.js > "$RUNNER_TEMP/dashboard-js-v2475.js"
 python3 - <<'PY'
 from pathlib import Path
-import os
+import os,zipfile
 t=Path(os.environ['RUNNER_TEMP'])
 boot=(t/'bootstrap-v2475.js').read_text()
 login=(t/'login-v2475.js').read_text()
@@ -157,16 +157,15 @@ html=(t/'dashboard-v2475.html').read_text()
 dash=(t/'dashboard-js-v2475.js').read_text()
 assert "__TAREFAS_ALPHA_2468_SERVICOS_HOTBAR_FIX__" in boot
 assert "__TAREFAS_ALPHA_2467_ESCALAS_2433__" not in boot
-assert "const APP_VERSION = '2.4.7.5';" in boot
-assert "const APP_BUILD = 287;" in boot
-assert "dashboard.html?app=2.4.7.5" in boot
-assert "dashboard.html?app=2.4.7.5" in login
-assert "mobile-dashboard-v184.js" not in html
-assert "mobile-dashboard-v185.js" not in html
-assert "kNextService" not in dash
-assert "Próximo Serviço" not in dash
-assert "Próximo serviço" not in dash
-print("APK DASHBOARD CHECK OK: caminho novo, sem módulos mobile-dashboard v184/v185 e sem Próximo Serviço.")
+assert "const APP_VERSION = '2.4.7.5';" in boot and "const APP_BUILD = 287;" in boot
+assert "dashboard.html?app=2.4.7.5" in boot and "dashboard.html?app=2.4.7.5" in login
+assert "mobile-dashboard-v184.js" not in html and "mobile-dashboard-v185.js" not in html
+assert "kNextService" not in dash and "Próximo Serviço" not in dash and "Próximo serviço" not in dash
+with zipfile.ZipFile("android/app/build/outputs/apk/release/app-release-unsigned.apk") as z:
+    names=set(z.namelist())
+    assert "assets/public/mobile-dashboard-v184.js" not in names
+    assert "assets/public/mobile-dashboard-v185.js" not in names
+print("APK DASHBOARD CHECK OK: caminho reestruturado, sem v184/v185 e sem lógica Próximo Serviço.")
 PY
 OIDC="$(curl --fail --silent --show-error \
   -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
@@ -210,7 +209,7 @@ mkdir -p "$RUNNER_TEMP/package/app" "$RUNNER_TEMP/package/scripts" "$RUNNER_TEMP
 cp "$APK" "$APK.sha256" "$RUNNER_TEMP/package/"
 cp app/mobile-launcher-icon-v241.js app/release-v2475.txt "$RUNNER_TEMP/package/app/"
 cp app/android/TarefasLauncherIconPlugin.java "$RUNNER_TEMP/package/app/"
-cp dist/mobile-dashboard-v184.js dist/mobile-dashboard-v185.js "$RUNNER_TEMP/package/app/"
+true
 cp scripts/build-mobile-v246.mjs scripts/build-mobile-v2475.mjs scripts/verify-mobile-v2475.mjs "$RUNNER_TEMP/package/scripts/"
 cp dist/ALPHA_2_4_7_5.json "$RUNNER_TEMP/package/manifest/"
 (cd "$RUNNER_TEMP/package" && zip -qr "$GITHUB_WORKSPACE/$ZIP" .)
