@@ -1,5 +1,7 @@
 name: Verify TAREFAS 2.4.6.7 SHA
-on: workflow_dispatch
+on:
+  push:
+    branches: [app/releases]
 jobs:
   verify:
     runs-on: ubuntu-latest
