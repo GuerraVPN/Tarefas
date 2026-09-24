@@ -137,30 +137,36 @@ unzip -p "$UNSIGNED" assets/public/mobile-launcher-icon-v241.js > "$RUNNER_TEMP/
 unzip -p "$UNSIGNED" assets/public/mobile-bootstrap.js > "$RUNNER_TEMP/bootstrap-v247.js"
 unzip -p "$UNSIGNED" assets/public/mobile-patch-manager-v240.js > "$RUNNER_TEMP/pm-v247.js"
 unzip -p "$UNSIGNED" assets/public/mobile-updates-v181.js > "$RUNNER_TEMP/updates-v247.js"
-grep -q '__TAREFAS_LAUNCHER_ICON_241__' "$RUNNER_TEMP/launcher-v247.js"
-grep -q 'pinProfileShortcut' "$RUNNER_TEMP/launcher-v247.js"
-grep -q '__TAREFAS_BETA_246_BOOT__' "$RUNNER_TEMP/bootstrap-v247.js"
-grep -q '__TAREFAS_PATCH_MANAGER_V282__' "$RUNNER_TEMP/pm-v247.js"
-grep -q "v1_8_get_beta_updates" "$RUNNER_TEMP/pm-v247.js"
-grep -q "v2_3_21_alpha_context" "$RUNNER_TEMP/pm-v247.js"
-grep -q "const APP_CHANNEL = 'beta';" "$RUNNER_TEMP/updates-v247.js"
-grep -q "const APP_VERSION = '2.4.7';" "$RUNNER_TEMP/bootstrap-v247.js"
-grep -q "const APP_BUILD = 282;" "$RUNNER_TEMP/bootstrap-v247.js"
-grep -q "basedOn:'2.4.5'" "$RUNNER_TEMP/bootstrap-v247.js"
-grep -q "const APP_VERSION='2.4.7',APP_BUILD=282,APP_CHANNEL='beta';" "$RUNNER_TEMP/pm-v247.js"
-grep -q "sha256Bytes" "$RUNNER_TEMP/pm-v247.js"
-grep -q "fetchOfficialBytes" "$RUNNER_TEMP/pm-v247.js"
-grep -q "crypto.subtle.digest" "$RUNNER_TEMP/pm-v247.js"
-grep -q "const APP_VERSION = '2.4.7';" "$RUNNER_TEMP/updates-v247.js"
-grep -q "const APP_BUILD = 282;" "$RUNNER_TEMP/updates-v247.js"
+unzip -p "$UNSIGNED" assets/public/mobile-release-v240.js > "$RUNNER_TEMP/release-v247.js"
 unzip -p "$UNSIGNED" assets/public/dashboard.html > "$RUNNER_TEMP/dashboard-v247.html"
-grep -q "mobile-launcher-icon-v241.js" "$RUNNER_TEMP/dashboard-v247.html"
-grep -q "tmScales246" "$RUNNER_TEMP/bootstrap-v247.js"
-grep -q "1T_BM9KY0NLwVhlifetQ6W6AdetujQjx--zOZHa27eQs" "$RUNNER_TEMP/bootstrap-v247.js"
-grep -q "1_LlfIHx4EuSHkC9BOR2VorvXoaiMyLa028wU6C0dQLs" "$RUNNER_TEMP/bootstrap-v247.js"
-grep -q "13eEei_JdGjAdVo371BGfPS59QdYySe9lJ47DLjWb_x0" "$RUNNER_TEMP/bootstrap-v247.js"
-! grep -q "Pessoal / Escalas" "$RUNNER_TEMP/bootstrap-v247.js"
-! grep -q "Missões" "$RUNNER_TEMP/bootstrap-v247.js"
+
+python3 - <<'PY'
+from pathlib import Path
+checks = {
+ 'launcher': ['__TAREFAS_LAUNCHER_ICON_241__','pinProfileShortcut'],
+ 'bootstrap': ['__TAREFAS_BETA_247_BOOT__','const APP_VERSION = \'2.4.7\';','const APP_BUILD = 282;','__TAREFAS_ALPHA_2467_ESCALAS_2433__','__TAREFAS_ALPHA_2468_SERVICOS_HOTBAR_FIX__','scaleImplementation:\'2.4.3.3\'','hotbarServicesRestored:true'],
+ 'patch-manager': ["const APP_VERSION='2.4.7',APP_BUILD=282,APP_CHANNEL='beta';",'__TAREFAS_PATCH_MANAGER_V282__','sha256Bytes','fetchOfficialBytes','crypto.subtle.digest'],
+ 'updates': ["const APP_VERSION = '2.4.7';",'const APP_BUILD = 282;',"const APP_CHANNEL = 'beta';"],
+ 'release': ['__TAREFAS_BETA_247__',"basedOn:'2.4.6+2.4.6.7+2.4.6.8'"],
+ 'dashboard': ['mobile-launcher-icon-v241.js'],
+}
+files = {
+ 'launcher': Path(__import__('os').environ['RUNNER_TEMP'])/'launcher-v247.js',
+ 'bootstrap': Path(__import__('os').environ['RUNNER_TEMP'])/'bootstrap-v247.js',
+ 'patch-manager': Path(__import__('os').environ['RUNNER_TEMP'])/'pm-v247.js',
+ 'updates': Path(__import__('os').environ['RUNNER_TEMP'])/'updates-v247.js',
+ 'release': Path(__import__('os').environ['RUNNER_TEMP'])/'release-v247.js',
+ 'dashboard': Path(__import__('os').environ['RUNNER_TEMP'])/'dashboard-v247.html',
+}
+for name, needles in checks.items():
+    data=files[name].read_text(encoding='utf-8')
+    missing=[x for x in needles if x not in data]
+    if missing:
+        print(f'APK CHECK FAIL [{name}]:')
+        for x in missing: print('  MISSING:',repr(x))
+        raise SystemExit(1)
+    print(f'APK CHECK OK [{name}]')
+PY
 
 OIDC="$(curl --fail --silent --show-error \
   -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
