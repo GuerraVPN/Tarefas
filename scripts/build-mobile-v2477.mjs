@@ -35,7 +35,7 @@ for(const name of await readdir(dist)){
  const f=path.join(dist,name);
  let h=await readFile(f,'utf8');
  h=h.replace(/\s*<script[^>]+src=["']mobile-dashboard-v18[45]\.js(?:\?[^"']*)?["'][^>]*><\/script>\s*/gi,'\n');
- if(name==='about.html'&&!h.includes('mobile-patch-manager-v240.js')) h=h.replace(/<\/body>/i,'  <script src="mobile-patch-manager-v240.js?v=2.4.7.7-b288"></script>\n</body>');
+ if(name==='about.html'&&!h.includes('mobile-patch-manager-v240.js')) h=h.replace(/<\/body>/i,'  <script src="mobile-patch-manager-v240.js?v=2.4.7.7-b289"></script>\n</body>');
  await writeFile(f,h,'utf8');
 }
 
