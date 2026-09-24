@@ -41,10 +41,10 @@ for (const name of htmlFiles) {
 
 console.log('CONFERÊNCIA 2/3 — Anti-travamento global');
 const requiredMarkers = {
-  'v6_2_mobile.js':['__TAREFAS_V771_PAGE_LOADER__',"'about.html','games.html','orcamentarios.html'",'v7_9_1_site.js?v=7.9.1','v7_9_1_web.js?v=7.9.1'],
+  'v6_2_mobile.js':['__TAREFAS_V771_PAGE_LOADER__',"'about.html','games.html','orcamentarios.html'",'v7_9_2_site.js?v=7.9.2','v7_9_2_web.js?v=7.9.2'],
   'v6_5_patch.js':['HEARTBEAT_MS=60000','PRESENCE_REFRESH_MS=60000','presenceVisualPage()'],
-  'v7_9_1_site.js':['POLL_IDLE=10000','POLL_PENDING=2000',"'v7_4_12_controle_site','v7_4_9_controle_site','v7_4_7_controle_site'",'reiniciar.html','desligado.html','broadcastAction','if(isAdmin)return'],
-  'v7_9_1_web.js':["const VERSION='7.9.1'",'schemaVersion:1','data-favrename','data-qretry','TarefasWeb791Lifecycle']
+  'v7_9_2_site.js':['POLL_IDLE=10000','POLL_PENDING=2000',"'v7_4_12_controle_site','v7_4_9_controle_site','v7_4_7_controle_site'",'reiniciar.html','desligado.html','broadcastAction','if(isAdmin)return'],
+  'v7_9_2_web.js':["const VERSION='7.9.2'",'schemaVersion:1','data-favrename','data-qretry','TarefasWeb792Lifecycle']
 };
 for (const [name,markers] of Object.entries(requiredMarkers)) {
   const src=await readFile(path.join(root,name),'utf8').catch(()=> '');
@@ -88,9 +88,17 @@ const cargaSql=await readFile(path.join(root,'supabase_v7_7_0_material_carga.sql
 for(const marker of ['v7_7_0_criar_pendencia_carga','v7_7_0_pedido_carga_trigger','v7_7_0_movimentacao_carga_trigger',"new.status='pronto'","set status='resolvida'"])
   if(!cargaSql.includes(marker))errors.push(`supabase_v7_7_0_material_carga.sql: automação de pendências ausente: ${marker}`);
 
+const nav=await readFile(path.join(root,'v7_9_2_web.js'),'utf8');
+for(const forbidden of ["Pessoal / Serviços","['Missão','missao.html','Serviços']","Pessoal / Escalas"])if(nav.includes(forbidden))errors.push('v7_9_2_web.js: navegação legada presente: '+forbidden);
+const escala=await readFile(path.join(root,'pessoal_v7.js'),'utf8').catch(()=> '');
+for(const marker of ['escala_integrantes','escala_servicos','function loadScale','Motorista','Patrulheiro','Permanência'])if(!escala.includes(marker))errors.push('pessoal_v7.js: Escalas incompleta: '+marker);
+const pedidos=await readFile(path.join(root,'pedidos_v6.js'),'utf8');
+for(const marker of ['v5_4_2_mover_distribuicao','let moving=false','p_mensagem:note||null','ambiguous|column reference.*motivo'])if(!pedidos.includes(marker))errors.push('pedidos_v6.js: correção Distribuição ausente: '+marker);
+
 console.log(`Verificados ${htmlFiles.length} HTML e ${jsFiles.length} JavaScript.`);
 if (errors.length) {
   for (const error of errors) console.error(`ERRO: ${error}`);
   process.exit(1);
 }
 console.log('OK: 3/3 conferências concluídas; sintaxe, desempenho e regras do Orçamentário válidos.');
+
