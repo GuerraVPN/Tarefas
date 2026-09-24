@@ -1,0 +1,15 @@
+name: temp-sha-2464
+on:
+  push:
+    branches: [app/releases]
+permissions:
+  contents: read
+jobs:
+  hash:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: hash
+        run: |
+          sha256sum patches/TAREFAS-2.4.6.4.tpatch
+          wc -c patches/TAREFAS-2.4.6.4.tpatch
