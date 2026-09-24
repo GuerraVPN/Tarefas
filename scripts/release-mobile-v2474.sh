@@ -149,7 +149,6 @@ unzip -p "$UNSIGNED" assets/public/mobile-updates-v181.js > "$RUNNER_TEMP/update
 unzip -p "$UNSIGNED" assets/public/mobile-dashboard-v184.js > "$RUNNER_TEMP/dashboard-v2474-v184.js"
 unzip -p "$UNSIGNED" assets/public/mobile-dashboard-v185.js > "$RUNNER_TEMP/dashboard-v2474-v185.js"
 unzip -p "$UNSIGNED" assets/public/dashboard.html > "$RUNNER_TEMP/dashboard-v2474.html"
-unzip -p "$UNSIGNED" assets/public/dashboard.html > "$RUNNER_TEMP/dashboard-v2474.html"
 python3 - <<'PY'
 from pathlib import Path
 import json, os
@@ -221,7 +220,7 @@ cp app/mobile-launcher-icon-v241.js app/release-v2474.txt "$RUNNER_TEMP/package/
 cp app/android/TarefasLauncherIconPlugin.java "$RUNNER_TEMP/package/app/"
 cp dist/mobile-dashboard-v184.js dist/mobile-dashboard-v185.js "$RUNNER_TEMP/package/app/"
 cp scripts/build-mobile-v246.mjs scripts/build-mobile-v2474.mjs scripts/verify-mobile-v2474.mjs "$RUNNER_TEMP/package/scripts/"
-cp dist/ALPHA_2_4_7_3.json "$RUNNER_TEMP/package/manifest/"
+cp dist/ALPHA_2_4_7_4.json "$RUNNER_TEMP/package/manifest/"
 (cd "$RUNNER_TEMP/package" && zip -qr "$GITHUB_WORKSPACE/$ZIP" .)
 unzip -tq "$ZIP"
 sha256sum "$ZIP" | tee "$ZIP.sha256"
