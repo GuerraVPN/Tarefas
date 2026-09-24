@@ -1,4 +1,4 @@
-name: Android 2.4.7.4 Alpha - corrigir carregamento do Dashboard
+name: Android 2.4.7.4 Alpha - remover definitivamente o Proximo Servico do Dashboard
 
 on:
   workflow_dispatch:
@@ -10,8 +10,8 @@ on:
       - 'app/android/TarefasLauncherIconPlugin.java'
       - 'app/mobile-launcher-icon-v241.js'
       - 'app/release-v2474.txt'
-      - 'app/mobile-dashboard-v184.js
-      - 'app/mobile-dashboard-v185.js''
+      - 'app/mobile-dashboard-v184.js'
+      - 'app/mobile-dashboard-v185.js'
       - 'scripts/build-mobile-v246.mjs'
       - 'scripts/build-mobile-v2474.mjs'
       - 'scripts/verify-mobile-v2474.mjs'
@@ -56,5 +56,5 @@ jobs:
             TAREFAS-2.4.7.4-alpha-build-286.zip
             TAREFAS-2.4.7.4-alpha-build-286.zip.sha256
             app/release-v2474.txt
-            dist/ALPHA_2_4_7_3.json
+            dist/ALPHA_2_4_7_4.json
           if-no-files-found: error
