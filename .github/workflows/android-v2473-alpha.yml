@@ -1,0 +1,59 @@
+name: Android 2.4.7.3 Alpha - corrigir carregamento do Dashboard
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [app/android-v2473-alpha-prep]
+  pull_request:
+    branches: [main]
+    paths:
+      - 'app/android/TarefasLauncherIconPlugin.java'
+      - 'app/mobile-launcher-icon-v241.js'
+      - 'app/release-v2473.txt'
+      - 'app/mobile-dashboard-v184.js'
+      - 'scripts/build-mobile-v246.mjs'
+      - 'scripts/build-mobile-v2473.mjs'
+      - 'scripts/verify-mobile-v2473.mjs'
+      - 'scripts/release-mobile-v2473.sh'
+      - 'patches/TAREFAS-2.4.6.8.tpatch'
+      - '.github/workflows/android-v2473-alpha.yml'
+
+concurrency:
+  group: android-v2473-alpha
+  cancel-in-progress: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Compilar, validar, assinar e publicar 2.4.7.3 Alpha
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          chmod +x scripts/release-mobile-v2473.sh
+          scripts/release-mobile-v2473.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tarefas-android-2.4.7.3-alpha-build-285
+          path: |
+            TAREFAS-2.4.7.3.apk
+            TAREFAS-2.4.7.3.apk.sha256
+            TAREFAS-2.4.7.3-alpha-build-285.zip
+            TAREFAS-2.4.7.3-alpha-build-285.zip.sha256
+            app/release-v2473.txt
+            dist/ALPHA_2_4_7_3.json
+          if-no-files-found: error
