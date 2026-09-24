@@ -2,7 +2,7 @@ name: Web 7.9.2 - SITE, Distribuição e Escalas
 
 on:
   push:
-    branches: [web-7.9.2-prep]
+    branches: [web-7.9.2-mainprep]
     paths:
       - 'v7_9_2_site.js'
       - 'v7_9_2_web.js'
@@ -32,7 +32,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: web-7.9.2-prep
+          ref: web-7.9.2-mainprep
           fetch-depth: 0
 
       - uses: actions/setup-node@v4
