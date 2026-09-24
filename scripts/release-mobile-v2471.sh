@@ -36,7 +36,7 @@ node scripts/build-mobile-v243.mjs
 node scripts/build-mobile-v245.mjs
 node scripts/build-mobile-v246.mjs
 node scripts/build-mobile-v2471.mjs
-node scripts/verify-mobile-v246.mjs dist
+node scripts/verify-mobile-v2471.mjs dist
 
 curl --fail --silent --show-error --retry 3 \
   'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/firebase-config-v17' \
@@ -129,11 +129,11 @@ python3 - <<'PY'
 import json
 with open('android/app/build/outputs/apk/release/output-metadata.json',encoding='utf-8') as f:
     e=json.load(f)['elements'][0]
-assert int(e['versionCode']) == 281, e
-assert str(e['versionName']) == '2.4.6', e
+assert int(e['versionCode']) == 283, e
+assert str(e['versionName']) == '2.4.7.1', e
 PY
 
-unzip -p "$UNSIGNED" assets/public/mobile-launcher-icon-v241.js > "$RUNNER_TEMP/launcher-v246.js"
+unzip -p "$UNSIGNED" assets/public/mobile-launcher-icon-v241.js > "$RUNNER_TEMP/launcher-v2471.js"
 unzip -p "$UNSIGNED" assets/public/mobile-bootstrap.js > "$RUNNER_TEMP/bootstrap-v246.js"
 unzip -p "$UNSIGNED" assets/public/mobile-patch-manager-v240.js > "$RUNNER_TEMP/pm-v246.js"
 unzip -p "$UNSIGNED" assets/public/mobile-updates-v181.js > "$RUNNER_TEMP/updates-v246.js"
@@ -199,15 +199,14 @@ mkdir -p "$RUNNER_TEMP/package/app" "$RUNNER_TEMP/package/scripts" "$RUNNER_TEMP
 cp "$APK" "$APK.sha256" "$RUNNER_TEMP/package/"
 cp app/mobile-launcher-icon-v241.js app/release-v2471.txt "$RUNNER_TEMP/package/app/"
 cp app/android/TarefasLauncherIconPlugin.java "$RUNNER_TEMP/package/app/"
-cp scripts/build-mobile-v246.mjs
-node scripts/build-mobile-v2471.mjs scripts/verify-mobile-v246.mjs "$RUNNER_TEMP/package/scripts/"
+cp scripts/build-mobile-v246.mjs scripts/build-mobile-v2471.mjs scripts/verify-mobile-v2471.mjs "$RUNNER_TEMP/package/scripts/"
 cp dist/ALPHA_2_4_7_1.json "$RUNNER_TEMP/package/manifest/"
 (cd "$RUNNER_TEMP/package" && zip -qr "$GITHUB_WORKSPACE/$ZIP" .)
 unzip -tq "$ZIP"
 sha256sum "$ZIP" | tee "$ZIP.sha256"
 
 git fetch origin app/releases
-RELEASES_DIR="$RUNNER_TEMP/tarefas-releases-v246"
+RELEASES_DIR="$RUNNER_TEMP/tarefas-releases-v2471"
 git worktree add "$RELEASES_DIR" origin/app/releases
 mkdir -p "$RELEASES_DIR/downloads"
 cp "$APK" "$APK.sha256" "$ZIP" "$ZIP.sha256" "$RELEASES_DIR/downloads/"
@@ -240,9 +239,9 @@ SHA="$(sha256sum "$APK" | awk '{print $1}')"
 jq -n \
   --arg version "$VERSION" \
   --argjson build "$BUILD" \
-  --arg channel 'beta' \
+  --arg channel 'alpha' \
   --arg web_version "$WEB_VERSION" \
-  --arg title 'TAREFAS 2.4.7.1 Beta — Pré-release baseada na 2.4.5' \
+  --arg title 'TAREFAS 2.4.7.1 Alpha — teste somente do patch 2.4.6.8' \
   --arg url "$URL" \
   --arg sha "$SHA" \
   '{
@@ -252,13 +251,13 @@ jq -n \
     web_version:$web_version,
     title:$title,
     changelog:[
-      "🧪 Pré-release de veredito da linha 2.4.x, baseada na Beta 2.4.5/build 280.",
+      "🧪 Alpha 2.4.7.1 para testar somente a incorporação do patch 2.4.6.8.",
       "🔒 Sem funcionalidades novas: foco em estabilidade e regressão.",
-      "📋 Escalas permanece como única seção, sem Pessoal / Escalas e sem Missões.",
+      "🧩 Patch incorporado: somente 2.4.6.8; 2.4.6.7 não foi incorporado.",
       "🔐 Patch Manager mantém validação SHA-256 diretamente sobre os bytes do .tpatch.",
       "📜 Histórico de versões e remoção do Próximo Serviço preservados.",
       "🌐 Web 7.9.1 preservada.",
-      "🔔 Preferências de recebimento de patches Beta/Alpha preservadas.",
+      "🔔 Canal Alpha preservado.",
       "🧪 Objetivo: dar o veredito final da base antes da próxima etapa."
     ],
     mandatory:false,
@@ -276,4 +275,4 @@ CODE="$(curl --silent --show-error \
 
 cat "$RUNNER_TEMP/result.json"
 test "$CODE" = '200'
-jq -e '.ok == true and .version == "2.4.6" and .build == 281 and .channel == "beta"' "$RUNNER_TEMP/result.json" >/dev/null
+jq -e '.ok == true and .version == "2.4.7.1" and .build == 283 and .channel == "alpha"' "$RUNNER_TEMP/result.json" >/dev/null
