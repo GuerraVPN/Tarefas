@@ -1,0 +1,10 @@
+TAREFAS 2.4.7.1 Alpha — build 283
+
+Base: Alpha 2.4.6/build 281.
+Incorporado: somente patch 2.4.6.8.
+Não incorporado: patch 2.4.6.7.
+
+Objetivo: isolar o comportamento do patch 2.4.6.8 e descobrir se ele é a causa da regressão observada na Beta 2.4.7.
+
+Canal: Alpha
+Web: 7.9.1
