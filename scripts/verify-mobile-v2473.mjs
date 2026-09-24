@@ -7,14 +7,14 @@ const must=(x,m)=>{if(!x)throw new Error('2.4.7.3 verify: '+m)};
 const patchFile=path.join(root,'patches','TAREFAS-2.4.6.8.tpatch');
 
 await access(patchFile);
-for(const f of ['mobile-bootstrap.js','mobile-patch-manager-v240.js','mobile-updates-v181.js','mobile-release-v240.js','mobile-dashboard-v184.js','ALPHA_2_4_7_2.json']) await access(path.join(dir,f));
+for(const f of ['mobile-bootstrap.js','mobile-patch-manager-v240.js','mobile-updates-v181.js','mobile-release-v240.js','mobile-dashboard-v184.js','ALPHA_2_4_7_3.json']) await access(path.join(dir,f));
 
 const patchData=JSON.parse(await readFile(patchFile,'utf8'));
 must(patchData.id==='2.4.6.8'&&patchData.baseVersion==='2.4.6','tpatch 2.4.6.8 inválido');
 must(String(patchData.payloadSha256||'').toLowerCase()==='9bf9f10ca640f313500b6936918debeb45a6c094efb4aeef759bf6c2cfdbe607','SHA-256 declarado do 2.4.6.8 não confere com o artefato oficial');
 must(!JSON.stringify(patchData).includes('__TAREFAS_ALPHA_2467_ESCALAS_2433__'),'2.4.6.7 detectado no tpatch');
 
-const [b,pm,u,r,d,m]=await Promise.all(['mobile-bootstrap.js','mobile-patch-manager-v240.js','mobile-updates-v181.js','mobile-release-v240.js','mobile-dashboard-v184.js','ALPHA_2_4_7_2.json'].map(read));
+const [b,pm,u,r,d,m]=await Promise.all(['mobile-bootstrap.js','mobile-patch-manager-v240.js','mobile-updates-v181.js','mobile-release-v240.js','mobile-dashboard-v184.js','ALPHA_2_4_7_3.json'].map(read));
 
 must(b.includes('__TAREFAS_ALPHA_2468_SERVICOS_HOTBAR_FIX__'),'patch 2.4.6.8 ausente no dist');
 must(!b.includes('__TAREFAS_ALPHA_2467_ESCALAS_2433__'),'patch 2.4.6.7 detectado no dist');
