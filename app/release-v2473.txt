@@ -1,0 +1,6 @@
+TAREFAS Android 2.4.7.3 build 285 ALPHA
+Base: Alpha 2.4.7.2 / Web 7.9.1
+Correção: garante que a versão corrigida do Dashboard seja realmente carregada no APK, com cache-bust do mobile-dashboard-v184.js.
+O cartão “Próximo Serviço” permanece removido.
+Preserva Serviços → Escalas e o patch oficial 2.4.6.8.
+Não incorpora 2.4.6.7.
