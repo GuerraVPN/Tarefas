@@ -17,7 +17,7 @@ on:
       - '.github/workflows/android-v2471-alpha.yml'
 
 concurrency:
-  group: android-v2471-alpha
+  group: android-v247-beta
   cancel-in-progress: true
 
 jobs:
@@ -37,21 +37,21 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
-      - name: Compilar, validar, assinar e publicar 2.4.7.1 Beta
+      - name: Compilar, validar, assinar e publicar 2.4.7.1 Alpha
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          chmod +x scripts/release-mobile-v2471.sh
-          scripts/release-mobile-v2471.sh
+          chmod +x scripts/release-mobile-v247.sh
+          scripts/release-mobile-v247.sh
       - uses: actions/upload-artifact@v4
         with:
-          name: tarefas-android-2.4.7.1-alpha-build-283
+          name: tarefas-android-2.4.7.1-beta-build-283
           path: |
             TAREFAS-2.4.7.1.apk
             TAREFAS-2.4.7.1.apk.sha256
-            TAREFAS-2.4.7.1-alpha-build-283.zip
-            TAREFAS-2.4.7.1-alpha-build-283.zip.sha256
-            app/release-v2471.txt
+            TAREFAS-2.4.7.1-beta-build-283.zip
+            TAREFAS-2.4.7.1-beta-build-283.zip.sha256
+            app/release-v247.txt
             dist/ALPHA_2_4_7_1.json
           if-no-files-found: error
