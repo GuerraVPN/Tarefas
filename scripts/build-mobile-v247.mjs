@@ -32,68 +32,68 @@ for(const name of await readdir(dist)){
 }
 
 await patch('mobile-patch-manager-v240.js',source=>source
-  .replace("const APP_VERSION='2.4.5',APP_BUILD=280,APP_CHANNEL='beta';","const APP_VERSION='"+VERSION+"',APP_BUILD="+BUILD+",APP_CHANNEL='beta';")
-  .replace("__TAREFAS_PATCH_MANAGER_V280__","__TAREFAS_PATCH_MANAGER_V282__")
-  .replaceAll("source:'beta-2.4.5'","source:'beta-2.4.7'"),{required:true});
+  .replace("const APP_VERSION='2.4.6',APP_BUILD=281,APP_CHANNEL='beta';","const APP_VERSION='"+VERSION+"',APP_BUILD="+BUILD+",APP_CHANNEL='beta';")
+  .replace("__TAREFAS_PATCH_MANAGER_V281__","__TAREFAS_PATCH_MANAGER_V282__")
+  .replaceAll("source:'beta-2.4.6'","source:'beta-2.4.7'"),{required:true});
 
 await patch('mobile-bootstrap.js',source=>{
   let out=source
-    .replace("const APP_VERSION = '2.4.5';","const APP_VERSION = '"+VERSION+"';")
-    .replace('const APP_BUILD = 280;','const APP_BUILD = '+BUILD+';')
-    .replaceAll('Beta 2.4.5','Beta '+VERSION)
-    .replaceAll('2.4.5 Beta',VERSION+' Beta')
-    .replaceAll('__TAREFAS_BETA_245_BOOT__','__TAREFAS_BETA_247_BOOT__')
-    .replaceAll('__TAREFAS_PATCH_SYSTEM_V280__','__TAREFAS_PATCH_SYSTEM_V282__')
-    .replaceAll("version:'2.4.5'","version:'"+VERSION+"'")
-    .replaceAll('build:280','build:'+BUILD);
+    .replace("const APP_VERSION = '2.4.6';","const APP_VERSION = '"+VERSION+"';")
+    .replace('const APP_BUILD = 281;','const APP_BUILD = '+BUILD+';')
+    .replaceAll('Beta 2.4.6','Beta '+VERSION)
+    .replaceAll('2.4.6 Beta',VERSION+' Beta')
+    .replaceAll('__TAREFAS_BETA_246_BOOT__','__TAREFAS_BETA_247_BOOT__')
+    .replaceAll('__TAREFAS_PATCH_SYSTEM_V281__','__TAREFAS_PATCH_SYSTEM_V282__')
+    .replaceAll("version:'2.4.6'","version:'"+VERSION+"'")
+    .replaceAll('build:281','build:'+BUILD);
   if(!out.includes("['Escalas','#escalas','Motorista, patrulheiro e permanência']"))throw new Error('2.4.7: menu Escalas ausente');
   if(out.includes("['Pessoal / Escalas','pessoal.html'")||out.includes("['Missões','missao.html'"))throw new Error('2.4.7: menu antigo presente');
-  out=out.replaceAll('tmScales245','tmScales247').replaceAll('tm245-scales-list','tm247-scales-list').replace("basedOn:'2.4.3'","basedOn:'2.4.6+2.4.6.7+2.4.6.8'");
+  out=out.replaceAll('tmScales246','tmScales247').replaceAll('tm246-scales-list','tm247-scales-list').replace("basedOn:'2.4.6+2.4.6.7+2.4.6.8'","basedOn:'2.4.6+2.4.6.7+2.4.6.8'");
   out=out.replace("__TAREFAS_BETA_247_BOOT__={version:'"+VERSION+"',build:"+BUILD+",channel:'beta',basedOn:'2.4.6+2.4.6.7+2.4.6.8'", "__TAREFAS_BETA_247_BOOT__={version:'"+VERSION+"',build:"+BUILD+",channel:'beta',basedOn:'2.4.6+2.4.6.7+2.4.6.8'");
   return out;
 },{required:true});
 
 await patch('mobile-alpha-v23223-fix.js',source=>source
-  .replace("const VERSION='2.4.5',BUILD=280,MARK='__TAREFAS_BETA_NAV_V280__';","const VERSION='"+VERSION+"',BUILD="+BUILD+",MARK='__TAREFAS_BETA_NAV_V282__';")
-  .replaceAll('TAREFAS 2.4.5 Beta','TAREFAS '+VERSION+' Beta')
-  .replaceAll('TarefasBeta245','TarefasBeta247'),{required:false});
+  .replace("const VERSION='2.4.5',BUILD=280,MARK='__TAREFAS_BETA_NAV_V281__';","const VERSION='"+VERSION+"',BUILD="+BUILD+",MARK='__TAREFAS_BETA_NAV_V282__';")
+  .replaceAll('TAREFAS 2.4.6 Beta','TAREFAS '+VERSION+' Beta')
+  .replaceAll('TarefasBeta246','TarefasBeta247'),{required:false});
 
 await patch('mobile-alpha-v23221.js',source=>source
   .replace("const VERSION='2.4.5',BUILD=280","const VERSION='"+VERSION+"',BUILD="+BUILD)
-  .replaceAll('Central Beta 2.4.5','Central Beta '+VERSION)
-  .replaceAll('Ferramentas Beta 2.4.5','Ferramentas Beta '+VERSION)
+  .replaceAll('Central Beta 2.4.6','Central Beta '+VERSION)
+  .replaceAll('Ferramentas Beta 2.4.6','Ferramentas Beta '+VERSION)
   .replaceAll('BETA 245','BETA 246'),{required:false});
 
 await patch('mobile-alpha-v23221-tabs.js',source=>source
-  .replace("const MARK='__TAREFAS_BETA_TABS_V280__',VERSION='2.4.5',BUILD=280","const MARK='__TAREFAS_BETA_TABS_V282__',VERSION='2.4.7',BUILD=282")
-  .replace('<small>Beta 2.4.5</small>','<small>Beta '+VERSION+'</small>'),{required:false});
+  .replace("const MARK='__TAREFAS_BETA_TABS_V281__',VERSION='2.4.5',BUILD=280","const MARK='__TAREFAS_BETA_TABS_V282__',VERSION='2.4.7',BUILD=282")
+  .replace('<small>Beta 2.4.6</small>','<small>Beta '+VERSION+'</small>'),{required:false});
 
 await patch('mobile-preload.js',source=>source
   .replaceAll("tarefasAppVersion = '2.4.5'","tarefasAppVersion = '"+VERSION+"'")
   .replaceAll("tarefasAppBuild = '280'","tarefasAppBuild = '"+BUILD+"'"),{required:false});
 
 await patch('mobile-updates-v181.js',source=>source
-  .replace("const APP_VERSION = '2.4.5';","const APP_VERSION = '"+VERSION+"';")
-  .replace('const APP_BUILD = 280;','const APP_BUILD = '+BUILD+';'),{required:false});
+  .replace("const APP_VERSION = '2.4.6';","const APP_VERSION = '"+VERSION+"';")
+  .replace('const APP_BUILD = 281;','const APP_BUILD = '+BUILD+';'),{required:false});
 
 await patch('mobile-ai-v230.js',source=>source
   .replaceAll('BETA 2.4.5','BETA '+VERSION)
-  .replaceAll("version:'2.4.5'","version:'"+VERSION+"'")
-  .replaceAll('build:280','build:'+BUILD),{required:false});
+  .replaceAll("version:'2.4.6'","version:'"+VERSION+"'")
+  .replaceAll('build:281','build:'+BUILD),{required:false});
 
 await patch('native-mobile.js',source=>source
-  .replaceAll("version:'2.4.5'","version:'"+VERSION+"'")
-  .replaceAll('build:280','build:'+BUILD)
+  .replaceAll("version:'2.4.6'","version:'"+VERSION+"'")
+  .replaceAll('build:281','build:'+BUILD)
   .replaceAll('"2.4.5"','"'+VERSION+'"')
   .replaceAll("'2.4.5'","'"+VERSION+"'"),{required:false});
 
 await patch('mobile-release-v240.js',source=>{
   let out=source
-    .replaceAll("const PATCH_VERSION='2.4.5';","const PATCH_VERSION='"+VERSION+"';")
-    .replaceAll("const BASE_VERSION='2.4.5';","const BASE_VERSION='"+VERSION+"';")
-    .replaceAll('const BUILD=278;','const BUILD='+BUILD+';')
-    .replaceAll("version:'2.4.5',build:280,channel:'beta'","version:'"+VERSION+"',build:"+BUILD+",channel:'beta'")
-    .replaceAll('__TAREFAS_BETA_245__','__TAREFAS_BETA_247__');
+    .replaceAll("const PATCH_VERSION='2.4.6';","const PATCH_VERSION='"+VERSION+"';")
+    .replaceAll("const BASE_VERSION='2.4.6';","const BASE_VERSION='"+VERSION+"';")
+    .replaceAll('const BUILD=281;','const BUILD='+BUILD+';')
+    .replaceAll("version:'2.4.6',build:281,channel:'beta'","version:'"+VERSION+"',build:"+BUILD+",channel:'beta'")
+    .replaceAll('__TAREFAS_BETA_246__','__TAREFAS_BETA_247__');
   out+="\n;globalThis.__TAREFAS_BETA_247__=Object.freeze({version:'"+VERSION+"',build:"+BUILD+",channel:'beta',basedOn:'2.4.6+2.4.6.7+2.4.6.8',webVersion:'"+WEB_VERSION+"',launcherIconBridge:true,profileHomeIcon:true,patchChannelsFollowApkPreferences:true,drawerScalesOnly:true,officialPatchSha256Bytes:true});\n";
   out+=";globalThis.__TAREFAS_EFFECTIVE_VERSION__='"+VERSION+"';\n";
   return out;
@@ -109,6 +109,6 @@ await writeFile(path.join(dist,'BETA_2_4_7.json'),JSON.stringify({
   features:{basedOnValidated246Patches:true,launcherIconSelector:true,launcherNativeBridge:true,profileAvatarAsHomeIcon:true,launcherPresetBlue:true,launcherPresetMilitary:true,launcherPresetGold:true,launcherPresetSystem:true,defaultLauncherIconFixed:true,patchManager:true,patchBetaChannelUsesApkPreference:true,patchAlphaChannelUsesApkPreference:true,web791:true,biometricColdStartOnly:true,diagnosticTabs:true,drawerScalesOnly:true,officialPatchSha256Bytes:true}
 },null,2)+'\n','utf8');
 
-console.log('TAREFAS Android '+VERSION+' build '+BUILD+' BETA pré-release baseada na Beta 2.4.5/build 280.');
+console.log('TAREFAS Android '+VERSION+' build '+BUILD+' BETA pré-release baseada na Beta 2.4.6/build 280.');
 
 console.log('TAREFAS Android 2.4.7 build 282 BETA: base 2.4.6 + Escalas 2.4.6.7 + Serviços 2.4.6.8.');
