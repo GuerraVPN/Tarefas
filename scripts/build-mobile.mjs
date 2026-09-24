@@ -17,7 +17,7 @@ for (const entry of await readdir(root, { withFileTypes: true })) {
 }
 await mkdir(path.join(dist, 'assets', 'icons'), { recursive: true });
 for (const size of [192, 512]) { try { await cp(path.join(root,'app-assets',`icon-${size}.png`),path.join(dist,'assets','icons',`icon-${size}.png`)); } catch (_) {} }
-for (const file of ['manifest.webmanifest','service-worker.js','mobile-bootstrap.js','mobile-preload.js','mobile-login-v17.js','mobile.css','mobile-v12.css','mobile-v16.css','mobile-v18.css','mobile-v181.css','mobile-v12.js','mobile-updates-v181.js','mobile-dashboard-v184.js','mobile-users-inline-v189.js','mobile-notes-v191.js','mobile-v196.js','games.html','games.css','games.js']) {
+for (const file of ['manifest.webmanifest','service-worker.js','mobile-bootstrap.js','mobile-preload.js','mobile-login-v17.js','mobile.css','mobile-v12.css','mobile-v16.css','mobile-v18.css','mobile-v181.css','mobile-v12.js','mobile-updates-v181.js','mobile-users-inline-v189.js','mobile-notes-v191.js','mobile-v196.js','games.html','games.css','games.js']) {
   await cp(path.join(root,'app',file),path.join(dist,file));
 }
 async function patch(rel,replacements){const file=path.join(dist,rel);let text=await readFile(file,'utf8');for(const [from,to] of replacements){if(!text.includes(from))throw new Error(`${rel}: trecho esperado não encontrado: ${from}`);text=text.split(from).join(to)}await writeFile(file,text,'utf8')}
@@ -46,7 +46,7 @@ for(const name of htmlFiles){
  for(const css of ['mobile.css','mobile-v12.css','mobile-v16.css','mobile-v18.css','mobile-v181.css'])if(!html.includes(css))html=html.replace(/<\/head>/i,`  <link rel="stylesheet" href="${css}">\n</head>`);
  if(!html.includes('manifest.webmanifest'))html=html.replace(/<\/head>/i,'  <link rel="manifest" href="manifest.webmanifest">\n  <meta name="theme-color" content="#05090b">\n</head>');
  if(name==='index.html'&&!html.includes('mobile-login-v17.js'))html=html.replace(/<\/body>/i,'  <script src="mobile-login-v17.js"></script>\n</body>');
- for(const js of ['mobile-bootstrap.js','mobile-v12.js','native-mobile.js','mobile-updates-v181.js','mobile-dashboard-v184.js','mobile-users-inline-v189.js','bloco_notas.js','mobile-notes-v191.js','mobile-v196.js'])if(!html.includes(js))html=html.replace(/<\/body>/i,`  <script src="${js}"></script>\n</body>`);
+ for(const js of ['mobile-bootstrap.js','mobile-v12.js','native-mobile.js','mobile-updates-v181.js','mobile-users-inline-v189.js','bloco_notas.js','mobile-notes-v191.js','mobile-v196.js'])if(!html.includes(js))html=html.replace(/<\/body>/i,`  <script src="${js}"></script>\n</body>`);
  await writeFile(file,html,'utf8');
 }
 console.log(`TAREFAS Android 2.0.0 build 200 OFICIAL: ${htmlFiles.length} páginas preparadas sobre Web 7.6.0 com Jogos, Jogos finalizados, gráficos renovados, trilhas próprias e placares públicos`);
