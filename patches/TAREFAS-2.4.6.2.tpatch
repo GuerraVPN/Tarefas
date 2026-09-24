@@ -1,0 +1,32 @@
+{
+  "format": "tarefas-tpatch-v1",
+  "id": "2.4.6.2",
+  "name": "TAREFAS 2.4.6.2 — Escalas dentro de Serviços",
+  "patchVersion": 1,
+  "createdAt": "2026-09-23T20:30:00Z",
+  "baseVersion": "2.4.6",
+  "minBuild": 281,
+  "maxBuild": 281,
+  "channel": "alpha",
+  "cumulative": true,
+  "replacementMode": "replace-older-same-base",
+  "replaces": [
+    "2.4.6.1"
+  ],
+  "description": "Corrige a hotbar para manter Escalas dentro da seção Serviços e faz essa opção abrir diretamente as três escalas oficiais do Google.",
+  "changelog": [
+    "Coloca Escalas dentro da seção Serviços da hotbar.",
+    "Escalas abre Motorista PA, Patrulheiro e Permanência nas planilhas oficiais do Google.",
+    "Mantém a remoção do Próximo Serviço.",
+    "Remove entradas antigas Pessoal / Escalas e Missões.",
+    "Substitui integralmente a Alpha 2.4.6.1 para a base 2.4.6/build 281."
+  ],
+  "order": 24602,
+  "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.6.2.tpatch",
+  "installable": true,
+  "payload": {
+    "js": "(()=>{'use strict';\nconst MARK='__TAREFAS_ALPHA_2462_PATCH__';\nif(globalThis[MARK])return;\nglobalThis[MARK]=true;\nconst LINKS=[\n['Motorista PA','https://docs.google.com/spreadsheets/d/1T_BM9KY0NLwVhlifetQ6W6AdetujQjx--zOZHa27eQs/edit?usp=drivesdk'],\n['Patrulheiro','https://docs.google.com/spreadsheets/d/1_LlfIHx4EuSHkC9BOR2VorvXoaiMyLa028wU6C0dQLs/edit?usp=drivesdk'],\n['Permanência','https://docs.google.com/spreadsheets/d/13eEei_JdGjAdVo371BGfPS59QdYySe9lJ47DLjWb_x0/edit?usp=drivesdk']\n];\nfunction removeNext(){\n for(const e of document.querySelectorAll('#kNextServiceCard,#kNextService,.tm-next-service-kpi,[data-tarefas-next-service],[data-next-service],.next-service-card'))e.remove();\n for(const el of document.querySelectorAll('h1,h2,h3,h4,h5,h6,strong,b,p,span,button,a')){\n  if(!el.children.length&&String(el.textContent||'').normalize('NFD').replace(/[̀-ͯ]/g,'').trim().toLowerCase()==='proximo servico'){\n   const c=el.closest('.tm-next-service-kpi,#kNextServiceCard,#kNextService,.dashboard-card,.v4-card,.card,article,section');if(c)c.remove();\n  }\n }\n}\nfunction openScales(){\n const old=document.getElementById('tmScales2462');if(old){old.remove();return}\n const wrap=document.createElement('div');wrap.id='tmScales2462';\n wrap.style.cssText='position:fixed;inset:0;z-index:2147483646;background:rgba(0,0,0,.58);display:flex;align-items:flex-end;justify-content:center;padding:12px';\n const box=document.createElement('div');box.style.cssText='width:min(560px,100%);max-height:82vh;overflow:auto;background:var(--v4-card,#101816);color:var(--v4-text,#fff);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:18px';\n box.innerHTML='<div style=\"display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px\"><strong style=\"font-size:20px\">Escalas</strong><button type=\"button\" data-close-scale style=\"border:0;background:transparent;color:inherit;font-size:24px\">×</button></div><div data-scale-list style=\"display:grid;gap:8px\"></div>';\n const list=box.querySelector('[data-scale-list]');\n for(const [label,url] of LINKS){const a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener noreferrer external';a.textContent=label;a.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 14px;border:1px solid rgba(255,255,255,.1);border-radius:12px;color:inherit;text-decoration:none;font-weight:800';const s=document.createElement('span');s.textContent='↗';s.style.opacity='.65';a.appendChild(s);list.appendChild(a)}\n wrap.appendChild(box);document.documentElement.appendChild(wrap);\n wrap.addEventListener('click',e=>{if(e.target===wrap||e.target.closest('[data-close-scale]'))wrap.remove()});\n}\nfunction wireServices(){\n for(const el of document.querySelectorAll('a,button,[role=\"button\"],li,span,div')){\n  const t=String(el.textContent||'').trim().normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();\n  if(t==='serviços e pessoal'||t==='servicos e pessoal'||t==='serviços'||t==='servicos'){\n   const box=el.closest('li,.nav-item,.menu-item,.drawer-section,.menu-section')||el.parentElement;\n   if(!box)continue;\n   const has=[...box.querySelectorAll('a,button,[role=\"button\"],li,span')].some(x=>String(x.textContent||'').trim().normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase()==='escalas');\n   if(!has){\n    const a=document.createElement('a');a.href='#escalas';a.textContent='Escalas';a.dataset.tarefasScale2462='1';a.style.cssText='cursor:pointer';\n    a.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();openScales()},true);\n    box.appendChild(a);\n   }\n  }\n }\n}\nfunction wireLegacy(){\n for(const el of document.querySelectorAll('a,button,[role=\"button\"],li,span')){\n  const t=String(el.textContent||'').trim().normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();\n  if(t==='pessoal / escalas'||t==='missões'||t==='missoes'){const item=el.closest('li,.nav-item,.menu-item,.tab-item')||el;if(item)item.remove()}\n }\n for(const el of document.querySelectorAll('a,button,[role=\"button\"],[data-target],.nav-item,.tab-item')){\n  const t=String(el.textContent||'').trim().normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase(),h=String(el.getAttribute?.('href')||'').toLowerCase();\n  if((t==='escalas'||h==='#escalas')&&el.dataset.tarefasScale2462!=='1'){el.dataset.tarefasScale2462='1';el.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();openScales()},true)}\n }\n}\nfunction boot(){removeNext();wireLegacy();wireServices();let n=0;const tm=setInterval(()=>{removeNext();wireLegacy();wireServices();if(++n>120)clearInterval(tm)},250);window.addEventListener('focus',()=>{removeNext();wireLegacy();wireServices()});window.addEventListener('pageshow',()=>{removeNext();wireLegacy();wireServices()})}\nif(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();\nnew MutationObserver(()=>{removeNext();wireLegacy();wireServices()}).observe(document.documentElement,{childList:true,subtree:true});\nglobalThis.TarefasAlpha2462Patch=Object.freeze({version:'2.4.6.2',base:'2.4.6',servicesScales:true,removeNextService:true,scalesGoogleLinks:true});\n})();",
+    "css": ""
+  },
+  "payloadSha256": "21e1e83cf16c1c1747693430210dc6d0e2dd7c3ecfa4c8b14d5372ce975da900"
+}
