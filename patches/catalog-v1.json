@@ -559,6 +559,34 @@
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.6.1.tpatch",
       "sha256": "90f28a87820f03427dcb80af247cbfe92da5d5b80adeb5b802f5e945ee191e91",
       "installable": true
+    },
+    {
+      "format": "tarefas-tpatch-v1",
+      "id": "2.4.6.2",
+      "name": "TAREFAS 2.4.6.2 — Escalas dentro de Serviços",
+      "patchVersion": 1,
+      "createdAt": "2026-09-23T20:30:00Z",
+      "baseVersion": "2.4.6",
+      "minBuild": 281,
+      "maxBuild": 281,
+      "channel": "alpha",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.4.6.1"
+      ],
+      "description": "Corrige a hotbar para manter Escalas dentro da seção Serviços e faz essa opção abrir diretamente as três escalas oficiais do Google.",
+      "changelog": [
+        "Coloca Escalas dentro da seção Serviços da hotbar.",
+        "Escalas abre Motorista PA, Patrulheiro e Permanência nas planilhas oficiais do Google.",
+        "Mantém a remoção do Próximo Serviço.",
+        "Remove entradas antigas Pessoal / Escalas e Missões.",
+        "Substitui integralmente a Alpha 2.4.6.1 para a base 2.4.6/build 281."
+      ],
+      "order": 24602,
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.6.2.tpatch",
+      "sha256": "",
+      "installable": true
     }
   ],
   "history": [
@@ -868,5 +896,5 @@
       "installable": true
     }
   ],
-  "cacheNonce": "2461-r2"
+  "cacheNonce": "2462-r1"
 }
