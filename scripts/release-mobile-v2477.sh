@@ -24,7 +24,7 @@ node --check app/mobile-launcher-icon-v241.js
 node --check scripts/build-mobile-v243.mjs
 node --check scripts/build-mobile-v245.mjs
 node --check scripts/build-mobile-v246.mjs
-node --check scripts/build-mobile-v2476.mjs
+node --check scripts/build-mobile-v2477.mjs
 node --check scripts/verify-mobile-v246.mjs
 node scripts/verify-web.mjs .
 
@@ -45,7 +45,7 @@ node scripts/build-mobile-v242.mjs
 node scripts/build-mobile-v243.mjs
 node scripts/build-mobile-v245.mjs
 node scripts/build-mobile-v246.mjs
-node scripts/build-mobile-v2476.mjs
+node scripts/build-mobile-v2477.mjs
 node scripts/verify-mobile-v2477.mjs dist
 
 curl --fail --silent --show-error --retry 3 \
@@ -123,7 +123,7 @@ cat > android/app/src/main/res/drawable/tarefas_launcher_blue.xml <<'XML'
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path android:fillColor="#08288B" android:pathData="M0,0H108V108H0Z"/>
+    <path android:fillColor="#08289B" android:pathData="M0,0H108V108H0Z"/>
     <path android:fillColor="#55C7FF" android:pathData="M18,20H90V38H63V88H45V38H18Z"/>
     <path android:fillColor="#EAF8FF" android:pathData="M45,45H63V54H45Z"/>
 </vector>
@@ -139,29 +139,29 @@ python3 - <<'PY'
 import json
 with open('android/app/build/outputs/apk/release/output-metadata.json',encoding='utf-8') as f:
     e=json.load(f)['elements'][0]
-assert int(e['versionCode']) == 288, e
+assert int(e['versionCode']) == 289, e
 assert str(e['versionName']) == '2.4.7.7', e
 PY
 
-unzip -p "$UNSIGNED" assets/public/mobile-bootstrap.js > "$RUNNER_TEMP/bootstrap-v2476.js"
-unzip -p "$UNSIGNED" assets/public/mobile-login-v17.js > "$RUNNER_TEMP/login-v2476.js"
-unzip -p "$UNSIGNED" assets/public/dashboard.html > "$RUNNER_TEMP/dashboard-v2476.html"
-unzip -p "$UNSIGNED" assets/public/dashboard.js > "$RUNNER_TEMP/dashboard-js-v2476.js"
-unzip -p "$UNSIGNED" assets/public/mobile-patch-manager-v240.js > "$RUNNER_TEMP/pm-v2476.js"
-unzip -p "$UNSIGNED" assets/public/about.html > "$RUNNER_TEMP/about-v2476.html"
+unzip -p "$UNSIGNED" assets/public/mobile-bootstrap.js > "$RUNNER_TEMP/bootstrap-v2477.js"
+unzip -p "$UNSIGNED" assets/public/mobile-login-v17.js > "$RUNNER_TEMP/login-v2477.js"
+unzip -p "$UNSIGNED" assets/public/dashboard.html > "$RUNNER_TEMP/dashboard-v2477.html"
+unzip -p "$UNSIGNED" assets/public/dashboard.js > "$RUNNER_TEMP/dashboard-js-v2477.js"
+unzip -p "$UNSIGNED" assets/public/mobile-patch-manager-v240.js > "$RUNNER_TEMP/pm-v2477.js"
+unzip -p "$UNSIGNED" assets/public/about.html > "$RUNNER_TEMP/about-v2477.html"
 python3 - <<'PY'
 from pathlib import Path
 import os,zipfile
 t=Path(os.environ['RUNNER_TEMP'])
-boot=(t/'bootstrap-v2476.js').read_text()
-login=(t/'login-v2476.js').read_text()
-html=(t/'dashboard-v2476.html').read_text()
-dash=(t/'dashboard-js-v2476.js').read_text()
-pm=(t/'pm-v2476.js').read_text()
-about=(t/'about-v2476.html').read_text()
+boot=(t/'bootstrap-v2477.js').read_text()
+login=(t/'login-v2477.js').read_text()
+html=(t/'dashboard-v2477.html').read_text()
+dash=(t/'dashboard-js-v2477.js').read_text()
+pm=(t/'pm-v2477.js').read_text()
+about=(t/'about-v2477.html').read_text()
 assert "__TAREFAS_ALPHA_2468_SERVICOS_HOTBAR_FIX__" in boot
 assert "__TAREFAS_ALPHA_2467_ESCALAS_2433__" not in boot
-assert "const APP_VERSION = '2.4.7.7';" in boot and "const APP_BUILD = 288;" in boot
+assert "const APP_VERSION = '2.4.7.7';" in boot and "const APP_BUILD = 289;" in boot
 assert "dashboard.html?app=2.4.7.7" in boot and "dashboard.html?app=2.4.7.7" in login
 assert "mobile-dashboard-v184.js" not in html and "mobile-dashboard-v185.js" not in html
 assert "kNextService" not in dash and "Próximo Serviço" not in dash and "Próximo serviço" not in dash
@@ -232,14 +232,14 @@ cp "$APK" "$APK.sha256" "$RUNNER_TEMP/package/"
 cp app/mobile-launcher-icon-v241.js app/release-v2477.txt "$RUNNER_TEMP/package/app/"
 cp app/android/TarefasLauncherIconPlugin.java "$RUNNER_TEMP/package/app/"
 true
-cp scripts/build-mobile-v246.mjs scripts/build-mobile-v2476.mjs scripts/verify-mobile-v2477.mjs "$RUNNER_TEMP/package/scripts/"
+cp scripts/build-mobile-v246.mjs scripts/build-mobile-v2477.mjs scripts/verify-mobile-v2477.mjs "$RUNNER_TEMP/package/scripts/"
 cp dist/ALPHA_2_4_7_7.json "$RUNNER_TEMP/package/manifest/"
 (cd "$RUNNER_TEMP/package" && zip -qr "$GITHUB_WORKSPACE/$ZIP" .)
 unzip -tq "$ZIP"
 sha256sum "$ZIP" | tee "$ZIP.sha256"
 
 git fetch origin app/releases
-RELEASES_DIR="$RUNNER_TEMP/tarefas-releases-v2476"
+RELEASES_DIR="$RUNNER_TEMP/tarefas-releases-v2477"
 git worktree add "$RELEASES_DIR" origin/app/releases
 mkdir -p "$RELEASES_DIR/downloads"
 cp "$APK" "$APK.sha256" "$ZIP" "$ZIP.sha256" "$RELEASES_DIR/downloads/"
@@ -308,4 +308,4 @@ CODE="$(curl --silent --show-error \
 
 cat "$RUNNER_TEMP/result.json"
 test "$CODE" = '200'
-jq -e '.ok == true and .version == "2.4.7.7" and .build == 288 and .channel == "alpha"' "$RUNNER_TEMP/result.json" >/dev/null
+jq -e '.ok == true and .version == "2.4.7.7" and .build == 289 and .channel == "alpha"' "$RUNNER_TEMP/result.json" >/dev/null
