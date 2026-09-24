@@ -1,5 +1,4 @@
 import { copyFile, readFile, writeFile, access, rm } from 'node:fs/promises';
-import { createHash } from 'node:crypto';
 import path from 'node:path';
 
 const root=process.cwd(), dist=path.join(root,'dist');
@@ -42,7 +41,7 @@ await patch('mobile-dashboard-v184.js',s=>{
 },{required:true});
 await patch('mobile-release-v240.js',s=>s.replaceAll("version:VERSION,build:BUILD,channel:'alpha'",`version:'${VERSION}',build:${BUILD},channel:'alpha'`),{required:false});
 await rm(path.join(dist,'RELEASE_2_4_0.json'),{force:true});
-await writeFile(path.join(dist,'ALPHA_2_4_7_1.json'),JSON.stringify({
+await writeFile(path.join(dist,'ALPHA_2_4_7_2.json'),JSON.stringify({
   version:VERSION,build:BUILD,channel:'alpha',base:'2.4.6',basedOn:PREVIOUS_ALPHA,incorporatedPatch:PATCH_ID,webVersion:WEB_VERSION,
   features:{only2468:true,scalesPatch2467:false,servicesHotbar2468:true,nextServiceDashboardCardRemoved:true}
 },null,2)+'\n');
