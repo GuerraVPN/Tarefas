@@ -216,7 +216,7 @@ cp app/mobile-launcher-icon-v241.js app/release-v2476.txt "$RUNNER_TEMP/package/
 cp app/android/TarefasLauncherIconPlugin.java "$RUNNER_TEMP/package/app/"
 true
 cp scripts/build-mobile-v246.mjs scripts/build-mobile-v2476.mjs scripts/verify-mobile-v2476.mjs "$RUNNER_TEMP/package/scripts/"
-cp dist/ALPHA_2_4_7_5.json "$RUNNER_TEMP/package/manifest/"
+cp dist/ALPHA_2_4_7_6.json "$RUNNER_TEMP/package/manifest/"
 (cd "$RUNNER_TEMP/package" && zip -qr "$GITHUB_WORKSPACE/$ZIP" .)
 unzip -tq "$ZIP"
 sha256sum "$ZIP" | tee "$ZIP.sha256"
