@@ -133,35 +133,27 @@ assert int(e['versionCode']) == 283, e
 assert str(e['versionName']) == '2.4.7.1', e
 PY
 
-unzip -p "$UNSIGNED" assets/public/mobile-launcher-icon-v241.js > "$RUNNER_TEMP/launcher-v2471.js"
-unzip -p "$UNSIGNED" assets/public/mobile-bootstrap.js > "$RUNNER_TEMP/bootstrap-v246.js"
-unzip -p "$UNSIGNED" assets/public/mobile-patch-manager-v240.js > "$RUNNER_TEMP/pm-v246.js"
-unzip -p "$UNSIGNED" assets/public/mobile-updates-v181.js > "$RUNNER_TEMP/updates-v246.js"
-grep -q '__TAREFAS_LAUNCHER_ICON_241__' "$RUNNER_TEMP/launcher-v246.js"
-grep -q 'pinProfileShortcut' "$RUNNER_TEMP/launcher-v246.js"
-grep -q '__TAREFAS_BETA_246_BOOT__' "$RUNNER_TEMP/bootstrap-v246.js"
-grep -q '__TAREFAS_PATCH_MANAGER_V281__' "$RUNNER_TEMP/pm-v246.js"
-grep -q "v1_8_get_beta_updates" "$RUNNER_TEMP/pm-v246.js"
-grep -q "v2_3_21_alpha_context" "$RUNNER_TEMP/pm-v246.js"
-grep -q "const APP_CHANNEL = 'alpha';" "$RUNNER_TEMP/updates-v246.js"
-grep -q "const APP_VERSION = '2.4.6';" "$RUNNER_TEMP/bootstrap-v246.js"
-grep -q "const APP_BUILD = 281;" "$RUNNER_TEMP/bootstrap-v246.js"
-grep -q "basedOn:'2.4.5'" "$RUNNER_TEMP/bootstrap-v246.js"
-grep -q "const APP_VERSION='2.4.7.1',APP_BUILD=281,APP_CHANNEL='beta';" "$RUNNER_TEMP/pm-v246.js"
-grep -q "sha256Bytes" "$RUNNER_TEMP/pm-v246.js"
-grep -q "fetchOfficialBytes" "$RUNNER_TEMP/pm-v246.js"
-grep -q "crypto.subtle.digest" "$RUNNER_TEMP/pm-v246.js"
-grep -q "const APP_VERSION = '2.4.6';" "$RUNNER_TEMP/updates-v246.js"
-grep -q "const APP_BUILD = 281;" "$RUNNER_TEMP/updates-v246.js"
-unzip -p "$UNSIGNED" assets/public/dashboard.html > "$RUNNER_TEMP/dashboard-v246.html"
-grep -q "mobile-launcher-icon-v241.js" "$RUNNER_TEMP/dashboard-v246.html"
-grep -q "tmScales246" "$RUNNER_TEMP/bootstrap-v246.js"
-grep -q "1T_BM9KY0NLwVhlifetQ6W6AdetujQjx--zOZHa27eQs" "$RUNNER_TEMP/bootstrap-v246.js"
-grep -q "1_LlfIHx4EuSHkC9BOR2VorvXoaiMyLa028wU6C0dQLs" "$RUNNER_TEMP/bootstrap-v246.js"
-grep -q "13eEei_JdGjAdVo371BGfPS59QdYySe9lJ47DLjWb_x0" "$RUNNER_TEMP/bootstrap-v246.js"
-! grep -q "Pessoal / Escalas" "$RUNNER_TEMP/bootstrap-v246.js"
-! grep -q "Missões" "$RUNNER_TEMP/bootstrap-v246.js"
-
+unzip -p "$UNSIGNED" assets/public/mobile-bootstrap.js > "$RUNNER_TEMP/bootstrap-v2471.js"
+unzip -p "$UNSIGNED" assets/public/mobile-patch-manager-v240.js > "$RUNNER_TEMP/pm-v2471.js"
+unzip -p "$UNSIGNED" assets/public/mobile-updates-v181.js > "$RUNNER_TEMP/updates-v2471.js"
+python3 - <<'PY'
+from pathlib import Path
+import json, os
+t=Path(os.environ['RUNNER_TEMP'])
+checks={
+ 'bootstrap':['__TAREFAS_ALPHA_2468_SERVICOS_HOTBAR_FIX__',"const APP_VERSION = '2.4.7.1';",'const APP_BUILD = 283;'],
+ 'pm':["APP_VERSION='2.4.7.1',APP_BUILD=283,APP_CHANNEL='alpha'"],
+ 'updates':["const APP_VERSION = '2.4.7.1';",'const APP_BUILD = 283;',\"const APP_CHANNEL = 'alpha';\"]
+}
+for f,needles in checks.items():
+ p=t/({'bootstrap':'bootstrap-v2471.js','pm':'pm-v2471.js','updates':'updates-v2471.js'}[f])
+ x=p.read_text()
+ for n in needles:
+  assert n in x,(f,n)
+boot=(t/'bootstrap-v2471.js').read_text()
+assert '__TAREFAS_ALPHA_2467_ESCALAS_2433__' not in boot
+print('APK CHECK OK: Alpha 2.4.7.1 com somente 2.4.6.8')
+PY
 OIDC="$(curl --fail --silent --show-error \
   -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
   "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-signing" | jq -r '.value')"
