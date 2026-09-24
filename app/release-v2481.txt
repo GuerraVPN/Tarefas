@@ -1,0 +1,18 @@
+# TAREFAS 2.4.8.1 Alpha — build 291
+
+## Correção da aprovação na Distribuição
+
+A tela de Distribuição mostrava o erro **“column reference \"motivo\" is ambiguous”** ao executar **Aprovar** na Fiscalização.
+
+### Causa encontrada
+A função Supabase `public.v5_4_2_mover_distribuicao` tinha uma variável PL/pgSQL chamada `motivo`, enquanto `pedidos_orcamentarios` também possui a coluna `motivo`. No `UPDATE` final, a referência ficava ambígua.
+
+### Correção
+- Variável interna renomeada para `v_motivo`.
+- Mantido o fluxo oficial da Distribuição: Fiscalização → Aguardando DIEx → Base → Pronto.
+- Mantidas as validações de Chefe/Auxiliar da Fiscalização.
+- O APK inclui a camada cliente de compatibilidade da 2.4.8.1.
+- A migration Supabase correspondente fica versionada em `supabase/migrations/`.
+- Somente o patch 2.4.6.8 continua incorporado; 2.4.6.7 não entra.
+- Patch Manager .tpatch v1, IndexedDB e SHA-256 preservados.
+- Web 7.9.1 preservada.
