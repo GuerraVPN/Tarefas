@@ -6,7 +6,6 @@ permissions:
   contents: write
 jobs:
   finalize:
-    if: ${{ contains(github.event.head_commit.message, 'feat(patch): publicar Alpha 2.4.6.8') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
