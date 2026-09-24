@@ -4,7 +4,7 @@ import path from 'node:path';
 const root=process.cwd(), dist=path.join(root,'dist');
 const VERSION='2.4.7.4', BUILD=286, WEB_VERSION='7.9.1';
 const PATCH_ID='2.4.6.8';
-const PREVIOUS_ALPHA='2.4.7.2';
+const PREVIOUS_ALPHA='2.4.7.3';
 const PATCH_FILE=path.join(root,'patches','TAREFAS-2.4.6.8.tpatch');
 const PATCH_SHA256='9bf9f10ca640f313500b6936918debeb45a6c094efb4aeef759bf6c2cfdbe607';
 
@@ -38,7 +38,7 @@ await patch('mobile-dashboard-v184.js',s=>{if(s==="(() => {\n  'use strict';\n  
 await writeFile(path.join(dist,'mobile-dashboard-v185.js'),"(() => {\n  'use strict';\n  const page=(location.pathname.split('/').pop()||'').toLowerCase();\n  if(page!=='dashboard.html') return;\n  const removeNextServiceCard=()=>{\n    document.getElementById('kNextServiceCard')?.remove();\n    document.getElementById('tmNextServiceStyle184')?.remove();\n    document.querySelectorAll('.tm-next-service-kpi').forEach(el=>el.remove());\n  };\n  const boot=()=>{\n    removeNextServiceCard();\n    setTimeout(removeNextServiceCard,0);\n    setTimeout(removeNextServiceCard,500);\n  };\n  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true});\n  else boot();\n  window.addEventListener('focus',removeNextServiceCard);\n  window.addEventListener('pageshow',removeNextServiceCard);\n  window.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')removeNextServiceCard()});\n})();",'utf8');
 await patch('mobile-release-v240.js',s=>s.replaceAll("version:VERSION,build:BUILD,channel:'alpha'",`version:'${VERSION}',build:${BUILD},channel:'alpha'`),{required:false});
 await rm(path.join(dist,'RELEASE_2_4_0.json'),{force:true});
-await writeFile(path.join(dist,'ALPHA_2_4_7_3.json'),JSON.stringify({
+await writeFile(path.join(dist,'ALPHA_2_4_7_4.json'),JSON.stringify({
   version:VERSION,build:BUILD,channel:'alpha',base:'2.4.6',basedOn:PREVIOUS_ALPHA,incorporatedPatch:PATCH_ID,webVersion:WEB_VERSION,
   features:{only2468:true,scalesPatch2467:false,servicesHotbar2468:true,nextServiceDashboardCardRemoved:true,nextServiceNeutralizerV185:true}
 },null,2)+'\n');
