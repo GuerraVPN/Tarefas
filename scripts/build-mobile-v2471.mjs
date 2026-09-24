@@ -27,7 +27,7 @@ if(payload.includes('__TAREFAS_ALPHA_2467_ESCALAS_2433__'))throw new Error('2.4.
 
 await copyFile(path.join(root,'app/mobile-launcher-icon-v241.js'),path.join(dist,'mobile-launcher-icon-v241.js'));
 for(const name of ['mobile-bootstrap.js','mobile-patch-manager-v240.js','mobile-updates-v181.js']){
-  await patch(name,s=>s.replaceAll('2.4.6',VERSION).replaceAll('281',String(BUILD)).replaceAll("channel:'beta'","channel:'alpha'").replaceAll("APP_CHANNEL='beta'","APP_CHANNEL='alpha'"),{required:false});
+  await patch(name,s=>s.replaceAll('2.4.6',VERSION).replaceAll('281',String(BUILD)).replaceAll("channel:'beta'","channel:'alpha'").replaceAll("APP_CHANNEL='beta'","APP_CHANNEL='alpha'").replaceAll("APP_CHANNEL = 'beta'","APP_CHANNEL = 'alpha'"),{required:false});
 }
 await patch('mobile-bootstrap.js',s=>{
   if(s.includes('__TAREFAS_ALPHA_2468_SERVICOS_HOTBAR_FIX__')) return s;
