@@ -1,0 +1,30 @@
+{
+  "format": "tarefas-tpatch-v1",
+  "id": "2.4.8.3",
+  "name": "TAREFAS 2.4.8.3 — Novo tipo de Guia: Fornecimento",
+  "patchVersion": 1,
+  "createdAt": "2026-09-25T12:20:00Z",
+  "baseVersion": "2.4.8",
+  "minBuild": 290,
+  "maxBuild": 290,
+  "channel": "alpha",
+  "cumulative": true,
+  "replacementMode": "replace-older-same-base",
+  "replaces": [
+    "2.4.8.2"
+  ],
+  "description": "Adiciona Fornecimento aos tipos de Guia do módulo Orçamentários no Web e no aplicativo, mantendo o fluxo regular de guias.",
+  "changelog": [
+    "Adiciona a opção Fornecimento ao cadastro de Guias.",
+    "Adiciona Fornecimento ao filtro Todos os tipos do módulo Orçamentários.",
+    "Fornecimento passa a ser reconhecido pelo rótulo correto nas listas e detalhes.",
+    "Fornecimento utiliza o fluxo regular da guia, como os tipos não-Recolhimento existentes.",
+    "Mantém as correções da Alpha 2.4.8.2."
+  ],
+  "order": 24803,
+  "payload": {
+    "js": "(()=>{'use strict';\nconst MARK='__TAREFAS_ALPHA_2483_FORNECIMENTO__';\nif(globalThis[MARK])return;\nglobalThis[MARK]=true;\n\nconst label=v=>v==='transferencia'?'Transferência':v==='remessa'?'Remessa':v==='fornecimento'?'Fornecimento':'Recolhimento';\nglobalThis.typeLabel=label;\n\nfunction addOption(id){\n  const sel=document.getElementById(id);\n  if(!sel || [...sel.options].some(o=>o.value==='fornecimento')) return !!sel;\n  const ref=[...sel.options].find(o=>o.value==='recolhimento');\n  const opt=document.createElement('option');\n  opt.value='fornecimento';\n  opt.textContent='Fornecimento';\n  ref?sel.insertBefore(opt,ref):sel.appendChild(opt);\n  return true;\n}\nfunction refresh(){\n  const a=addOption('gTipo');\n  const b=addOption('tipoFilter');\n  const edit=document.getElementById('egTipo');\n  if(edit && String(edit.value).toLowerCase()==='fornecimento')edit.value='Fornecimento';\n  return a||b;\n}\nrefresh();\nif(document.readyState==='loading')document.addEventListener('DOMContentLoaded',refresh,{once:true});\nlet tries=0;\nconst timer=setInterval(()=>{refresh();if(++tries>=60)clearInterval(timer)},100);\nwindow.addEventListener('pageshow',refresh);\nwindow.addEventListener('focus',refresh);\n\nglobalThis.TarefasAlpha2483Fornecimento=Object.freeze({\n  version:'2.4.8.3',\n  base:'2.4.8',\n  build:290,\n  guideType:'fornecimento'\n});\n})();",
+    "css": ""
+  },
+  "payloadSha256": "904e33da3ed073c2c7e3aa4366e7fffa61507c4c11b5a2241e9fc1ab86c9d6bf"
+}
