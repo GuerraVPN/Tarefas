@@ -85,7 +85,7 @@ function renderList(){
  for(const [d,list] of groups){
    h+=`<div class="orc-date">${d==='sem-data'?'Sem data':dateBR(d)} (${list.length})</div>`;
    h+=list.map(m=>`<article class="pedido-card ${selected&&String(selected.id)===String(m.id)?'active':''}" data-mov-id="${m.id}">
-     <div class="pedido-card-top"><strong>${esc(m.numero)}</strong><span class="pedido-status info">Movimentação</span></div>
+     <div class="pedido-card-top"><strong>${esc(m.numero)}</strong><span class="pedido-status ${movStatusClass(m.status)}">${esc(MOV_STATUS[m.status]||m.status||'Encaminhado ao Fiscal')}</span></div>
      <p>${esc(m.dependencia_origem)} → ${esc(m.dependencia_destino)} · ${its(m.id).length} material(is)<br>Total: ${esc(money(m.valor_total))}</p>
    </article>`).join('');
  }
