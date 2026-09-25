@@ -1,0 +1,19 @@
+# TAREFAS Android — Alpha 2.4.8.5
+
+Base: 2.4.8 / build 290
+Canal: Alpha
+Formato: .tpatch v1
+
+## Correção do menu Pessoal
+- Restaura a seção **Serviços e pessoal** no menu Android.
+- **Escala de serviço** volta a aparecer.
+- **Férias e dispensas** volta a aparecer.
+- **Usuários** volta a aparecer dentro de Serviços e pessoal.
+- Remove a duplicação de Usuários em Gestão.
+- **Missões** continua removida do menu.
+
+SHA-256 do .tpatch:
+`d40336d53df2cdb5eb977830733efeb3b4b513dd1ae47da7e02961d21aeacef9`
+
+SHA-256 interno do payload:
+`7f3e4fbe2fc3e3510e2822065f283d824e53721f26de207b47084e91b36b7b35`
