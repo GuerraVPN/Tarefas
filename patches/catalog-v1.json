@@ -3,8 +3,8 @@
   "app": "TAREFAS",
   "baseVersion": "2.4.1",
   "baseBuild": 276,
-  "generatedAt": "2026-09-25T12:25:00Z",
-  "latestPatch": "2.4.8.3",
+  "generatedAt": "2026-09-25T12:45:00Z",
+  "latestPatch": "2.4.8.4",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -849,6 +849,35 @@
         "Mantém as correções da Alpha 2.4.8.2."
       ],
       "order": 24803
+    },
+    {
+      "id": "2.4.8.4",
+      "name": "TAREFAS 2.4.8.4 — Correção do layout do pedido de Desrelacionamento / Baixa",
+      "patchVersion": 1,
+      "createdAt": "2026-09-25T12:45:00Z",
+      "baseVersion": "2.4.8",
+      "minBuild": 290,
+      "maxBuild": 290,
+      "channel": "alpha",
+      "publishedAt": "2026-09-25T12:45:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.4.8.3"
+      ],
+      "description": "Corrige no aplicativo o layout da tela de criação do pedido de Desrelacionamento / Baixa para que o conteúdo possa rolar e os botões de Cancelar e Cadastrar pedido permaneçam visíveis.",
+      "changelog": [
+        "Corrige o modal Novo pedido de Desrelacionamento / Baixa no celular.",
+        "O conteúdo do formulário passa a ter rolagem vertical própria, evitando que o final do formulário fique escondido.",
+        "Os botões Cancelar e Cadastrar pedido ficam presos na parte inferior do formulário e continuam acessíveis.",
+        "Adapta a altura do modal ao viewport do Android, inclusive com a barra/teclado do sistema.",
+        "Ajusta os botões para ocuparem a largura disponível em telas estreitas.",
+        "Mantém as funções e regras de cadastro existentes; a correção é somente de layout."
+      ],
+      "order": 24804,
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.8.4.tpatch",
+      "sha256": "ce248cf36560d41f9773c73bf32f1c3fb12aa3f622caebd9a8da9eeff2048649",
+      "installable": true
     }
   ],
   "history": [
@@ -1320,5 +1349,5 @@
       ]
     }
   ],
-  "cacheNonce": "2468"
+  "cacheNonce": "2484"
 }
