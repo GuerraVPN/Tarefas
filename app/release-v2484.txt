@@ -1,0 +1,20 @@
+# TAREFAS Android — Alpha 2.4.8.4
+
+Base: 2.4.8 / build 290
+Canal: Alpha
+Formato: .tpatch v1
+Arquivo oficial: TAREFAS-2.4.8.4.tpatch
+
+## Correção
+- Corrigido o layout do modal de criação do pedido de **Desrelacionamento / Baixa** no aplicativo.
+- O formulário passa a possuir rolagem própria, evitando que os campos finais fiquem escondidos.
+- **Cancelar** e **Cadastrar pedido** permanecem acessíveis na parte inferior.
+- O modal se adapta ao viewport do Android e a telas estreitas.
+- Nenhuma regra de cadastro ou fluxo de Desrelacionamento/Baixa foi alterada.
+
+## Integridade
+SHA-256 do .tpatch:
+`ce248cf36560d41f9773c73bf32f1c3fb12aa3f622caebd9a8da9eeff2048649`
+
+SHA-256 do payload:
+`1d221052e6e8a70dab1ae4dbe1d5ba32a7616a558671ff532aa3c5bc5298ca38`
