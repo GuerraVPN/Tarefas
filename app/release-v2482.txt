@@ -1,0 +1,19 @@
+# TAREFAS Android — Alpha 2.4.8.2
+
+Base: 2.4.8 / build 290
+Canal: Alpha
+Formato: .tpatch v1
+Arquivo oficial: TAREFAS-2.4.8.2.tpatch
+
+## Correções
+- Guias com status `pronto` passam a ser encaminhadas para a aba **Pronto**, mesmo quando `etapa_orcamentaria` ficou desatualizada.
+- A aba **Aguardando inclusão em carga** deixa de manter guias já concluídas.
+- Corrigida a permissão da função `v7_7_0_criar_pendencia_carga` no Supabase para os papéis usados pelo aplicativo.
+- Mantida a compatibilidade com a base 2.4.8 / build 290 e o patch 2.4.8.1.
+
+## Integridade
+SHA-256 do .tpatch:
+`dcba209492ab10e6dbf52fb9804cf01bc7e44e78f0184e9bbeb99f74c9629a55`
+
+SHA-256 do payload:
+`0796607aa0b1eb973389321dba2123bd235e37454e8bee86bc0c46cb372c8269`
