@@ -3,8 +3,8 @@
   "app": "TAREFAS",
   "baseVersion": "2.4.1",
   "baseBuild": 276,
-  "generatedAt": "2026-09-25T12:05:00Z",
-  "latestPatch": "2.4.8.2",
+  "generatedAt": "2026-09-25T12:25:00Z",
+  "latestPatch": "2.4.8.3",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -821,7 +821,34 @@
         "A correção do banco libera a execução da função v7_7_0_criar_pendencia_carga para os papéis usados pelo aplicativo, eliminando o erro de acesso negado.",
         "Mantém o fluxo existente de Fiscalização → inclusão em carga → Pronto e todas as correções da 2.4.8.1."
       ],
-      "order": 24802
+      "order": 24802,
+      "supersededBy": "2.4.8.3"
+    },
+    {
+      "id": "2.4.8.3",
+      "name": "TAREFAS 2.4.8.3 — Novo tipo de Guia: Fornecimento",
+      "baseVersion": "2.4.8",
+      "minBuild": 290,
+      "maxBuild": 290,
+      "channel": "alpha",
+      "publishedAt": "2026-09-25T12:20:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.4.8.2"
+      ],
+      "installable": true,
+      "description": "Adiciona Fornecimento aos tipos de Guia do módulo Orçamentários no Web e no aplicativo, mantendo o fluxo regular de guias.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.8.3.tpatch",
+      "sha256": "320bdf3f8803717c69f0c4bd844f9ee2cc4a56c0c290e2955b644a0679d39eb3",
+      "changelog": [
+        "Adiciona a opção Fornecimento ao cadastro de Guias.",
+        "Adiciona Fornecimento ao filtro Todos os tipos do módulo Orçamentários.",
+        "Fornecimento passa a ser reconhecido pelo rótulo correto nas listas e detalhes.",
+        "Fornecimento utiliza o fluxo regular da guia, como os tipos não-Recolhimento existentes.",
+        "Mantém as correções da Alpha 2.4.8.2."
+      ],
+      "order": 24803
     }
   ],
   "history": [
