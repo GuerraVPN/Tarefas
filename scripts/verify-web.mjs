@@ -92,6 +92,16 @@ const nav=await readFile(path.join(root,'v7_9_2_web.js'),'utf8');
 for(const forbidden of ["Pessoal / Serviços","['Missão','missao.html','Serviços']","Pessoal / Escalas"])if(nav.includes(forbidden))errors.push('v7_9_2_web.js: navegação legada presente: '+forbidden);
 const escala=await readFile(path.join(root,'pessoal_v7.js'),'utf8').catch(()=> '');
 for(const marker of ['escala_integrantes','escala_servicos','function loadScale','Motorista','Patrulheiro','Permanência'])if(!escala.includes(marker))errors.push('pessoal_v7.js: Escalas incompleta: '+marker);
+
+const nav793=await readFile(path.join(root,'v7_9_3_nav.js'),'utf8').catch(()=> '');
+for(const marker of ['const VERSION=\'7.9.3\'','data-v793-scale-toggle','1T_BM9KY0NLwVhlifetQ6W6AdetujQjx--zOZHa27eQs','1_LlfIHx4EuSHkC9BOR2VorvXoaiMyLa028wU6C0dQLs','13eEei_JdGjAdVo371BGfPS59QdYySe9lJ47DLjWb_x0'])
+  if(!nav793.includes(marker))errors.push(`v7_9_3_nav.js: item obrigatório ausente: ${marker}`);
+for(const forbidden of ['Escala de serviço','Escala de missão','Pessoal / Escalas','Missões'])
+  if(nav793.includes(forbidden))errors.push('v7_9_3_nav.js: navegação antiga presente: '+forbidden);
+const ver793=await readFile(path.join(root,'v7_9_3_version.js'),'utf8').catch(()=> '');
+for(const marker of ['const VERSION=\'7.9.3\'','__TAREFAS_V793_VERSION__'])
+  if(!ver793.includes(marker))errors.push(`v7_9_3_version.js: marcador ausente: ${marker}`);
+
 const pedidos=await readFile(path.join(root,'pedidos_v6.js'),'utf8');
 for(const marker of ['v5_4_2_mover_distribuicao','let moving=false','p_mensagem:note||null','ambiguous|column reference.*motivo'])if(!pedidos.includes(marker))errors.push('pedidos_v6.js: correção Distribuição ausente: '+marker);
 
