@@ -3,8 +3,8 @@
   "app": "TAREFAS",
   "baseVersion": "2.4.1",
   "baseBuild": 276,
-  "generatedAt": "2026-09-24T17:01:00.000Z",
-  "latestPatch": "2.4.8.1",
+  "generatedAt": "2026-09-25T12:05:00Z",
+  "latestPatch": "2.4.8.2",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -796,6 +796,32 @@
         "Patch Manager .tpatch v1 e SHA-256 permanecem preservados."
       ],
       "order": 24801
+    },
+    {
+      "id": "2.4.8.2",
+      "name": "TAREFAS 2.4.8.2 — Guias Prontas e correção das pendências de carga",
+      "baseVersion": "2.4.8",
+      "minBuild": 290,
+      "maxBuild": 290,
+      "channel": "alpha",
+      "publishedAt": "2026-09-25T12:05:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.4.8.1"
+      ],
+      "installable": true,
+      "description": "Corrige no aplicativo o direcionamento de guias já concluídas para a aba Pronto e acompanha a correção da permissão da função de pendências de carga no Supabase.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.8.2.tpatch",
+      "sha256": "dcba209492ab10e6dbf52fb9804cf01bc7e44e78f0184e9bbeb99f74c9629a55",
+      "changelog": [
+        "Guias com status Pronto passam a ser tratadas como etapa orçamentária Pronto mesmo quando o campo etapa_orcamentaria estiver desatualizado.",
+        "A aba Pronto passa a receber corretamente as guias já concluídas.",
+        "Guias prontas deixam de permanecer na aba Aguardando inclusão em carga por inconsistência de etapa.",
+        "A correção do banco libera a execução da função v7_7_0_criar_pendencia_carga para os papéis usados pelo aplicativo, eliminando o erro de acesso negado.",
+        "Mantém o fluxo existente de Fiscalização → inclusão em carga → Pronto e todas as correções da 2.4.8.1."
+      ],
+      "order": 24802
     }
   ],
   "history": [
