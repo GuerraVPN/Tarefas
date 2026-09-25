@@ -47,7 +47,7 @@ Ao atualizar uma instalação existente, mantenha o APK assinado do projeto para
 
 ## Web
 
-**Versão Web atual: 7.9.4 — Movimentações com identificação visual clara de “Como anda o processo”, mantendo os dados e etapas do fluxo.
+**Versão Web atual: 7.9.5** — Módulo Orçamentários com o novo tipo de Guia **Fornecimento**, além das correções anteriores.
 
 A versão Web continua disponível pelo GitHub Pages:
 
