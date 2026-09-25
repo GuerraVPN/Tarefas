@@ -3,17 +3,19 @@
 Base: 2.4.8 / build 290
 Canal: Alpha
 Formato: .tpatch v1
+Arquivo oficial: TAREFAS-2.4.8.5.tpatch
 
-## Correção do menu Pessoal
-- Restaura a seção **Serviços e pessoal** no menu Android.
-- **Escala de serviço** volta a aparecer.
-- **Férias e dispensas** volta a aparecer.
-- **Usuários** volta a aparecer dentro de Serviços e pessoal.
-- Remove a duplicação de Usuários em Gestão.
-- **Missões** continua removida do menu.
+## Correção
+- Mantém a correção de layout do pedido de Desrelacionamento / Baixa da Alpha 2.4.8.4.
+- Corrige a solicitação duplicada de biometria no início do aplicativo.
+- Chamadas biométricas simultâneas agora compartilham a mesma autenticação em andamento.
+- A correção impede que duas rotinas do WebView abram dois prompts nativos consecutivos.
+- Mantida a regra de biometria somente em um novo início real do aplicativo.
+- Sem alteração de senha, sessão, regras de acesso ou cadastro.
 
+## Integridade
 SHA-256 do .tpatch:
-`d40336d53df2cdb5eb977830733efeb3b4b513dd1ae47da7e02961d21aeacef9`
+`a4367385b015c08a37522a1267361023fc780c7000728e20a96b1f47c08e31d5`
 
-SHA-256 interno do payload:
-`7f3e4fbe2fc3e3510e2822065f283d824e53721f26de207b47084e91b36b7b35`
+SHA-256 do payload:
+`4ef407e95833c75bb05b4b3da5dab3f872038e03c06390107500b71fb0bc1299`
