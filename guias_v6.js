@@ -80,7 +80,7 @@ function fiscalClass(v){
         v==='em_analise_fiscalizacao'?'fiscal-analysis':
         v==='devolvida_fiscalizacao'?'fiscal-return':'fiscal-ok';
 }
-function typeLabel(v){return v==='transferencia'?'Transferência':v==='remessa'?'Remessa':'Recolhimento'}
+function typeLabel(v){return v==='transferencia'?'Transferência':v==='remessa'?'Remessa':v==='fornecimento'?'Fornecimento':'Recolhimento'}
 function userName(id){
  const x=usersMap.get(String(id));
  return x?[x.patente,x.nome_guerra].filter(Boolean).join(' '):`Usuário ${id||'-'}`;
