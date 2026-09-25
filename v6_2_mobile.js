@@ -103,7 +103,8 @@ if(heavy.has(page)){
     ['v6_5_patch.js?v=7.7.1-perf','data-v65-loader'],
     ['v7_6_5_webfix.js?v=7.7.1-perf','data-v765-webfix'],
     ['v7_9_3_version.js?v=7.9.3','data-v793-version'],
-    ['v7_9_3_nav.js?v=7.9.3','data-v793-nav']
+    ['v7_9_3_nav.js?v=7.9.3','data-v793-nav'],
+    ['v7_9_4_mov_process.js?v=7.9.4','data-v794-mov-process']
   ];
   if(page==='about.html')list.push(['v7_5_1_about.js?v=7.9.2','data-v751-about']);
   chain(list);
