@@ -3,8 +3,8 @@
   "app": "TAREFAS",
   "baseVersion": "2.4.1",
   "baseBuild": 276,
-  "generatedAt": "2026-09-25T13:35:00Z",
-  "latestPatch": "2.4.8.5",
+  "generatedAt": "2026-09-25T13:50:00Z",
+  "latestPatch": "2.4.8.4",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -877,9 +877,8 @@
       ],
       "order": 24804,
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.8.4.tpatch",
-      "sha256": "85b94e453ce9f4818255dff9d0157d6be2710f9164c1b97710bfa58561ed8461",
-      "installable": false,
-      "supersededBy": "2.4.8.5"
+      "sha256": "ac4e4cfbca56e0cdf0c2e03199dff61016b97d0d404067c9c98c2d31f9452ad6",
+      "installable": true
     },
     {
       "id": "2.4.8.5",
@@ -896,7 +895,7 @@
       "replaces": [
         "2.4.8.4"
       ],
-      "installable": true,
+      "installable": false,
       "description": "Restaura no menu Android a área Serviços e pessoal com Escala de serviço, Férias e dispensas e Usuários, mantendo Missões removida.",
       "changelog": [
         "Restaura a seção Serviços e pessoal no menu lateral do aplicativo.",
@@ -908,7 +907,8 @@
       ],
       "order": 24805,
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.8.5.tpatch",
-      "sha256": "d40336d53df2cdb5eb977830733efeb3b4b513dd1ae47da7e02961d21aeacef9"
+      "sha256": "d40336d53df2cdb5eb977830733efeb3b4b513dd1ae47da7e02961d21aeacef9",
+      "supersededBy": "2.4.8.4"
     }
   ],
   "history": [
@@ -1380,5 +1380,5 @@
       ]
     }
   ],
-  "cacheNonce": "2485"
+  "cacheNonce": "2484-sha2"
 }
