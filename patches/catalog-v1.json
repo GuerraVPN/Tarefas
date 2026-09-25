@@ -3,7 +3,7 @@
   "app": "TAREFAS",
   "baseVersion": "2.4.1",
   "baseBuild": 276,
-  "generatedAt": "2026-09-25T13:00:00Z",
+  "generatedAt": "2026-09-25T13:10:00Z",
   "latestPatch": "2.4.8.4",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
@@ -810,7 +810,7 @@
       "replaces": [
         "2.4.8.1"
       ],
-      "installable": true,
+      "installable": false,
       "description": "Corrige no aplicativo o direcionamento de guias já concluídas para a aba Pronto e acompanha a correção da permissão da função de pendências de carga no Supabase.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.8.2.tpatch",
       "sha256": "dcba209492ab10e6dbf52fb9804cf01bc7e44e78f0184e9bbeb99f74c9629a55",
@@ -822,7 +822,7 @@
         "Mantém o fluxo existente de Fiscalização → inclusão em carga → Pronto e todas as correções da 2.4.8.1."
       ],
       "order": 24802,
-      "supersededBy": "2.4.8.3"
+      "supersededBy": "2.4.8.4"
     },
     {
       "id": "2.4.8.3",
@@ -837,7 +837,7 @@
       "replaces": [
         "2.4.8.2"
       ],
-      "installable": true,
+      "installable": false,
       "description": "Adiciona Fornecimento aos tipos de Guia do módulo Orçamentários no Web e no aplicativo, mantendo o fluxo regular de guias.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.8.3.tpatch",
       "sha256": "320bdf3f8803717c69f0c4bd844f9ee2cc4a56c0c290e2955b644a0679d39eb3",
@@ -848,7 +848,8 @@
         "Fornecimento utiliza o fluxo regular da guia, como os tipos não-Recolhimento existentes.",
         "Mantém as correções da Alpha 2.4.8.2."
       ],
-      "order": 24803
+      "order": 24803,
+      "supersededBy": "2.4.8.4"
     },
     {
       "id": "2.4.8.4",
@@ -859,7 +860,7 @@
       "minBuild": 290,
       "maxBuild": 290,
       "channel": "alpha",
-      "publishedAt": "2026-09-25T12:45:00Z",
+      "publishedAt": "2026-09-25T13:10:00Z",
       "cumulative": true,
       "replacementMode": "replace-older-same-base",
       "replaces": [
@@ -876,7 +877,7 @@
       ],
       "order": 24804,
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.8.4.tpatch",
-      "sha256": "6930cfce91752d05ab567d8ee83c6a9fcadbd180111c3635774328573e55d4c9",
+      "sha256": "85b94e453ce9f4818255dff9d0157d6be2710f9164c1b97710bfa58561ed8461",
       "installable": true
     }
   ],
@@ -1349,5 +1350,5 @@
       ]
     }
   ],
-  "cacheNonce": "2484b"
+  "cacheNonce": "2484c"
 }
