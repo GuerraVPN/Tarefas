@@ -47,7 +47,7 @@ Ao atualizar uma instalação existente, mantenha o APK assinado do projeto para
 
 ## Web
 
-**Versão Web atual: 7.9.1** — Painel SITE corrigido, Central 2.0, Favoritos/Filtros por subaba, melhorias da IA e estabilização do navegador.
+**Versão Web atual: 7.9.3** — Menu Pessoal reorganizado com Escala → Motorista / Patrulheiro / Permanência via Google Sheets, mantendo Férias / Dispensas e Usuários, além das correções da 7.9.2.
 
 A versão Web continua disponível pelo GitHub Pages:
 
