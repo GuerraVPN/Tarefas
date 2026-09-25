@@ -1,0 +1,31 @@
+{
+  "format": "tarefas-tpatch-v1",
+  "id": "2.4.8.4",
+  "name": "TAREFAS 2.4.8.4 — Correção do layout do pedido de Desrelacionamento / Baixa",
+  "patchVersion": 1,
+  "createdAt": "2026-09-25T12:45:00Z",
+  "baseVersion": "2.4.8",
+  "minBuild": 290,
+  "maxBuild": 290,
+  "channel": "alpha",
+  "cumulative": true,
+  "replacementMode": "replace-older-same-base",
+  "replaces": [
+    "2.4.8.3"
+  ],
+  "description": "Corrige no aplicativo o layout da tela de criação do pedido de Desrelacionamento / Baixa para que o conteúdo possa rolar e os botões de Cancelar e Cadastrar pedido permaneçam visíveis.",
+  "changelog": [
+    "Corrige o modal Novo pedido de Desrelacionamento / Baixa no celular.",
+    "O conteúdo do formulário passa a ter rolagem vertical própria, evitando que o final do formulário fique escondido.",
+    "Os botões Cancelar e Cadastrar pedido ficam presos na parte inferior do formulário e continuam acessíveis.",
+    "Adapta a altura do modal ao viewport do Android, inclusive com a barra/teclado do sistema.",
+    "Ajusta os botões para ocuparem a largura disponível em telas estreitas.",
+    "Mantém as funções e regras de cadastro existentes; a correção é somente de layout."
+  ],
+  "order": 24804,
+  "payload": {
+    "js": "(()=>{'use strict';\nconst MARK='__TAREFAS_ALPHA_2484_PEDIDO_LAYOUT_FIX__';\nif(globalThis[MARK])return;\nglobalThis[MARK]=true;\n\nfunction ensurePedidoModalLayout(){\n  const bg=document.getElementById('newPedidoBg');\n  if(!bg)return false;\n  bg.classList.add('tm-2484-pedido-layout');\n  const modal=bg.querySelector('.orc-modal');\n  const form=bg.querySelector('#newPedidoForm');\n  const actions=bg.querySelector('.pedido-form-actions');\n  if(modal)modal.classList.add('tm-2484-pedido-modal');\n  if(form)form.classList.add('tm-2484-pedido-form');\n  if(actions)actions.classList.add('tm-2484-pedido-actions');\n  return true;\n}\nfunction boot(){\n  ensurePedidoModalLayout();\n  let tries=0;\n  const timer=setInterval(()=>{\n    ensurePedidoModalLayout();\n    if(++tries>=80)clearInterval(timer);\n  },125);\n  window.addEventListener('pageshow',ensurePedidoModalLayout);\n  window.addEventListener('focus',ensurePedidoModalLayout);\n}\nif(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();\n\nglobalThis.TarefasAlpha2484PedidoLayout=Object.freeze({\n  version:'2.4.8.4',\n  base:'2.4.8',\n  build:290,\n  pedidoModalScrollable:true,\n  actionButtonsVisible:true\n});\n})();",
+    "css": "html.tarefas-mobile-shell.tm-page-orcamentarios #newPedidoBg.tm-2484-pedido-layout{\n  align-items:flex-start!important;\n  justify-content:center!important;\n  overflow-y:auto!important;\n  overflow-x:hidden!important;\n  padding:8px!important;\n  box-sizing:border-box!important;\n}\nhtml.tarefas-mobile-shell.tm-page-orcamentarios #newPedidoBg .tm-2484-pedido-modal{\n  width:min(980px,100%)!important;\n  max-width:100%!important;\n  max-height:calc(100dvh - 16px)!important;\n  min-height:0!important;\n  margin:auto!important;\n  display:flex!important;\n  flex-direction:column!important;\n  overflow:hidden!important;\n  box-sizing:border-box!important;\n}\nhtml.tarefas-mobile-shell.tm-page-orcamentarios #newPedidoBg .tm-2484-pedido-modal .orc-modal-head{\n  flex:0 0 auto!important;\n  position:relative!important;\n  z-index:3!important;\n}\nhtml.tarefas-mobile-shell.tm-page-orcamentarios #newPedidoBg .tm-2484-pedido-form{\n  min-height:0!important;\n  max-height:none!important;\n  overflow-y:auto!important;\n  overflow-x:hidden!important;\n  -webkit-overflow-scrolling:touch!important;\n  overscroll-behavior:contain!important;\n  padding-bottom:12px!important;\n}\nhtml.tarefas-mobile-shell.tm-page-orcamentarios #newPedidoBg .tm-2484-pedido-actions{\n  position:sticky!important;\n  bottom:0!important;\n  z-index:20!important;\n  flex:0 0 auto!important;\n  justify-content:stretch!important;\n  background:var(--v4-surface,#101816)!important;\n  box-shadow:0 -8px 18px rgba(0,0,0,.28)!important;\n  padding:11px 15px calc(11px + env(safe-area-inset-bottom))!important;\n  margin:0 -15px!important;\n  width:calc(100% + 30px)!important;\n  box-sizing:border-box!important;\n}\nhtml.tarefas-mobile-shell.tm-page-orcamentarios #newPedidoBg .tm-2484-pedido-actions .orc-btn{\n  flex:1 1 0!important;\n  min-height:44px!important;\n  white-space:nowrap!important;\n}\n@media(max-width:420px){\n  html.tarefas-mobile-shell.tm-page-orcamentarios #newPedidoBg .tm-2484-pedido-actions{\n    gap:8px!important;\n  }\n  html.tarefas-mobile-shell.tm-page-orcamentarios #newPedidoBg .tm-2484-pedido-actions .orc-btn{\n    min-width:0!important;\n    padding-left:10px!important;\n    padding-right:10px!important;\n  }\n}"
+  },
+  "payloadSha256": "1d221052e6e8a70dab1ae4dbe1d5ba32a7616a558671ff532aa3c5bc5298ca38"
+}
