@@ -71,7 +71,7 @@ function catOf(g){
    g.situacao_fiscalizacao==='aprovada_fiscalizacao'?'aguardando_inclusao_carga':
    g.situacao_fiscalizacao==='devolvida_fiscalizacao'?'fiscalizacao':'fiscalizacao'
  );
- if(e==='pronto')return'pronto';
+ if(g.status==='pronto'||e==='pronto')return'pronto';
  if(e==='aguardando_inclusao_carga')return'aguardando_carga';
  return'fiscalizacao';
 }
