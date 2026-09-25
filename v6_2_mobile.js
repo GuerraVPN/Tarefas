@@ -106,7 +106,7 @@ if(heavy.has(page)){
     ['v7_9_3_nav.js?v=7.9.3','data-v793-nav'],
     ['v7_9_4_mov_process.js?v=7.9.4','data-v794-mov-process'],
     ['v7_9_5_fornecimento.js?v=7.9.5,
-    ['v7_9_6_usuarios_nav_fix.js?v=7.9.6','data-v796-usuarios-nav']','data-v795-fornecimento']
+    ['v7_9_6_usuarios_nav_fix.js?v=7.9.7','data-v796-usuarios-nav']','data-v795-fornecimento']
   ];
   if(page==='about.html')list.push(['v7_5_1_about.js?v=7.9.2','data-v751-about']);
   chain(list);
