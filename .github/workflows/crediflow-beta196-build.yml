@@ -44,6 +44,19 @@ jobs:
       - name: Decode base APK
         run: java -jar /tmp/apktool.jar d -f /tmp/base.apk -o /tmp/app
 
+      - name: Inspect existing EarlyPaymentUi
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/early-ui
+          find /tmp/app -name 'EarlyPaymentUi.smali' -print -exec cp {} /tmp/early-ui/EarlyPaymentUi.smali \\\;
+          test -s /tmp/early-ui/EarlyPaymentUi.smali
+      - name: Upload EarlyPaymentUi source for patching
+        uses: actions/upload-artifact@v4
+        with:
+          name: crediflow-early-payment-ui-source
+          path: /tmp/early-ui/EarlyPaymentUi.smali
+          retention-days: 2
       - name: Apply Beta 1.9.5 base updater
         run: python3 crediflow-build/patch_beta195.py
 
