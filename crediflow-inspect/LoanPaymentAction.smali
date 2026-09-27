@@ -129,4 +129,4 @@
 .end method
 
 # trigger approved CrediFlow 1.9.7 signing build
-# build trigger: final build verification 2
+# build trigger: APK integrity verification
