@@ -20,7 +20,7 @@
     .locals 0
     invoke-direct {p0}, Ljava/lang/Object;-><init>()V
     iput-object p1, p0, Lbr/com/guerravpn/crediflow/LoanPaymentAction;->a:Lbr/com/guerravpn/crediflow/MainActivityV06;
-    iput-object p2, p0, Lbr/com/guerravpn/crediflow/MainActivityV06;->b:Lorg/json/JSONObject;
+    iput-object p2, p0, Lbr/com/guerravpn/crediflow/LoanPaymentAction;->b:Lorg/json/JSONObject;
     return-void
 .end method
 
