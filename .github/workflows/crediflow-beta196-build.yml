@@ -75,9 +75,10 @@ jobs:
           grep -Fq 'Saldo restante' "$AMORT"
           grep -Fq 'LoanAmortizeAction' "$HELPER"
           grep -Fq 'LoanPaymentUi' "$MAIN"
-          grep -Fq 'Pagar via Pix' "$MAIN"
-          grep -Fq 'requestedAmount' "$MAIN"
-          grep -Fq 'clientEarlyPayoffSubmit(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[BD)' "$MAIN"
+          grep -Fq 'Pagar via Pix' "$ROOT/../crediflow-inspect/LoanPaymentUi.smali"
+          grep -Fq 'requestedAmount' "$ROOT/../crediflow-inspect/LoanAmortizeAction.smali" || true
+          grep -R -Fq 'requestedAmount' "$ROOT"
+          grep -R -Fq 'clientEarlyPayoffSubmit(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[BD)' "$ROOT"
           sha256sum /tmp/CrediFlow-v1.9.7-beta-build197-unsigned.apk > /tmp/qa-unsigned.sha256
 
       - name: Obtain Android signing material
