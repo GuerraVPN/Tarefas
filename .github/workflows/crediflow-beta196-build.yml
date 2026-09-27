@@ -6,6 +6,7 @@ on:
   push:
     branches: [crediflow-beta196-build]
     paths:
+      - '.github/workflows/crediflow-beta196-build.yml'
       - '.github/workflows/crediflow-beta198-build.yml'
       - 'crediflow-build/patch_beta195.py'
       - 'crediflow-build/patch_beta198.py'
