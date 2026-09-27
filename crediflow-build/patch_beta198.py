@@ -162,7 +162,8 @@ if '.field private final requestedAmount:D' not in e:
 
     .line 30
     return-void'''
-    ctor_new='''    .line 29
+    ctor_new='''    .locals 2
+    .line 29
     iput-object p2, p0, Lbr/com/guerravpn/crediflow/EarlyPaymentUi;->loanId:Ljava/lang/String;
 
     iget-wide v0, p1, Lbr/com/guerravpn/crediflow/MainActivityV06;->partialPaymentAmount:D
