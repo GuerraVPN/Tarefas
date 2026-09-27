@@ -54,7 +54,7 @@ jobs:
         run: |
           MAIN=$(find /tmp/app -name MainActivityV06.smali | head -1)
           echo "MAIN=$MAIN"
-          nl -ba "$MAIN" | sed -n '1500,1540p;1580,1660p;1800,1910p'
+          nl -ba "$MAIN" | sed -n '1748,1760p;1800,1910p'
           echo '--- method/local around 1901 ---'
           awk 'NR<=1901 && /^\.method /{last=$0; line=NR} END{print "LAST_METHOD_LINE=" line; print last}' "$MAIN"
           awk 'NR>=1800 && NR<=1901 && /^    \.locals /{print NR ":" $0}' "$MAIN"
