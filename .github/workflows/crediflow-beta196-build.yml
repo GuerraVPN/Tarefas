@@ -57,6 +57,12 @@ jobs:
           name: crediflow-early-payment-ui-source
           path: /tmp/early-ui/EarlyPaymentUi.smali
           retention-days: 2
+      - name: Upload Api source for payment flow
+        uses: actions/upload-artifact@v4
+        with:
+          name: crediflow-api-source
+          path: /tmp/app/smali_classes3/br/com/guerravpn/crediflow/Api.smali
+          retention-days: 2
       - name: Apply Beta 1.9.5 base updater
         run: python3 crediflow-build/patch_beta195.py
 
