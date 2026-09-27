@@ -42,9 +42,9 @@ repl_loan = '''    iget-object v25, p0, Lbr/com/guerravpn/crediflow/MainActivity
 
     invoke-virtual {v10, v27}, Landroid/widget/LinearLayout;->addView(Landroid/view/View;)V
 
-    iget-object v3, p0, Lbr/com/guerravpn/crediflow/Ui;
+    iget-object v3, p0, Lbr/com/guerravpn/crediflow/MainActivityV06;->u:Lbr/com/guerravpn/crediflow/Ui;
 
-    new-instance v12, Lbr/com/guerravpn/crediflow/MainActivityV06$$ExternalSyntheticLambda36;'''
+    new-instance v12, Lbr/com/guerravpn/crediflow/MainActivityV06$ExternalSyntheticLambda36;'''
 if s.count(needle_loan) != 1:
     raise SystemExit(f'per-loan insertion point count={s.count(needle_loan)}')
 s = s.replace(needle_loan, repl_loan, 1)
