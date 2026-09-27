@@ -66,3 +66,7 @@ listener_src = Path('crediflow-inspect/LoanPaymentAction.smali')
 if not listener_src.exists():
     raise SystemExit('LoanPaymentAction source file not found')
 (main.parent / 'LoanPaymentAction.smali').write_text(listener_src.read_text(encoding='utf-8'), encoding='utf-8')
+helper_src = Path('crediflow-inspect/LoanPaymentUi.smali')
+if not helper_src.exists():
+    raise SystemExit('LoanPaymentUi source file not found')
+(main.parent / 'LoanPaymentUi.smali').write_text(helper_src.read_text(encoding='utf-8'), encoding='utf-8')
