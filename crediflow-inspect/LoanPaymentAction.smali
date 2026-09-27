@@ -129,4 +129,4 @@
 .end method
 
 # trigger approved CrediFlow 1.9.7 signing build
-# inspect Api source
+# build trigger: Pix partial uses existing early-payment proof flow
