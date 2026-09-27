@@ -46,16 +46,10 @@
     move-result-wide v4
     invoke-static {v4, v5}, Lbr/com/guerravpn/crediflow/MainActivityV06;->money(D)Ljava/lang/String;
     move-result-object v3
-    new-instance v4, Ljava/lang/StringBuilder;
-    invoke-direct {v4}, Ljava/lang/StringBuilder;-><init>()V
-    const-string v5, "Saldo restante: "
-    invoke-virtual {v4, v5}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder
+    const-string v4, "Saldo restante: "
+    invoke-virtual {v4, v3}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
     move-result-object v4
-    invoke-virtual {v4, v3}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-    move-result-object v4
-    invoke-virtual {v4}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
-    move-result-object v3
-    invoke-virtual {v2, v3}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
+    invoke-virtual {v2, v4}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
     sget v3, Lbr/com/guerravpn/crediflow/Ui;->MUTED:I
     invoke-virtual {v2, v3}, Landroid/widget/TextView;->setTextColor(I)V
     const/high16 v3, 0x41600000
