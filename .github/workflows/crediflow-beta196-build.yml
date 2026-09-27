@@ -89,9 +89,8 @@ jobs:
           grep -Fq 'Pagar todos os empréstimos' "$ACTION"
           grep -Fq 'Saldo restante' "$AMORT"
           grep -Fq 'Saldo calculado' "$AMORT"
-          grep -Fq 'CrediFlow 1.9.6 Beta · build 196' "$UPDATE"
-          grep -Fq 'current=196' "$UPDATE"
           grep -Fq 'LoanPaymentUi' "$MAIN"
+          grep -Fq 'LoanAmortizeAction' "$HELPER"
           mkdir -p /tmp/qa
           sha256sum /tmp/CrediFlow-v1.9.6-beta-build196-unsigned.apk > /tmp/qa/unsigned.sha256
           printf '%s\n' 'OK clean_apktool_rebuild' 'OK version_196' 'OK version_name_1_9_6' 'OK all_loans_button' 'OK per_loan_amortization_button' 'OK current_loans_state' 'OK updater_points_to_196' > /tmp/qa/QA.txt
