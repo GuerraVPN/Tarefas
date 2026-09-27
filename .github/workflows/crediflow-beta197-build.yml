@@ -1,0 +1,142 @@
+name: CrediFlow Beta 1.9.7 build
+# signing policy: android-signing-material v30 allows this exact CrediFlow beta workflow
+
+on:
+  push:
+    branches: [crediflow-beta197-build]
+    paths:
+      - '.github/workflows/crediflow-beta197-build.yml'
+      - 'crediflow-build/patch_beta195.py'
+      - 'crediflow-build/patch_beta197.py'
+      - 'crediflow-inspect/LoanPaymentAction.smali'
+      - 'crediflow-inspect/LoanPaymentUi.smali'
+      - 'crediflow-inspect/LoanAmortizeAction.smali'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Beta 1.9.7
+        uses: actions/checkout@v4
+        with:
+          ref: crediflow-beta197-build
+          fetch-depth: 0
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Restore stable base APK
+        run: |
+          cat crediflow-build/base.part00 crediflow-build/base.part01 crediflow-build/base.part02 crediflow-build/base.part03 crediflow-build/base.part04 crediflow-build/base.part05 crediflow-build/base.part06 crediflow-build/base.part07 | base64 -d > /tmp/base.apk
+          echo '3d13bfb2e55c9d9719f19f6769701a28e438566574022bb4cd4d7220197a46c0  /tmp/base.apk' | sha256sum -c -
+
+      - name: Install Apktool
+        run: |
+          curl -fL --retry 3 -o /tmp/apktool.jar https://github.com/iBotPeaches/Apktool/releases/download/v3.0.3/apktool_3.0.3.jar
+          echo 'dbf930b076c6b9be08d57c449cacefc3bdd6b71ebd59b3066fc0e1f5b14f9423  /tmp/apktool.jar' | sha256sum -c -
+
+      - name: Decode base APK
+        run: java -jar /tmp/apktool.jar d -f /tmp/base.apk -o /tmp/app
+
+      - name: Apply Beta 1.9.5 base updater
+        run: python3 crediflow-build/patch_beta195.py
+
+      - name: Apply Beta 1.9.7 payment features
+        run: python3 crediflow-build/patch_beta197.py
+
+      - name: Build unsigned APK
+      - name: Build unsigned APK
+        run: |
+          java -jar /tmp/apktool.jar b /tmp/app -o /tmp/CrediFlow-v1.9.7-beta-build197-unsigned.apk
+          unzip -tq /tmp/CrediFlow-v1.9.7-beta-build197-unsigned.apk
+
+      - name: Verify Beta 1.9.7 payload
+        run: |
+          set -e
+          test -s /tmp/CrediFlow-v1.9.7-beta-build197-unsigned.apk
+          test -f /tmp/app/apktool.yml
+          MAIN=$(find /tmp/app -name MainActivityV06.smali | head -1)
+          ACTION=$(find /tmp/app -name LoanPaymentAction.smali | head -1)
+          AMORT=$(find /tmp/app -name LoanAmortizeAction.smali | head -1)
+          HELPER=$(find /tmp/app -name LoanPaymentUi.smali | head -1)
+          test -n "$MAIN"
+          test -n "$ACTION"
+          test -n "$AMORT"
+          test -n "$HELPER"
+          grep -Fq 'Pagar todos os empréstimos' "$ACTION"
+          grep -Fq 'EarlyPaymentUi' "$ACTION"
+          grep -Fq 'Saldo restante' "$AMORT"
+          grep -Fq 'LoanAmortizeAction' "$HELPER"
+          grep -Fq 'LoanPaymentUi' "$MAIN"
+          grep -Fq 'client-partial-payment' "$AMORT"
+          grep -Fq 'Pagamento registrado' "$AMORT"
+          sha256sum /tmp/CrediFlow-v1.9.7-beta-build197-unsigned.apk > /tmp/qa-unsigned.sha256
+
+      - name: Obtain Android signing material
+        run: |
+          OIDC="$(curl --fail --silent --show-error -H "Authorization: bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-signing" | jq -r '.value')"
+          curl --fail --silent --show-error -H "Authorization: Bearer $OIDC" 'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/android-signing-material' -o "$RUNNER_TEMP/signing.json"
+          test -s "$RUNNER_TEMP/signing.json"
+          jq -r '.keystore_b64' "$RUNNER_TEMP/signing.json" | base64 -d > "$RUNNER_TEMP/GuerraVPN.keystore"
+          STORE_PASS="$(jq -r '.store_password' "$RUNNER_TEMP/signing.json")"
+          KEY_ALIAS="$(jq -r '.key_alias' "$RUNNER_TEMP/signing.json")"
+          KEY_PASS="$(jq -r '.key_password' "$RUNNER_TEMP/signing.json")"
+          EXPECTED_CERT="$(jq -r '.cert_sha256' "$RUNNER_TEMP/signing.json" | tr -d ': ' | tr '[:upper:]' '[:lower:]')"
+          APKSIGNER="$(find "$ANDROID_HOME/build-tools" -type f -name apksigner | sort -V | tail -1)"
+          ZIPALIGN="$(find "$ANDROID_HOME/build-tools" -type f -name zipalign | sort -V | tail -1)"
+          test -n "$APKSIGNER"
+          test -n "$ZIPALIGN"
+          "$ZIPALIGN" -p -f 4 /tmp/CrediFlow-v1.9.7-beta-build197-unsigned.apk "$RUNNER_TEMP/CrediFlow-v1.9.7-beta-build197-aligned.apk"
+          "$APKSIGNER" sign --ks "$RUNNER_TEMP/GuerraVPN.keystore" --ks-key-alias "$KEY_ALIAS" --ks-pass "pass:$STORE_PASS" --key-pass "pass:$KEY_PASS" --out "$RUNNER_TEMP/CrediFlow-v1.9.7-beta-build197.apk" "$RUNNER_TEMP/CrediFlow-v1.9.7-beta-build197-aligned.apk"
+          "$APKSIGNER" verify --verbose --print-certs "$RUNNER_TEMP/CrediFlow-v1.9.7-beta-build197.apk" | tee "$RUNNER_TEMP/apksigner.txt"
+          ACTUAL_CERT="$(sed -n 's/.*certificate SHA-256 digest: //p' "$RUNNER_TEMP/apksigner.txt" | head -1 | tr -d ': ' | tr '[:upper:]' '[:lower:]')"
+          test -n "$ACTUAL_CERT"
+          test "$ACTUAL_CERT" = "$EXPECTED_CERT"
+          sha256sum "$RUNNER_TEMP/CrediFlow-v1.9.7-beta-build197.apk" > "$RUNNER_TEMP/CrediFlow-v1.9.7-beta-build197.apk.sha256"
+
+      - name: Publish signed APK to app/releases
+        run: |
+          git fetch origin app/releases
+          RELEASES_DIR="$RUNNER_TEMP/crediflow-releases"
+          git worktree add "$RELEASES_DIR" origin/app/releases
+          mkdir -p "$RELEASES_DIR/downloads"
+          cp "$RUNNER_TEMP/CrediFlow-v1.9.7-beta-build197.apk" "$RELEASES_DIR/downloads/"
+          cp "$RUNNER_TEMP/CrediFlow-v1.9.7-beta-build197.apk.sha256" "$RELEASES_DIR/downloads/"
+          cd "$RELEASES_DIR"
+          git config user.name 'GuerraVPN CrediFlow Build'
+          git config user.email '81371258+GuerraVPN@users.noreply.github.com'
+          git add "downloads/CrediFlow-v1.9.7-beta-build197.apk" "downloads/CrediFlow-v1.9.7-beta-build197.apk.sha256"
+          git commit -m 'release(crediflow): CrediFlow 1.9.7 beta build 197'
+          git push origin HEAD:app/releases
+
+      - name: Verify published APK
+        run: |
+          URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/CrediFlow-v1.9.7-beta-build197.apk'
+          LOCAL_SHA="$(sha256sum "$RUNNER_TEMP/CrediFlow-v1.9.7-beta-build197.apk" | awk '{print $1}')"
+          for attempt in 1 2 3 4 5 6 7 8; do
+            if curl --fail --silent --show-error -L "$URL" -o "$RUNNER_TEMP/published.apk" && test "$(sha256sum "$RUNNER_TEMP/published.apk" | awk '{print $1}')" = "$LOCAL_SHA"; then
+              echo "Published APK verified: $LOCAL_SHA"
+              break
+            fi
+            sleep 3
+            test "$attempt" != '8'
+          done
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: CrediFlow-v1.9.7-beta-build197
+          path: |
+            /tmp/CrediFlow-v1.9.7-beta-build197-unsigned.apk
+            ${{ runner.temp }}/CrediFlow-v1.9.7-beta-build197.apk
+            ${{ runner.temp }}/CrediFlow-v1.9.7-beta-build197.apk.sha256
+          if-no-files-found: error
+          retention-days: 14
