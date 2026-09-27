@@ -68,10 +68,13 @@ if '.field private final requestedAmount:D' not in e:
     if ctor_old not in e: raise SystemExit('EarlyPaymentUi constructor anchor not found')
     e=e.replace(ctor_old,ctor_new,1)
     e=e.replace('const-string v12, "Valor para quitar agora"','const-string v12, "Valor para pagar agora"',1)
-    payoff_old='''    invoke-virtual {v1, v9, v7, v8}, Lorg/json/JSONObject;->optDouble(Ljava/lang/String;D)D\n    move-result-wide v7\n\n    .line 70'''
-    payoff_new='''    invoke-virtual {v1, v9, v7, v8}, Lorg/json/JSONObject;->optDouble(Ljava/lang/String;D)D\n    move-result-wide v7\n    iget-wide v9, v0, Lbr/com/guerravpn/crediflow/EarlyPaymentUi;->requestedAmount:D\n    const-wide/16 v11, 0x0\n    cmpg-double v13, v9, v11\n    if-lez v13, :requested_done\n    move-wide v7, v9\n:requested_done\n\n    .line 70'''
-    if payoff_old not in e: raise SystemExit('EarlyPaymentUi payoff anchor not found')
-    e=e.replace(payoff_old,payoff_new,1)
+    payoff_old='''    const-string v9, "payoffAmount"'''
+    payoff_pos=e.find(payoff_old)
+    if payoff_pos < 0: raise SystemExit('EarlyPaymentUi payoff key anchor not found')
+    payoff_end=e.find('    .line 70', payoff_pos)
+    if payoff_end < 0: raise SystemExit('EarlyPaymentUi payoff value anchor not found')
+    payoff_insert='''    iget-wide v9, v0, Lbr/com/guerravpn/crediflow/EarlyPaymentUi;->requestedAmount:D\n    const-wide/16 v11, 0x0\n    cmpg-double v13, v9, v11\n    if-lez v13, :requested_done\n    move-wide v7, v9\n:requested_done\n\n'''
+    e=e[:payoff_end]+payoff_insert+e[payoff_end:]
     upload_old='''    .method private synthetic lambda$onProofSelected$7(Landroid/net/Uri;)V'''
     # Increase locals for the added wide amount register.
     e=e.replace(upload_old,upload_old,1)
