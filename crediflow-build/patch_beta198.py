@@ -168,7 +168,8 @@ early = next(root.rglob('EarlyPaymentUi.smali'))
 e = early.read_text(encoding='utf-8')
 if '.field private final requestedAmount:D' not in e:
     e=e.replace('.field private final loanId:Ljava/lang/String;\n','.field private final loanId:Ljava/lang/String;\n\n.field private final requestedAmount:D\n',1)
-    ctor_old='''    .line 29
+    ctor_old='''    .locals 1
+    .line 29
     iput-object p2, p0, Lbr/com/guerravpn/crediflow/EarlyPaymentUi;->loanId:Ljava/lang/String;
 
     .line 30
