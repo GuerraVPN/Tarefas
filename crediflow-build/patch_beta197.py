@@ -165,3 +165,90 @@ amort_src = Path('crediflow-inspect/LoanAmortizeAction.smali')
 if not amort_src.exists():
     raise SystemExit('LoanAmortizeAction source file not found')
 (main.parent / 'LoanAmortizeAction.smali').write_text(amort_src.read_text(encoding='utf-8'), encoding='utf-8')
+, re.M)
+    call_new='''    iget-wide v5, p0, Lbr/com/guerravpn/crediflow/EarlyPaymentUi;->requestedAmount:D
+    invoke-static {v3, v4, v1, v0, v2, v5, v6}, Lbr/com/guerravpn/crediflow/Api;->clientEarlyPayoffSubmit(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[BD)Lbr/com/guerravpn/crediflow/Api$Resp;'''
+    if not call_re.search(upload): raise SystemExit('EarlyPaymentUi upload call anchor not found')
+    upload=call_re.sub(call_new,upload,count=1)
+    e=e[:upload_start]+upload+e[upload_end:]
+    early.write_text(e,encoding='utf-8')
+
+api = next(root.rglob('Api.smali'))
+a = api.read_text(encoding='utf-8')
+if 'clientEarlyPayoffSubmit(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[BD)' not in a:
+    anchor='''    return-object v1\n.end method\n\n.method static clientLoanPreview'''
+    method='''    return-object v1\n.end method\n\n.method static clientEarlyPayoffSubmit(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[BD)Lbr/com/guerravpn/crediflow/Api$Resp;\n    .locals 4\n    .param p0, "accessToken"    # Ljava/lang/String;\n    .param p1, "loanId"    # Ljava/lang/String;\n    .param p2, "fileName"    # Ljava/lang/String;\n    .param p3, "mimeType"    # Ljava/lang/String;\n    .param p4, "bytes"    # [B\n    .param p5, "amount"    # D\n\n    new-instance v0, Lorg/json/JSONObject;\n    invoke-direct {v0}, Lorg/json/JSONObject;-><init>()V\n    const-string v1, "loanId"\n    invoke-virtual {v0, v1, p1}, Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;\n    const-string v1, "fileName"\n    invoke-virtual {v0, v1, p2}, Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;\n    const-string v1, "mimeType"\n    invoke-virtual {v0, v1, p3}, Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;\n    const/4 v1, 0x2\n    invoke-static {p4, v1}, Landroid/util/Base64;->encodeToString([BI)Ljava/lang/String;\n    move-result-object v1\n    const-string v2, "base64"\n    invoke-virtual {v0, v2, v1}, Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;\n    const-string v1, "amount"\n    invoke-virtual {v0, v1, p5, p6}, Lorg/json/JSONObject;->put(Ljava/lang/String;D)Lorg/json/JSONObject;\n    const-string v1, "/functions/v1/client-early-payoff-submit"\n    invoke-static {v1, v0, p0}, Lbr/com/guerravpn/crediflow/Api;->post(Ljava/lang/String;Lorg/json/JSONObject;Ljava/lang/String;)Lbr/com/guerravpn/crediflow/Api$Resp;\n    move-result-object v1\n    return-object v1\n.end method\n\n.method static clientLoanPreview'''
+    if anchor not in a: raise SystemExit('Api insertion anchor not found')
+    a=a.replace(anchor,method,1)
+    api.write_text(a,encoding='utf-8')
+
+# Bump APK version.
+apktool = root / 'apktool.yml'
+t = apktool.read_text(encoding='utf-8')
+t = re.sub(r'versionCode: .*', 'versionCode: 197', t)
+t = re.sub(r'versionName: .*', 'versionName: 1.9.7', t)
+apktool.write_text(t, encoding='utf-8')
+
+# Update the Beta 1.9.5 in-app updater to identify build 197.
+up = next(root.rglob('UpdateActivity.smali'))
+u = up.read_text(encoding='utf-8')
+u = u.replace('current=195', 'current=197')
+u = u.replace('CURRENT=195', 'CURRENT=197')
+u = u.replace('CrediFlow 1.9.5 Beta · build 195', 'CrediFlow 1.9.7 Beta · build 197')
+up.write_text(u, encoding='utf-8')
+
+listener_src = Path('crediflow-inspect/LoanPaymentAction.smali')
+if not listener_src.exists():
+    raise SystemExit('LoanPaymentAction source file not found')
+(main.parent / 'LoanPaymentAction.smali').write_text(listener_src.read_text(encoding='utf-8'), encoding='utf-8')
+helper_src = Path('crediflow-inspect/LoanPaymentUi.smali')
+if not helper_src.exists():
+    raise SystemExit('LoanPaymentUi source file not found')
+(main.parent / 'LoanPaymentUi.smali').write_text(helper_src.read_text(encoding='utf-8'), encoding='utf-8')
+amort_src = Path('crediflow-inspect/LoanAmortizeAction.smali')
+if not amort_src.exists():
+    raise SystemExit('LoanAmortizeAction source file not found')
+(main.parent / 'LoanAmortizeAction.smali').write_text(amort_src.read_text(encoding='utf-8'), encoding='utf-8')
+, re.M)
+    call_new='''    iget-wide v5, p0, Lbr/com/guerravpn/crediflow/EarlyPaymentUi;->requestedAmount:D\n    invoke-static {v3, v4, v1, v0, v2, v5, v6}, Lbr/com/guerravpn/crediflow/Api;->clientEarlyPayoffSubmit(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[BD)Lbr/com/guerravpn/crediflow/Api$Resp;'''
+    if not call_re.search(upload): raise SystemExit('EarlyPaymentUi upload call anchor not found')
+    upload=call_re.sub(call_new,upload,count=1)
+    e=e[:upload_start]+upload+e[upload_end:]
+    early.write_text(e,encoding='utf-8')
+
+api = next(root.rglob('Api.smali'))
+a = api.read_text(encoding='utf-8')
+if 'clientEarlyPayoffSubmit(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[BD)' not in a:
+    anchor='''    return-object v1\n.end method\n\n.method static clientLoanPreview'''
+    method='''    return-object v1\n.end method\n\n.method static clientEarlyPayoffSubmit(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[BD)Lbr/com/guerravpn/crediflow/Api$Resp;\n    .locals 4\n    .param p0, "accessToken"    # Ljava/lang/String;\n    .param p1, "loanId"    # Ljava/lang/String;\n    .param p2, "fileName"    # Ljava/lang/String;\n    .param p3, "mimeType"    # Ljava/lang/String;\n    .param p4, "bytes"    # [B\n    .param p5, "amount"    # D\n\n    new-instance v0, Lorg/json/JSONObject;\n    invoke-direct {v0}, Lorg/json/JSONObject;-><init>()V\n    const-string v1, "loanId"\n    invoke-virtual {v0, v1, p1}, Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;\n    const-string v1, "fileName"\n    invoke-virtual {v0, v1, p2}, Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;\n    const-string v1, "mimeType"\n    invoke-virtual {v0, v1, p3}, Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;\n    const/4 v1, 0x2\n    invoke-static {p4, v1}, Landroid/util/Base64;->encodeToString([BI)Ljava/lang/String;\n    move-result-object v1\n    const-string v2, "base64"\n    invoke-virtual {v0, v2, v1}, Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;\n    const-string v1, "amount"\n    invoke-virtual {v0, v1, p5, p6}, Lorg/json/JSONObject;->put(Ljava/lang/String;D)Lorg/json/JSONObject;\n    const-string v1, "/functions/v1/client-early-payoff-submit"\n    invoke-static {v1, v0, p0}, Lbr/com/guerravpn/crediflow/Api;->post(Ljava/lang/String;Lorg/json/JSONObject;Ljava/lang/String;)Lbr/com/guerravpn/crediflow/Api$Resp;\n    move-result-object v1\n    return-object v1\n.end method\n\n.method static clientLoanPreview'''
+    if anchor not in a: raise SystemExit('Api insertion anchor not found')
+    a=a.replace(anchor,method,1)
+    api.write_text(a,encoding='utf-8')
+
+# Bump APK version.
+apktool = root / 'apktool.yml'
+t = apktool.read_text(encoding='utf-8')
+t = re.sub(r'versionCode: .*', 'versionCode: 197', t)
+t = re.sub(r'versionName: .*', 'versionName: 1.9.7', t)
+apktool.write_text(t, encoding='utf-8')
+
+# Update the Beta 1.9.5 in-app updater to identify build 197.
+up = next(root.rglob('UpdateActivity.smali'))
+u = up.read_text(encoding='utf-8')
+u = u.replace('current=195', 'current=197')
+u = u.replace('CURRENT=195', 'CURRENT=197')
+u = u.replace('CrediFlow 1.9.5 Beta · build 195', 'CrediFlow 1.9.7 Beta · build 197')
+up.write_text(u, encoding='utf-8')
+
+listener_src = Path('crediflow-inspect/LoanPaymentAction.smali')
+if not listener_src.exists():
+    raise SystemExit('LoanPaymentAction source file not found')
+(main.parent / 'LoanPaymentAction.smali').write_text(listener_src.read_text(encoding='utf-8'), encoding='utf-8')
+helper_src = Path('crediflow-inspect/LoanPaymentUi.smali')
+if not helper_src.exists():
+    raise SystemExit('LoanPaymentUi source file not found')
+(main.parent / 'LoanPaymentUi.smali').write_text(helper_src.read_text(encoding='utf-8'), encoding='utf-8')
+amort_src = Path('crediflow-inspect/LoanAmortizeAction.smali')
+if not amort_src.exists():
+    raise SystemExit('LoanAmortizeAction source file not found')
+(main.parent / 'LoanAmortizeAction.smali').write_text(amort_src.read_text(encoding='utf-8'), encoding='utf-8')
