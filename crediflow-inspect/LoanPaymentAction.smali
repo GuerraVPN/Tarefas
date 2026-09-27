@@ -30,6 +30,18 @@
     if-eqz v0, :all
 
     iget-object v1, p0, Lbr/com/guerravpn/crediflow/LoanPaymentAction;->a:Lbr/com/guerravpn/crediflow/MainActivityV06;
+    new-instance v2, Lbr/com/guerravpn/crediflow/EarlyPaymentUi;
+    const-string v3, "id"
+    invoke-virtual {v0, v3}, Lorg/json/JSONObject;->optString(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v3
+    invoke-direct {v2, v1, v3}, Lbr/com/guerravpn/crediflow/EarlyPaymentUi;-><init>(Lbr/com/guerravpn/crediflow/MainActivityV06;Ljava/lang/String;)V
+    iput-object v2, v1, Lbr/com/guerravpn/crediflow/MainActivityV06;->earlyPaymentUi:Lbr/com/guerravpn/crediflow/EarlyPaymentUi;
+    invoke-virtual {v2}, Lbr/com/guerravpn/crediflow/EarlyPaymentUi;->show()V
+    return-void
+
+:all
+
+    iget-object v1, p0, Lbr/com/guerravpn/crediflow/LoanPaymentAction;->a:Lbr/com/guerravpn/crediflow/MainActivityV06;
     new-instance v2, Landroid/app/AlertDialog$Builder;
     invoke-direct {v2, v1}, Landroid/app/AlertDialog$Builder;-><init>(Landroid/content/Context;)V
     const-string v3, "Amortizar empréstimo"
