@@ -64,15 +64,27 @@ jobs:
 
       - name: Verify Beta 1.9.6 payload
         run: |
+          set -e
+          MAIN=$(find /tmp/app -name MainActivityV06.smali | head -1)
+          ACTION=$(find /tmp/app -name LoanPaymentAction.smali | head -1)
+          HELPER=$(find /tmp/app -name LoanPaymentUi.smali | head -1)
+          UPDATE=$(find /tmp/app -name UpdateActivity.smali | head -1)
+          test -n "$MAIN"
+          test -n "$ACTION"
+          test -n "$HELPER"
+          test -n "$UPDATE"
           grep -q 'versionCode: 196' /tmp/app/apktool.yml
           grep -q 'versionName: 1.9.6' /tmp/app/apktool.yml
-          grep -Fq 'Pagar todos os empréstimos' $(find /tmp/app -name MainActivityV06.smali)
-          grep -Fq 'Amortizar valor' $(find /tmp/app -name MainActivityV06.smali)
-          grep -Fq 'LoanPaymentAction' $(find /tmp/app -name MainActivityV06.smali)
-          grep -Fq 'currentLoans' $(find /tmp/app -name MainActivityV06.smali)
-          test -s "$(find /tmp/app -name LoanPaymentAction.smali | head -1)"
-          grep -Fq 'CrediFlow 1.9.6 Beta · build 196' $(find /tmp/app -name UpdateActivity.smali)
-          grep -Fq 'current=196' $(find /tmp/app -name UpdateActivity.smali)
+          grep -Fq 'Pagar todos os empréstimos' "$HELPER"
+          grep -Fq 'Amortizar valor' "$HELPER"
+          grep -Fq 'LoanPaymentAction' "$HELPER"
+          grep -Fq 'currentLoans' "$MAIN"
+          grep -Fq 'Amortizar empréstimo' "$ACTION"
+          grep -Fq 'Saldo restante' "$ACTION"
+          grep -Fq 'Pagar todos os empréstimos' "$ACTION"
+          grep -Fq 'CrediFlow 1.9.6 Beta · build 196' "$UPDATE"
+          grep -Fq 'current=196' "$UPDATE"
+          grep -Fq 'LoanPaymentUi' "$MAIN"
           mkdir -p /tmp/qa
           sha256sum /tmp/CrediFlow-v1.9.6-beta-build196-unsigned.apk > /tmp/qa/unsigned.sha256
           printf '%s\n' 'OK clean_apktool_rebuild' 'OK version_196' 'OK version_name_1_9_6' 'OK all_loans_button' 'OK per_loan_amortization_button' 'OK current_loans_state' 'OK updater_points_to_196' > /tmp/qa/QA.txt
