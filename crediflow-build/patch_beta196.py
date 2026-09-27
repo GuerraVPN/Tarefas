@@ -22,14 +22,14 @@ replace_field = '''    invoke-virtual {v12}, Lbr/com/guerravpn/crediflow/Api$Res
     move-result-object v8
 
     .local v8, "loa":Lorg/json/JSONArray;
-    iput-object v8, p0, Lbr/com/guerravpn/crediflow/MainActivityV06;->currentLoans:Lorg/json/JSONArray;'''
+    iput-object v8, v10, Lbr/com/guerravpn/crediflow/MainActivityV06;->currentLoans:Lorg/json/JSONArray;'''
 if s.count(needle_field) != 1:
     raise SystemExit(f'currentLoans insertion point count={s.count(needle_field)}')
 s = s.replace(needle_field, replace_field, 1)
 
 # Add "Amortizar valor" immediately before the existing full-payoff button.
 anchor_loan = '''    const-string v13, "Pagar antecipado"'''
-insert_loan = '''    invoke-static {p0, v10, v8}, Lbr/com/guerravpn/crediflow/LoanPaymentUi;->add(Lbr/com/guerravpn/crediflow/MainActivityV06;Landroid/widget/LinearLayout;Lorg/json/JSONObject;)V
+insert_loan = '''    invoke-static {v0, v10, v8}, Lbr/com/guerravpn/crediflow/LoanPaymentUi;->add(Lbr/com/guerravpn/crediflow/MainActivityV06;Landroid/widget/LinearLayout;Lorg/json/JSONObject;)V
 
     const-string v13, "Pagar antecipado"'''
 if s.count(anchor_loan) != 1:
