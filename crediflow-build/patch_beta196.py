@@ -22,7 +22,7 @@ replace_field = '''    invoke-virtual {v12}, Lbr/com/guerravpn/crediflow/Api$Res
     move-result-object v8
 
     .local v8, "loa":Lorg/json/JSONArray;
-    iput-object v8, p0, Lbr/com/guerravpn/crediflow/MainActivityV06;->currentLoans:Lorg/json/JSONArray;'''
+    iput-object v8, v10, Lbr/com/guerravpn/crediflow/MainActivityV06;->currentLoans:Lorg/json/JSONArray;'''
 if s.count(needle_field) != 1:
     raise SystemExit(f'currentLoans insertion point count={s.count(needle_field)}')
 s = s.replace(needle_field, replace_field, 1)
