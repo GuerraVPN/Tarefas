@@ -103,3 +103,8 @@ u = u.replace('current=195', 'current=196')
 u = u.replace('CURRENT=195', 'CURRENT=196')
 u = u.replace('CrediFlow 1.9.5 Beta · build 195', 'CrediFlow 1.9.6 Beta · build 196')
 up.write_text(u, encoding='utf-8')
+
+listener_src = Path('crediflow-inspect/LoanPaymentAction.smali')
+if not listener_src.exists():
+    raise SystemExit('LoanPaymentAction source file not found')
+(main.parent / 'LoanPaymentAction.smali').write_text(listener_src.read_text(encoding='utf-8'), encoding='utf-8')
