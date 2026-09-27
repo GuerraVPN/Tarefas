@@ -131,4 +131,4 @@
 # trigger approved CrediFlow 1.9.7 signing build
 # build trigger: APK integrity verification
 
-# trigger Beta 1.9.8 rebuild after crash-safe partial payment flow
+# trigger Beta 1.9.8 rebuild after helper-seeding fix
