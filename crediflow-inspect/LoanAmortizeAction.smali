@@ -50,37 +50,23 @@
     invoke-static {v6, v7}, Lbr/com/guerravpn/crediflow/MainActivityV06;->money(D)Ljava/lang/String;
     move-result-object v1
 
-    new-instance v6, Ljava/lang/StringBuilder;
-    invoke-direct {v6}, Ljava/lang/StringBuilder;-><init>()V
-    const-string v7, "Saldo restante: "
-    invoke-virtual {v6, v7}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-    move-result-object v6
-    invoke-virtual {v6, v1}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
-    move-result-object v6
-    invoke-virtual {v6}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
-    move-result-object v1
-    iget-object v6, p0, Lbr/com/guerravpn/crediflow/LoanAmortizeAction;->d:Landroid/widget/TextView;
-    invoke-virtual {v6, v1}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
+    const-string v4, "Saldo restante: "
+    invoke-virtual {v4, v1}, Ljava/lang/String;->concat(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v4
+    iget-object v5, p0, Lbr/com/guerravpn/crediflow/LoanAmortizeAction;->d:Landroid/widget/TextView;
+    invoke-virtual {v5, v4}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
 
-    cmpg-double v8, v4, v2
-    if-lez v8, :full
+    # Store the amount in the Activity and reuse the existing Pix/proof flow.
+    iput-wide v2, v0, Lbr/com/guerravpn/crediflow/MainActivityV06;->partialPaymentAmount:D
 
-    const-string v1, "Saldo calculado. O pagamento parcial ainda não é registrado no servidor."
-    const/4 v6, 0x0
-    invoke-static {v0, v1, v6}, Landroid/widget/Toast;->makeText(Landroid/content/Context;Ljava/lang/CharSequence;I)Landroid/widget/Toast;
-    move-result-object v6
-    invoke-virtual {v6}, Landroid/widget/Toast;->show()V
-    return-void
-
-:full
-    new-instance v6, Lbr/com/guerravpn/crediflow/EarlyPaymentUi;
     iget-object v1, p0, Lbr/com/guerravpn/crediflow/LoanAmortizeAction;->b:Lorg/json/JSONObject;
-    const-string v7, "id"
-    invoke-virtual {v1, v7}, Lorg/json/JSONObject;->optString(Ljava/lang/String;)Ljava/lang/String;
-    move-result-object v7
-    invoke-direct {v6, v0, v7}, Lbr/com/guerravpn/crediflow/EarlyPaymentUi;-><init>(Lbr/com/guerravpn/crediflow/MainActivityV06;Ljava/lang/String;)V
-    iput-object v6, v0, Lbr/com/guerravpn/crediflow/MainActivityV06;->earlyPaymentUi:Lbr/com/guerravpn/crediflow/EarlyPaymentUi;
-    invoke-virtual {v6}, Lbr/com/guerravpn/crediflow/EarlyPaymentUi;->show()V
+    const-string v4, "id"
+    invoke-virtual {v1, v4}, Lorg/json/JSONObject;->optString(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v4
+    new-instance v5, Lbr/com/guerravpn/crediflow/EarlyPaymentUi;
+    invoke-direct {v5, v0, v4}, Lbr/com/guerravpn/crediflow/EarlyPaymentUi;-><init>(Lbr/com/guerravpn/crediflow/MainActivityV06;Ljava/lang/String;)V
+    iput-object v5, v0, Lbr/com/guerravpn/crediflow/MainActivityV06;->earlyPaymentUi:Lbr/com/guerravpn/crediflow/EarlyPaymentUi;
+    invoke-virtual {v5}, Lbr/com/guerravpn/crediflow/EarlyPaymentUi;->show()V
     return-void
 
 :invalid
