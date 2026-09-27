@@ -44,25 +44,6 @@ jobs:
       - name: Decode base APK
         run: java -jar /tmp/apktool.jar d -f /tmp/base.apk -o /tmp/app
 
-      - name: Inspect existing EarlyPaymentUi
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p /tmp/early-ui
-          cp /tmp/app/smali_classes3/br/com/guerravpn/crediflow/EarlyPaymentUi.smali /tmp/early-ui/EarlyPaymentUi.smali
-          wc -l /tmp/early-ui/EarlyPaymentUi.smali
-      - name: Upload EarlyPaymentUi source for patching
-        uses: actions/upload-artifact@v4
-        with:
-          name: crediflow-early-payment-ui-source
-          path: /tmp/early-ui/EarlyPaymentUi.smali
-          retention-days: 2
-      - name: Upload Api source for payment flow
-        uses: actions/upload-artifact@v4
-        with:
-          name: crediflow-api-source
-          path: /tmp/app/smali_classes3/br/com/guerravpn/crediflow/Api.smali
-          retention-days: 2
       - name: Apply Beta 1.9.5 base updater
         run: python3 crediflow-build/patch_beta195.py
 
@@ -94,6 +75,9 @@ jobs:
           grep -Fq 'Saldo restante' "$AMORT"
           grep -Fq 'LoanAmortizeAction' "$HELPER"
           grep -Fq 'LoanPaymentUi' "$MAIN"
+          grep -Fq 'Pagar via Pix' "$MAIN"
+          grep -Fq 'requestedAmount' "$MAIN"
+          grep -Fq 'clientEarlyPayoffSubmit(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[BD)' "$MAIN"
           sha256sum /tmp/CrediFlow-v1.9.7-beta-build197-unsigned.apk > /tmp/qa-unsigned.sha256
 
       - name: Obtain Android signing material
