@@ -49,6 +49,14 @@ jobs:
       - name: Apply Beta 1.9.6 payment features
         run: python3 crediflow-build/patch_beta196.py
 
+      - name: Debug generated MainActivity registers
+        run: |
+          MAIN=$(find /tmp/app -name MainActivityV06.smali | head -1)
+          echo "MAIN=$MAIN"
+          nl -ba "$MAIN" | sed -n '1600,1660p;1870,1935p'
+          echo '--- register references ---'
+          grep -nE '\\bv(16|17|18|19|20|21|22|23|24|25|26|27)\\b' "$MAIN" || true
+
       - name: Build unsigned APK
         run: |
           java -jar /tmp/apktool.jar b /tmp/app -o /tmp/CrediFlow-v1.9.6-beta-build196-unsigned.apk
