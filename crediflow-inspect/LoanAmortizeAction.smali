@@ -211,7 +211,7 @@
     const-string v7, ""
     invoke-virtual {v6, v7}, Landroid/widget/EditText;->setText(Ljava/lang/CharSequence;)V
 :ui_toast
-    iget-object v5, p0, Lbr/com/guerravpn/crediflow/LoanAmortizeAction;->a:Lbr/com/guerravpn/crediflow/LoanAmortizeAction;
+    iget-object v5, p0, Lbr/com/guerravpn/crediflow/LoanAmortizeAction;->a:Lbr/com/guerravpn/crediflow/MainActivityV06;
     const-string v6, "Pagamento parcial registrado em Pagamentos."
     const/4 v7, 0x0
     invoke-static {v5, v6, v7}, Landroid/widget/Toast;->makeText(Landroid/content/Context;Ljava/lang/CharSequence;I)Landroid/widget/Toast;
