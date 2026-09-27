@@ -253,7 +253,7 @@
     invoke-direct {v7}, Ljava/lang/StringBuilder;-><init>()V
     invoke-virtual {v7, v5}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
     move-result-object v7
-    invoke-virtual {v7, v6}, Ljava/lang/StringBuilder;->append(Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;
+    invoke-virtual {v7, v6}, Ljava/lang/StringBuilder;->append(Ljava/lang/String;)Ljava/lang/StringBuilder;
     move-result-object v7
     invoke-virtual {v7}, Ljava/lang/StringBuilder;->toString()Ljava/lang/String;
     move-result-object v7
