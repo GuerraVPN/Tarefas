@@ -70,6 +70,7 @@ if partial_field not in s:
         raise SystemExit('no method for partialPaymentAmount field')
     s = s[:first_method] + partial_field + '\n\n' + s[first_method:]
 
+# Seed the helper sources into the decoded APK before applying runtime-safe edits.
 # The renderer only calculates/validates the amount and then opens the normal Pix/proof screen.
 amort = main.parent / 'LoanAmortizeAction.smali'
 a = amort.read_text(encoding='utf-8')
