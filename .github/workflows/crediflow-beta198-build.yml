@@ -34,7 +34,7 @@ jobs:
       - name: Restore stable base APK
         run: |
           cat crediflow-build/base.part00 crediflow-build/base.part01 crediflow-build/base.part02 crediflow-build/base.part03 crediflow-build/base.part04 crediflow-build/base.part05 crediflow-build/base.part06 crediflow-build/base.part07 | base64 -d > /tmp/base.apk
-          echo '3d13bfb2e55c9d9719f19f6769701a28e438566574022bb4cd4d7220198a46c0  /tmp/base.apk' | sha256sum -c -
+          echo '3d13bfb2e55c9d9719f19f6769701a28e438566574022bb4cd4d7220197a46c0  /tmp/base.apk' | sha256sum -c -
 
       - name: Install Apktool
         run: |
@@ -106,7 +106,7 @@ jobs:
           git config user.name 'GuerraVPN CrediFlow Build'
           git config user.email '81371258+GuerraVPN@users.noreply.github.com'
           git add "downloads/CrediFlow-v1.9.8-beta-build198.apk" "downloads/CrediFlow-v1.9.8-beta-build198.apk.sha256"
-          git commit -m 'release(crediflow): CrediFlow 1.9.6 beta build 198'
+          git commit -m 'release(crediflow): CrediFlow 1.9.8 beta build 198'
           git push origin HEAD:app/releases
 
       - name: Verify published APK
