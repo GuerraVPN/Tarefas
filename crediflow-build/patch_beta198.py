@@ -59,6 +59,7 @@ s = s[:loc] + method + s[end_method:]
 main.write_text(s, encoding='utf-8')
 
 # Safe partial-payment implementation:
+# rebuild trigger: verify crash-safe constructor registers
 # - keep the existing EarlyPaymentUi constructor/call path intact;
 # - pass the requested amount through a field on MainActivityV06;
 # - submit Pix + proof through the same early-payment request flow;
