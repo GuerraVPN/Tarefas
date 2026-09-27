@@ -71,10 +71,12 @@ jobs:
           set -e
           MAIN=$(find /tmp/app -name MainActivityV06.smali | head -1)
           ACTION=$(find /tmp/app -name LoanPaymentAction.smali | head -1)
+          AMORT=$(find /tmp/app -name LoanAmortizeAction.smali | head -1)
           HELPER=$(find /tmp/app -name LoanPaymentUi.smali | head -1)
           UPDATE=$(find /tmp/app -name UpdateActivity.smali | head -1)
           test -n "$MAIN"
           test -n "$ACTION"
+          test -n "$AMORT"
           test -n "$HELPER"
           test -n "$UPDATE"
           grep -q 'versionCode: 196' /tmp/app/apktool.yml
@@ -83,9 +85,10 @@ jobs:
           grep -Fq 'Amortizar valor' "$HELPER"
           grep -Fq 'LoanPaymentAction' "$HELPER"
           grep -Fq 'currentLoans' "$MAIN"
-          grep -Fq 'Amortizar empréstimo' "$ACTION"
-          grep -Fq 'Saldo restante' "$ACTION"
+          grep -Fq 'EarlyPaymentUi' "$ACTION"
           grep -Fq 'Pagar todos os empréstimos' "$ACTION"
+          grep -Fq 'Saldo restante' "$AMORT"
+          grep -Fq 'Saldo calculado' "$AMORT"
           grep -Fq 'CrediFlow 1.9.6 Beta · build 196' "$UPDATE"
           grep -Fq 'current=196' "$UPDATE"
           grep -Fq 'LoanPaymentUi' "$MAIN"
