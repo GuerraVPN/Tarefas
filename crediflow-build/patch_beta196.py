@@ -27,28 +27,23 @@ if s.count(needle_field) != 1:
     raise SystemExit(f'currentLoans insertion point count={s.count(needle_field)}')
 s = s.replace(needle_field, replace_field, 1)
 
-# Add "Amortizar valor" to every eligible loan card, immediately before the existing full-payoff button.
+# Add "Amortizar valor" immediately before the existing full-payoff button.
 anchor_loan = '''    const-string v13, "Pagar antecipado"'''
-insert_loan = '''    iget-object v25, p0, Lbr/com/guerravpn/crediflow/MainActivityV06;->u:Lbr/com/guerravpn/crediflow/Ui;\n\n    new-instance v26, Lbr/com/guerravpn/crediflow/LoanPaymentAction;\n\n    invoke-direct {v26, p0, v8}, Lbr/com/guerravpn/crediflow/LoanPaymentAction;-><init>(Lbr/com/guerravpn/crediflow/MainActivityV06;Lorg/json/JSONObject;)V\n\n    const-string v27, "Amortizar valor"\n\n    invoke-virtual {v25, v27, v26}, Lbr/com/guerravpn/crediflow/Ui;->outline(Ljava/lang/String;Landroid/view/View$OnClickListener;)Landroid/widget/Button;\n\n    move-result-object v27\n\n    invoke-virtual {v10, v27}, Landroid/widget/LinearLayout;->addView(Landroid/view/View;)V\n\n    const-string v13, "Pagar antecipado"'''
+insert_loan = '''    invoke-static {p0, v10, v8}, Lbr/com/guerravpn/crediflow/LoanPaymentUi;->add(Lbr/com/guerravpn/crediflow/MainActivityV06;Landroid/widget/LinearLayout;Lorg/json/JSONObject;)V
+
+    const-string v13, "Pagar antecipado"'''
 if s.count(anchor_loan) != 1:
     raise SystemExit('per-loan insertion point count=%d' % s.count(anchor_loan))
 s = s.replace(anchor_loan, insert_loan, 1)
 
-# Add "Pagar todos os empréstimos" directly below "Solicitar empréstimo" on the home screen.
+# Add "Pagar todos os empréstimos" between the loan request and profile buttons.
 anchor_home = '''    const-string v6, "Meu perfil"'''
-insert_home = '''    iget-object v4, p0, Lbr/com/guerravpn/crediflow/MainActivityV06;->u:Lbr/com/guerravpn/crediflow/Ui;\n\n    new-instance v5, Lbr/com/guerravpn/crediflow/LoanPaymentAction;\n\n    invoke-direct {v5, p0}, Lbr/com/guerravpn/crediflow/LoanPaymentAction;-><init>(Lbr/com/guerravpn/crediflow/MainActivityV06;)V\n\n    const-string v6, "Pagar todos os empréstimos"\n\n    invoke-virtual {v4, v6, v5}, Lbr/com/guerravpn/crediflow/Ui;->primary(Ljava/lang/String;Landroid/view/View$OnClickListener;)Landroid/widget/Button;\n\n    move-result-object v4\n\n    invoke-virtual {v0, v4}, Landroid/widget/LinearLayout;->addView(Landroid/view/View;)V\n\n    const-string v6, "Meu perfil"'''
+insert_home = '''    invoke-static {p0, v0}, Lbr/com/guerravpn/crediflow/LoanPaymentUi;->addAll(Lbr/com/guerravpn/crediflow/MainActivityV06;Landroid/widget/LinearLayout;)V
+
+    const-string v6, "Meu perfil"'''
 if s.count(anchor_home) != 1:
     raise SystemExit('home insertion point count=%d' % s.count(anchor_home))
 s = s.replace(anchor_home, insert_home, 1)
-
-# The method now uses v25-v27.
-loc = s.find('.method private synthetic lambda$showHome$32(')
-end = s.find('.end method', loc)
-if loc < 0 or end < 0:
-    raise SystemExit('lambda$showHome$32 not found')
-method = s[loc:end]
-method = method.replace('.locals 25', '.locals 28', 1)
-s = s[:loc] + method + s[end:]
 
 main.write_text(s, encoding='utf-8')
 
