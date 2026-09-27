@@ -129,4 +129,4 @@
 .end method
 
 # trigger approved CrediFlow 1.9.7 signing build
-# build trigger: rebuild after invoke-range fix
+# build trigger: rebuild after verification fix
