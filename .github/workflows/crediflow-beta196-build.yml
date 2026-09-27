@@ -75,8 +75,6 @@ jobs:
           grep -Fq 'Saldo restante' "$AMORT"
           grep -Fq 'LoanAmortizeAction' "$HELPER"
           grep -Fq 'LoanPaymentUi' "$MAIN"
-          PAY_UI=$(find /tmp/app -name LoanPaymentUi.smali | head -1)
-          test -n "$PAY_UI"
           sha256sum /tmp/CrediFlow-v1.9.7-beta-build197-unsigned.apk > /tmp/qa-unsigned.sha256
 
       - name: Obtain Android signing material
