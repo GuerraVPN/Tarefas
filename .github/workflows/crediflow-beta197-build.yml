@@ -1,7 +1,7 @@
 name: CrediFlow Beta 1.9.7 build
 # signing policy: android-signing-material v30 allows this exact CrediFlow beta workflow
 # Beta 1.9.7: partial payments are persisted to installments + ledger_entries.
-# rebuild trigger 2
+# rebuild trigger 3
 
 on:
   push:
