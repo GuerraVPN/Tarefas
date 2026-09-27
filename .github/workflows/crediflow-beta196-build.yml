@@ -3,11 +3,11 @@ name: CrediFlow Beta 1.9.6 build
 
 on:
   push:
-    branches: [crediflow-beta196-build]
+    branches: [crediflow-beta197-build]
     paths:
       - '.github/workflows/crediflow-beta196-build.yml'
       - 'crediflow-build/patch_beta195.py'
-      - 'crediflow-build/patch_beta196.py'
+      - 'crediflow-build/patch_beta197.py'
       - 'crediflow-inspect/LoanPaymentAction.smali'
   workflow_dispatch:
 
@@ -19,10 +19,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Beta 1.9.6
+      - name: Checkout Beta 1.9.7
         uses: actions/checkout@v4
         with:
-          ref: crediflow-beta196-build
+          ref: crediflow-beta197-build
           fetch-depth: 0
 
       - name: Setup Java
@@ -47,29 +47,20 @@ jobs:
       - name: Apply Beta 1.9.5 base updater
         run: python3 crediflow-build/patch_beta195.py
 
-      - name: Apply Beta 1.9.6 payment features
-        run: python3 crediflow-build/patch_beta196.py
+      - name: Apply Beta 1.9.7 payment features
+        run: python3 crediflow-build/patch_beta197.py
 
-      - name: Debug generated MainActivity registers
-        run: |
-          MAIN=$(find /tmp/app -name MainActivityV06.smali | head -1)
-          echo "MAIN=$MAIN"
-          nl -ba "$MAIN" | sed -n '1748,1760p;1800,1910p'
-          echo '--- method/local around 1901 ---'
-          awk 'NR<=1901 && /^\.method /{last=$0; line=NR} END{print "LAST_METHOD_LINE=" line; print last}' "$MAIN"
-          awk 'NR>=1800 && NR<=1901 && /^    \.locals /{print NR ":" $0}' "$MAIN"
-          echo '--- register references ---'
-          grep -nE '\\bv(16|17|18|19|20|21|22|23|24|25|26|27)\\b' "$MAIN" || true
+
 
       - name: Build unsigned APK
         run: |
-          java -jar /tmp/apktool.jar b /tmp/app -o /tmp/CrediFlow-v1.9.6-beta-build196-unsigned.apk
-          unzip -tq /tmp/CrediFlow-v1.9.6-beta-build196-unsigned.apk
+          java -jar /tmp/apktool.jar b /tmp/app -o /tmp/CrediFlow-v1.9.7-beta-build197-unsigned.apk
+          unzip -tq /tmp/CrediFlow-v1.9.7-beta-build197-unsigned.apk
 
-      - name: Verify Beta 1.9.6 payload
+      - name: Verify Beta 1.9.7 payload
         run: |
           set -e
-          test -s /tmp/CrediFlow-v1.9.6-beta-build196-unsigned.apk
+          test -s /tmp/CrediFlow-v1.9.7-beta-build197-unsigned.apk
           test -f /tmp/app/apktool.yml
           MAIN=$(find /tmp/app -name MainActivityV06.smali | head -1)
           ACTION=$(find /tmp/app -name LoanPaymentAction.smali | head -1)
@@ -84,7 +75,7 @@ jobs:
           grep -Fq 'Saldo restante' "$AMORT"
           grep -Fq 'LoanAmortizeAction' "$HELPER"
           grep -Fq 'LoanPaymentUi' "$MAIN"
-          sha256sum /tmp/CrediFlow-v1.9.6-beta-build196-unsigned.apk > /tmp/qa-unsigned.sha256
+          sha256sum /tmp/CrediFlow-v1.9.7-beta-build197-unsigned.apk > /tmp/qa-unsigned.sha256
 
       - name: Obtain Android signing material
         run: |
@@ -100,13 +91,13 @@ jobs:
           ZIPALIGN="$(find "$ANDROID_HOME/build-tools" -type f -name zipalign | sort -V | tail -1)"
           test -n "$APKSIGNER"
           test -n "$ZIPALIGN"
-          "$ZIPALIGN" -p -f 4 /tmp/CrediFlow-v1.9.6-beta-build196-unsigned.apk "$RUNNER_TEMP/CrediFlow-v1.9.6-beta-build196-aligned.apk"
-          "$APKSIGNER" sign --ks "$RUNNER_TEMP/GuerraVPN.keystore" --ks-key-alias "$KEY_ALIAS" --ks-pass "pass:$STORE_PASS" --key-pass "pass:$KEY_PASS" --out "$RUNNER_TEMP/CrediFlow-v1.9.6-beta-build196.apk" "$RUNNER_TEMP/CrediFlow-v1.9.6-beta-build196-aligned.apk"
-          "$APKSIGNER" verify --verbose --print-certs "$RUNNER_TEMP/CrediFlow-v1.9.6-beta-build196.apk" | tee "$RUNNER_TEMP/apksigner.txt"
+          "$ZIPALIGN" -p -f 4 /tmp/CrediFlow-v1.9.7-beta-build197-unsigned.apk "$RUNNER_TEMP/CrediFlow-v1.9.7-beta-build197-aligned.apk"
+          "$APKSIGNER" sign --ks "$RUNNER_TEMP/GuerraVPN.keystore" --ks-key-alias "$KEY_ALIAS" --ks-pass "pass:$STORE_PASS" --key-pass "pass:$KEY_PASS" --out "$RUNNER_TEMP/CrediFlow-v1.9.7-beta-build197.apk" "$RUNNER_TEMP/CrediFlow-v1.9.7-beta-build197-aligned.apk"
+          "$APKSIGNER" verify --verbose --print-certs "$RUNNER_TEMP/CrediFlow-v1.9.7-beta-build197.apk" | tee "$RUNNER_TEMP/apksigner.txt"
           ACTUAL_CERT="$(sed -n 's/.*certificate SHA-256 digest: //p' "$RUNNER_TEMP/apksigner.txt" | head -1 | tr -d ': ' | tr '[:upper:]' '[:lower:]')"
           test -n "$ACTUAL_CERT"
           test "$ACTUAL_CERT" = "$EXPECTED_CERT"
-          sha256sum "$RUNNER_TEMP/CrediFlow-v1.9.6-beta-build196.apk" > "$RUNNER_TEMP/CrediFlow-v1.9.6-beta-build196.apk.sha256"
+          sha256sum "$RUNNER_TEMP/CrediFlow-v1.9.7-beta-build197.apk" > "$RUNNER_TEMP/CrediFlow-v1.9.7-beta-build197.apk.sha256"
 
       - name: Publish signed APK to app/releases
         run: |
@@ -114,19 +105,19 @@ jobs:
           RELEASES_DIR="$RUNNER_TEMP/crediflow-releases"
           git worktree add "$RELEASES_DIR" origin/app/releases
           mkdir -p "$RELEASES_DIR/downloads"
-          cp "$RUNNER_TEMP/CrediFlow-v1.9.6-beta-build196.apk" "$RELEASES_DIR/downloads/"
-          cp "$RUNNER_TEMP/CrediFlow-v1.9.6-beta-build196.apk.sha256" "$RELEASES_DIR/downloads/"
+          cp "$RUNNER_TEMP/CrediFlow-v1.9.7-beta-build197.apk" "$RELEASES_DIR/downloads/"
+          cp "$RUNNER_TEMP/CrediFlow-v1.9.7-beta-build197.apk.sha256" "$RELEASES_DIR/downloads/"
           cd "$RELEASES_DIR"
           git config user.name 'GuerraVPN CrediFlow Build'
           git config user.email '81371258+GuerraVPN@users.noreply.github.com'
-          git add "downloads/CrediFlow-v1.9.6-beta-build196.apk" "downloads/CrediFlow-v1.9.6-beta-build196.apk.sha256"
-          git commit -m 'release(crediflow): CrediFlow 1.9.6 beta build 196'
+          git add "downloads/CrediFlow-v1.9.7-beta-build197.apk" "downloads/CrediFlow-v1.9.7-beta-build197.apk.sha256"
+          git commit -m 'release(crediflow): CrediFlow 1.9.6 beta build 197'
           git push origin HEAD:app/releases
 
       - name: Verify published APK
         run: |
-          URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/CrediFlow-v1.9.6-beta-build196.apk'
-          LOCAL_SHA="$(sha256sum "$RUNNER_TEMP/CrediFlow-v1.9.6-beta-build196.apk" | awk '{print $1}')"
+          URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/CrediFlow-v1.9.7-beta-build197.apk'
+          LOCAL_SHA="$(sha256sum "$RUNNER_TEMP/CrediFlow-v1.9.7-beta-build197.apk" | awk '{print $1}')"
           for attempt in 1 2 3 4 5 6 7 8; do
             if curl --fail --silent --show-error -L "$URL" -o "$RUNNER_TEMP/published.apk" && test "$(sha256sum "$RUNNER_TEMP/published.apk" | awk '{print $1}')" = "$LOCAL_SHA"; then
               echo "Published APK verified: $LOCAL_SHA"
@@ -139,11 +130,11 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: CrediFlow-v1.9.6-beta-build196
+          name: CrediFlow-v1.9.7-beta-build197
           path: |
-            /tmp/CrediFlow-v1.9.6-beta-build196-unsigned.apk
-            ${{ runner.temp }}/CrediFlow-v1.9.6-beta-build196.apk
-            ${{ runner.temp }}/CrediFlow-v1.9.6-beta-build196.apk.sha256
+            /tmp/CrediFlow-v1.9.7-beta-build197-unsigned.apk
+            ${{ runner.temp }}/CrediFlow-v1.9.7-beta-build197.apk
+            ${{ runner.temp }}/CrediFlow-v1.9.7-beta-build197.apk.sha256
             /tmp/qa/QA.txt
             /tmp/qa/unsigned.sha256
           if-no-files-found: error
