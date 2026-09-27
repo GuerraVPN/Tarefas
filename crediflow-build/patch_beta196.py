@@ -70,3 +70,7 @@ helper_src = Path('crediflow-inspect/LoanPaymentUi.smali')
 if not helper_src.exists():
     raise SystemExit('LoanPaymentUi source file not found')
 (main.parent / 'LoanPaymentUi.smali').write_text(helper_src.read_text(encoding='utf-8'), encoding='utf-8')
+amort_src = Path('crediflow-inspect/LoanAmortizeAction.smali')
+if not amort_src.exists():
+    raise SystemExit('LoanAmortizeAction source file not found')
+(main.parent / 'LoanAmortizeAction.smali').write_text(amort_src.read_text(encoding='utf-8'), encoding='utf-8')
