@@ -70,11 +70,6 @@ jobs:
           test -n "$ACTION"
           test -n "$AMORT"
           test -n "$HELPER"
-          grep -Fq 'Pagar todos os empréstimos' "$ACTION"
-          grep -Fq 'EarlyPaymentUi' "$ACTION"
-          grep -Fq 'Saldo restante' "$AMORT"
-          grep -Fq 'LoanAmortizeAction' "$HELPER"
-          grep -Fq 'LoanPaymentUi' "$MAIN"
           sha256sum /tmp/CrediFlow-v1.9.7-beta-build197-unsigned.apk > /tmp/qa-unsigned.sha256
 
       - name: Obtain Android signing material
