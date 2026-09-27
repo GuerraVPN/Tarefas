@@ -118,7 +118,14 @@ if '.field private final requestedAmount:D' not in e:
     line_end = upload.find('\n', call_pos)
     replacement = "\n".join([
         '    iget-wide v5, p0, Lbr/com/guerravpn/crediflow/EarlyPaymentUi;->requestedAmount:D',
-        '    invoke-static {v3, v4, v1, v0, v2, v5, v6}, Lbr/com/guerravpn/crediflow/Api;->clientEarlyPayoffSubmit(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[BD)Lbr/com/guerravpn/crediflow/Api$Resp;'
+        '    move-object p1, v0',
+        '    move-object v0, v3',
+        '    move-object v3, p1',
+        '    move-object p1, v1',
+        '    move-object v1, v4',
+        '    move-object v4, v2',
+        '    move-object v2, p1',
+        '    invoke-static/range {v0 .. v6}, Lbr/com/guerravpn/crediflow/Api;->clientEarlyPayoffSubmit(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[BD)Lbr/com/guerravpn/crediflow/Api$Resp;'
     ]) + '\n'
     upload = upload[:line_start] + replacement + upload[line_end + 1:]
     e = e[:upload_start] + upload + e[upload_end:]
