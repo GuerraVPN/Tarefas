@@ -45,16 +45,13 @@ if s.count(anchor_home) != 1:
     raise SystemExit('home insertion point count=%d' % s.count(anchor_home))
 s = s.replace(anchor_home, insert_home, 1)
 
-# Keep the large register frame used by the home/loan renderer.
-loc = s.find('.method private synthetic lambda$showHome$32(')
-if loc < 0:
-    raise SystemExit('lambda$showHome$32 not found')
-end = s.find('.end method', loc)
-if end < 0:
-    raise SystemExit('lambda$showHome$32 end not found')
-method = s[loc:end]
-method = method.replace('.locals 13', '.locals 25', 1)
-s = s[:loc] + method + s[end:]
+# Preserve the register frame of the loan-rendering method. The stable base uses
+# wide v16/v17 temporaries for late-interest calculations.
+methods = s.split('.method ')
+for idx, method in enumerate(methods):
+    if 'Api$Resp;->array()Lorg/json/JSONArray;' in method and 'move-result-wide v16' in method:
+        methods[idx] = method.replace('.locals 13', '.locals 25', 1)
+s = '.method '.join(methods)
 
 main.write_text(s, encoding='utf-8')
 
