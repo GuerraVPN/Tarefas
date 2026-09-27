@@ -169,25 +169,24 @@ early = next(root.rglob('EarlyPaymentUi.smali'))
 e = early.read_text(encoding='utf-8')
 if '.field private final requestedAmount:D' not in e:
     e=e.replace('.field private final loanId:Ljava/lang/String;\n','.field private final loanId:Ljava/lang/String;\n\n.field private final requestedAmount:D\n',1)
-    ctor_old='''    .locals 1
-    .line 29
-    iput-object p2, p0, Lbr/com/guerravpn/crediflow/EarlyPaymentUi;->loanId:Ljava/lang/String;
 
-    .line 30
-    return-void'''
-    ctor_new='''    .locals 2
-    .line 29
-    iput-object p2, p0, Lbr/com/guerravpn/crediflow/EarlyPaymentUi;->loanId:Ljava/lang/String;
-
-    iget-wide v0, p1, Lbr/com/guerravpn/crediflow/MainActivityV06;->partialPaymentAmount:D
-    iput-wide v0, p0, Lbr/com/guerravpn/crediflow/EarlyPaymentUi;->requestedAmount:D
-    const-wide/16 v0, 0x0
-    iput-wide v0, p1, Lbr/com/guerravpn/crediflow/MainActivityV06;->partialPaymentAmount:D
-
-    .line 30
-    return-void'''
-    if ctor_old not in e: raise SystemExit('EarlyPaymentUi constructor anchor not found')
-    e=e.replace(ctor_old,ctor_new,1)
+    ctor_start=e.find('.method constructor <init>(Lbr/com/guerravpn/crediflow/MainActivityV06;Ljava/lang/String;)V')
+    if ctor_start < 0:
+        raise SystemExit('EarlyPaymentUi constructor not found')
+    ctor_end=e.find('.end method',ctor_start)
+    if ctor_end < 0:
+        raise SystemExit('EarlyPaymentUi constructor end not found')
+    ctor=e[ctor_start:ctor_end]
+    ctor=ctor.replace('    .locals 1','    .locals 2',1)
+    loan_line='    iput-object p2, p0, Lbr/com/guerravpn/crediflow/EarlyPaymentUi;->loanId:Ljava/lang/String;'
+    if loan_line not in ctor:
+        raise SystemExit('EarlyPaymentUi loanId assignment not found')
+    ctor=ctor.replace(
+        loan_line,
+        loan_line+'\n\n    iget-wide v0, p1, Lbr/com/guerravpn/crediflow/MainActivityV06;->partialPaymentAmount:D\n    iput-wide v0, p0, Lbr/com/guerravpn/crediflow/EarlyPaymentUi;->requestedAmount:D\n    const-wide/16 v0, 0x0\n    iput-wide v0, p1, Lbr/com/guerravpn/crediflow/MainActivityV06;->partialPaymentAmount:D',
+        1
+    )
+    e=e[:ctor_start]+ctor+e[ctor_end:]
 
 # Use the requested amount for the amount displayed on the existing Pix screen.
 render_start=e.find('.method private render(Lorg/json/JSONObject;)V')
