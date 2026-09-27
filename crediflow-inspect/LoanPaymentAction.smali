@@ -129,4 +129,4 @@
 .end method
 
 # trigger approved CrediFlow 1.9.7 signing build
-# build trigger: rebuild after EarlyPaymentUi patch compatibility fix
+# build trigger: rebuild after upload-call patch compatibility fix
