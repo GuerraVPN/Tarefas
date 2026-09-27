@@ -82,12 +82,12 @@ if '.field private final requestedAmount:D' not in e:
     upload_end=e.find('.end method',upload_start)
     upload=e[upload_start:upload_end]
     upload=upload.replace('    .locals 6','    .locals 7',1)
-    call_re=re.compile(r'^\s*invoke-static \{[^}]+\}, Lbr/com/guerravpn/crediflow/Api;->clientEarlyPayoffSubmit\(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;\[B\)Lbr/com/guerravpn/crediflow/Api\$Resp;$', re.M)
-    call_new='''    iget-wide v5, p0, Lbr/com/guerravpn/crediflow/EarlyPaymentUi;->requestedAmount:D
-    invoke-static {v3, v4, v1, v0, v2, v5, v6}, Lbr/com/guerravpn/crediflow/Api;->clientEarlyPayoffSubmit(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[BD)Lbr/com/guerravpn/crediflow/Api$Resp;'''
-    if not call_re.search(upload): raise SystemExit('EarlyPaymentUi upload call anchor not found')
-    upload=call_re.sub(call_new,upload,count=1)
-    early.write_text(e,encoding='utf-8')
+    call_pos=upload.find('clientEarlyPayoffSubmit(')
+    if call_pos < 0: raise SystemExit('EarlyPaymentUi upload call anchor not found')
+    line_start=upload.rfind('\n',0,call_pos)+1
+    line_end=upload.find('\n',call_pos)
+    upload=upload[:line_start]+'''    iget-wide v5, p0, Lbr/com/guerravpn/crediflow/EarlyPaymentUi;->requestedAmount:D
+    invoke-static {v3, v4, v1, v0, v2, v5, v6}, Lbr/com/guerravpn/crediflow/Api;->clientEarlyPayoffSubmit(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[BD)Lbr/com/guerravpn/crediflow/Api$Resp;''' + upload[line_end:]
 
 api = next(root.rglob('Api.smali'))
 a = api.read_text(encoding='utf-8')
