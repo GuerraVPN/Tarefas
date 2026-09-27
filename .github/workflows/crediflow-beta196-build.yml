@@ -1,5 +1,5 @@
 name: CrediFlow Beta 1.9.6 build
-# signing policy: android-signing-material v29 allows this exact CrediFlow beta workflow
+# signing policy: android-signing-material v30 allows this exact CrediFlow beta workflow
 
 on:
   push:
