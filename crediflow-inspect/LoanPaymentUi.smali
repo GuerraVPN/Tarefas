@@ -2,12 +2,10 @@
 .super Ljava/lang/Object;
 
 .method public static add(Lbr/com/guerravpn/crediflow/MainActivityV06;Landroid/widget/LinearLayout;Lorg/json/JSONObject;)V
-    .locals 8
+    .locals 7
     iget-object v0, p0, Lbr/com/guerravpn/crediflow/MainActivityV06;->u:Lbr/com/guerravpn/crediflow/Ui;
-
     const-string v1, "AMORTIZAÇÃO"
     invoke-virtual {v0, p1, v1}, Lbr/com/guerravpn/crediflow/Ui;->caption(Landroid/widget/LinearLayout;Ljava/lang/String;)V
-
     new-instance v1, Landroid/widget/EditText;
     invoke-direct {v1, p0}, Landroid/widget/EditText;-><init>(Landroid/content/Context;)V
     const-string v2, "Quanto deseja pagar? Ex.: 21,90"
@@ -70,9 +68,10 @@
 
     new-instance v3, Lbr/com/guerravpn/crediflow/LoanAmortizeAction;
     invoke-direct {v3, p0, p2, v1, v2}, Lbr/com/guerravpn/crediflow/LoanAmortizeAction;-><init>(Lbr/com/guerravpn/crediflow/MainActivityV06;Lorg/json/JSONObject;Landroid/widget/EditText;Landroid/widget/TextView;)V
-    const-string v4, "Calcular saldo"
+    const-string v4, "Calcular e registrar pagamento"
     invoke-virtual {v0, v4, v3}, Lbr/com/guerravpn/crediflow/Ui;->outline(Ljava/lang/String;Landroid/view/View$OnClickListener;)Landroid/widget/Button;
     move-result-object v4
+    invoke-virtual {v3, v4}, Lbr/com/guerravpn/crediflow/LoanAmortizeAction;->setButton(Landroid/widget/Button;)V
     invoke-virtual {p1, v4}, Landroid/widget/LinearLayout;->addView(Landroid/view/View;)V
     return-void
 .end method
