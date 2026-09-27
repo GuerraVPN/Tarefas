@@ -1,0 +1,38 @@
+name: CrediFlow pay flow inspect
+
+on:
+  push:
+    branches: [crediflow-pay-flow-inspect]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: crediflow-pay-flow-inspect
+      - name: Restore base APK
+        run: |
+          cat crediflow-build/base.part00 crediflow-build/base.part01 crediflow-build/base.part02 crediflow-build/base.part03 crediflow-build/base.part04 crediflow-build/base.part05 crediflow-build/base.part06 crediflow-build/base.part07 | base64 -d > /tmp/base.apk
+          sha256sum /tmp/base.apk
+      - name: Install Apktool
+        run: curl -fL --retry 3 -o /tmp/apktool.jar https://github.com/iBotPeaches/Apktool/releases/download/v3.0.3/apktool_3.0.3.jar
+      - name: Decode
+        run: java -jar /tmp/apktool.jar d -f /tmp/base.apk -o /tmp/app
+      - name: Package sources
+        run: |
+          mkdir -p /tmp/pay-flow
+          cp /tmp/app/smali_classes3/br/com/guerravpn/crediflow/EarlyPaymentUi.smali /tmp/pay-flow/
+          cp /tmp/app/smali_classes3/br/com/guerravpn/crediflow/Api.smali /tmp/pay-flow/
+          cp /tmp/app/smali_classes3/br/com/guerravpn/crediflow/MainActivityV06.smali /tmp/pay-flow/
+          cp /tmp/app/smali_classes3/br/com/guerravpn/crediflow/Ui.smali /tmp/pay-flow/
+          cp /tmp/app/AndroidManifest.xml /tmp/pay-flow/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: crediflow-base195-pay-flow-source
+          path: /tmp/pay-flow/
+          retention-days: 2
