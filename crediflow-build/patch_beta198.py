@@ -70,7 +70,17 @@ if partial_field not in s:
         raise SystemExit('no method for partialPaymentAmount field')
     s = s[:first_method] + partial_field + '\n\n' + s[first_method:]
 
+# Persist the new activity field before helper edits.
+main.write_text(s, encoding='utf-8')
+
 # Seed the helper sources into the decoded APK before applying runtime-safe edits.
+# Seed the helper sources into the decoded APK before applying runtime-safe edits.
+for name in ['LoanPaymentAction.smali', 'LoanPaymentUi.smali', 'LoanAmortizeAction.smali']:
+    src = Path('crediflow-inspect') / name
+    if not src.exists():
+        raise SystemExit(name + ' source file not found')
+    (main.parent / name).write_text(src.read_text(encoding='utf-8'), encoding='utf-8')
+
 # The renderer only calculates/validates the amount and then opens the normal Pix/proof screen.
 amort = main.parent / 'LoanAmortizeAction.smali'
 a = amort.read_text(encoding='utf-8')
