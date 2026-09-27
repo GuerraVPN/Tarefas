@@ -49,8 +49,8 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p /tmp/early-ui
-          find /tmp/app -name 'EarlyPaymentUi.smali' -print -exec cp {} /tmp/early-ui/EarlyPaymentUi.smali \\\;
-          test -s /tmp/early-ui/EarlyPaymentUi.smali
+          cp /tmp/app/smali_classes3/br/com/guerravpn/crediflow/EarlyPaymentUi.smali /tmp/early-ui/EarlyPaymentUi.smali
+          wc -l /tmp/early-ui/EarlyPaymentUi.smali
       - name: Upload EarlyPaymentUi source for patching
         uses: actions/upload-artifact@v4
         with:
