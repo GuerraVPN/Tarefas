@@ -7,7 +7,10 @@ s = main.read_text(encoding='utf-8')
 
 # Keep the updater delivered by Beta 1.9.5 and add Beta 1.9.6 payment controls.
 if '.field currentLoans:Lorg/json/JSONArray;' not in s:
-    s = s.replace('.method ', '.field currentLoans:Lorg/json/JSONArray;\n\n.method ', 1)
+    first_method = s.find('.method ')
+    if first_method < 0:
+        raise SystemExit('no method found in MainActivityV06')
+    s = s[:first_method] + '.field currentLoans:Lorg/json/JSONArray;\n\n' + s[first_method:]
 
 needle_field = '''    invoke-virtual {v12}, Lbr/com/guerravpn/crediflow/Api$Resp;->array()Lorg/json/JSONArray;
 
@@ -25,58 +28,18 @@ if s.count(needle_field) != 1:
 s = s.replace(needle_field, replace_field, 1)
 
 # Add "Amortizar valor" to every eligible loan card, immediately before the existing full-payoff button.
-needle_loan = '''    iget-object v3, p0, Lbr/com/guerravpn/crediflow/MainActivityV06;->u:Lbr/com/guerravpn/crediflow/Ui;
-
-    new-instance v12, Lbr/com/guerravpn/crediflow/MainActivityV06$$ExternalSyntheticLambda36;'''
-repl_loan = '''    iget-object v25, p0, Lbr/com/guerravpn/crediflow/MainActivityV06;->u:Lbr/com/guerravpn/crediflow/Ui;
-
-    new-instance v26, Lbr/com/guerravpn/crediflow/LoanPaymentAction;
-
-    invoke-direct {v26, p0, v8}, Lbr/com/guerravpn/crediflow/LoanPaymentAction;-><init>(Lbr/com/guerravpn/crediflow/MainActivityV06;Lorg/json/JSONObject;)V
-
-    const-string v27, "Amortizar valor"
-
-    invoke-virtual {v25, v27, v26}, Lbr/com/guerravpn/crediflow/Ui;->outline(Ljava/lang/String;Landroid/view/View$OnClickListener;)Landroid/widget/Button;
-
-    move-result-object v27
-
-    invoke-virtual {v10, v27}, Landroid/widget/LinearLayout;->addView(Landroid/view/View;)V
-
-    iget-object v3, p0, Lbr/com/guerravpn/crediflow/MainActivityV06;->u:Lbr/com/guerravpn/crediflow/Ui;
-
-    new-instance v12, Lbr/com/guerravpn/crediflow/MainActivityV06$ExternalSyntheticLambda36;'''
-if s.count(needle_loan) != 1:
-    raise SystemExit(f'per-loan insertion point count={s.count(needle_loan)}')
-s = s.replace(needle_loan, repl_loan, 1)
+anchor_loan = '''    const-string v13, "Pagar antecipado"'''
+insert_loan = '''    iget-object v25, p0, Lbr/com/guerravpn/crediflow/MainActivityV06;->u:Lbr/com/guerravpn/crediflow/Ui;\n\n    new-instance v26, Lbr/com/guerravpn/crediflow/LoanPaymentAction;\n\n    invoke-direct {v26, p0, v8}, Lbr/com/guerravpn/crediflow/LoanPaymentAction;-><init>(Lbr/com/guerravpn/crediflow/MainActivityV06;Lorg/json/JSONObject;)V\n\n    const-string v27, "Amortizar valor"\n\n    invoke-virtual {v25, v27, v26}, Lbr/com/guerravpn/crediflow/Ui;->outline(Ljava/lang/String;Landroid/view/View$OnClickListener;)Landroid/widget/Button;\n\n    move-result-object v27\n\n    invoke-virtual {v10, v27}, Landroid/widget/LinearLayout;->addView(Landroid/view/View;)V\n\n    const-string v13, "Pagar antecipado"'''
+if s.count(anchor_loan) != 1:
+    raise SystemExit('per-loan insertion point count=%d' % s.count(anchor_loan))
+s = s.replace(anchor_loan, insert_loan, 1)
 
 # Add "Pagar todos os empréstimos" directly below "Solicitar empréstimo" on the home screen.
-needle_home = '''    invoke-virtual {v0, v4}, Landroid/widget/LinearLayout;->addView(Landroid/view/View;)V
-
-    iget-object v4, p0, Lbr/com/guerravpn/crediflow/MainActivityV06;->u:Lbr/com/guerravpn/crediflow/Ui;
-
-    new-instance v5, Lbr/com/guerravpn/crediflow/MainActivityV06$$ExternalSyntheticLambda12;'''
-repl_home = '''    invoke-virtual {v0, v4}, Landroid/widget/LinearLayout;->addView(Landroid/view/View;)V
-
-    iget-object v4, p0, Lbr/com/guerravpn/crediflow/MainActivityV06;->u:Lbr/com/guerravpn/crediflow/Ui;
-
-    new-instance v5, Lbr/com/guerravpn/crediflow/LoanPaymentAction;
-
-    invoke-direct {v5, p0}, Lbr/com/guerravpn/crediflow/LoanPaymentAction;-><init>(Lbr/com/guerravpn/crediflow/MainActivityV06;)V
-
-    const-string v6, "Pagar todos os empréstimos"
-
-    invoke-virtual {v4, v6, v5}, Lbr/com/guerravpn/crediflow/Ui;->primary(Ljava/lang/String;Landroid/view/View$OnClickListener;)Landroid/widget/Button;
-
-    move-result-object v4
-
-    invoke-virtual {v0, v4}, Landroid/widget/LinearLayout;->addView(Landroid/view/View;)V
-
-    iget-object v4, p0, Lbr/com/guerravpn/crediflow/MainActivityV06;->u:Lbr/com/guerravpn/crediflow/Ui;
-
-    new-instance v5, Lbr/com/guerravpn/crediflow/MainActivityV06$$ExternalSyntheticLambda12;'''
-if s.count(needle_home) != 1:
-    raise SystemExit(f'home button insertion point count={s.count(needle_home)}')
-s = s.replace(needle_home, repl_home, 1)
+anchor_home = '''    const-string v6, "Meu perfil"'''
+insert_home = '''    iget-object v4, p0, Lbr/com/guerravpn/crediflow/MainActivityV06;->u:Lbr/com/guerravpn/crediflow/Ui;\n\n    new-instance v5, Lbr/com/guerravpn/crediflow/LoanPaymentAction;\n\n    invoke-direct {v5, p0}, Lbr/com/guerravpn/crediflow/LoanPaymentAction;-><init>(Lbr/com/guerravpn/crediflow/MainActivityV06;)V\n\n    const-string v6, "Pagar todos os empréstimos"\n\n    invoke-virtual {v4, v6, v5}, Lbr/com/guerravpn/crediflow/Ui;->primary(Ljava/lang/String;Landroid/view/View$OnClickListener;)Landroid/widget/Button;\n\n    move-result-object v4\n\n    invoke-virtual {v0, v4}, Landroid/widget/LinearLayout;->addView(Landroid/view/View;)V\n\n    const-string v6, "Meu perfil"'''
+if s.count(anchor_home) != 1:
+    raise SystemExit('home insertion point count=%d' % s.count(anchor_home))
+s = s.replace(anchor_home, insert_home, 1)
 
 # The method now uses v25-v27.
 loc = s.find('.method private synthetic lambda$showHome$32(')
