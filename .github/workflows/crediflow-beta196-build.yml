@@ -1,4 +1,4 @@
-name: CrediFlow Beta 1.9.6 build
+name: CrediFlow Beta 1.9.8 restore build
 # approved workflow branch retained for signing policy; build artifact is Beta 1.9.8
 # signing policy: android-signing-material v30 allows this exact CrediFlow beta workflow
 
@@ -107,7 +107,7 @@ jobs:
           git config user.name 'GuerraVPN CrediFlow Build'
           git config user.email '81371258+GuerraVPN@users.noreply.github.com'
           git add "downloads/CrediFlow-v1.9.8-beta-build198.apk" "downloads/CrediFlow-v1.9.8-beta-build198.apk.sha256"
-          git commit -m 'release(crediflow): CrediFlow 1.9.6 beta build 197'
+          git commit -m 'release(crediflow): CrediFlow 1.9.8 restore from 1.9.5'
           git push origin HEAD:app/releases
 
       - name: Verify published APK
