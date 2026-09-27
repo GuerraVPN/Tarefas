@@ -45,13 +45,16 @@ if s.count(anchor_home) != 1:
     raise SystemExit('home insertion point count=%d' % s.count(anchor_home))
 s = s.replace(anchor_home, insert_home, 1)
 
-# Preserve the register frame of the loan-rendering method. The stable base uses
-# wide v16/v17 temporaries for late-interest calculations.
-methods = s.split('.method ')
-for idx, method in enumerate(methods):
-    if 'Api$Resp;->array()Lorg/json/JSONArray;' in method and 'move-result-wide v16' in method:
-        methods[idx] = method.replace('.locals 13', '.locals 25', 1)
-s = '.method '.join(methods)
+# Preserve the register frame of the post-Beta195 home/loan renderer.
+loc = s.find('.method private synthetic lambda$showHome$34(')
+if loc < 0:
+    raise SystemExit('lambda$showHome$34 not found')
+end_method = s.find('.end method', loc)
+if end_method < 0:
+    raise SystemExit('lambda$showHome$34 end not found')
+method = s[loc:end_method]
+method = re.sub(r'^\.locals \d+', '.locals 25', method, count=1, flags=re.M)
+s = s[:loc] + method + s[end_method:]
 
 main.write_text(s, encoding='utf-8')
 
