@@ -53,7 +53,7 @@ end_method = s.find('.end method', loc)
 if end_method < 0:
     raise SystemExit('lambda$showHome$34 end not found')
 method = s[loc:end_method]
-method = re.sub(r'^\.locals \d+', '.locals 25', method, count=1, flags=re.M)
+method = re.sub(r'^\s*\.locals \d+', '    .locals 25', method, count=1, flags=re.M)
 s = s[:loc] + method + s[end_method:]
 
 main.write_text(s, encoding='utf-8')
