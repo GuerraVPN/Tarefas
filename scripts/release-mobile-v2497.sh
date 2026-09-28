@@ -167,8 +167,8 @@ assert "__TAREFAS_ALPHA_2468_SERVICOS_HOTBAR_FIX__" in boot
 assert "__TAREFAS_ALPHA_2467_ESCALAS_2433__" not in boot
 for marker in ["__TAREFAS_ALPHA_2481_DISTRIBUICAO_FISCAL_FIX__","__TAREFAS_ALPHA_2482_GUIDES_READY_FIX__","__TAREFAS_ALPHA_2483_FORNECIMENTO__","__TAREFAS_ALPHA_2484_PEDIDO_LAYOUT_FIX__","__TAREFAS_ALPHA_2485_BIOMETRIC_SINGLE_PROMPT__"]:
     assert marker in boot, marker
-assert "const APP_VERSION = '2.4.9';" in boot and "const APP_BUILD = 293;" in boot
-assert "dashboard.html?app=2.4.9" in boot and "dashboard.html?app=2.4.9" in login
+assert "const APP_VERSION = '2.4.9.7';" in boot and "const APP_BUILD = 294;" in boot
+assert "dashboard.html?app=2.4.9.7" in boot and "dashboard.html?app=2.4.9.7" in login
 assert "mobile-dashboard-v184.js" not in html and "mobile-dashboard-v185.js" not in html
 assert "kNextService" not in dash and "Próximo Serviço" not in dash and "Próximo serviço" not in dash
 java=Path('app/android/TarefasBiometricPlugin.java').read_text()
