@@ -3,7 +3,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 
 const root=process.cwd(),dist=path.join(root,'dist');
-const VERSION='2.4.9',BUILD=293,WEB_VERSION='7.9.1',BASE='2.4.8.6';
+const VERSION='2.4.9',BUILD=293,WEB_VERSION='7.9.7',BASE='2.4.8.6';
 const PATCH='2.4.8.7';
 
 const patch=async(rel,fn)=>{
