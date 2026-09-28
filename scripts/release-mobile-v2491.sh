@@ -168,7 +168,7 @@ assert "__TAREFAS_ALPHA_2467_ESCALAS_2433__" not in boot
 for marker in ["__TAREFAS_ALPHA_2481_DISTRIBUICAO_FISCAL_FIX__","__TAREFAS_ALPHA_2482_GUIDES_READY_FIX__","__TAREFAS_ALPHA_2483_FORNECIMENTO__","__TAREFAS_ALPHA_2484_PEDIDO_LAYOUT_FIX__","__TAREFAS_ALPHA_2485_BIOMETRIC_SINGLE_PROMPT__"]:
     assert marker in boot, marker
 assert "const APP_VERSION = '2.4.9.1';" in boot and "const APP_BUILD = 294;" in boot
-assert "dashboard.html?app=2.4.9.1" in boot and "dashboard.html?app=2.4.9" in login
+assert "dashboard.html?app=2.4.9.1" in boot and "dashboard.html?app=2.4.9.1" in login
 assert "mobile-dashboard-v184.js" not in html and "mobile-dashboard-v185.js" not in html
 assert "kNextService" not in dash and "Próximo Serviço" not in dash and "Próximo serviço" not in dash
 java=Path('app/android/TarefasBiometricPlugin.java').read_text()
@@ -303,7 +303,7 @@ jq -n \
     changelog:[
       "🔐 Corrige na camada Android nativa a duplicidade de solicitações de biometria.",
       "1️⃣ Apenas um BiometricPrompt pode ficar ativo por vez; chamadas concorrentes reutilizam a mesma autenticação.",
-      "🧩 Patches 2.4.8.1 até 2.4.8.5 e o handoff 2.4.8.7 consolidados no APK 2.4.9.",
+      "🧩 Patches 2.4.8.1 até 2.4.8.5 e o handoff 2.4.8.7 consolidados no APK 2.4.9.1.",
       "🛡️ Mantidas Escalas, Fornecimento, Guias, Distribuição e layout de Desrelacionamento/Baixa.",
       "🩹 Patch Manager .tpatch v1 e validação SHA-256 preservados.",
       "🚫 Cartão Próximo Serviço continua removido.",
