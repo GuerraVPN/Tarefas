@@ -4,7 +4,7 @@
   "baseVersion": "2.4.1",
   "baseBuild": 276,
   "generatedAt": "2026-09-28T00:00:00Z",
-  "latestPatch": "2.4.9.5",
+  "latestPatch": "2.4.9.4",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -1022,7 +1022,7 @@
         "2.4.9.2",
         "2.4.9.1"
       ],
-      "installable": true,
+      "installable": false,
       "description": "Desvincula a identificação visual da Web no Android: o cabeçalho e a tela Sobre exibem somente a versão do aplicativo.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.9.5.tpatch",
       "sha256": "e31db0e91c6fd7670e2d68f0ceaf0ef0eb0fe234b0855fea17ea4bd7f466226b",
@@ -1033,7 +1033,8 @@
         "Mantém o aplicativo independente da Web; a integração entre os dois permanece somente no banco de dados.",
         "Substitui cumulativamente o 2.4.9.4."
       ],
-      "order": 24905
+      "order": 24905,
+      "supersededBy": "2.4.9.6"
     }
   ],
   "history": [
