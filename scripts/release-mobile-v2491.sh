@@ -143,16 +143,16 @@ python3 - <<'PY'
 import json
 with open('android/app/build/outputs/apk/release/output-metadata.json',encoding='utf-8') as f:
     e=json.load(f)['elements'][0]
-assert int(e['versionCode']) == 293, e
+assert int(e['versionCode']) == 294, e
 assert str(e['versionName']) == '2.4.9.1', e
 PY
 
-unzip -p "$UNSIGNED" assets/public/mobile-bootstrap.js > "$RUNNER_TEMP/bootstrap-v249.js"
-unzip -p "$UNSIGNED" assets/public/mobile-login-v17.js > "$RUNNER_TEMP/login-v249.js"
-unzip -p "$UNSIGNED" assets/public/dashboard.html > "$RUNNER_TEMP/dashboard-v249.html"
-unzip -p "$UNSIGNED" assets/public/dashboard.js > "$RUNNER_TEMP/dashboard-js-v249.js"
-unzip -p "$UNSIGNED" assets/public/mobile-patch-manager-v240.js > "$RUNNER_TEMP/pm-v249.js"
-unzip -p "$UNSIGNED" assets/public/about.html > "$RUNNER_TEMP/about-v249.html"
+unzip -p "$UNSIGNED" assets/public/mobile-bootstrap.js > "$RUNNER_TEMP/bootstrap-v2491.js"
+unzip -p "$UNSIGNED" assets/public/mobile-login-v17.js > "$RUNNER_TEMP/login-v2491.js"
+unzip -p "$UNSIGNED" assets/public/dashboard.html > "$RUNNER_TEMP/dashboard-v2491.html"
+unzip -p "$UNSIGNED" assets/public/dashboard.js > "$RUNNER_TEMP/dashboard-js-v2491.js"
+unzip -p "$UNSIGNED" assets/public/mobile-patch-manager-v240.js > "$RUNNER_TEMP/pm-v2491.js"
+unzip -p "$UNSIGNED" assets/public/about.html > "$RUNNER_TEMP/about-v2491.html"
 python3 - <<'PY'
 from pathlib import Path
 import os,zipfile
@@ -167,8 +167,8 @@ assert "__TAREFAS_ALPHA_2468_SERVICOS_HOTBAR_FIX__" in boot
 assert "__TAREFAS_ALPHA_2467_ESCALAS_2433__" not in boot
 for marker in ["__TAREFAS_ALPHA_2481_DISTRIBUICAO_FISCAL_FIX__","__TAREFAS_ALPHA_2482_GUIDES_READY_FIX__","__TAREFAS_ALPHA_2483_FORNECIMENTO__","__TAREFAS_ALPHA_2484_PEDIDO_LAYOUT_FIX__","__TAREFAS_ALPHA_2485_BIOMETRIC_SINGLE_PROMPT__"]:
     assert marker in boot, marker
-assert "const APP_VERSION = '2.4.9.1';" in boot and "const APP_BUILD = 293;" in boot
-assert "dashboard.html?app=2.4.9" in boot and "dashboard.html?app=2.4.9" in login
+assert "const APP_VERSION = '2.4.9.1';" in boot and "const APP_BUILD = 294;" in boot
+assert "dashboard.html?app=2.4.9.1" in boot and "dashboard.html?app=2.4.9" in login
 assert "mobile-dashboard-v184.js" not in html and "mobile-dashboard-v185.js" not in html
 assert "kNextService" not in dash and "Próximo Serviço" not in dash and "Próximo serviço" not in dash
 java=Path('app/android/TarefasBiometricPlugin.java').read_text()
@@ -239,7 +239,7 @@ sha256sum "$APK" | tee "$APK.sha256"
 
 mkdir -p "$RUNNER_TEMP/package/app" "$RUNNER_TEMP/package/scripts" "$RUNNER_TEMP/package/manifest" "$RUNNER_TEMP/package/patches" "$RUNNER_TEMP/package/supabase"
 cp "$APK" "$APK.sha256" "$RUNNER_TEMP/package/"
-cp app/mobile-launcher-icon-v241.js app/release-v249.txt app/android/TarefasBiometricPlugin.java "$RUNNER_TEMP/package/app/"
+cp app/mobile-launcher-icon-v241.js app/release-v2491.txt app/android/TarefasBiometricPlugin.java "$RUNNER_TEMP/package/app/"
 cp patches/TAREFAS-2.4.8.1.tpatch "$RUNNER_TEMP/package/patches/"
 cp patches/TAREFAS-2.4.8.2.tpatch "$RUNNER_TEMP/package/patches/"
 cp patches/TAREFAS-2.4.8.3.tpatch "$RUNNER_TEMP/package/patches/"
@@ -250,7 +250,7 @@ cp supabase/migrations/20260924133000_fix_v5_4_2_mover_distribuicao_motivo_ambig
 cp app/android/TarefasLauncherIconPlugin.java "$RUNNER_TEMP/package/app/"
 true
 cp scripts/build-mobile-v246.mjs scripts/build-mobile-v2477.mjs scripts/build-mobile-v2486.mjs scripts/build-mobile-v2491.mjs scripts/verify-mobile-v2486.mjs scripts/verify-mobile-v2491.mjs "$RUNNER_TEMP/package/scripts/"
-cp dist/BETA_2_4_9.json "$RUNNER_TEMP/package/manifest/"
+cp dist/ALPHA_2_4_9_1.json "$RUNNER_TEMP/package/manifest/"
 (cd "$RUNNER_TEMP/package" && zip -qr "$GITHUB_WORKSPACE/$ZIP" .)
 unzip -tq "$ZIP"
 sha256sum "$ZIP" | tee "$ZIP.sha256"
@@ -326,4 +326,4 @@ CODE="$(curl --silent --show-error \
 
 cat "$RUNNER_TEMP/result.json"
 test "$CODE" = '200'
-jq -e '.ok == true and .version == "2.4.9.1" and .build == 293 and .channel == "beta"' "$RUNNER_TEMP/result.json" >/dev/null
+jq -e '.ok == true and .version == "2.4.9.1" and .build == 294 and .channel == "alpha"' "$RUNNER_TEMP/result.json" >/dev/null
