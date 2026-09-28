@@ -3,8 +3,8 @@
   "app": "TAREFAS",
   "baseVersion": "2.4.1",
   "baseBuild": 276,
-  "generatedAt": "2026-09-28T00:00:00Z",
-  "latestPatch": "2.4.9.6",
+  "generatedAt": "2026-09-28T22:31:25.864Z",
+  "latestPatch": "2.4.9.8",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -1066,6 +1066,31 @@
         "Substitui cumulativamente o 2.4.9.5."
       ],
       "order": 24906
+    },
+    {
+      "id": "2.4.9.8",
+      "name": "TAREFAS 2.4.9.8 — Notas Fiscais nos Orçamentários",
+      "baseVersion": "2.4.9",
+      "minBuild": 293,
+      "maxBuild": 294,
+      "channel": "alpha",
+      "publishedAt": "2026-09-28T22:31:25.864Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [],
+      "installable": true,
+      "description": "Adiciona somente o módulo Notas Fiscais aos Orçamentários do Android, abaixo de Guias, usando a mesma implementação funcional da Web 7.9.7.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.9.8.tpatch",
+      "sha256": "d806d71138cfc31fe5f2408d714dc6719f068e6f61d84884079acc5bc7c8ae20",
+      "changelog": [
+        "Adiciona a entrada Notas Fiscais logo abaixo de Guias no menu Gestão.",
+        "Abre o módulo completo de Notas Fiscais dentro do Android, sem depender da página Web.",
+        "Mantém empresas, cadastro de Nota Fiscal, filtros, ND 30/32/52, depósito de destino e andamento.",
+        "Mantém os quatro estágios: aprovação do Fiscal Administrativo, Siscofis, inclusão em carga e Pronto.",
+        "Mantém o histórico e as permissões de aprovação usadas pela Web 7.9.7.",
+        "Não altera Escalas, biometria, Patch Manager ou os demais módulos."
+      ],
+      "order": 24908
     }
   ],
   "history": [
@@ -1535,6 +1560,31 @@
         "Remove acessos legados e o Próximo Serviço sem usar MutationObserver.",
         "Não cria uma nova implementação de Escalas."
       ]
+    },
+    {
+      "id": "2.4.9.8",
+      "name": "TAREFAS 2.4.9.8 — Notas Fiscais nos Orçamentários",
+      "baseVersion": "2.4.9",
+      "minBuild": 293,
+      "maxBuild": 294,
+      "channel": "alpha",
+      "publishedAt": "2026-09-28T22:31:25.864Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [],
+      "installable": true,
+      "description": "Adiciona somente o módulo Notas Fiscais aos Orçamentários do Android, abaixo de Guias, usando a mesma implementação funcional da Web 7.9.7.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.9.8.tpatch",
+      "sha256": "d806d71138cfc31fe5f2408d714dc6719f068e6f61d84884079acc5bc7c8ae20",
+      "changelog": [
+        "Adiciona a entrada Notas Fiscais logo abaixo de Guias no menu Gestão.",
+        "Abre o módulo completo de Notas Fiscais dentro do Android, sem depender da página Web.",
+        "Mantém empresas, cadastro de Nota Fiscal, filtros, ND 30/32/52, depósito de destino e andamento.",
+        "Mantém os quatro estágios: aprovação do Fiscal Administrativo, Siscofis, inclusão em carga e Pronto.",
+        "Mantém o histórico e as permissões de aprovação usadas pela Web 7.9.7.",
+        "Não altera Escalas, biometria, Patch Manager ou os demais módulos."
+      ],
+      "order": 24908
     }
   ],
   "cacheNonce": "2485-bio1"
