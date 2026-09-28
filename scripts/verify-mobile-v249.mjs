@@ -1,0 +1,23 @@
+import { access,readFile,readdir } from 'node:fs/promises';
+import path from 'node:path';
+const root=process.cwd(),dir=path.resolve(process.argv[2]||'dist'),read=f=>readFile(path.join(dir,f),'utf8');
+const must=(x,m)=>{if(!x)throw new Error('2.4.9 verify: '+m)};
+for(const f of ['mobile-bootstrap.js','mobile-login-v17.js','mobile-patch-manager-v240.js','dashboard.html','dashboard.js','about.html','BETA_2_4_9.json'])await access(path.join(dir,f));
+const b=await read('mobile-bootstrap.js'),pm=await read('mobile-patch-manager-v240.js'),m=JSON.parse(await read('BETA_2_4_9.json'));
+must(b.includes("const APP_VERSION = '2.4.9';")&&b.includes('const APP_BUILD = 293;'),'versão/build incorretos');
+must(pm.includes("const APP_VERSION='2.4.9',APP_BUILD=293,APP_CHANNEL='beta';'),'Patch Manager não promovido');
+must(b.includes('__TAREFAS_PATCH_CONSOLIDATED_2487__'),'handoff 2.4.8.7 não consolidado');
+must(b.includes('__TAREFAS_ALPHA_2468_SERVICOS_HOTBAR_FIX__'),'2.4.6.8 ausente');
+must(!b.includes('__TAREFAS_ALPHA_2467_ESCALAS_2433__'),'2.4.6.7 detectado');
+must(b.includes('__TAREFAS_ALPHA_2485_BIOMETRIC_SINGLE_PROMPT__'),'2.4.8.5 ausente');
+const p=JSON.parse(await readFile(path.join(root,'patches/TAREFAS-2.4.8.7.tpatch'),'utf8'));
+must(p.payloadSha256==='b4daaffe72b76fcad6919f6e21fc34558f9746e4e8349cc987c65a0260f890c2','SHA do patch 2.4.8.7 inválido');
+const forbidden=['kNextServiceCard','kNextService','tm-next-service-kpi','v756-next-service','ensureNextCard','loadDashboardService','v756NextServiceCss','data-v756-next-icon','Próximo serviço</small>','Próximo Serviço</small>'];
+for(const name of await readdir(dir)){if(!/\.(?:js|html)$/i.test(name))continue;const c=await read(name);for(const t of forbidden)must(!c.includes(t),name+' contém '+t)}
+const java=await readFile(path.join(root,'app/android/TarefasBiometricPlugin.java'),'utf8');
+for(const marker of ['authenticateInProgress','pendingAuthenticateCalls','resolvePendingAuthenticateCalls','rejectPendingAuthenticateCalls','synchronized (authenticateLock)'])must(java.includes(marker),'trava nativa ausente');
+must((java.match(/new BiometricPrompt\(/g)||[]).length===1,'mais de um BiometricPrompt no plugin');
+const v756=await read('v7_5_6_patch.js');must(v756.includes('loadCalendarServices')&&v756.includes('applyCalendarServices'),'calendário não preservado');
+must(m.version==='2.4.9'&&m.build===293&&m.channel==='beta'&&m.incorporatedPatch==='2.4.8.7','manifesto incorreto');
+must(m.features?.preRelease25===true&&m.features?.biometricSessionHandoff===true,'flags da pré-release ausentes');
+console.log('VERIFY 2.4.9 BETA OK.');
