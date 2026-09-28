@@ -7,6 +7,7 @@ const VERSION='2.4.9.1',BUILD=294,WEB_VERSION='7.9.1',BASE='2.4.9';
 const PATCH='2.4.8.7';
 
 // Promove a base Beta 2.4.9 para a Alpha 2.4.9.1 sem reconstruir a linha principal.
+await import('./build-mobile-v249.mjs');
 const patch=async(rel,fn)=>{
   const f=path.join(dist,rel),before=await readFile(f,'utf8'),after=fn(before);
   if(after!==before)await writeFile(f,after,'utf8');
@@ -29,7 +30,7 @@ for(const name of await readdir(dist)){
 }
 
 for(const name of await readdir(dist)){
-  if(!/\\.(?:js|html)$/i.test(name))continue;
+  if(!/\.(?:js|html)$/i.test(name))continue;
   await patch(name,s=>s
     .replaceAll("APP_VERSION='2.4.9'","APP_VERSION='2.4.9.1'")
     .replaceAll("APP_VERSION = '2.4.9'","APP_VERSION = '2.4.9.1'")
