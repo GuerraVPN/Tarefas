@@ -1,0 +1,53 @@
+name: Android 2.4.9.7 Alpha — App somente
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [app/android-v2497-alpha]
+    paths:
+      - 'scripts/build-mobile-v2497.mjs'
+      - 'scripts/verify-mobile-v2497.mjs'
+      - 'scripts/release-mobile-v2497.sh'
+      - 'app/android/TarefasBiometricPlugin.java'
+      - '.github/workflows/android-v2497-alpha.yml'
+
+concurrency:
+  group: android-v2497-alpha
+  cancel-in-progress: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: app/android-v2497-alpha
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Compilar, validar, assinar e publicar 2.4.9.7 Alpha
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          chmod +x scripts/release-mobile-v2497.sh
+          scripts/release-mobile-v2497.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tarefas-android-2.4.9.7-alpha-build-294
+          path: |
+            TAREFAS-2.4.9.7-alpha.apk
+            TAREFAS-2.4.9.7-alpha.apk.sha256
+            TAREFAS-2.4.9.7-alpha-build-294.zip
+            TAREFAS-2.4.9.7-alpha-build-294.zip.sha256
+            dist/ALPHA_2_4_9_7.json
+          if-no-files-found: error
