@@ -257,7 +257,6 @@ function render(){
     if(actual){cls.push('service');text=esc(actual.marcacao||'SV');title=`Serviço confirmado · ${personName(row)} · ${br(date)}`}
     else if(vac){cls.push('vacation');text='FÉRIAS';title=`Férias · ${br(vac.data_inicio)} a ${br(vac.data_fim)}`}
     else if(adapt){cls.push('adaptation');text='ADP';title=`Dia de adaptação · serviço permitido a partir de ${br(addDays(date,1))}`}
-    else if(duty?.type==='predicted'){cls.push('predicted');text='SV';title=`Próximo serviço previsto automaticamente · ${personName(row)} · ${br(date)}`}
     else{const f=folgaNumber(row,g,date);if(f!==null&&f>0){cls.push('folga-count');text=String(f);title=`${f}º dia da ${scaleLaneName(date)} desde o último serviço confirmado desta mesma escala`}}
     html+=`<td class="${cls.filter(Boolean).join(' ')}" data-user="${row.usuario_id||''}" data-external="${row.pessoa_externa_id||''}" data-group="${g}" data-date="${date}" title="${esc(title)}">${text}</td>`;
    }
@@ -288,9 +287,7 @@ function serviceContext(row,g,date){
 function fillServiceContext(row,g,date,item){
  const ctx=serviceContext(row,g,date);
  $('serviceFolgas').value=ctx.prev?`${ctx.folgas} dia(s) da ${ctx.lane==='vermelha'?'Vermelha':'Preta'} · último serviço confirmado ${br(ctx.prev.date)}`:'Sem serviço confirmado anterior nesta escala';
- $('serviceNext').value=ctx.nextConfirmed?`Confirmado · ${br(ctx.nextConfirmed.date)}`:'Sem próximo serviço confirmado';
  $('serviceForecast').value=ctx.nextPredicted?`Previsto · ${br(ctx.nextPredicted.date)}`:'Sem previsão automática';
- $('serviceNextDays').value=ctx.nextPredicted?`${ctx.diasAte} dia(s) desta escala · ${ctx.diasCorridos} dia(s) corridos`:'Sem previsão automática';
  $('serviceModalTitle').textContent=item?'Editar serviço':'Lançar serviço';
 }
 function openService(td){
