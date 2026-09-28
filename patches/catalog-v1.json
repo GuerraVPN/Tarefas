@@ -1079,7 +1079,7 @@
       "cumulative": true,
       "replacementMode": "replace-older-same-base",
       "replaces": [],
-      "installable": true,
+      "installable": false,
       "description": "Adiciona somente o módulo Notas Fiscais aos Orçamentários do Android, abaixo de Guias, usando a mesma implementação funcional da Web 7.9.7.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.9.8.tpatch",
       "sha256": "baf40b67f6247b6a97fc03f0ea2d5fb56a30e417a301dab3cda531124314a1f6",
@@ -1091,7 +1091,34 @@
         "Mantém o histórico e as permissões de aprovação usadas pela Web 7.9.7.",
         "Não altera Escalas, biometria, Patch Manager ou os demais módulos."
       ],
-      "order": 24908
+      "order": 24908,
+      "supersededBy": "2.4.9.9"
+    },
+    {
+      "id": "2.4.9.9",
+      "name": "TAREFAS 2.4.9.9 — Ajuste visual das Notas Fiscais",
+      "baseVersion": "2.4.9.7",
+      "minBuild": 293,
+      "maxBuild": 294,
+      "channel": "alpha",
+      "publishedAt": "2026-09-28T22:55:00.000Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.4.9.8"
+      ],
+      "installable": true,
+      "description": "Ajusta somente o layout dos comandos de adicionar empresa, adicionar Nota Fiscal e avançar de etapa no módulo Notas Fiscais.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.9.9.tpatch",
+      "sha256": "14917ead292fd12f5ed563ef65497259bb379ae8e9e963b28293a085d08f3018",
+      "changelog": [
+        "Deixa Adicionar empresa com botão mais organizado, destacado e responsivo.",
+        "Deixa Adicionar Nota Fiscal com o mesmo padrão visual do botão de empresa.",
+        "Melhora o botão Avançar para, destacando a próxima etapa de forma mais clara.",
+        "Ajusta espaçamentos, tamanhos, bordas, ícones e comportamento no celular.",
+        "Não altera a lógica, banco, permissões, Escalas, biometria ou outros módulos."
+      ],
+      "order": 24909
     }
   ],
   "history": [
