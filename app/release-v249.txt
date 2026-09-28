@@ -1,0 +1,30 @@
+# TAREFAS 2.4.9 Beta — pré-release da 2.5 💪🏼
+
+## Objetivo
+A Beta 2.4.9 é uma build de validação antes da linha 2.5. O foco é consolidar a base 2.4.8.x e deixar os testadores procurarem regressões reais antes da próxima grande linha.
+
+### Base
+- Base Android: **2.4.8.6 / build 292**.
+- Correção **2.4.8.7** incorporada diretamente no APK.
+- Build Beta: **293**.
+- Web embarcada preservada em **7.9.1**, sem misturar o trabalho atual da Web 7.9.7.
+- Branch isolada: `app/android-v249-beta-prep`.
+
+### Biometria
+- Mantém a trava nativa introduzida na 2.4.8.6.
+- Incorpora o handoff de sessão do 2.4.8.7: após uma biometria de login bem-sucedida, o ciclo atual é marcado como desbloqueado.
+- Objetivo: impedir que o Dashboard dispare uma segunda biometria imediatamente após o login biométrico.
+
+### Recursos preservados
+- Escalas e usuários.
+- Serviços / hotbar.
+- Orçamentários, Guias, Distribuição, Fornecimento, Movimentação e Baixa.
+- Patch Manager .tpatch v1, IndexedDB e SHA-256.
+- Remoção do cartão **Próximo Serviço**.
+- Correções de calendário.
+
+### Teste dos Betas
+Fluxo sugerido:
+`login → biometria → Dashboard → Escalas → Usuários → Serviços → Orçamentários → Guias → Distribuição → Baixa → Notificações → fechar completamente → abrir novamente`.
+
+A ideia desta versão é **estabilizar e encontrar regressões**, deixando novidades maiores para a 2.5.
