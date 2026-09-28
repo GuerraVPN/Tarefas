@@ -1,19 +1,29 @@
-<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Orçamentários · Guias</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="perfis.js?v=7.9.7"></script>
-<link rel="stylesheet" href="notificacoes.css?v=7.9.7"><link rel="stylesheet" href="v4_tema.css?v=7.9.7"><link rel="stylesheet" href="orcamentarios.css?v=7.9.7"><link rel="stylesheet" href="orcamentarios_modulos_v6.css?v=7.9.7"><style>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Orçamentários - 26º Pel PE Mec</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="perfis.js?v=7.9.7"></script>
+<link rel="stylesheet" href="notificacoes.css?v=7.9.7">
+<link rel="stylesheet" href="v4_tema.css?v=7.9.7">
+<link rel="stylesheet" href="orcamentarios.css?v=7.9.7">
+<link rel="stylesheet" href="orcamentarios_modulos_v6.css?v=7.9.7">
+<style>
 *{margin:0;padding:0;font-family:Arial,sans-serif}
-body{display:block;min-height:100vh}
-.sidebar{width:238px;padding:16px;display:flex;flex-direction:column;min-height:100vh;flex-shrink:0;position:fixed;left:0;top:0;bottom:0;z-index:50}
-.orc-main{margin-left:238px;width:calc(100% - 238px);min-height:100vh;background:var(--v4-bg);color:var(--v4-text)}
-.orc-topbar{min-height:68px;background:var(--v4-surface);border-bottom:1px solid var(--v4-border);display:flex;align-items:center;justify-content:space-between;padding:10px 22px;position:sticky;top:0;z-index:40}
-.orc-title h2{font-size:22px;margin:0}.orc-title p{font-size:11px;color:var(--v4-muted);margin-top:4px}
-.orc-page{padding:16px 18px 30px}
-.orc-module-nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.orc-module-nav a{display:inline-flex;align-items:center;text-decoration:none;border:1px solid var(--v4-border);background:var(--v4-surface);color:var(--v4-text-2);padding:8px 10px;border-radius:8px;font-size:9px;font-weight:800}.orc-module-nav a:hover,.orc-module-nav a.active{border-color:var(--v4-accent);color:var(--v4-accent);background:var(--v4-accent-soft)}
-.orc-menu-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.orc-menu-card{display:block;text-decoration:none;color:inherit;border:1px solid var(--v4-border);background:var(--v4-surface);border-radius:14px;padding:18px;transition:.16s}.orc-menu-card:hover{transform:translateY(-1px);border-color:var(--v4-accent);box-shadow:0 8px 25px rgba(0,0,0,.12)}.orc-menu-card .ico{font-size:28px}.orc-menu-card h3{font-size:14px;margin-top:10px}.orc-menu-card p{font-size:9px;color:var(--v4-muted);line-height:1.45;margin-top:5px}.orc-menu-card .go{display:block;margin-top:13px;color:var(--v4-accent);font-size:9px;font-weight:800}
-@media(max-width:900px){.sidebar{display:none!important}.orc-main{margin-left:0;width:100%}.orc-menu-grid{grid-template-columns:1fr 1fr}}
-@media(max-width:620px){.orc-topbar{padding:9px 12px}.orc-title h2{font-size:18px}.orc-menu-grid{grid-template-columns:1fr}.orc-page{padding:10px}.orc-module-nav{overflow:auto;flex-wrap:nowrap}.orc-module-nav a{white-space:nowrap}}
+body{display:flex;min-height:100vh}
+.sidebar{width:238px;padding:16px;display:flex;flex-direction:column;min-height:100vh;flex-shrink:0}
+.brand{display:flex;gap:12px;align-items:center;margin-bottom:28px}
+.star{width:36px;height:36px;background:var(--v4-gold);color:#111;border-radius:7px;display:grid;place-items:center;font-size:22px;font-weight:800}
+.brand h1{color:#fff;font-size:20px}.brand p{font-size:12px;color:var(--v4-gold)}
+.nav{list-style:none;flex:1}.nav li{padding:12px 14px;border-radius:8px;margin-bottom:6px;cursor:pointer;display:flex;gap:10px;align-items:center;color:var(--v4-sidebar-text)}.nav li:hover,.nav li.active{background:var(--v4-sidebar-hover)}.nav li.active{color:var(--v4-gold);border:1px solid var(--v4-gold)}
+.credit{font-size:10px;text-align:center;line-height:1.5;border-top:1px solid rgba(255,255,255,.12);padding-top:12px;color:var(--v4-sidebar-text)}.credit b{color:var(--v4-gold)}
+@media(max-width:900px){.sidebar{display:none!important}.orc-main{margin-left:0!important;width:100%!important}}
 </style>
-</head><body><aside class="sidebar">
+</head>
+
+<aside class="sidebar">
   <div class="brand"><div class="star">★</div><div><h1>TAREFAS</h1><p>26º Pel PE Mec</p></div></div>
   <ul class="nav">
     <li onclick="location.href='menu.html'">■ Quadro</li>
@@ -26,16 +36,24 @@ body{display:block;min-height:100vh}
     <li onclick="location.href='configuracoes.html'">⚙️ Configurações</li>
   </ul>
   <div class="credit">Criado por <b>Sd Guerra</b><br>26º Pel PE Mec 💪🏼</div>
-</aside><main class="orc-main"><header class="orc-topbar topbar"><div class="orc-title"><h2 id="orcPageTitle">Orçamentários · Guias</h2><p id="orcPageSubtitle">Cadastro, Fiscalização, documentos e andamento das guias.</p></div><div></div></header><section class="orc-page"><nav class="orc-module-nav" aria-label="Módulos Orçamentários">
-<a href="orcamento_relatorio.html">📊 Relatório</a>
-<a href="guias.html" class="active">📑 Guias</a>
-<a href="pedidos.html?modulo=baixas">📦 Baixa / Desrelacionamento</a>
-<a href="pedidos.html?modulo=distribuicao">🚚 Distribuição</a>
-<a href="movimentacoes.html?modulo=movimentacao">🔄 Movimentação</a>
-<a href="material_carga.html?modulo=material_carga">🗂 Material Carga</a>
-<a href="passagem_carga.html?modulo=passagem_carga">🔁 Passagem</a>
-<a href="lavanderia.html?modulo=lavanderia">🧺 Lavanderia</a>
-</nav><div id="orcModuleNav" hidden aria-hidden="true"></div><div id="reportModule" hidden></div><div id="pedidosModule" hidden></div><div id="movimentacaoModule" hidden></div><div id="materialCargaModule" hidden></div><div id="passagemCargaModule" hidden></div><div id="guiasModule">
+</aside>
+
+<main class="orc-main">
+  <header class="orc-topbar topbar">
+    <div class="orc-title"><h2 id="orcPageTitle">Orçamentários · Guias</h2><p id="orcPageSubtitle">Cadastro, Fiscalização, devolução, reenvio e andamento das guias.</p></div>
+    <div></div>
+  </header>
+
+  <section class="orc-page">
+    <div class="orc-module-nav" id="orcModuleNav" hidden aria-hidden="true" style="display:none!important">
+      <button class="orc-module-btn active" data-orc-module="guias">📑 Guias</button>
+      <button class="orc-module-btn" data-orc-module="baixas">📦 Desrelacionamento / Baixa</button>
+      <button class="orc-module-btn" data-orc-module="distribuicao">🚚 Distribuição</button>
+      <button class="orc-module-btn" data-orc-module="movimentacao">🔄 Movimentação de Material</button>
+      <button class="orc-module-btn" data-orc-module="material_carga">🗂 Material Carga / Depósito</button>
+      <button class="orc-module-btn" data-orc-module="passagem_carga">🔁 Passagem de Carga</button>
+    </div><nav class="orc-module-nav" aria-label="Módulos Orçamentários">
+<a href="orcamento_relatorio.html">📊 Relatório</a><a href="guias.html">📑 Guias</a><a href="pedidos.html?modulo=baixas">📦 Baixa / Desrelacionamento</a><a href="pedidos.html?modulo=distribuicao">🚚 Distribuição</a><a href="movimentacoes.html?modulo=movimentacao">🔄 Movimentação</a><a href="material_carga.html?modulo=material_carga">🗂 Material Carga</a><a href="passagem_carga.html?modulo=passagem_carga">🔁 Passagem</a><a href="lavanderia.html?modulo=lavanderia">🧺 Lavanderia</a></nav><div id="reportModule" hidden></div><div id="pedidosModule" hidden></div><div id="movimentacaoModule" hidden></div><div id="materialCargaModule" hidden></div><div id="passagemCargaModule" hidden></div><div id="guiasModule">
     <div id="fiscalBanner" class="orc-fiscal-banner">🛡️ Perfil autorizado na fila de Fiscalização — Chefe/Auxiliar da Fiscalização.</div>
 
     <div class="orc-toolbar">
@@ -206,9 +224,7 @@ body{display:block;min-height:100vh}
         </div>
       </section>
     </div>
-    </div><!-- /guiasModule -->
-
-    </section></main><div class="orc-modal-bg" id="newGuideBg">
+    </div><div class="orc-modal-bg" id="newGuideBg">
   <div class="orc-modal">
     <div class="orc-modal-head"><h3>Cadastrar Guia</h3><button class="orc-close" id="closeGuide">×</button></div>
     <form class="orc-form" id="newGuideForm">
@@ -231,10 +247,7 @@ body{display:block;min-height:100vh}
       <div class="orc-modal-actions"><button type="button" class="orc-btn" id="cancelGuide">Cancelar</button><button type="submit" class="orc-btn primary" id="saveGuide">Cadastrar e despachar</button></div>
     </form>
   </div>
-</div>
-
-
-<div class="orc-modal-bg" id="editGuideBg">
+</div><div class="orc-modal-bg" id="editGuideBg">
   <div class="orc-modal">
     <div class="orc-modal-head"><h3>Editar Guia</h3><button class="orc-close" id="closeEditGuide">×</button></div>
     <form class="orc-form" id="editGuideForm">
@@ -249,10 +262,7 @@ body{display:block;min-height:100vh}
       <div class="orc-modal-actions"><button type="button" class="orc-btn" id="cancelEditGuide">Cancelar</button><button type="submit" class="orc-btn primary">Salvar alterações</button></div>
     </form>
   </div>
-</div>
-
-<div class="orc-toast" id="orcToast"></div>
-
+</div></section></main><div class="orc-toast" id="orcToast"></div>
 <script>
 const SUPABASE_URL="https://bpvijatnsluwsgnzklrd.supabase.co";
 const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwdmlqYXRuc2x1d3NnbnprbHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MzkxNDMsImV4cCI6MjEwMjQxNTE0M30.uvyfm9mgl6MON0v75CwfGzNz6FBqw58uzR4ZcRAOLNQ";
@@ -263,6 +273,8 @@ const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 <script src="v4_ui.js?v=7.9.7"></script>
 <script src="bloco_notas.js?v=7.9.7"></script>
 <script src="v4_tema.js?v=7.9.7"></script>
+<script src="v6_4_patch.js?v=7.9.7"></script>
+<script src="v6_2_mobile.js?v=7.9.7"></script>
+<script src="v7_6_8_theme_fix.js?v=7.9.7"></script>
 <script src="v7_6_9_profile_required.js?v=7.9.7"></script>
-<script src="v7_9_6_usuarios_nav_fix.js?v=7.9.7"></script>
-<script src="guias_v6.js?v=7.9.7"></script></body></html>
+<script src="v7_9_6_usuarios_nav_fix.js?v=7.9.7"></script><script src="guias_v6.js?v=7.9.7"></script></body></html>
