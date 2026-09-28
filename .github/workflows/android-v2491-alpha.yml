@@ -1,0 +1,61 @@
+name: Android 2.4.9.1 Alpha — Notas Fiscais
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [app/android-v2491-alpha-prep]
+    paths:
+      - 'notas_fiscais.html'
+      - 'notas_fiscais_v1.js'
+      - 'orcamentarios.html'
+      - 'app/mobile-bootstrap.js'
+      - 'app/android/TarefasBiometricPlugin.java'
+      - 'app/release-v2491.txt'
+      - 'patches/TAREFAS-2.4.8.7.tpatch'
+      - 'scripts/build-mobile-v249.mjs'
+      - 'scripts/build-mobile-v2491.mjs'
+      - 'scripts/verify-mobile-v2491.mjs'
+      - 'scripts/release-mobile-v2491.sh'
+      - '.github/workflows/android-v2491-alpha.yml'
+
+concurrency:
+  group: android-v2491-alpha
+  cancel-in-progress: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: app/android-v2491-alpha-prep
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Compilar, validar, assinar e publicar Alpha 2.4.9.1
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          chmod +x scripts/release-mobile-v2491.sh
+          scripts/release-mobile-v2491.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tarefas-android-2.4.9.1-alpha-build-294
+          path: |
+            TAREFAS-2.4.9.1.apk
+            TAREFAS-2.4.9.1.apk.sha256
+            TAREFAS-2.4.9.1-alpha-build-294.zip
+            TAREFAS-2.4.9.1-alpha-build-294.zip.sha256
+            app/release-v2491.txt
+            dist/ALPHA_2_4_9_1.json
+          if-no-files-found: error
