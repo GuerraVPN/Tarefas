@@ -36,3 +36,4 @@ Formato: APK
 
 ## Observação
 Esta versão é um Alpha APK destinado à validação da correção da biometria duplicada.
+CI trigger: Alpha 2.4.8.6 build 292 — validação final automatizada.
