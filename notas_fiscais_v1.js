@@ -50,7 +50,7 @@ function renderEmpresas(){
  $('nfCompanyList').innerHTML=arr.length?arr.map(x=>'<article class="nf-company '+(selected&&String(selected.empresa_id)===String(x.id)?'active':'')+'" data-company="'+x.id+'"><strong>'+esc(x.nome)+'</strong><small>'+(x.cnpj?'CNPJ '+esc(x.cnpj):'Sem CNPJ cadastrado')+'</small></article>').join(''):'<div class="nf-empty">Nenhuma empresa encontrada.</div>';
 }
 function filteredNotas(){
- const q=norm($('nfSearch').value),s=$('nfStatus').value,nd=$('nfND').value;
+ const q=norm($('nfSearch').value),s=$('nfStatus').value,nd=$('nfNDFiltro').value;
  return notas.filter(n=>{
    if(s&&n.status!==s)return false;if(nd&&String(n.nd)!==nd)return false;
    return !q||norm(n.numero+' '+n.empresa_origem+' '+n.deposito_destino+' '+n.natureza_material).includes(q);
@@ -113,7 +113,7 @@ function bind(){
  $('nfModal').onclick=e=>{if(e.target===$('nfModal'))$('nfModal').classList.remove('open')};
  $('empresaForm').onsubmit=createEmpresa;$('nfForm').onsubmit=createNF;
  $('btnNovaNF').onclick=()=>{$('nfModal').classList.add('open');$('nfNumero').focus()};
- $('nfCompanySearch').oninput=renderEmpresas;$('nfSearch').oninput=renderNotas;$('nfStatus').onchange=renderNotas;$('nfND').onchange=renderNotas;
+ $('nfCompanySearch').oninput=renderEmpresas;$('nfSearch').oninput=renderNotas;$('nfStatus').onchange=renderNotas;$('nfNDFiltro').onchange=renderNotas;
  $('nfList').onclick=e=>{const card=e.target.closest('[data-note]');if(!card)return;selected=notas.find(n=>String(n.id)===String(card.dataset.note))||null;renderNotas();renderEmpresas();renderDetail()};
  $('nfCompanyList').onclick=e=>{const card=e.target.closest('[data-company]');if(!card)return;const empresa=empresas.find(x=>String(x.id)===String(card.dataset.company));$('nfSearch').value=empresa?empresa.nome:'';renderNotas()};
 }
