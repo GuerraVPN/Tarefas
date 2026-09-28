@@ -1,0 +1,230 @@
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Orçamentários · Pedidos</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="perfis.js?v=7.9.7"></script>
+<link rel="stylesheet" href="notificacoes.css?v=7.9.7"><link rel="stylesheet" href="v4_tema.css?v=7.9.7"><link rel="stylesheet" href="orcamentarios.css?v=7.9.7"><link rel="stylesheet" href="orcamentarios_modulos_v6.css?v=7.9.7"><style>
+*{margin:0;padding:0;font-family:Arial,sans-serif}
+body{display:block;min-height:100vh}
+.sidebar{width:238px;padding:16px;display:flex;flex-direction:column;min-height:100vh;flex-shrink:0;position:fixed;left:0;top:0;bottom:0;z-index:50}
+.orc-main{margin-left:238px;width:calc(100% - 238px);min-height:100vh;background:var(--v4-bg);color:var(--v4-text)}
+.orc-topbar{min-height:68px;background:var(--v4-surface);border-bottom:1px solid var(--v4-border);display:flex;align-items:center;justify-content:space-between;padding:10px 22px;position:sticky;top:0;z-index:40}
+.orc-title h2{font-size:22px;margin:0}.orc-title p{font-size:11px;color:var(--v4-muted);margin-top:4px}
+.orc-page{padding:16px 18px 30px}
+.orc-module-nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.orc-module-nav a{display:inline-flex;align-items:center;text-decoration:none;border:1px solid var(--v4-border);background:var(--v4-surface);color:var(--v4-text-2);padding:8px 10px;border-radius:8px;font-size:9px;font-weight:800}.orc-module-nav a:hover,.orc-module-nav a.active{border-color:var(--v4-accent);color:var(--v4-accent);background:var(--v4-accent-soft)}
+.orc-menu-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.orc-menu-card{display:block;text-decoration:none;color:inherit;border:1px solid var(--v4-border);background:var(--v4-surface);border-radius:14px;padding:18px;transition:.16s}.orc-menu-card:hover{transform:translateY(-1px);border-color:var(--v4-accent);box-shadow:0 8px 25px rgba(0,0,0,.12)}.orc-menu-card .ico{font-size:28px}.orc-menu-card h3{font-size:14px;margin-top:10px}.orc-menu-card p{font-size:9px;color:var(--v4-muted);line-height:1.45;margin-top:5px}.orc-menu-card .go{display:block;margin-top:13px;color:var(--v4-accent);font-size:9px;font-weight:800}
+@media(max-width:900px){.sidebar{display:none!important}.orc-main{margin-left:0;width:100%}.orc-menu-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:620px){.orc-topbar{padding:9px 12px}.orc-title h2{font-size:18px}.orc-menu-grid{grid-template-columns:1fr}.orc-page{padding:10px}.orc-module-nav{overflow:auto;flex-wrap:nowrap}.orc-module-nav a{white-space:nowrap}}
+</style>
+</head><body><aside class="sidebar">
+  <div class="brand"><div class="star">★</div><div><h1>TAREFAS</h1><p>26º Pel PE Mec</p></div></div>
+  <ul class="nav">
+    <li onclick="location.href='menu.html'">■ Quadro</li>
+    <li onclick="location.href='minhas_tarefas.html'">👤 Minhas tarefas</li>
+    <li onclick="location.href='calendario.html'">📅 Calendário</li>
+    <li onclick="location.href='relatorios.html'">📊 Relatórios</li>
+    <li onclick="location.href='usuarios.html'">👥 Usuários</li>
+    <li onclick="location.href='central.html'" data-v3-central="1">🔔 Central</li>
+    <li class="active" data-v5-orcamentarios="1">📑 Orçamentários</li>
+    <li onclick="location.href='configuracoes.html'">⚙️ Configurações</li>
+  </ul>
+  <div class="credit">Criado por <b>Sd Guerra</b><br>26º Pel PE Mec 💪🏼</div>
+</aside><main class="orc-main"><header class="orc-topbar topbar"><div class="orc-title"><h2>Orçamentários · Pedidos</h2><p>Desrelacionamento / Baixa e Distribuição.</p></div><div></div></header><section class="orc-page"><nav class="orc-module-nav" aria-label="Módulos Orçamentários">
+<a href="orcamento_relatorio.html">📊 Relatório</a>
+<a href="guias.html">📑 Guias</a>
+<a href="pedidos.html?modulo=baixas">📦 Baixa / Desrelacionamento</a>
+<a href="pedidos.html?modulo=distribuicao">🚚 Distribuição</a>
+<a href="movimentacoes.html?modulo=movimentacao">🔄 Movimentação</a>
+<a href="material_carga.html?modulo=material_carga">🗂 Material Carga</a>
+<a href="passagem_carga.html?modulo=passagem_carga">🔁 Passagem</a>
+<a href="lavanderia.html?modulo=lavanderia">🧺 Lavanderia</a>
+</nav><div id="orcModuleNav" hidden aria-hidden="true"></div><div id="reportModule" hidden></div><div id="guiasModule" hidden></div><div id="pedidosModule" hidden></div><div id="movimentacaoModule" hidden></div><div id="materialCargaModule" hidden></div><div id="passagemCargaModule" hidden></div><div id="pedidosModule" hidden>
+      <div class="pedido-toolbar">
+        <div class="pedido-tabs" id="pedidoTabs">
+          <button class="pedido-tab active" data-pedido-cat="permanente">Permanente <span class="count" id="pCountPermanente">0</span></button>
+          <button class="pedido-tab" data-pedido-cat="uso_duradouro">Uso Duradouro <span class="count" id="pCountDuradouro">0</span></button>
+          <button class="pedido-tab" data-pedido-cat="consumo">Consumo <span class="count" id="pCountConsumo">0</span></button>
+        </div>
+        <button class="orc-btn primary" id="btnNovoPedido">＋ Novo pedido</button>
+      </div>
+
+      <div class="pedido-filters">
+        <input id="pedidoSearch" type="search" placeholder="Buscar nº do pedido, material, ficha, origem ou destino...">
+        <select id="pedidoStatusFilter">
+          <option value="">Todos os status</option>
+          <option value="pedido">Pedido</option>
+          <option value="aguardando_aprovacao">Aguardando aprovação</option>
+          <option value="retornado">Retornado</option>
+          <option value="aprovado">Aprovado</option>
+          <option value="encaminhado_base">Encaminhado à Base Administrativa</option>
+          <option value="retornado_base">Retornado pela Base</option>
+          <option value="aprovado_base">Aprovado pela Base</option>
+          <option value="pronto">Pronto</option>
+          <option value="encaminhado_fiscal">Encaminhado ao Fiscal</option>
+          <option value="retornado_fiscal">Retornado pela Fiscalização</option>
+          <option value="aguardando_diex">Aguardando DIEx do material</option>
+        </select>
+        <input id="pedidoDateFilter" type="date">
+      </div>
+
+      <div class="pedido-grid">
+        <section class="orc-panel">
+          <div class="orc-panel-head"><h3 id="pedidoListTitle">Pedidos por data</h3><span id="pedidoListInfo">0 pedido(s)</span></div>
+          <div class="orc-list" id="pedidoList"><div class="orc-empty">Carregando pedidos...</div></div>
+        </section>
+
+        <section class="orc-panel">
+          <div class="orc-empty" id="pedidoDetailEmpty">Selecione um pedido para visualizar os materiais, total, andamento e atualizações.</div>
+          <div class="pedido-detail" id="pedidoDetail" hidden>
+            <div class="pedido-head">
+              <div><h3 id="pdTitle">Pedido</h3><p id="pdSubtitle"></p></div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+                <span class="pedido-status" id="pdStatus"></span>
+                <button type="button" class="orc-btn" id="btnEditPedido" hidden>✏️ Editar</button>
+                <button type="button" class="orc-btn danger" id="btnDeletePedido" hidden>🗑 Excluir</button>
+              </div>
+            </div>
+
+            <div class="pedido-meta">
+              <div><small>Quem fez o pedido</small><b id="pdCriadoPor">-</b></div>
+              <div><small>Data do pedido</small><b id="pdData">-</b></div>
+              <div id="pdCategoriaWrap"><small>Categoria</small><b id="pdCategoria">-</b></div>
+              <div><small>Total do pedido</small><b class="pedido-total" id="pdTotal">R$ 0,00</b></div>
+              <div id="pdDependenciaOrigemWrap"><small>Dependência de origem</small><b id="pdDependenciaOrigem">-</b></div>
+              <div id="pdDepositoOrigemWrap"><small>Depósito de origem</small><b id="pdDepositoOrigem">-</b></div>
+              <div id="pdDependenciaDestinoWrap"><small>Dependência de destino</small><b id="pdDependenciaDestino">-</b></div>
+              <div style="grid-column:1/-1"><small>Motivo / finalidade</small><b id="pdMotivo">-</b></div>
+              <div style="grid-column:1/-1"><small>Observações</small><b id="pdObservacoes">-</b></div>
+            </div>
+
+            <div class="pedido-return" id="pedidoReturnNotice" hidden></div>
+
+            <div class="pedido-sub">
+              <div class="pedido-subhead"><span>📦 Materiais do pedido</span><span id="pdItemsCount">0 item(ns)</span></div>
+              <div class="pedido-table-wrap">
+                <table class="pedido-table">
+                  <thead><tr><th>Material</th><th>Nº da ficha</th><th class="pedido-patrimonio-col">Nº Patrimônio</th><th>Quantidade</th><th>Valor unitário</th><th>Total</th></tr></thead>
+                  <tbody id="pdItemsBody"></tbody>
+                  <tfoot><tr><td colspan="5">Total do pedido</td><td class="num" id="pdItemsTotal">R$ 0,00</td></tr></tfoot>
+                </table>
+              </div>
+            </div>
+
+
+            <div class="pedido-sub" id="pedidoAttachmentsBox">
+              <div class="pedido-subhead"><span>📎 Arquivos anexados</span><span id="pedidoAttachCount">0 arquivo(s)</span></div>
+              <div class="pedido-actions">
+                <div id="pedidoAttachList"></div>
+                <input type="file" id="pedidoAddFiles" multiple accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx,.xls,.xlsx,.odt,.ods,.txt">
+                <textarea id="pedidoAttachNote" placeholder="Observação opcional sobre os arquivos..."></textarea>
+                <div><button type="button" class="orc-btn" id="btnPedidoAddFiles">📎 Anexar arquivos</button></div>
+              </div>
+            </div>
+
+            <div class="pedido-sub" id="pedidoFlowBox">
+              <div class="pedido-subhead"><span>Fluxo do pedido</span><span id="pedidoFlowHint"></span></div>
+              <div class="pedido-steps" id="pedidoSteps"></div>
+            </div>
+
+            <div class="pedido-sub" id="pedidoActionsBox">
+              <div class="pedido-subhead"><span>Ações do andamento</span><span id="pedidoActionHint"></span></div>
+              <div class="pedido-actions">
+                <textarea id="pedidoActionNote" placeholder="Informe observação da decisão ou o motivo quando retornar o pedido..."></textarea>
+                <div class="pedido-action-row" id="pedidoActionButtons"></div>
+              </div>
+            </div>
+
+            <div class="pedido-sub">
+              <div class="pedido-subhead"><span>📝 Adicionar atualização</span><span>Registrada no histórico</span></div>
+              <div class="pedido-actions">
+                <textarea id="pedidoUpdateText" placeholder="Ex.: conferência realizada, documentação encaminhada, aguardando providência..."></textarea>
+                <div><button class="orc-btn" id="btnPedidoUpdate">Registrar atualização</button></div>
+              </div>
+            </div>
+
+            <div class="pedido-sub">
+              <div class="pedido-subhead"><span>🕘 Histórico / Atualizações</span><span id="pedidoHistoryCount">0 evento(s)</span></div>
+              <div class="pedido-history" id="pedidoHistory"></div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div><!-- /pedidosModule -->
+
+    </section></main><div class="orc-modal-bg" id="newPedidoBg">
+  <div class="orc-modal" style="width:min(980px,97vw)">
+    <div class="orc-modal-head"><h3 id="newPedidoTitle">Novo pedido</h3><button class="orc-close" id="closePedido">×</button></div>
+    <form class="pedido-form" id="newPedidoForm">
+      <div class="pedido-field"><label>Número do pedido *</label><input id="pNumero" required placeholder="Ex.: 15-Almox"></div>
+      <div class="pedido-field"><label>Data do pedido *</label><input id="pData" type="date" required></div>
+
+      <div class="pedido-field" id="pCategoriaWrap">
+        <label>Categoria *</label>
+        <select id="pCategoria">
+          <option value="permanente">Permanente</option>
+          <option value="uso_duradouro">Uso Duradouro</option>
+          <option value="consumo">Consumo</option>
+        </select>
+      </div>
+
+      <div class="pedido-field" id="pDependenciaOrigemWrap" hidden>
+        <label>Dependência de origem *</label>
+        <select id="pDependenciaOrigem"><option value="">Selecione...</option></select>
+      </div>
+
+      <div class="pedido-field" id="pDepositoOrigemWrap" hidden>
+        <label>Depósito de origem *</label>
+        <select id="pDepositoOrigem"><option value="">Selecione...</option></select>
+      </div>
+
+      <div class="pedido-field" id="pDependenciaDestinoWrap" hidden>
+        <label>Dependência de destino *</label>
+        <select id="pDependenciaDestino"><option value="">Selecione...</option></select>
+      </div>
+
+      <div class="pedido-location-note" id="pedidoLocationRule"></div>
+
+      <div class="pedido-field full">
+        <label id="pMotivoLabel">Motivo / finalidade *</label>
+        <textarea id="pMotivo" required placeholder="Informe o motivo ou finalidade do pedido..."></textarea>
+      </div>
+
+      <div class="pedido-field full">
+        <label>Observações</label>
+        <textarea id="pObservacoes" placeholder="Informações complementares, se houver..."></textarea>
+      </div>
+
+      <div class="pedido-items-editor">
+        <div class="pedido-items-head"><span>Materiais do pedido</span><button type="button" class="orc-btn" id="btnAddPedidoItem">＋ Adicionar material</button></div>
+        <div id="pedidoItemsEditor"></div>
+        <div class="pedido-editor-total">Total do pedido: <span id="pedidoEditorTotal">R$ 0,00</span></div>
+      </div>
+
+
+      <div class="pedido-field full">
+        <label>Arquivos anexos</label>
+        <input id="pFiles" type="file" multiple accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx,.xls,.xlsx,.odt,.ods,.txt">
+        <div style="font-size:8px;color:var(--v4-muted);margin-top:5px">Opcional · até 25 MB por arquivo.</div>
+      </div>
+
+      <div class="pedido-form-actions">
+        <button type="button" class="orc-btn" id="cancelPedido">Cancelar</button>
+        <button type="submit" class="orc-btn primary" id="savePedido">Cadastrar pedido</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<div class="orc-toast" id="orcToast"></div>
+
+<script>
+const SUPABASE_URL="https://bpvijatnsluwsgnzklrd.supabase.co";
+const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwdmlqYXRuc2x1d3NnbnprbHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MzkxNDMsImV4cCI6MjEwMjQxNTE0M30.uvyfm9mgl6MON0v75CwfGzNz6FBqw58uzR4ZcRAOLNQ";
+const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+</script>
+<script src="sistema_comum.js?v=7.9.7"></script>
+<script src="notificacoes.js?v=7.9.7"></script>
+<script src="v4_ui.js?v=7.9.7"></script>
+<script src="bloco_notas.js?v=7.9.7"></script>
+<script src="v4_tema.js?v=7.9.7"></script>
+<script src="v7_6_9_profile_required.js?v=7.9.7"></script>
+<script src="v7_9_6_usuarios_nav_fix.js?v=7.9.7"></script>
+<script src="pedidos_v6.js?v=7.9.7"></script></body></html>

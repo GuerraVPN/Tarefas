@@ -15,10 +15,10 @@ function destinoNotificacao(row){
  const tipo=norm(row?.referencia_tipo||row?.tipo),id=row?.referencia_id;
  if(!id){if(tipo==='mensagem')return'central.html?tab=mensagens';return'central.html?tab=notificacoes'}
  if(['tarefa','tarefas'].includes(tipo))return`minhas_tarefas.html?tarefa=${encodeURIComponent(id)}`;
- if(['guia','guias'].includes(tipo))return`orcamentarios.html?modulo=guias&guia=${encodeURIComponent(id)}`;
- if(['pedido','pedidos','baixa','distribuicao'].includes(tipo))return`orcamentarios.html?pedido=${encodeURIComponent(id)}`;
- if(['movimentacao','movimentacao_material'].includes(tipo))return`orcamentarios.html?modulo=movimentacao&movimentacao=${encodeURIComponent(id)}`;
- if(['passagem','passagem_carga'].includes(tipo))return`orcamentarios.html?modulo=passagem_carga&passagem=${encodeURIComponent(id)}`;
+ if(['guia','guias'].includes(tipo))return`guias.html?guia=${encodeURIComponent(id)}`;
+ if(['pedido','pedidos','baixa','distribuicao'].includes(tipo))return`pedidos.html?pedido=${encodeURIComponent(id)}`;
+ if(['movimentacao','movimentacao_material'].includes(tipo))return`movimentacoes.html?modulo=movimentacao&movimentacao=${encodeURIComponent(id)}`;
+ if(['passagem','passagem_carga'].includes(tipo))return`passagem_carga.html?modulo=passagem_carga&passagem=${encodeURIComponent(id)}`;
  if(['usuario','usuarios'].includes(tipo))return`usuarios.html?usuario=${encodeURIComponent(id)}`;
  return'central.html?tab=notificacoes';
 }

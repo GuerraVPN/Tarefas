@@ -2,8 +2,9 @@
 'use strict';
 if(window.__TAREFAS_ORC_REPORT_LIGHT__)return;
 window.__TAREFAS_ORC_REPORT_LIGHT__=true;
+const REPORT_VERSION='7.9.7';
 const page=(location.pathname.split('/').pop()||'').toLowerCase();
-if(page!=='orcamentarios.html')return;
+if(!['orcamentarios.html','orcamento_relatorio.html'].includes(page))return;
 const params=new URLSearchParams(location.search);
 if(params.get('modulo')||params.get('pedido')||params.get('movimentacao')||params.get('passagem'))return;
 
