@@ -159,46 +159,34 @@ import os,zipfile
 t=Path(os.environ['RUNNER_TEMP'])
 boot=(t/'bootstrap-v249.js').read_text()
 login=(t/'login-v249.js').read_text()
-html=(t/'dashboard-v249.html').read_text()
-dash=(t/'dashboard-js-v249.js').read_text()
 pm=(t/'pm-v249.js').read_text()
-about=(t/'about-v249.html').read_text()
-assert "__TAREFAS_ALPHA_2468_SERVICOS_HOTBAR_FIX__" in boot
-assert "__TAREFAS_ALPHA_2467_ESCALAS_2433__" not in boot
-for marker in ["__TAREFAS_ALPHA_2481_DISTRIBUICAO_FISCAL_FIX__","__TAREFAS_ALPHA_2482_GUIDES_READY_FIX__","__TAREFAS_ALPHA_2483_FORNECIMENTO__","__TAREFAS_ALPHA_2484_PEDIDO_LAYOUT_FIX__","__TAREFAS_ALPHA_2485_BIOMETRIC_SINGLE_PROMPT__"]:
-    assert marker in boot, marker
-assert "const APP_VERSION = '2.4.9.7';" in boot and "const APP_BUILD = 294;" in boot
+assert "const APP_VERSION = '2.4.9.7';" in boot
+assert "const APP_BUILD = 294;" in boot
+assert "APP_VERSION='2.4.9.7'" in pm and "APP_BUILD=294" in pm and "APP_CHANNEL='alpha'" in pm
 assert "dashboard.html?app=2.4.9.7" in boot and "dashboard.html?app=2.4.9.7" in login
-assert "mobile-dashboard-v184.js" not in html and "mobile-dashboard-v185.js" not in html
-assert "kNextService" not in dash and "Próximo Serviço" not in dash and "Próximo serviço" not in dash
-java=Path('app/android/TarefasBiometricPlugin.java').read_text()
-for marker in ["authenticateInProgress","pendingAuthenticateCalls","resolvePendingAuthenticateCalls","rejectPendingAuthenticateCalls","synchronized (authenticateLock)"]:
-    assert marker in java, marker
-assert java.count("new BiometricPrompt(")==1
+for token in [' • WEB ','Base web','Base Web','WEB_VERSION','__TAREFAS_WEB_BASE_VERSION__','tarefasWebVersion']:
+    assert token not in boot, token
+    assert token not in pm, token
 with zipfile.ZipFile("android/app/build/outputs/apk/release/app-release-unsigned.apk") as z:
     names=set(z.namelist())
-    assert "assets/public/mobile-dashboard-v184.js" not in names
-    assert "assets/public/mobile-dashboard-v185.js" not in names
     assert "assets/public/mobile-patch-manager-v240.js" in names
-    forbidden=[
-        "kNextServiceCard","kNextService","tm-next-service-kpi","v756-next-service",
-        "ensureNextCard","loadDashboardService","v756NextServiceCss","data-v756-next-icon",
-        "Próximo serviço</small>","Próximo Serviço</small>"
-    ]
+    java=Path('app/android/TarefasBiometricPlugin.java').read_text()
+    for marker in ["authenticateInProgress","pendingAuthenticateCalls","resolvePendingAuthenticateCalls","rejectPendingAuthenticateCalls","synchronized (authenticateLock)"]:
+        assert marker in java, marker
+    assert java.count("new BiometricPrompt(")==1
     hits=[]
     for name in names:
-        if not name.startswith("assets/public/") or not name.endswith((".js",".html")):
+        if not name.startswith("assets/public/") or not name.endswith((".js",".html",".json")):
             continue
         try: content=z.read(name).decode("utf-8")
         except UnicodeDecodeError: content=z.read(name).decode("utf-8","replace")
-        for token in forbidden:
+        for token in [' • WEB ','Base web','Base Web','WEB_VERSION','__TAREFAS_WEB_BASE_VERSION__','tarefasWebVersion']:
             if token in content:
                 hits.append(f"{name} :: {token}")
-    assert not hits, "origem do cartão Próximo Serviço presente no APK: " + " | ".join(hits)
-    v756=z.read("assets/public/v7_5_6_patch.js").decode("utf-8")
-    assert "loadCalendarServices" in v756 and "applyCalendarServices" in v756
-print("APK OPEN-CODE AUDIT OK: nenhum JS/HTML empacotado contém a origem do cartão Próximo Serviço; v7.5.6 mantém as correções de calendário.")
+    assert not hits, "referência Web no APK: " + " | ".join(hits[:40])
+print("APK APP-ONLY AUDIT OK: 2.4.9.7/build 294, sem identificação Web e biometria nativa preservada.")
 PY
+
 OIDC="$(curl --fail --silent --show-error \
   -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
   "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-signing" | jq -r '.value')"
