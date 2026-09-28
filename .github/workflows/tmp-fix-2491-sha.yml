@@ -1,10 +1,13 @@
 name: tmp-fix-2491-sha
 on:
+  push:
+    branches: [app/releases]
   workflow_dispatch:
 permissions:
   contents: write
 jobs:
   fix:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,8 +23,7 @@ jobs:
           const payload=JSON.stringify({js:String(patch.payload?.js||''),css:String(patch.payload?.css||'')});
           patch.payloadSha256=crypto.createHash('sha256').update(Buffer.from(payload,'utf8')).digest('hex');
           fs.writeFileSync(p,JSON.stringify(patch,null,2)+'\n');
-          const whole=fs.readFileSync(p);
-          const sha=crypto.createHash('sha256').update(whole).digest('hex');
+          const sha=crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
           const cat=JSON.parse(fs.readFileSync(c,'utf8'));
           const e=cat.patches.find(x=>x.id==='2.4.9.1');
           e.sha256=sha;
