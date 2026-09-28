@@ -3,8 +3,11 @@ set -euo pipefail
 
 VERSION='2.4.9.7'
 BUILD='294'
-WEB_VERSION=''
-APK="TAREFAS-${VERSION}-alpha.apk"
+# O endpoint de publicação exige semver para web_version, mas a versão Web não é
+# incorporada nem exibida no bundle do App. Mantemos somente o metadado compatível.
+WEB_VERSION='7.9.1'
+APK="TAREFAS-${VERSION}.apk"
+ALPHA_APK="TAREFAS-${VERSION}-alpha.apk"
 ZIP="TAREFAS-${VERSION}-alpha-build-${BUILD}.zip"
 
 npm ci
@@ -193,6 +196,8 @@ ZIPALIGN="$(find "$ANDROID_HOME/build-tools" -type f -name zipalign | sort -V | 
   --key-pass "pass:$KEY_PASS" \
   --out "$APK" "$RUNNER_TEMP/aligned.apk"
 
+cp "$APK" "$ALPHA_APK"
+
 "$APKSIGNER" verify --verbose --print-certs "$APK" | tee "$RUNNER_TEMP/apksigner.txt"
 ACTUAL_CERT="$(sed -n 's/.*certificate SHA-256 digest: //p' "$RUNNER_TEMP/apksigner.txt" | head -1 | tr -d ': ' | tr '[:upper:]' '[:lower:]')"
 test -n "$ACTUAL_CERT"
@@ -212,9 +217,10 @@ assert 'APP_BUILD=294' in (Path(__import__('os').environ['RUNNER_TEMP'])/'pm-alp
 print('APK APP-ONLY POST-SIGN CHECK OK')
 PY
 sha256sum "$APK" | tee "$APK.sha256"
+sha256sum "$ALPHA_APK" | tee "$ALPHA_APK.sha256"
 
 mkdir -p "$RUNNER_TEMP/package/app" "$RUNNER_TEMP/package/scripts" "$RUNNER_TEMP/package/manifest" "$RUNNER_TEMP/package/patches" "$RUNNER_TEMP/package/supabase"
-cp "$APK" "$APK.sha256" "$RUNNER_TEMP/package/"
+cp "$APK" "$APK.sha256" "$ALPHA_APK" "$ALPHA_APK.sha256" "$RUNNER_TEMP/package/"
 cp app/mobile-launcher-icon-v241.js app/release-v249.txt app/android/TarefasBiometricPlugin.java "$RUNNER_TEMP/package/app/"
 cp patches/TAREFAS-2.4.8.1.tpatch "$RUNNER_TEMP/package/patches/"
 cp patches/TAREFAS-2.4.8.2.tpatch "$RUNNER_TEMP/package/patches/"
@@ -235,7 +241,7 @@ git fetch origin app/releases
 RELEASES_DIR="$RUNNER_TEMP/tarefas-releases-v248"
 git worktree add "$RELEASES_DIR" origin/app/releases
 mkdir -p "$RELEASES_DIR/downloads"
-cp "$APK" "$APK.sha256" "$ZIP" "$ZIP.sha256" "$RELEASES_DIR/downloads/"
+cp "$APK" "$APK.sha256" "$ALPHA_APK" "$ALPHA_APK.sha256" "$ZIP" "$ZIP.sha256" "$RELEASES_DIR/downloads/"
 cd "$RELEASES_DIR"
 git config user.name 'GuerraVPN Android Build'
 git config user.email '81371258+GuerraVPN@users.noreply.github.com'
@@ -246,7 +252,7 @@ if ! git diff --cached --quiet; then
 fi
 cd "$GITHUB_WORKSPACE"
 
-URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.4.9.7-alpha.apk'
+URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.4.9.7.apk'
 LOCAL_SHA="$(sha256sum "$APK" | awk '{print $1}')"
 for attempt in 1 2 3 4 5 6 7 8; do
   if curl --fail --silent --show-error -L "$URL" -o "$RUNNER_TEMP/published.apk" \
@@ -284,7 +290,7 @@ jq -n \
       "🩹 Patch Manager .tpatch v1 e validação SHA-256 preservados.",
       "🚫 Cartão Próximo Serviço continua removido.",
       "📱 App independente da Web; integração somente pelo banco de dados.",
-      "🌿 Build isolada da main na branch app/android-v2497-alpha.",
+      "🌿 Build isolada da main na branch app/android-v2497-prep.",
       "🧪 Alpha destinado à validação da biometria duplicada."
     ],
     mandatory:false,
@@ -303,13 +309,3 @@ CODE="$(curl --silent --show-error \
 cat "$RUNNER_TEMP/result.json"
 test "$CODE" = '200'
 jq -e '.ok == true and .version == "2.4.9.7" and .build == 294 and .channel == "alpha"' "$RUNNER_TEMP/result.json" >/dev/null
-
-# trigger final signing check
-
-# trigger APK audit correction
-
-# final trigger app-only audit
-
-# trigger final release audit
-
-# trigger final signed build
