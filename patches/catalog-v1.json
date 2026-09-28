@@ -4,7 +4,7 @@
   "baseVersion": "2.4.1",
   "baseBuild": 276,
   "generatedAt": "2026-09-28T00:00:00Z",
-  "latestPatch": "2.4.9.1",
+  "latestPatch": "2.4.9.2",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -921,10 +921,33 @@
       "cumulative": true,
       "replacementMode": "replace-older-same-base",
       "replaces": [],
-      "installable": true,
+      "installable": false,
       "description": "Corrige o travamento de Orçamentários no Android reproduzindo a arquitetura da Web 7.9.7, com módulos separados, e atualiza a base Web carregada pelo app para a Web 7.9.7.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.9.1.tpatch",
       "sha256": "0aab8eb73ce579e4fbdf4e8f410c2bac7cb84c0a3d135539e87b59d234a238fa"
+    },
+    {
+      "id": "2.4.9.2",
+      "name": "TAREFAS 2.4.9.2 — Notas Fiscais no Orçamentários",
+      "baseVersion": "2.4.9",
+      "minBuild": 293,
+      "maxBuild": 293,
+      "channel": "alpha",
+      "publishedAt": "2026-09-28T13:50:09.390Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.4.9.1"
+      ],
+      "installable": true,
+      "description": "Preserva o Orçamentários da base anterior e adiciona somente o módulo Notas Fiscais.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.9.2.tpatch",
+      "sha256": "11e2fc0ba37eb26d43e8d55b1f79107f0deb064a8d2d1c0d1ce67c9d08a96df9",
+      "changelog": [
+        "Preserva a base existente do Orçamentários.",
+        "Adiciona somente Notas Fiscais.",
+        "Substitui o patch 2.4.9.1."
+      ]
     }
   ],
   "history": [
