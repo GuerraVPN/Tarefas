@@ -41,8 +41,8 @@ function shortcuts(){
   ['users','Usuários','Efetivo e perfis','usuarios.html'],
   ['bell','Central','Notificações e mensagens','central.html'],
   ['budget','Orçamentários','Resumo e módulos orçamentários','orcamentarios.html'],
-  ['file','Material Carga','Carga das dependências e depósitos','orcamentarios.html?modulo=material_carga'],
-  ['tasks','Passagem de Carga','Histórico e troca de detentores','orcamentarios.html?modulo=passagem_carga'],
+  ['file','Material Carga','Carga das dependências e depósitos','material_carga.html?modulo=material_carga'],
+  ['tasks','Passagem de Carga','Histórico e troca de detentores','passagem_carga.html?modulo=passagem_carga'],
   ...(admin?[['shield','Histórico / Auditoria','Ações e reversões','historico_auditoria.html']]:[]),
   ['settings','Configurações','Preferências do sistema','configuracoes.html']
  ];
