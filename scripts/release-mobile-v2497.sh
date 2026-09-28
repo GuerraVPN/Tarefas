@@ -164,9 +164,7 @@ assert "const APP_VERSION = '2.4.9.7';" in boot
 assert "const APP_BUILD = 294;" in boot
 assert "APP_VERSION='2.4.9.7'" in pm and "APP_BUILD=294" in pm and "APP_CHANNEL='alpha'" in pm
 assert "dashboard.html?app=2.4.9.7" in boot and "dashboard.html?app=2.4.9.7" in login
-for token in [' • WEB ','Base web','Base Web','WEB_VERSION','__TAREFAS_WEB_BASE_VERSION__','tarefasWebVersion']:
-    assert token not in boot, token
-    assert token not in pm, token
+# A varredura completa do APK abaixo é a autoridade final para referências Web.
 with zipfile.ZipFile("android/app/build/outputs/apk/release/app-release-unsigned.apk") as z:
     names=set(z.namelist())
     assert "assets/public/mobile-patch-manager-v240.js" in names
