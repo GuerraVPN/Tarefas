@@ -5,7 +5,7 @@ const must=(x,m)=>{if(!x)throw new Error('2.4.9.1 verify: '+m)};
 for(const f of ['mobile-bootstrap.js','mobile-login-v17.js','mobile-patch-manager-v240.js','dashboard.html','dashboard.js','about.html','ALPHA_2_4_9_1.json'])await access(path.join(dir,f));
 const b=await read('mobile-bootstrap.js'),pm=await read('mobile-patch-manager-v240.js'),m=JSON.parse(await read('ALPHA_2_4_9_1.json'));
 must(b.includes("const APP_VERSION = '2.4.9.1';")&&b.includes('const APP_BUILD = 294;'),'versão/build incorretos');
-must(pm.includes("APP_VERSION='2.4.9.1'")&&pm.includes('APP_BUILD=294')&&pm.includes("APP_CHANNEL='beta'"),"Patch Manager não promovido");
+must(pm.includes("APP_VERSION='2.4.9.1'")&&pm.includes('APP_BUILD=294')&&pm.includes("APP_CHANNEL='alpha'"),"Patch Manager não promovido");
 must(b.includes('__TAREFAS_PATCH_CONSOLIDATED_2487__'),'handoff 2.4.8.7 não consolidado');
 must(b.includes('__TAREFAS_ALPHA_2468_SERVICOS_HOTBAR_FIX__'),'2.4.6.8 ausente');
 must(!b.includes('__TAREFAS_ALPHA_2467_ESCALAS_2433__'),'2.4.6.7 detectado');
@@ -27,4 +27,4 @@ must((java.match(/new BiometricPrompt\(/g)||[]).length===1,'mais de um Biometric
 const v756=await read('v7_5_6_patch.js');must(v756.includes('loadCalendarServices')&&v756.includes('applyCalendarServices'),'calendário não preservado');
 must(m.version==='2.4.9.1'&&m.build===294&&m.channel==='alpha'&&m.incorporatedPatch==='2.4.8.7','manifesto incorreto');
 must(m.features?.preRelease25===true&&m.features?.biometricSessionHandoff===true,'flags da pré-release ausentes');
-console.log('VERIFY 2.4.9.1 BETA OK.');
+console.log('VERIFY 2.4.9.1 ALPHA OK.');
