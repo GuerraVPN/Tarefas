@@ -50,14 +50,24 @@ function apply(){
  css();
  const p=findParent();
  if(p){
-   p.querySelector('[data-v797-farias]')?.classList.toggle('active',page()==='ferias_dispensas.html');
-   p.querySelector('[data-v797-users]')?.classList.toggle('active',page()==='usuarios.html');
-   p.classList.toggle('active',['usuarios.html','ferias_dispensas.html','pessoal.html'].includes(page()));
+   const f=p.querySelector('[data-v797-farias]');
+   const u=p.querySelector('[data-v797-users]');
+   const activeF=page()==='ferias_dispensas.html';
+   const activeU=page()==='usuarios.html';
+   const activeP=['usuarios.html','ferias_dispensas.html','pessoal.html'].includes(page());
+   if(f && f.classList.contains('active')!==activeF)f.classList.toggle('active',activeF);
+   if(u && u.classList.contains('active')!==activeU)u.classList.toggle('active',activeU);
+   if(p.classList.contains('active')!==activeP)p.classList.toggle('active',activeP);
  }
  document.documentElement.dataset.tarefasVersion=VERSION;
- document.querySelectorAll('.v65-version-badge').forEach(b=>{b.textContent='● TAREFAS v'+VERSION;b.title='Sobre a versão '+VERSION});
- document.querySelectorAll('.v65-mobile-version').forEach(v=>v.textContent='v'+VERSION);
- const g=document.getElementById('gamesVersionLabel');if(g)g.textContent='WEB '+VERSION+' · 26º PEL PE MEC';
+ document.querySelectorAll('.v65-version-badge').forEach(b=>{
+   const label='● TAREFAS v'+VERSION;
+   if(b.textContent!==label)b.textContent=label;
+   if(b.title!=='Sobre a versão '+VERSION)b.title='Sobre a versão '+VERSION;
+ });
+ document.querySelectorAll('.v65-mobile-version').forEach(v=>{const label='v'+VERSION;if(v.textContent!==label)v.textContent=label});
+ const g=document.getElementById('gamesVersionLabel');
+ if(g){const label='WEB '+VERSION+' · 26º PEL PE MEC';if(g.textContent!==label)g.textContent=label}
 }
 function init(){
   let applying=false;
