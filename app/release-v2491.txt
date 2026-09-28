@@ -1,0 +1,18 @@
+TAREFAS Android Alpha 2.4.9.1 — build 294
+
+Pré-release da linha 2.5 para validação do módulo Notas Fiscais no Orçamentários.
+
+Implementado:
+- 🧾 Novo módulo próprio Notas Fiscais, separado do carregamento principal de Orçamentários.
+- 🏢 Cadastro de empresas e seleção da empresa na origem.
+- 📦 Seleção de depósito no destino.
+- 🔢 Número e valor total da Nota Fiscal.
+- 📚 ND 30 Consumo, ND 32 Uso duradouro e ND 52 Permanente.
+- 🔄 Fluxo com apenas quatro andamentos: aguardando aprovação do Fiscal Administrativo → aguardando inclusão no Siscofis → aguardando inclusão em carga → pronto.
+- 🕘 Histórico de andamento.
+- 📱 Acesso pelo menu Android e pelo módulo Orçamentários.
+- 🔐 Mantida a consolidação da correção de biometria 2.4.8.7.
+- 🩹 Patch Manager .tpatch v1 preservado.
+- 🚫 Correções de Próximo Serviço não foram alteradas nesta Alpha.
+
+Branch isolada: app/android-v2491-alpha-prep.
