@@ -966,7 +966,7 @@
       "installable": true,
       "description": "Android independente: remove referências à Web, corrige o carregamento das Notas Fiscais e adiciona a aba logo abaixo de Guias.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.9.3.tpatch",
-      "sha256": "94cfb15a272c16b7d041f0b193cadc2aff6e4e5bb0279a18500e43f681ed682b",
+      "sha256": "4c2b2f7ddbf4b6ea9761464b0b58e842eca1700e7f15d7d0b850ce772fe1abbc",
       "changelog": [
         "Remove do Android a identificação de Base Web e Web da versão.",
         "Corrige o carregamento das Notas Fiscais incluindo os formulários de Empresa e Nota Fiscal.",
