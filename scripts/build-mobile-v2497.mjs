@@ -31,7 +31,6 @@ await patch('mobile-release-v240.js',s=>s
  .replace("      next=next.replace(/WEB\\s*7\\.8(?:\\.0|\\.1|\\.2|\\.6)?/ig,'WEB '+WEB_VERSION);\n      next=next.replace(/Base\\s*Web\\s*[:•-]?\\s*7\\.8(?:\\.0|\\.1|\\.2|\\.6)?/ig,'Base Web: '+WEB_VERSION);\n",'')
 );
 await patch('mobile-v12.js',s=>s.replace(/([0-9.]+) • WEB [0-9.]+/g,VERSION));
-await patch('mobile-beta-v2325.js',s=>s.replace("const wanted=effectiveVersion()+' • WEB '+web;","const wanted=effectiveVersion();"));
 
 const manifest={version:VERSION,build:BUILD,channel:'alpha',base:'2.4.9',basedOn:'2.4.9',features:{appOnly:true,webDecoupled:true,webVersionVisible:false,webDependency:false,biometricSessionHandoff:true,patchManagerPreserved:true,patchManagerV1:true,scalesPreserved:true,notesFiscal2493:true,legacyOrcamentariosPreserved:true,releaseBranchIsolatedFromMain:true}};
 await writeFile(path.join(dist,'ALPHA_2_4_9_7.json'),JSON.stringify(manifest,null,2)+'\n');
