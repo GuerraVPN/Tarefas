@@ -311,3 +311,5 @@ jq -e '.ok == true and .version == "2.4.9.7" and .build == 294 and .channel == "
 # final trigger app-only audit
 
 # trigger final release audit
+
+# trigger final signed build
