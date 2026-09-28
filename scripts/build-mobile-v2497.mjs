@@ -50,3 +50,5 @@ if(!boot.includes("const APP_VERSION = '2.4.9.7';")||!boot.includes('const APP_B
 if(!pm.includes("APP_VERSION='2.4.9.7'")||!pm.includes('APP_BUILD=294')||!pm.includes("APP_CHANNEL='alpha'"))throw new Error('Patch Manager não promovido');
 if(/new\s+MutationObserver/.test(boot))throw new Error('Observer global indevido no bootstrap');
 console.log('TAREFAS Alpha 2.4.9.7 build 294 — App independente da Web: OK');
+
+// Alpha 2.4.9.7 build trigger: source-level Web decoupling.
