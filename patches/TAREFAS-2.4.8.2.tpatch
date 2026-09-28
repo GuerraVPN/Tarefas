@@ -1,0 +1,30 @@
+{
+  "format": "tarefas-tpatch-v1",
+  "id": "2.4.8.2",
+  "name": "TAREFAS 2.4.8.2 — Guias Prontas e correção das pendências de carga",
+  "patchVersion": 1,
+  "createdAt": "2026-09-25T12:00:00Z",
+  "baseVersion": "2.4.8",
+  "minBuild": 290,
+  "maxBuild": 290,
+  "channel": "alpha",
+  "cumulative": true,
+  "replacementMode": "replace-older-same-base",
+  "replaces": [
+    "2.4.8.1"
+  ],
+  "description": "Corrige no aplicativo o direcionamento de guias já concluídas para a aba Pronto e acompanha a correção da permissão da função de pendências de carga no Supabase.",
+  "changelog": [
+    "Guias com status Pronto passam a ser tratadas como etapa orçamentária Pronto mesmo quando o campo etapa_orcamentaria estiver desatualizado.",
+    "A aba Pronto passa a receber corretamente as guias já concluídas.",
+    "Guias prontas deixam de permanecer na aba Aguardando inclusão em carga por inconsistência de etapa.",
+    "A correção do banco libera a execução da função v7_7_0_criar_pendencia_carga para os papéis usados pelo aplicativo, eliminando o erro de acesso negado.",
+    "Mantém o fluxo existente de Fiscalização → inclusão em carga → Pronto e todas as correções da 2.4.8.1."
+  ],
+  "order": 24802,
+  "payload": {
+    "js": "(()=>{'use strict';\nconst MARK='__TAREFAS_ALPHA_2482_GUIDES_READY_FIX__';\nif(globalThis[MARK])return;\nglobalThis[MARK]=true;\n\nconst client=globalThis.supabaseClient;\nconst originalFrom=client?.from?.bind(client);\n\nif(originalFrom&&client){\n  client.from=function(relation){\n    const query=originalFrom(relation);\n    if(relation!=='guias_orcamentarias' || query.__tarefas2482Wrapped)return query;\n    query.__tarefas2482Wrapped=true;\n\n    const originalSelect=query.select?.bind(query);\n    if(!originalSelect)return query;\n\n    query.select=function(...args){\n      const builder=originalSelect(...args);\n      if(typeof builder?.then!=='function')return builder;\n\n      const originalThen=builder.then.bind(builder);\n      builder.then=function(resolve,reject){\n        return originalThen((response)=>{\n          if(Array.isArray(response?.data)){\n            const data=response.data.map(row=>{\n              if(row?.status==='pronto' && row?.etapa_orcamentaria!=='pronto'){\n                return {...row,etapa_orcamentaria:'pronto'};\n              }\n              return row;\n            });\n            response={...response,data};\n          }\n          return resolve?resolve(response):response;\n        },reject);\n      };\n      return builder;\n    };\n    return query;\n  };\n}\n\nfunction repairGuideCards(){\n  try{\n    document.querySelectorAll('#guiaList [data-guide], .orc-guide-card[data-guide]').forEach(card=>{\n      const status=(card.getAttribute('data-status')||card.dataset?.status||'').toLowerCase();\n      if(status==='pronto')card.dataset.guiaCategory='pronto';\n    });\n  }catch(_){}\n}\n\nrepairGuideCards();\nwindow.addEventListener('pageshow',repairGuideCards);\nwindow.addEventListener('focus',repairGuideCards);\n\nglobalThis.TarefasAlpha2482Fix=Object.freeze({\n  version:'2.4.8.2',\n  base:'2.4.8',\n  build:290,\n  guidesReadyRouting:true,\n  readyStatusWins:true,\n  permissionFixServerSide:true\n});\n})();",
+    "css": ""
+  },
+  "payloadSha256": "0796607aa0b1eb973389321dba2123bd235e37454e8bee86bc0c46cb372c8269"
+}
