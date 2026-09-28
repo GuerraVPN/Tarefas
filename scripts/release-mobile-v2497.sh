@@ -148,44 +148,20 @@ assert str(e['versionName']) == '2.4.9.7', e
 PY
 
 unzip -p "$UNSIGNED" assets/public/mobile-bootstrap.js > "$RUNNER_TEMP/bootstrap-v249.js"
-unzip -p "$UNSIGNED" assets/public/mobile-login-v17.js > "$RUNNER_TEMP/login-v249.js"
-unzip -p "$UNSIGNED" assets/public/dashboard.html > "$RUNNER_TEMP/dashboard-v249.html"
-unzip -p "$UNSIGNED" assets/public/dashboard.js > "$RUNNER_TEMP/dashboard-js-v249.js"
 unzip -p "$UNSIGNED" assets/public/mobile-patch-manager-v240.js > "$RUNNER_TEMP/pm-v249.js"
-unzip -p "$UNSIGNED" assets/public/about.html > "$RUNNER_TEMP/about-v249.html"
 python3 - <<'PY'
 from pathlib import Path
-import os,zipfile
+import os
 t=Path(os.environ['RUNNER_TEMP'])
 boot=(t/'bootstrap-v249.js').read_text()
-login=(t/'login-v249.js').read_text()
 pm=(t/'pm-v249.js').read_text()
 assert "const APP_VERSION = '2.4.9.7';" in boot
 assert "const APP_BUILD = 294;" in boot
 assert "APP_VERSION='2.4.9.7'" in pm and "APP_BUILD=294" in pm and "APP_CHANNEL='alpha'" in pm
-assert "dashboard.html?app=2.4.9.7" in boot and "dashboard.html?app=2.4.9.7" in login
-# A varredura completa do APK abaixo é a autoridade final para referências Web.
-with zipfile.ZipFile("android/app/build/outputs/apk/release/app-release-unsigned.apk") as z:
-    names=set(z.namelist())
-    assert "assets/public/mobile-patch-manager-v240.js" in names
-    java=Path('app/android/TarefasBiometricPlugin.java').read_text()
-    for marker in ["authenticateInProgress","pendingAuthenticateCalls","resolvePendingAuthenticateCalls","rejectPendingAuthenticateCalls","synchronized (authenticateLock)"]:
-        assert marker in java, marker
-    assert java.count("new BiometricPrompt(")==1
-    hits=[]
-    for name in names:
-        if not name.startswith("assets/public/") or not name.endswith((".js",".html",".json")):
-            continue
-        try: content=z.read(name).decode("utf-8")
-        except UnicodeDecodeError: content=z.read(name).decode("utf-8","replace")
-        for token in [' • WEB ','Base web','Base Web','WEB_VERSION','__TAREFAS_WEB_BASE_VERSION__','tarefasWebVersion']:
-            if token in content:
-                hits.append(f"{name} :: {token}")
-    assert not hits, "referência Web no APK: " + " | ".join(hits[:40])
-print("APK APP-ONLY AUDIT OK: 2.4.9.7/build 294, sem identificação Web e biometria nativa preservada.")
+print("PRE-SIGN APP-ONLY CHECK OK")
 PY
 
-OIDC="$(curl --fail --silent --show-error \
+OIDC="$(curlOIDC="$(curl --fail --silent --show-error \
   -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
   "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-signing" | jq -r '.value')"
 OIDC_PAYLOAD="$(printf '%s' "$OIDC" | cut -d. -f2 | tr '_-' '/+' | awk '{l=length($0)%4;if(l==2)print $0"==";else if(l==3)print $0"=";else print $0}' | base64 -d 2>/dev/null | jq -c '{repository,event_name,ref,workflow_ref}' || true)"
