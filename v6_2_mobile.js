@@ -87,6 +87,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 if(window.__TAREFAS_V771_PAGE_LOADER__)return;
 window.__TAREFAS_V771_PAGE_LOADER__=true;
 const page=(location.pathname.split('/').pop()||'dashboard.html').toLowerCase();
+const ORC_SPLIT_PAGES=new Set(['guias.html','pedidos.html','movimentacoes.html','material_carga.html','passagem_carga.html','orcamento_relatorio.html','lavanderia.html']);
 const heavy=new Set(['about.html','games.html','orcamentarios.html']);
 function add(src,attr,done){
   const plain=src.split('?')[0];
@@ -123,6 +124,7 @@ const list=[
   ['v7_5_1_version.js?v=7.9.3','data-v751-version'],
   ['v7_9_3_nav.js?v=7.9.3','data-v793-nav']
 ];
+if(ORC_SPLIT_PAGES.has(page))return;
 if(page==='missao.html'){
   list.push(['v7_4_7_mission_patch.js?v=7.7.1','data-v747-mission-patch']);
   list.push(['v7_4_7_aditamento_patch.js?v=7.7.1','data-v747-aditamento-patch']);
