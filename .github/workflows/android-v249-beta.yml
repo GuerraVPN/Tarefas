@@ -1,4 +1,4 @@
-name: Android 2.4.9 Beta — pré-release da 2.5
+name: Android 2.4.9 Beta — pré-release da 2.5 (rebuild)
 
 on:
   workflow_dispatch:
