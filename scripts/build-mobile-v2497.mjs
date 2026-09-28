@@ -22,15 +22,23 @@ await patch('mobile-patch-manager-v240.js',s=>s
  .replace("const APP_VERSION='2.4.9',APP_BUILD=293,APP_CHANNEL='beta';","const APP_VERSION='2.4.9.7',APP_BUILD=294,APP_CHANNEL='alpha';")
  .replace(/const web=el\.textContent\.match\(\/WEB\\s\*\(\[0-9\.\]\+\)\/i\)\?\.\[1\]\|\|'7\.8\.6';\s*const wanted=effectiveVersion\+' • WEB '\+web;/,'const wanted=effectiveVersion;')
 );
-await patch('mobile-release-v240.js',s=>s
- .replace("const WEB_VERSION='7.9.1';","const WEB_VERSION='';")
- .replace("globalThis.__TAREFAS_WEB_BASE_VERSION__=WEB_VERSION;\n",'')
- .replace("document.documentElement.dataset.tarefasWebVersion=WEB_VERSION;\n",'')
- .replace("const wanted=effectiveVersion()+' • WEB '+web;","const wanted=effectiveVersion();")
- .replace("const wanted=PATCH_VERSION+' • WEB '+WEB_VERSION;","const wanted=PATCH_VERSION;")
- .replace("      next=next.replace(/WEB\\s*7\\.8(?:\\.0|\\.1|\\.2|\\.6)?/ig,'WEB '+WEB_VERSION);\n      next=next.replace(/Base\\s*Web\\s*[:•-]?\\s*7\\.8(?:\\.0|\\.1|\\.2|\\.6)?/ig,'Base Web: '+WEB_VERSION);\n",'')
-);
+await patch('mobile-release-v240.js',s=>{
+ let x=s;
+ x=x.replace(/const\\s+WEB_VERSION\\s*=\\s*'[^']*';\\s*/g,'');
+ x=x.replace(/globalThis\\.__TAREFAS_WEB_BASE_VERSION__=WEB_VERSION;\\s*/g,'');
+ x=x.replace(/document\\.documentElement\\.dataset\\.tarefasWebVersion=WEB_VERSION;\\s*/g,'');
+ x=x.replace(/const wanted=effectiveVersion\\(\\)+' • WEB '\\+web;/g,'const wanted=effectiveVersion();');
+ x=x.replace(/const wanted=PATCH_VERSION\\+' • WEB '\\+WEB_VERSION;/g,'const wanted=PATCH_VERSION;');
+ x=x.replace(/next=next\\.replace\\([^;]*WEB_VERSION[^;]*;\\s*/g,'');
+ x=x.replace(/WEB_VERSION/g,'APP_VERSION');
+ x=x.replace(/__TAREFAS_WEB_BASE_VERSION__/g,'__TAREFAS_APP_BASE_VERSION__');
+ x=x.replace(/tarefasWebVersion/g,'tarefasAppBaseVersion');
+ x=x.replace(/Base Web/gi,'TAREFAS App');
+ return x;
+});
 await patch('mobile-v12.js',s=>s.replace(/([0-9.]+) • WEB [0-9.]+/g,VERSION));
+await patch('package.json',s=>s.replace(/Base Web/gi,'TAREFAS App').replace(/WEB_VERSION/gi,'APP_VERSION'));
+await patch('v7_5_1_about.js',s=>s.replace(/Base Web/gi,'TAREFAS App').replace(/Web 7\\.[0-9.]+/g,'TAREFAS App'));
 
 const manifest={version:VERSION,build:BUILD,channel:'alpha',base:'2.4.9',basedOn:'2.4.9',features:{appOnly:true,webDecoupled:true,webVersionVisible:false,webDependency:false,biometricSessionHandoff:true,patchManagerPreserved:true,patchManagerV1:true,scalesPreserved:true,notesFiscal2493:true,legacyOrcamentariosPreserved:true,releaseBranchIsolatedFromMain:true}};
 await writeFile(path.join(dist,'ALPHA_2_4_9_7.json'),JSON.stringify(manifest,null,2)+'\n');
