@@ -59,6 +59,22 @@ function apply(){
  document.querySelectorAll('.v65-mobile-version').forEach(v=>v.textContent='v'+VERSION);
  const g=document.getElementById('gamesVersionLabel');if(g)g.textContent='WEB '+VERSION+' · 26º PEL PE MEC';
 }
-function init(){apply();const obs=new MutationObserver(()=>apply());obs.observe(document.body,{childList:true,subtree:true});}
+function init(){
+  let applying=false;
+  const obs=new MutationObserver(()=>{
+    if(applying)return;
+    applying=true;
+    obs.disconnect();
+    try{apply()}finally{
+      applying=false;
+      obs.observe(document.body,{childList:true,subtree:true});
+    }
+  });
+  applying=true;
+  try{apply()}finally{
+    applying=false;
+    obs.observe(document.body,{childList:true,subtree:true});
+  }
+}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
