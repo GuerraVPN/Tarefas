@@ -13,7 +13,7 @@ function ensureGamesNav(){
 function ensureLaundryNav(){
  const parent=document.querySelector('.v6-orc-parent[data-v6-nav="orcamentarios"]'),sub=parent?.querySelector('.v6-orc-sub');if(!sub)return;
  let b=sub.querySelector('[data-orc-link="lavanderia"]');if(!b){b=document.createElement('button');b.type='button';b.dataset.orcLink='lavanderia';b.textContent='Lavagem de Forro de Cama';sub.appendChild(b)}
- const active=page()==='orcamentarios.html'&&new URLSearchParams(location.search).get('modulo')==='lavanderia';b.classList.toggle('active',active);b.onclick=e=>{e.preventDefault();e.stopPropagation();location.href='orcamentarios.html?modulo=lavanderia'};
+ const active=['orcamentarios.html','lavanderia.html'].includes(page())&&new URLSearchParams(location.search).get('modulo')==='lavanderia';b.classList.toggle('active',active);b.onclick=e=>{e.preventDefault();e.stopPropagation();location.href='lavanderia.html?modulo=lavanderia'};
 }
 function ensureAboutVersion(){
  if(page()!=='about.html')return;
