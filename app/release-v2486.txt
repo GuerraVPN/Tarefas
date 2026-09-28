@@ -1,0 +1,38 @@
+# TAREFAS Android — Alpha 2.4.8.6
+
+Base funcional: Alpha 2.4.8.5 / base 2.4.8 / build 290
+Nova versão APK: 2.4.8.6 / build 292
+Canal: Alpha
+Formato: APK
+
+## Correção principal
+- Corrige na camada Android nativa a duplicidade de solicitações de biometria.
+- Apenas um BiometricPrompt pode ficar ativo por vez.
+- Chamadas concorrentes ao método nativo authenticate() entram na mesma autenticação em andamento.
+- O resultado de uma autenticação concluída é entregue às chamadas pendentes.
+- Erros ou cancelamento também são propagados às chamadas pendentes e liberam a trava para a próxima tentativa.
+- Mantida a regra de biometria somente em novo início real do aplicativo.
+
+## Base preservada
+- Patches 2.4.8.1, 2.4.8.2, 2.4.8.3, 2.4.8.4 e 2.4.8.5 consolidados no APK.
+- Correção de Distribuição/Fiscalização preservada.
+- Correção de Guias prontas preservada.
+- Fornecimento no Orçamentário preservado.
+- Layout móvel de Desrelacionamento/Baixa preservado.
+- Correção de menu de Serviços e pessoal preservada.
+- Patch Manager .tpatch v1 e validação SHA-256 preservados.
+- Remoção do cartão “Próximo Serviço” preservada.
+- Web 7.9.1 preservada.
+
+## Isolamento
+- Build realizada na branch app/android-v2486-alpha-prep.
+- Nenhuma alteração é feita na branch main ou no trabalho atual de correção do site.
+
+## Integridade da correção
+- O plugin nativo contém trava compartilhada authenticateInProgress.
+- Chamadas aguardando são mantidas em pendingAuthenticateCalls.
+- O plugin possui caminhos separados para resolver/rejeitar todas as chamadas pendentes.
+- O código fonte cria apenas um BiometricPrompt para o fluxo de autenticação.
+
+## Observação
+Esta versão é um Alpha APK destinado à validação da correção da biometria duplicada.
