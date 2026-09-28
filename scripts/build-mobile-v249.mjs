@@ -6,8 +6,6 @@ const root=process.cwd(),dist=path.join(root,'dist');
 const VERSION='2.4.9',BUILD=293,WEB_VERSION='7.9.1',BASE='2.4.8.6';
 const PATCH='2.4.8.7';
 
-await import('./build-mobile-v2486.mjs');
-
 const patch=async(rel,fn)=>{
   const f=path.join(dist,rel),before=await readFile(f,'utf8'),after=fn(before);
   if(after!==before)await writeFile(f,after,'utf8');
