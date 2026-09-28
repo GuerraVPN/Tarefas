@@ -20,22 +20,34 @@ async function initUser(){
  const s=norm(user.secao),p=norm(user.posicao);canManage=s==='admin'||(s==='fiscalizacao'&&['chefe','auxiliar'].includes(p));
  return true;
 }
+function withTimeout(promise,ms,label){
+ return Promise.race([promise,new Promise((_,reject)=>setTimeout(()=>reject(new Error(label+' demorou mais de '+Math.round(ms/1000)+'s.')),ms))]);
+}
 async function loadRefs(){
- const [d,h,u,p]=await Promise.all([
-   supabaseClient.from('orc_dependencias').select('nome').eq('ativo',true).order('ordem'),
-   supabaseClient.from('orc_detentores_carga').select('*').order('dependencia'),
-   supabaseClient.from('usuarios').select('id,patente,nome_guerra,ativo'),
-   supabaseClient.from('usuario_perfis').select('id,usuario_id,secao,posicao,ativo').eq('ativo',true).order('id')
+ const results=await Promise.allSettled([
+   withTimeout(supabaseClient.from('orc_dependencias').select('nome').eq('ativo',true).order('ordem'),7000,'Dependências'),
+   withTimeout(supabaseClient.from('orc_detentores_carga').select('*').order('dependencia'),7000,'Detentores'),
+   withTimeout(supabaseClient.from('usuarios').select('id,patente,nome_guerra,ativo'),7000,'Usuários'),
+   withTimeout(supabaseClient.from('usuario_perfis').select('id,usuario_id,secao,posicao,ativo').eq('ativo',true).order('id'),7000,'Perfis')
  ]);
- if(d.error)throw d.error;dependencias=(d.data||[]).map(x=>x.nome);
- detentores=h.error?[]:(h.data||[]);users=new Map((u.error?[]:(u.data||[])).filter(x=>x.ativo!==false).map(x=>[String(x.id),x]));
- perfis=p.error?[]:(p.data||[]).filter(x=>users.has(String(x.usuario_id)));
- const depOpts='<option value="">Selecione...</option>'+dependencias.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');$('pgDependenciaNew').innerHTML=depOpts;
+ const [d,h,u,p]=results.map(x=>x.status==='fulfilled'?x.value:null);
+ if(d?.error)console.warn('[PASSAGEM] dependências:',d.error.message);
+ if(h?.error)console.warn('[PASSAGEM] detentores:',h.error.message);
+ if(u?.error)console.warn('[PASSAGEM] usuários:',u.error.message);
+ if(p?.error)console.warn('[PASSAGEM] perfis:',p.error.message);
+ dependencias=d?.data?.map(x=>x.nome)||[];
+ detentores=h?.data||[];
+ users=new Map((u?.data||[]).filter(x=>x.ativo!==false).map(x=>[String(x.id),x]));
+ perfis=(p?.data||[]).filter(x=>users.has(String(x.usuario_id)));
+ const depOpts='<option value="">Selecione...</option>'+dependencias.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
+ $('pgDependenciaNew').innerHTML=depOpts;
  $('pgNovoPerfil').innerHTML='<option value="">Selecione o novo detentor...</option>'+perfis.map(x=>`<option value="${x.id}" data-user="${esc(x.usuario_id)}">${esc(uname(x.usuario_id))} — ${esc(x.secao||'-')} / ${esc(x.posicao||'-')}</option>`).join('');
 }
 async function loadPassagens(){
- const r=await supabaseClient.from('orc_passagens_carga').select('*').order('data_passagem',{ascending:false}).order('id',{ascending:false}).limit(500);
- if(r.error)throw r.error;passagens=r.data||[];renderList();
+ const r=await withTimeout(supabaseClient.from('orc_passagens_carga').select('*').order('data_passagem',{ascending:false}).order('id',{ascending:false}).limit(500),7000,'Passagens de carga');
+ if(r.error)throw r.error;
+ passagens=r.data||[];
+ renderList();
 }
 function filtered(){
  let a=passagens.slice(),q=norm($('passagemSearch').value),s=$('passagemStatus').value,d=$('passagemDate').value;
@@ -86,6 +98,21 @@ function bind(){
  $('orcModuleNav').addEventListener('click',e=>{const b=e.target.closest('[data-orc-module="passagem_carga"]');if(b)switchToPassagem()});$('btnNovaPassagem').onclick=openNew;$('closePassagem').onclick=$('cancelPassagem').onclick=()=>$('newPassagemBg').classList.remove('open');$('newPassagemBg').onclick=e=>{if(e.target===$('newPassagemBg'))$('newPassagemBg').classList.remove('open')};$('pgDependenciaNew').onchange=syncCurrent;$('newPassagemForm').onsubmit=create;
  ['passagemSearch','passagemStatus','passagemDate'].forEach(id=>$(id).addEventListener(id==='passagemSearch'?'input':'change',renderList));$('passagemList').onclick=e=>{const c=e.target.closest('[data-pg-id]');if(c)selectPassagem(c.dataset.pgId)};$('btnPgFiles').onclick=addFiles;$('btnPgUpdate').onclick=addUpdate;$('btnPgConcluir').onclick=conclude;$('btnPgCancelar').onclick=cancel;$('pgAttachList').onclick=e=>{const o=e.target.closest('[data-pg-open]'),d=e.target.closest('[data-pg-down]');const id=o?.dataset.pgOpen||d?.dataset.pgDown;if(!id)return;const a=anexos.find(x=>String(x.id)===String(id));if(!a)return;if(o)window.open(a.arquivo_url,'_blank','noopener');else{const l=document.createElement('a');l.href=a.arquivo_url;l.download=a.arquivo_nome;l.target='_blank';l.click()}};
 }
-async function start(){if(!await initUser())return;bind();await Promise.all([loadRefs(),loadPassagens()]);const p=new URLSearchParams(location.search);if(p.get('modulo')==='passagem_carga'||p.get('passagem')){switchToPassagem();if(p.get('passagem')&&passagens.some(x=>String(x.id)===String(p.get('passagem'))))await selectPassagem(p.get('passagem'))}}
+async function start(){
+ if(!await initUser())return;
+ bind();
+ try{
+   await loadPassagens();
+ }catch(err){
+   console.error('[PASSAGEM] Falha na lista principal:',err);
+   $('passagemList').innerHTML=`<div class="orc-empty">Erro ao carregar passagens:<br>${esc(err.message)}</div>`;
+ }
+ loadRefs().catch(err=>console.warn('[PASSAGEM] Falha nas referências:',err));
+ const p=new URLSearchParams(location.search);
+ if(p.get('modulo')==='passagem_carga'||p.get('passagem')){
+   switchToPassagem();
+   if(p.get('passagem')&&passagens.some(x=>String(x.id)===String(p.get('passagem'))))await selectPassagem(p.get('passagem'));
+ }
+}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();
