@@ -42,7 +42,7 @@ if(!usuarioLogado?.id)location.replace('index.html');
    <button class="v7-btn primary" id="generateAddendum">Gerar aditamento PDF</button>
   </div>
  </div>
- <div class="v7-legend"><span><i class="dia"></i> Escala Preta — dias úteis</span><span><i class="fds"></i> Escala Vermelha — sábados, domingos e feriados</span><span><i class="sv"></i> Serviço confirmado</span><span><i class="prev"></i> Próximo serviço previsto</span><span><i class="ferias"></i> Férias</span><span><i class="adapt"></i> Adaptação</span></div>
+ <div class="v7-legend"><span><i class="dia"></i> Escala Preta — dias úteis</span><span><i class="fds"></i> Escala Vermelha — sábados, domingos e feriados</span><span><i class="sv"></i> Serviço confirmado</span><span><i class="ferias"></i> Férias</span><span><i class="adapt"></i> Adaptação</span></div>
  <div class="v7-note" id="scaleInfo">A <b>Escala Preta</b> roda somente em dias úteis. A <b>Escala Vermelha</b> roda somente em sábados, domingos e feriados. As duas possuem rodízios e contagens independentes: um SV na Preta não reinicia a Vermelha e um SV na Vermelha não reinicia a Preta. Férias e ADP bloqueiam serviço; <b>dispensas não interferem em nenhuma das duas escalas.</b></div>
  <div class="v72-summary" id="serviceSummary">
   <div><small>Efetivo nas escalas</small><strong id="sumScalePeople">0</strong><span>pessoas cadastradas</span></div>
@@ -69,9 +69,7 @@ if(!usuarioLogado?.id)location.replace('index.html');
    <div class="v7-field full"><label>Marcação do serviço</label><input id="serviceMark" maxlength="8" value="SV" placeholder="Ex.: SV"></div>
    <div class="v7-field full"><label>Observação</label><textarea id="serviceNote" rows="3" maxlength="500"></textarea></div>
    <div class="v7-field"><label>Folgas desde o último serviço confirmado</label><input id="serviceFolgas" disabled value="-"></div>
-   <div class="v7-field"><label>Próximo serviço confirmado</label><input id="serviceNext" disabled value="-"></div>
    <div class="v7-field"><label>Próxima previsão automática</label><input id="serviceForecast" disabled value="-"></div>
-   <div class="v7-field"><label>Estimativa até a próxima previsão</label><input id="serviceNextDays" disabled value="-"></div>
    <div class="v7-field full"><div class="v72-last-change" id="serviceChangedBy">Sem alteração registrada.</div></div>
   </div>
   <div class="v7-modal-actions"><button type="button" class="v7-btn" id="markVacation">Marcar férias</button><button type="button" class="v7-btn" id="swapService" hidden>Trocar serviço</button><button type="button" class="v7-btn danger" id="removeService" hidden>Tirar serviço</button><button type="button" class="v7-btn" data-close="serviceModal">Cancelar</button><button type="submit" class="v7-btn primary">Confirmar serviço</button></div>
