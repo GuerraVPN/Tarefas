@@ -4,7 +4,7 @@
   "baseVersion": "2.4.1",
   "baseBuild": 276,
   "generatedAt": "2026-09-28T00:00:00Z",
-  "latestPatch": "2.4.9.3",
+  "latestPatch": "2.4.9.4",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -975,6 +975,33 @@
         "Substitui cumulativamente o 2.4.9.2."
       ],
       "supersededBy": "2.4.9.4"
+    },
+    {
+      "id": "2.4.9.4",
+      "name": "TAREFAS 2.4.9.4 — App somente + Notas Fiscais estáveis",
+      "baseVersion": "2.4.9",
+      "minBuild": 293,
+      "maxBuild": 293,
+      "channel": "alpha",
+      "publishedAt": "2026-09-28T14:20:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.4.9.3",
+        "2.4.9.2",
+        "2.4.9.1"
+      ],
+      "installable": true,
+      "description": "Android independente: remove referências à Web sem observers globais e mantém Notas Fiscais sem interferir no boot do aplicativo.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.9.4.tpatch",
+      "sha256": "5428e20d9c5a541f85799b0609b3839fd6ed18e28b3a335a2582fbec2217cdca",
+      "changelog": [
+        "Corrige o travamento do APK causado pelos observers globais do 2.4.9.3.",
+        "Remove Base Web e WEB sem MutationObserver global.",
+        "Limita a inclusão da aba Notas Fiscais ao módulo Orçamentários.",
+        "Mantém o módulo Notas Fiscais e os formulários Empresa/Nota Fiscal.",
+        "Substitui cumulativamente o 2.4.9.3."
+      ]
     }
   ],
   "history": [
