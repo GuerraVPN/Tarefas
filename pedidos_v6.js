@@ -85,9 +85,9 @@ async function loadUsers(){
 }
 async function loadPedidos(){
  const [p,i]=await Promise.all([
-   supabaseClient.from('pedidos_orcamentarios').select('*').order('data_pedido',{ascending:false}).order('id',{ascending:false}).limit(1000),
-   supabaseClient.from('pedido_orcamentario_itens').select('*').order('id',{ascending:true}).limit(10000)
- ]);
+   Promise.race([supabaseClient.from('pedidos_orcamentarios').select('*').order('data_pedido',{ascending:false}).order('id',{ascending:false}).limit(1000),new Promise((_,reject)=>setTimeout(()=>reject(new Error('Pedidos demoraram mais de 7s.')),7000))]),
+   Promise.race([supabaseClient.from('pedido_orcamentario_itens').select('*').order('id',{ascending:true}).limit(10000),new Promise((_,reject)=>setTimeout(()=>reject(new Error('Itens dos pedidos demoraram mais de 7s.')),7000))])
+ ]).catch(e=>[{error:e}, {error:e}]);
  if(p.error){
    $('pedidoList').innerHTML=`<div class="orc-empty">Erro ao carregar pedidos:<br>${esc(p.error.message)}</div>`;
    return;
@@ -721,7 +721,7 @@ function bind(){
 async function start(){
  if(!await initUser())return;
  bind();
- await Promise.all([loadRefs(),loadUsers(),loadPedidos()]);
+ await Promise.all([loadRefs(),loadPedidos()]);loadUsers().catch(()=>{});
  const params=new URLSearchParams(location.search);
  const modulo=params.get('modulo');
  const pedidoId=params.get('pedido');
