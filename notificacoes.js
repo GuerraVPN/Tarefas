@@ -19,6 +19,7 @@ function destinoNotificacao(row){
  if(['pedido','pedidos','baixa','distribuicao'].includes(tipo))return`pedidos.html?pedido=${encodeURIComponent(id)}`;
  if(['movimentacao','movimentacao_material'].includes(tipo))return`movimentacoes.html?modulo=movimentacao&movimentacao=${encodeURIComponent(id)}`;
  if(['passagem','passagem_carga'].includes(tipo))return`passagem_carga.html?modulo=passagem_carga&passagem=${encodeURIComponent(id)}`;
+ if(['lavanderia','lavagem'].includes(tipo))return`lavanderia.html?modulo=lavanderia&lavagem=${encodeURIComponent(id)}`;
  if(['usuario','usuarios'].includes(tipo))return`usuarios.html?usuario=${encodeURIComponent(id)}`;
  return'central.html?tab=notificacoes';
 }
