@@ -333,3 +333,5 @@ jq -e '.ok == true and .version == "2.4.9.7" and .build == 294 and .channel == "
 # trigger final signing check
 
 # trigger APK audit correction
+
+# final trigger app-only audit
