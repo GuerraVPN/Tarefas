@@ -12,7 +12,7 @@ on:
       - '.github/workflows/android-v2497-alpha.yml'
 
 concurrency:
-  group: android-v2497-alpha-prep
+  group: android-v2497-prep-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:
