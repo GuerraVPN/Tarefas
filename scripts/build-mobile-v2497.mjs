@@ -33,6 +33,7 @@ await patch('mobile-release-v240.js',s=>{
  x=x.replace(/WEB_VERSION/g,'APP_VERSION');
  x=x.replace(/__TAREFAS_WEB_BASE_VERSION__/g,'__TAREFAS_APP_BASE_VERSION__');
  x=x.replace(/tarefasWebVersion/g,'tarefasAppBaseVersion');
+ x=x.replaceAll(' • WEB ',' ');
  x=x.replace(/Base Web/gi,'TAREFAS App');
  return x;
 });
