@@ -161,7 +161,7 @@ assert "APP_VERSION='2.4.9.7'" in pm and "APP_BUILD=294" in pm and "APP_CHANNEL=
 print("PRE-SIGN APP-ONLY CHECK OK")
 PY
 
-OIDC="$(curlOIDC="$(curl --fail --silent --show-error \
+OIDC="$(curl --fail --silent --show-error \
   -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
   "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=tarefas-android-signing" | jq -r '.value')"
 OIDC_PAYLOAD="$(printf '%s' "$OIDC" | cut -d. -f2 | tr '_-' '/+' | awk '{l=length($0)%4;if(l==2)print $0"==";else if(l==3)print $0"=";else print $0}' | base64 -d 2>/dev/null | jq -c '{repository,event_name,ref,workflow_ref}' || true)"
