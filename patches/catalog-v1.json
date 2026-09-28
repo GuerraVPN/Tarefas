@@ -924,7 +924,7 @@
       "installable": true,
       "description": "Corrige o travamento de Orçamentários no Android reproduzindo a arquitetura da Web 7.9.7, com módulos separados, e atualiza a base Web carregada pelo app para a Web 7.9.7.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.9.1.tpatch",
-      "sha256": "26f4de6b6bbb1e56e385a18805091c1675670976343aa031496d3fed761e806b"
+      "sha256": "6a2bd57b711a78584f5973a93516a880c68e644476e0e872e93a02b288d65c96"
     }
   ],
   "history": [
