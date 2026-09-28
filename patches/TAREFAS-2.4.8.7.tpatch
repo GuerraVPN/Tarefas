@@ -1,0 +1,27 @@
+{
+  "format": "tarefas-tpatch-v1",
+  "id": "2.4.8.7",
+  "name": "TAREFAS 2.4.8.7 — Corrigir biometria duplicada",
+  "patchVersion": 3,
+  "createdAt": "2026-09-28T08:00:00-03:00",
+  "baseVersion": "2.4.8",
+  "minBuild": 290,
+  "maxBuild": 292,
+  "channel": "alpha",
+  "cumulative": false,
+  "replacementMode": "replace-older-same-base",
+  "replaces": ["2.4.8.5", "2.4.8.6"],
+  "description": "Marca o ciclo atual como já autenticado quando a biometria do login é concluída, evitando que o mecanismo de proteção de abertura solicite a mesma biometria novamente ao entrar no Dashboard.",
+  "changelog": [
+    "Corrige o fluxo sequencial que causava duas solicitações de biometria após Entrar com biometria.",
+    "Após uma autenticação biométrica válida no login, marca tarefasSecureProcessSessionV1 antes da navegação para o Dashboard.",
+    "A trava de novo ciclo continua exigindo biometria normalmente em uma abertura real posterior.",
+    "Não altera a biometria nativa, senha, sessão do servidor ou cadastro."
+  ],
+  "order": 24807,
+  "payload": {
+    "js": "(()=>{'use strict';\nconst MARK='__TAREFAS_ALPHA_2487_BIOMETRIC_SESSION_HANDOFF__';\nif(globalThis[MARK])return;\nglobalThis[MARK]=true;\nconst PROCESS_SESSION_KEY='tarefasSecureProcessSessionV1';\nconst api=()=>window.TarefasNative?.biometric||null;\nfunction markUnlocked(){try{sessionStorage.setItem(PROCESS_SESSION_KEY,'1')}catch(_){}}\nfunction install(){\n  const b=api();\n  if(!b?.authenticate||b.__tarefas2487SessionHandoff)return false;\n  const original=b.authenticate.bind(b);\n  b.authenticate=async(...args)=>{\n    const result=await original(...args);\n    const token=String(result?.sessionToken||'').trim();\n    if(token.length>=32)markUnlocked();\n    return result;\n  };\n  try{Object.defineProperty(b,'__tarefas2487SessionHandoff',{value:true,configurable:false,enumerable:false})}catch(_){try{b.__tarefas2487SessionHandoff=true}catch(__){}}\n  return true;\n}\nif(!install()){const timer=setInterval(()=>{if(install())clearInterval(timer)},50);setTimeout(()=>clearInterval(timer),5000)}\nglobalThis.TarefasAlpha2487Biometric=Object.freeze({version:'2.4.8.7',sessionHandoff:true,processSessionKey:PROCESS_SESSION_KEY});\n})();",
+    "css": ""
+  },
+  "payloadSha256": "b4daaffe72b76fcad6919f6e21fc34558f9746e4e8349cc987c65a0260f890c2"
+}
