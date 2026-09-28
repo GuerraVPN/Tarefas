@@ -19,5 +19,6 @@ for(const marker of ['authenticateInProgress','pendingAuthenticateCalls','resolv
 must((java.match(/new BiometricPrompt\(/g)||[]).length===1,'mais de um BiometricPrompt no plugin');
 const v756=await read('v7_5_6_patch.js');must(v756.includes('loadCalendarServices')&&v756.includes('applyCalendarServices'),'calendário não preservado');
 must(m.version==='2.4.9'&&m.build===293&&m.channel==='beta'&&m.incorporatedPatch==='2.4.8.7','manifesto incorreto');
+must(m.webVersion==='7.9.7','Web 7.9.7 ausente no manifesto');
 must(m.features?.preRelease25===true&&m.features?.biometricSessionHandoff===true,'flags da pré-release ausentes');
 console.log('VERIFY 2.4.9 BETA OK.');
