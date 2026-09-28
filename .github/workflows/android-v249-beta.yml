@@ -1,4 +1,4 @@
-name: Android 2.4.9.7 Alpha — assinatura oficial
+name: Android 2.4.9 Beta — pré-release da 2.5 (rebuild 2)
 
 on:
   workflow_dispatch:
@@ -43,15 +43,16 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          chmod +x scripts/release-mobile-v2497.sh
-          scripts/release-mobile-v2497.sh
+          chmod +x scripts/release-mobile-v249.sh
+          scripts/release-mobile-v249.sh
       - uses: actions/upload-artifact@v4
         with:
-          name: tarefas-android-2.4.9.7-alpha-build-294
+          name: tarefas-android-2.4.9-beta-build-293
           path: |
-            TAREFAS-2.4.9.7-alpha.apk
-            TAREFAS-2.4.9.7-alpha.apk.sha256
-            TAREFAS-2.4.9.7-alpha-build-294.zip
-            TAREFAS-2.4.9.7-alpha-build-294.zip.sha256
-            dist/ALPHA_2_4_9_7.json
+            TAREFAS-2.4.9.apk
+            TAREFAS-2.4.9.apk.sha256
+            TAREFAS-2.4.9-beta-build-293.zip
+            TAREFAS-2.4.9-beta-build-293.zip.sha256
+            app/release-v249.txt
+            dist/BETA_2_4_9.json
           if-no-files-found: error
