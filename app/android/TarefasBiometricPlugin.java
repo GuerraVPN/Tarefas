@@ -252,7 +252,7 @@ public class TarefasBiometricPlugin extends Plugin {
         }
     }
 
-    private void rejectPendingAuthenticateCalls(String message, String code, Throwable error) {
+    private void rejectPendingAuthenticateCalls(String message, String code, Exception error) {
         List<PluginCall> calls;
         synchronized (authenticateLock) {
             calls = new ArrayList<>(pendingAuthenticateCalls);
