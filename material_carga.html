@@ -26,16 +26,16 @@ body{display:block;min-height:100vh}
     <li onclick="location.href='configuracoes.html'">⚙️ Configurações</li>
   </ul>
   <div class="credit">Criado por <b>Sd Guerra</b><br>26º Pel PE Mec 💪🏼</div>
-</aside><main class="orc-main"><header class="orc-topbar topbar"><div class="orc-title"><h2>Orçamentários · Material Carga / Depósito</h2><p>Consulta de carga, detentor atual e documentos.</p></div><div></div></header><section class="orc-page"><nav class="orc-module-nav" aria-label="Módulos Orçamentários">
+</aside><main class="orc-main"><header class="orc-topbar topbar"><div class="orc-title"><h2 id="orcPageTitle">Orçamentários · Material Carga / Depósito</h2><p id="orcPageSubtitle">Consulta de carga, detentor atual e documentos.</p></div><div></div></header><section class="orc-page"><nav class="orc-module-nav" aria-label="Módulos Orçamentários">
 <a href="orcamento_relatorio.html">📊 Relatório</a>
 <a href="guias.html">📑 Guias</a>
 <a href="pedidos.html?modulo=baixas">📦 Baixa / Desrelacionamento</a>
 <a href="pedidos.html?modulo=distribuicao">🚚 Distribuição</a>
 <a href="movimentacoes.html?modulo=movimentacao">🔄 Movimentação</a>
-<a href="material_carga.html?modulo=material_carga">🗂 Material Carga</a>
+<a href="material_carga.html?modulo=material_carga" class="active">🗂 Material Carga</a>
 <a href="passagem_carga.html?modulo=passagem_carga">🔁 Passagem</a>
 <a href="lavanderia.html?modulo=lavanderia">🧺 Lavanderia</a>
-</nav><div id="orcModuleNav" hidden aria-hidden="true"></div><div id="reportModule" hidden></div><div id="guiasModule" hidden></div><div id="pedidosModule" hidden></div><div id="movimentacaoModule" hidden></div><div id="materialCargaModule" hidden></div><div id="passagemCargaModule" hidden></div><div id="materialCargaModule" hidden>
+</nav><div id="orcModuleNav" hidden aria-hidden="true"></div><div id="reportModule" hidden></div><div id="guiasModule" hidden></div><div id="pedidosModule" hidden></div><div id="movimentacaoModule" hidden></div><div id="passagemCargaModule" hidden></div><div id="materialCargaModule">
       <div class="pedido-toolbar">
         <div class="pedido-tabs" id="cargaTabs">
           <button class="pedido-tab active" data-carga-tipo="dependencia">Material Carga</button>
