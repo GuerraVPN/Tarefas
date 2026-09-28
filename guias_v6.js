@@ -104,11 +104,17 @@ async function initUser(){
  return true;
 }
 async function loadUsers(){
- const r=await supabaseClient.from('usuarios').select('id,nome_guerra,patente,secao,posicao');
- if(!r.error)(r.data||[]).forEach(x=>usersMap.set(String(x.id),x));
+ const r=await Promise.race([
+   supabaseClient.from('usuarios').select('id,nome_guerra,patente,secao,posicao'),
+   new Promise((_,reject)=>setTimeout(()=>reject(new Error('Usuários demoraram mais de 7s.')),7000))
+ ]).catch(()=>null);
+ if(r&&!r.error)(r.data||[]).forEach(x=>usersMap.set(String(x.id),x));
 }
 async function loadGuides(){
- const r=await supabaseClient.from('guias_orcamentarias').select('*').order('data_guia',{ascending:false}).order('id',{ascending:false}).limit(1000);
+ const r=await Promise.race([
+   supabaseClient.from('guias_orcamentarias').select('*').order('data_guia',{ascending:false}).order('id',{ascending:false}).limit(1000),
+   new Promise((_,reject)=>setTimeout(()=>reject(new Error('Guias demoraram mais de 7s.')),7000))
+ ]);
  if(r.error)throw r.error;
  guides=r.data||[];
  updateCounts();renderList();
@@ -668,7 +674,7 @@ function bind(){
 async function start(){
  try{
    if(!await initUser())return;
-   bind();await loadGuideDepositos();syncGuideDepositField();await loadUsers();await loadGuides();
+   bind();await loadGuideDepositos();syncGuideDepositField();await loadGuides();loadUsers().catch(()=>{});
  }catch(err){console.error(err);$('guiaList').innerHTML=`<div class="orc-empty">Erro ao abrir Orçamentários:<br>${esc(err.message)}</div>`}
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
