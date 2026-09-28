@@ -963,7 +963,7 @@
         "2.4.9.2",
         "2.4.9.1"
       ],
-      "installable": true,
+      "installable": false,
       "description": "Android independente: remove referências à Web, corrige o carregamento das Notas Fiscais e adiciona a aba logo abaixo de Guias.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.9.3.tpatch",
       "sha256": "b70c8708d05167216258506b24a45dcc56a0c4ce265c2f29e19d06c0e8fd9a62",
@@ -973,7 +973,8 @@
         "Adiciona Notas Fiscais como aba visível imediatamente abaixo de Guias.",
         "Mantém o Orçamentários local do Android e não carrega uma base Web externa.",
         "Substitui cumulativamente o 2.4.9.2."
-      ]
+      ],
+      "supersededBy": "2.4.9.4"
     }
   ],
   "history": [
