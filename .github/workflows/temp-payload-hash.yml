@@ -15,5 +15,6 @@ jobs:
           const p=JSON.parse(fs.readFileSync('patches/TAREFAS-2.4.9.1.tpatch','utf8'));
           const s=JSON.stringify({js:String(p.payload?.js||''),css:String(p.payload?.css||'')});
           console.log('PAYLOAD_SHA256='+crypto.createHash('sha256').update(Buffer.from(s,'utf8')).digest('hex'));
-          console.log('PAYLOAD_BYTES='+Buffer.byteLength(s,'utf8'));\n          console.log('FILE_SHA256='+crypto.createHash('sha256').update(fs.readFileSync('patches/TAREFAS-2.4.9.1.tpatch')).digest('hex'));
+          console.log('PAYLOAD_BYTES='+Buffer.byteLength(s,'utf8'));
+          console.log('FILE_SHA256='+crypto.createHash('sha256').update(fs.readFileSync('patches/TAREFAS-2.4.9.1.tpatch')).digest('hex'));
           NODE
