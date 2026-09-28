@@ -60,9 +60,9 @@ async function loadUsers(){
 }
 async function loadAll(){
  const [m,i]=await Promise.all([
-   supabaseClient.from('movimentacoes_material').select('*').order('data_movimentacao',{ascending:false}).order('id',{ascending:false}).limit(1000),
-   supabaseClient.from('movimentacao_material_itens').select('*').order('id',{ascending:true}).limit(10000)
- ]);
+   Promise.race([supabaseClient.from('movimentacoes_material').select('*').order('data_movimentacao',{ascending:false}).order('id',{ascending:false}).limit(1000),new Promise((_,reject)=>setTimeout(()=>reject(new Error('Movimentações demoraram mais de 7s.')),7000))]),
+   Promise.race([supabaseClient.from('movimentacao_material_itens').select('*').order('id',{ascending:true}).limit(10000),new Promise((_,reject)=>setTimeout(()=>reject(new Error('Itens das movimentações demoraram mais de 7s.')),7000))])
+ ]).catch(e=>[{error:e},{error:e}]);
  if(m.error){$('movList').innerHTML=`<div class="orc-empty">Erro ao carregar movimentações:<br>${esc(m.error.message)}</div>`;return}
  movs=m.data||[];items=i.error?[]:(i.data||[]);renderList();
  const id=new URLSearchParams(location.search).get('movimentacao');
@@ -332,7 +332,7 @@ function bind(){
  $('movActionButtons').onclick=e=>{const b=e.target.closest('[data-mov-action]');if(b)moveMov(b.dataset.movAction)};
 }
 async function start(){
- if(!await initUser())return;bind();await Promise.all([loadRefs(),loadUsers(),loadAll()]);
+ if(!await initUser())return;bind();await Promise.all([loadRefs(),loadAll()]);loadUsers().catch(()=>{});
  if(new URLSearchParams(location.search).get('modulo')==='movimentacao'||new URLSearchParams(location.search).get('movimentacao'))switchToMov();
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
