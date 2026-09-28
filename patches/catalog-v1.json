@@ -1053,7 +1053,7 @@
         "2.4.9.2",
         "2.4.9.1"
       ],
-      "installable": true,
+      "installable": false,
       "description": "Android independente: remove a identificação Web do cabeçalho e da tela Sobre sem observers no patch.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.9.6.tpatch",
       "sha256": "a48807b7b5ff2f436e20c7a2f180be58443dd37e3d84e54c0f0ed28b35f35600",
@@ -1065,7 +1065,8 @@
         "App e Web permanecem independentes; a única integração é o banco de dados.",
         "Substitui cumulativamente o 2.4.9.5."
       ],
-      "order": 24906
+      "order": 24906,
+      "supersededBy": "2.4.9.8"
     },
     {
       "id": "2.4.9.8",
