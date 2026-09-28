@@ -27,8 +27,10 @@ node --check scripts/build-mobile-v246.mjs
 node --check scripts/build-mobile-v2477.mjs
 node --check scripts/build-mobile-v2486.mjs
 node --check scripts/build-mobile-v249.mjs
+node --check scripts/build-mobile-v249.mjs
 node --check scripts/verify-mobile-v246.mjs
 node --check scripts/verify-mobile-v2486.mjs
+node --check scripts/verify-mobile-v249.mjs
 node --check scripts/verify-mobile-v249.mjs
 node scripts/verify-web.mjs .
 
@@ -51,6 +53,7 @@ node scripts/build-mobile-v245.mjs
 node scripts/build-mobile-v246.mjs
 node scripts/build-mobile-v2477.mjs
 node scripts/build-mobile-v2486.mjs
+node scripts/build-mobile-v249.mjs
 node scripts/build-mobile-v249.mjs
 node scripts/verify-mobile-v249.mjs dist
 
@@ -145,32 +148,32 @@ python3 - <<'PY'
 import json
 with open('android/app/build/outputs/apk/release/output-metadata.json',encoding='utf-8') as f:
     e=json.load(f)['elements'][0]
-assert int(e['versionCode']) == 292, e
-assert str(e['versionName']) == '2.4.8.6', e
+assert int(e['versionCode']) == 293, e
+assert str(e['versionName']) == '2.4.9', e
 PY
 
-unzip -p "$UNSIGNED" assets/public/mobile-bootstrap.js > "$RUNNER_TEMP/bootstrap-v2486.js"
-unzip -p "$UNSIGNED" assets/public/mobile-login-v17.js > "$RUNNER_TEMP/login-v2486.js"
-unzip -p "$UNSIGNED" assets/public/dashboard.html > "$RUNNER_TEMP/dashboard-v2486.html"
-unzip -p "$UNSIGNED" assets/public/dashboard.js > "$RUNNER_TEMP/dashboard-js-v2486.js"
-unzip -p "$UNSIGNED" assets/public/mobile-patch-manager-v240.js > "$RUNNER_TEMP/pm-v2486.js"
-unzip -p "$UNSIGNED" assets/public/about.html > "$RUNNER_TEMP/about-v2486.html"
+unzip -p "$UNSIGNED" assets/public/mobile-bootstrap.js > "$RUNNER_TEMP/bootstrap-v249.js"
+unzip -p "$UNSIGNED" assets/public/mobile-login-v17.js > "$RUNNER_TEMP/login-v249.js"
+unzip -p "$UNSIGNED" assets/public/dashboard.html > "$RUNNER_TEMP/dashboard-v249.html"
+unzip -p "$UNSIGNED" assets/public/dashboard.js > "$RUNNER_TEMP/dashboard-js-v249.js"
+unzip -p "$UNSIGNED" assets/public/mobile-patch-manager-v240.js > "$RUNNER_TEMP/pm-v249.js"
+unzip -p "$UNSIGNED" assets/public/about.html > "$RUNNER_TEMP/about-v249.html"
 python3 - <<'PY'
 from pathlib import Path
 import os,zipfile
 t=Path(os.environ['RUNNER_TEMP'])
-boot=(t/'bootstrap-v2486.js').read_text()
-login=(t/'login-v2486.js').read_text()
-html=(t/'dashboard-v2486.html').read_text()
-dash=(t/'dashboard-js-v2486.js').read_text()
-pm=(t/'pm-v2486.js').read_text()
-about=(t/'about-v2486.html').read_text()
+boot=(t/'bootstrap-v249.js').read_text()
+login=(t/'login-v249.js').read_text()
+html=(t/'dashboard-v249.html').read_text()
+dash=(t/'dashboard-js-v249.js').read_text()
+pm=(t/'pm-v249.js').read_text()
+about=(t/'about-v249.html').read_text()
 assert "__TAREFAS_ALPHA_2468_SERVICOS_HOTBAR_FIX__" in boot
 assert "__TAREFAS_ALPHA_2467_ESCALAS_2433__" not in boot
 for marker in ["__TAREFAS_ALPHA_2481_DISTRIBUICAO_FISCAL_FIX__","__TAREFAS_ALPHA_2482_GUIDES_READY_FIX__","__TAREFAS_ALPHA_2483_FORNECIMENTO__","__TAREFAS_ALPHA_2484_PEDIDO_LAYOUT_FIX__","__TAREFAS_ALPHA_2485_BIOMETRIC_SINGLE_PROMPT__"]:
     assert marker in boot, marker
-assert "const APP_VERSION = '2.4.8.6';" in boot and "const APP_BUILD = 292;" in boot
-assert "dashboard.html?app=2.4.8.6" in boot and "dashboard.html?app=2.4.8.6" in login
+assert "const APP_VERSION = '2.4.9';" in boot and "const APP_BUILD = 293;" in boot
+assert "dashboard.html?app=2.4.9" in boot and "dashboard.html?app=2.4.9" in login
 assert "mobile-dashboard-v184.js" not in html and "mobile-dashboard-v185.js" not in html
 assert "kNextService" not in dash and "Próximo Serviço" not in dash and "Próximo serviço" not in dash
 java=Path('app/android/TarefasBiometricPlugin.java').read_text()
@@ -247,6 +250,7 @@ cp patches/TAREFAS-2.4.8.2.tpatch "$RUNNER_TEMP/package/patches/"
 cp patches/TAREFAS-2.4.8.3.tpatch "$RUNNER_TEMP/package/patches/"
 cp patches/TAREFAS-2.4.8.4.tpatch "$RUNNER_TEMP/package/patches/"
 cp patches/TAREFAS-2.4.8.5.tpatch "$RUNNER_TEMP/package/patches/"
+cp patches/TAREFAS-2.4.8.7.tpatch "$RUNNER_TEMP/package/patches/"
 cp supabase/migrations/20260924133000_fix_v5_4_2_mover_distribuicao_motivo_ambiguous.sql "$RUNNER_TEMP/package/supabase/"
 cp app/android/TarefasLauncherIconPlugin.java "$RUNNER_TEMP/package/app/"
 true
@@ -304,12 +308,12 @@ jq -n \
     changelog:[
       "🔐 Corrige na camada Android nativa a duplicidade de solicitações de biometria.",
       "1️⃣ Apenas um BiometricPrompt pode ficar ativo por vez; chamadas concorrentes reutilizam a mesma autenticação.",
-      "🧩 Patches 2.4.8.1 até 2.4.8.5 consolidados no APK 2.4.8.6.",
+      "🧩 Patches 2.4.8.1 até 2.4.8.5 e o handoff 2.4.8.7 consolidados no APK 2.4.9.",
       "🛡️ Mantidas Escalas, Fornecimento, Guias, Distribuição e layout de Desrelacionamento/Baixa.",
       "🩹 Patch Manager .tpatch v1 e validação SHA-256 preservados.",
       "🚫 Cartão Próximo Serviço continua removido.",
       "🌐 Web 7.9.1 preservada.",
-      "🌿 Build isolada da main na branch app/android-v2486-alpha-prep.",
+      "🌿 Build isolada da main na branch app/android-v249-beta-prep.",
       "🧪 Alpha destinado à validação da biometria duplicada."
     ],
     mandatory:false,
