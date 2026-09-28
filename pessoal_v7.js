@@ -280,14 +280,11 @@ function openCell(td){
 function serviceContext(row,g,date){
  const lane=scaleLane(date),list=dutyDates.get(g+'|'+lane+'|'+personKey(row))||[];
  const prev=previousDuty(row,g,date,lane);
- const nextConfirmed=list.find(x=>x.date>date&&x.type==='actual')||null;
- const nextPredicted=list.find(x=>x.date>date&&x.type==='predicted')||null;
- return{lane,prev,nextConfirmed,nextPredicted,folgas:prev?countLaneDays(prev.date,date,lane):null,diasAte:nextPredicted?countLaneDays(date,nextPredicted.date,lane):null,diasCorridos:nextPredicted?Math.max(0,diffDays(date,nextPredicted.date)):null};
+ return{lane,prev,folgas:prev?countLaneDays(prev.date,date,lane):null};
 }
 function fillServiceContext(row,g,date,item){
  const ctx=serviceContext(row,g,date);
  $('serviceFolgas').value=ctx.prev?`${ctx.folgas} dia(s) da ${ctx.lane==='vermelha'?'Vermelha':'Preta'} · último serviço confirmado ${br(ctx.prev.date)}`:'Sem serviço confirmado anterior nesta escala';
- $('serviceForecast').value=ctx.nextPredicted?`Previsto · ${br(ctx.nextPredicted.date)}`:'Sem previsão automática';
  $('serviceModalTitle').textContent=item?'Editar serviço':'Lançar serviço';
 }
 function openService(td){
