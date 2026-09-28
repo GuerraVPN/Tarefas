@@ -26,12 +26,8 @@ node --check scripts/build-mobile-v245.mjs
 node --check scripts/build-mobile-v246.mjs
 node --check scripts/build-mobile-v2477.mjs
 node --check scripts/build-mobile-v2486.mjs
-node --check scripts/build-mobile-v249.mjs
-node --check scripts/build-mobile-v249.mjs
 node --check scripts/verify-mobile-v246.mjs
 node --check scripts/verify-mobile-v2486.mjs
-node --check scripts/verify-mobile-v249.mjs
-node --check scripts/verify-mobile-v249.mjs
 node scripts/verify-web.mjs .
 
 # Recria a cadeia até a base validada 2.4.3, aplica 2.4.5 e então a camada Beta 2.4.6 pré-release.
@@ -53,7 +49,6 @@ node scripts/build-mobile-v245.mjs
 node scripts/build-mobile-v246.mjs
 node scripts/build-mobile-v2477.mjs
 node scripts/build-mobile-v2486.mjs
-node scripts/build-mobile-v249.mjs
 node scripts/build-mobile-v249.mjs
 node scripts/verify-mobile-v249.mjs dist
 
