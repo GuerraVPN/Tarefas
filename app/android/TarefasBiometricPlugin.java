@@ -24,6 +24,8 @@ import com.getcapacitor.annotation.CapacitorPlugin;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.util.concurrent.Executor;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -37,6 +39,13 @@ public class TarefasBiometricPlugin extends Plugin {
     private static final String PREF_CIPHERTEXT = "ciphertext";
     private static final String PREF_IV = "iv";
     private static final int AUTHENTICATORS = BiometricManager.Authenticators.BIOMETRIC_STRONG;
+
+    // A autenticação de desbloqueio pode ser solicitada por mais de uma rotina
+    // do WebView durante o mesmo ciclo de abertura. Apenas um prompt nativo
+    // pode ficar ativo; chamadas adicionais aguardam e recebem o mesmo resultado.
+    private final Object authenticateLock = new Object();
+    private final List<PluginCall> pendingAuthenticateCalls = new ArrayList<>();
+    private boolean authenticateInProgress = false;
 
     private SharedPreferences preferences() {
         return getContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
@@ -190,6 +199,14 @@ public class TarefasBiometricPlugin extends Plugin {
             return;
         }
 
+        synchronized (authenticateLock) {
+            pendingAuthenticateCalls.add(call);
+            if (authenticateInProgress) {
+                return;
+            }
+            authenticateInProgress = true;
+        }
+
         try {
             byte[] iv = Base64.decode(preferences().getString(PREF_IV, ""), Base64.NO_WRAP);
             Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
@@ -197,17 +214,68 @@ public class TarefasBiometricPlugin extends Plugin {
             showPrompt(call, cipher, false, null);
         } catch (KeyPermanentlyInvalidatedException invalidated) {
             clearCredentialInternal();
-            call.reject("A biometria do aparelho mudou. Entre com CPF e senha.", "CREDENTIAL_INVALIDATED");
+            rejectPendingAuthenticateCalls(
+                "A biometria do aparelho mudou. Entre com CPF e senha.",
+                "CREDENTIAL_INVALIDATED",
+                invalidated
+            );
         } catch (Exception error) {
             clearCredentialInternal();
-            call.reject("Não foi possível abrir o login biométrico. Entre com CPF e senha.", "BIOMETRIC_AUTH_FAILED", error);
+            rejectPendingAuthenticateCalls(
+                "Não foi possível abrir o login biométrico. Entre com CPF e senha.",
+                "BIOMETRIC_AUTH_FAILED",
+                error
+            );
+        }
+    }
+
+    private void resolvePendingAuthenticateCalls(JSObject response) {
+        List<PluginCall> calls;
+        synchronized (authenticateLock) {
+            calls = new ArrayList<>(pendingAuthenticateCalls);
+            pendingAuthenticateCalls.clear();
+            authenticateInProgress = false;
+        }
+        for (PluginCall pending : calls) {
+            try {
+                JSObject copy = new JSObject();
+                copy.put("sessionToken", response.getString("sessionToken"));
+                copy.put("authenticated", response.getBoolean("authenticated"));
+                pending.resolve(copy);
+            } catch (Exception error) {
+                pending.reject(
+                    "Falha ao entregar o resultado da autenticação biométrica.",
+                    "BIOMETRIC_RESULT_FAILED",
+                    error
+                );
+            }
+        }
+    }
+
+    private void rejectPendingAuthenticateCalls(String message, String code, Throwable error) {
+        List<PluginCall> calls;
+        synchronized (authenticateLock) {
+            calls = new ArrayList<>(pendingAuthenticateCalls);
+            pendingAuthenticateCalls.clear();
+            authenticateInProgress = false;
+        }
+        for (PluginCall pending : calls) {
+            pending.reject(message, code, error);
         }
     }
 
     private void showPrompt(PluginCall call, Cipher cipher, boolean encrypting, String sessionToken) {
         getActivity().runOnUiThread(() -> {
             if (!(getActivity() instanceof FragmentActivity)) {
-                call.reject("Tela incompatível com o login biométrico.", "ACTIVITY_UNAVAILABLE");
+                if (encrypting) {
+                    call.reject("Tela incompatível com o login biométrico.", "ACTIVITY_UNAVAILABLE");
+                } else {
+                    rejectPendingAuthenticateCalls(
+                        "Tela incompatível com o login biométrico.",
+                        "ACTIVITY_UNAVAILABLE",
+                        null
+                    );
+                }
                 return;
             }
 
@@ -223,7 +291,11 @@ public class TarefasBiometricPlugin extends Plugin {
                             || errorCode == BiometricPrompt.ERROR_USER_CANCELED
                             || errorCode == BiometricPrompt.ERROR_CANCELED)
                             ? "BIOMETRIC_CANCELED" : "BIOMETRIC_ERROR";
-                        call.reject(errString.toString(), code);
+                        if (encrypting) {
+                            call.reject(errString.toString(), code);
+                        } else {
+                            rejectPendingAuthenticateCalls(errString.toString(), code, null);
+                        }
                     }
 
                     @Override
@@ -251,10 +323,22 @@ public class TarefasBiometricPlugin extends Plugin {
                                 response.put("sessionToken", new String(decrypted, StandardCharsets.UTF_8));
                                 response.put("authenticated", true);
                             }
-                            call.resolve(response);
+                            if (encrypting) {
+                                call.resolve(response);
+                            } else {
+                                resolvePendingAuthenticateCalls(response);
+                            }
                         } catch (Exception error) {
-                            if (!encrypting) clearCredentialInternal();
-                            call.reject("Falha ao processar a credencial biométrica.", "CRYPTO_FAILED", error);
+                            if (!encrypting) {
+                                clearCredentialInternal();
+                                rejectPendingAuthenticateCalls(
+                                    "Falha ao processar a credencial biométrica.",
+                                    "CRYPTO_FAILED",
+                                    error
+                                );
+                            } else {
+                                call.reject("Falha ao processar a credencial biométrica.", "CRYPTO_FAILED", error);
+                            }
                         }
                     }
                 }
