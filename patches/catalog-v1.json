@@ -4,7 +4,7 @@
   "baseVersion": "2.4.1",
   "baseBuild": 276,
   "generatedAt": "2026-09-28T00:00:00Z",
-  "latestPatch": "2.4.9.2",
+  "latestPatch": "2.4.9.3",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -939,7 +939,7 @@
       "replaces": [
         "2.4.9.1"
       ],
-      "installable": true,
+      "installable": false,
       "description": "Preserva o Orçamentários da base anterior e adiciona somente o módulo Notas Fiscais.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.9.2.tpatch",
       "sha256": "11e2fc0ba37eb26d43e8d55b1f79107f0deb064a8d2d1c0d1ce67c9d08a96df9",
@@ -947,6 +947,32 @@
         "Preserva a base existente do Orçamentários.",
         "Adiciona somente Notas Fiscais.",
         "Substitui o patch 2.4.9.1."
+      ]
+    },
+    {
+      "id": "2.4.9.3",
+      "name": "TAREFAS 2.4.9.3 — App somente + Notas Fiscais corrigidas",
+      "baseVersion": "2.4.9",
+      "minBuild": 293,
+      "maxBuild": 293,
+      "channel": "alpha",
+      "publishedAt": "2026-09-28T14:03:31.949Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.4.9.2",
+        "2.4.9.1"
+      ],
+      "installable": true,
+      "description": "Android independente: remove referências à Web, corrige o carregamento das Notas Fiscais e adiciona a aba logo abaixo de Guias.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.9.3.tpatch",
+      "sha256": "94cfb15a272c16b7d041f0b193cadc2aff6e4e5bb0279a18500e43f681ed682b",
+      "changelog": [
+        "Remove do Android a identificação de Base Web e Web da versão.",
+        "Corrige o carregamento das Notas Fiscais incluindo os formulários de Empresa e Nota Fiscal.",
+        "Adiciona Notas Fiscais como aba visível imediatamente abaixo de Guias.",
+        "Mantém o Orçamentários local do Android e não carrega uma base Web externa.",
+        "Substitui cumulativamente o 2.4.9.2."
       ]
     }
   ],
