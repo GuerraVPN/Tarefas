@@ -1082,7 +1082,7 @@
       "installable": true,
       "description": "Adiciona somente o módulo Notas Fiscais aos Orçamentários do Android, abaixo de Guias, usando a mesma implementação funcional da Web 7.9.7.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.9.8.tpatch",
-      "sha256": "4dc9c6a745b7962291507c0494174360eec4ad9db5b35f25d98e91c0706ce023",
+      "sha256": "baf40b67f6247b6a97fc03f0ea2d5fb56a30e417a301dab3cda531124314a1f6",
       "changelog": [
         "Adiciona a entrada Notas Fiscais logo abaixo de Guias no menu Gestão.",
         "Abre o módulo completo de Notas Fiscais dentro do Android, sem depender da página Web.",
