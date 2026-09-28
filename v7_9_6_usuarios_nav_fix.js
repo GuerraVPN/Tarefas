@@ -70,21 +70,8 @@ function apply(){
  if(g){const label='WEB '+VERSION+' · 26º PEL PE MEC';if(g.textContent!==label)g.textContent=label}
 }
 function init(){
-  let applying=false;
-  const obs=new MutationObserver(()=>{
-    if(applying)return;
-    applying=true;
-    obs.disconnect();
-    try{apply()}finally{
-      applying=false;
-      obs.observe(document.body,{childList:true,subtree:true});
-    }
-  });
-  applying=true;
-  try{apply()}finally{
-    applying=false;
-    obs.observe(document.body,{childList:true,subtree:true});
-  }
+  apply();
+  window.addEventListener('pageshow',apply,{passive:true});
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
