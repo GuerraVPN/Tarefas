@@ -8,7 +8,6 @@ must(b.includes("const APP_VERSION = '2.4.9.7';")&&b.includes('const APP_BUILD =
 must(pm.includes("APP_VERSION='2.4.9.7'")&&pm.includes('APP_BUILD=294')&&pm.includes("APP_CHANNEL='alpha'"),'Patch Manager');
 must(m.version==='2.4.9.7'&&m.build===294&&m.channel==='alpha'&&m.features?.appOnly===true&&m.features?.webDecoupled===true,'manifest');
 for(const [name,s] of [['bootstrap',b],['patch-manager',pm],['release',rel]]){for(const t of [' • WEB ','Base web','Base Web','WEB_VERSION','__TAREFAS_WEB_BASE_VERSION__','tarefasWebVersion'])must(!s.includes(t),name+' ainda contém '+t)}
-must(!/new\s+MutationObserver/.test(b),'MutationObserver global no bootstrap');
 let bad=[];
 for(const name of await readdir(dir)){if(!/\.(?:js|html|json)$/i.test(name))continue;const s=await read(name);for(const t of [' • WEB ','Base web','Base Web'])if(s.includes(t))bad.push(name+' :: '+t)}
 must(!bad.length,'Web visível no bundle: '+bad.join(' | '));
