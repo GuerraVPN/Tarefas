@@ -26,16 +26,16 @@ body{display:block;min-height:100vh}
     <li onclick="location.href='configuracoes.html'">⚙️ Configurações</li>
   </ul>
   <div class="credit">Criado por <b>Sd Guerra</b><br>26º Pel PE Mec 💪🏼</div>
-</aside><main class="orc-main"><header class="orc-topbar topbar"><div class="orc-title"><h2>Orçamentários · Passagem de Carga</h2><p>Transferência formal e histórico dos detentores.</p></div><div></div></header><section class="orc-page"><nav class="orc-module-nav" aria-label="Módulos Orçamentários">
+</aside><main class="orc-main"><header class="orc-topbar topbar"><div class="orc-title"><h2 id="orcPageTitle">Orçamentários · Passagem de Carga</h2><p id="orcPageSubtitle">Transferência formal e histórico dos detentores.</p></div><div></div></header><section class="orc-page"><nav class="orc-module-nav" aria-label="Módulos Orçamentários">
 <a href="orcamento_relatorio.html">📊 Relatório</a>
 <a href="guias.html">📑 Guias</a>
 <a href="pedidos.html?modulo=baixas">📦 Baixa / Desrelacionamento</a>
 <a href="pedidos.html?modulo=distribuicao">🚚 Distribuição</a>
 <a href="movimentacoes.html?modulo=movimentacao">🔄 Movimentação</a>
 <a href="material_carga.html?modulo=material_carga">🗂 Material Carga</a>
-<a href="passagem_carga.html?modulo=passagem_carga">🔁 Passagem</a>
+<a href="passagem_carga.html?modulo=passagem_carga" class="active">🔁 Passagem</a>
 <a href="lavanderia.html?modulo=lavanderia">🧺 Lavanderia</a>
-</nav><div id="orcModuleNav" hidden aria-hidden="true"></div><div id="reportModule" hidden></div><div id="guiasModule" hidden></div><div id="pedidosModule" hidden></div><div id="movimentacaoModule" hidden></div><div id="materialCargaModule" hidden></div><div id="passagemCargaModule" hidden></div><div id="passagemCargaModule" hidden>
+</nav><div id="orcModuleNav" hidden aria-hidden="true"></div><div id="reportModule" hidden></div><div id="guiasModule" hidden></div><div id="pedidosModule" hidden></div><div id="movimentacaoModule" hidden></div><div id="materialCargaModule" hidden></div><div id="passagemCargaModule">
       <div class="pedido-toolbar">
         <div style="flex:1"><strong style="font-size:12px">Passagem de Carga</strong><div style="font-size:9px;color:var(--v4-muted);margin-top:3px">Histórico de detentores e troca formal da carga por dependência.</div></div>
         <button class="orc-btn primary" id="btnNovaPassagem" hidden>＋ Nova passagem</button>
