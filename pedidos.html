@@ -20,7 +20,7 @@ body{display:flex;min-height:100vh}
 .nav{list-style:none;flex:1}.nav li{padding:12px 14px;border-radius:8px;margin-bottom:6px;cursor:pointer;display:flex;gap:10px;align-items:center;color:var(--v4-sidebar-text)}.nav li:hover,.nav li.active{background:var(--v4-sidebar-hover)}.nav li.active{color:var(--v4-gold);border:1px solid var(--v4-gold)}
 .credit{font-size:10px;text-align:center;line-height:1.5;border-top:1px solid rgba(255,255,255,.12);padding-top:12px;color:var(--v4-sidebar-text)}.credit b{color:var(--v4-gold)}
 @media(max-width:900px){.sidebar{display:none!important}.orc-main{margin-left:0!important;width:100%!important}}
-</style>
+<style>.orc-module-nav{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 12px}.orc-module-nav a{display:inline-flex;align-items:center;text-decoration:none;border:1px solid var(--v4-border);background:var(--v4-surface);color:var(--v4-text-2);padding:9px 11px;border-radius:9px;font-size:10px;font-weight:800}.orc-module-nav a:hover,.orc-module-nav a.active{border-color:var(--v4-accent);color:var(--v4-accent);background:var(--v4-accent-soft)}@media(max-width:700px){.orc-module-nav{overflow:auto;flex-wrap:nowrap}.orc-module-nav a{white-space:nowrap}}</style></style>
 </head>
 
 <aside class="sidebar">
@@ -52,8 +52,7 @@ body{display:flex;min-height:100vh}
       <button class="orc-module-btn" data-orc-module="movimentacao">🔄 Movimentação de Material</button>
       <button class="orc-module-btn" data-orc-module="material_carga">🗂 Material Carga / Depósito</button>
       <button class="orc-module-btn" data-orc-module="passagem_carga">🔁 Passagem de Carga</button>
-    </div><nav class="orc-module-nav" aria-label="Módulos Orçamentários">
-<a href="orcamento_relatorio.html">📊 Relatório</a><a href="guias.html">📑 Guias</a><a href="pedidos.html?modulo=baixas">📦 Baixa / Desrelacionamento</a><a href="pedidos.html?modulo=distribuicao">🚚 Distribuição</a><a href="movimentacoes.html?modulo=movimentacao">🔄 Movimentação</a><a href="material_carga.html?modulo=material_carga">🗂 Material Carga</a><a href="passagem_carga.html?modulo=passagem_carga">🔁 Passagem</a><a href="lavanderia.html?modulo=lavanderia">🧺 Lavanderia</a></nav><div id="reportModule" hidden></div><div id="guiasModule" hidden></div><div id="movimentacaoModule" hidden></div><div id="materialCargaModule" hidden></div><div id="passagemCargaModule" hidden></div><div id="pedidosModule">
+    </div><nav class="orc-module-nav"><a href="orcamento_relatorio.html">📊 Relatório</a><a href="guias.html">📑 Guias</a><a href="pedidos.html?modulo=baixas" class="active">📦 Baixa / Desrelacionamento</a><a href="pedidos.html?modulo=distribuicao">🚚 Distribuição</a><a href="movimentacoes.html?modulo=movimentacao">🔄 Movimentação</a><a href="material_carga.html?modulo=material_carga">🗂 Material Carga</a><a href="passagem_carga.html?modulo=passagem_carga">🔁 Passagem</a><a href="lavanderia.html?modulo=lavanderia">🧺 Lavanderia</a></nav><div id="reportModule" hidden></div><div id="guiasModule" hidden></div><div id="movimentacaoModule" hidden></div><div id="materialCargaModule" hidden></div><div id="passagemCargaModule" hidden></div><div id="pedidosModule" >
       <div class="pedido-toolbar">
         <div class="pedido-tabs" id="pedidoTabs">
           <button class="pedido-tab active" data-pedido-cat="permanente">Permanente <span class="count" id="pCountPermanente">0</span></button>
@@ -226,19 +225,4 @@ body{display:flex;min-height:100vh}
       </div>
     </form>
   </div>
-</div></section></main><div class="orc-toast" id="orcToast"></div>
-<script>
-const SUPABASE_URL="https://bpvijatnsluwsgnzklrd.supabase.co";
-const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwdmlqYXRuc2x1d3NnbnprbHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MzkxNDMsImV4cCI6MjEwMjQxNTE0M30.uvyfm9mgl6MON0v75CwfGzNz6FBqw58uzR4ZcRAOLNQ";
-const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-</script>
-<script src="sistema_comum.js?v=7.9.7"></script>
-<script src="notificacoes.js?v=7.9.7"></script>
-<script src="v4_ui.js?v=7.9.7"></script>
-<script src="bloco_notas.js?v=7.9.7"></script>
-<script src="v4_tema.js?v=7.9.7"></script>
-<script src="v6_4_patch.js?v=7.9.7"></script>
-<script src="v6_2_mobile.js?v=7.9.7"></script>
-<script src="v7_6_8_theme_fix.js?v=7.9.7"></script>
-<script src="v7_6_9_profile_required.js?v=7.9.7"></script>
-<script src="v7_9_6_usuarios_nav_fix.js?v=7.9.7"></script><script src="pedidos_v6.js?v=7.9.7"></script></body></html>
+</div></section></main><div class="orc-toast" id="orcToast"></div><script>const SUPABASE_URL="https://bpvijatnsluwsgnzklrd.supabase.co";const SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwdmlqYXRuc2x1d3NnbnprbHJkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4MzkxNDMsImV4cCI6MjEwMjQxNTE0M30.uvyfm9mgl6MON0v75CwfGzNz6FBqw58uzR4ZcRAOLNQ";const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);</script><script src="sistema_comum.js?v=7.9.7"></script><script src="notificacoes.js?v=7.9.7"></script><script src="v4_ui.js?v=7.9.7"></script><script src="bloco_notas.js?v=7.9.7"></script><script src="v4_tema.js?v=7.9.7"></script><script src="v6_4_patch.js?v=7.9.7"></script><script src="v6_2_mobile.js?v=7.9.7"></script><script src="v7_6_8_theme_fix.js?v=7.9.7"></script><script src="v7_6_9_profile_required.js?v=7.9.7"></script><script src="v7_9_6_usuarios_nav_fix.js?v=7.9.7"></script><script src="pedidos_v6.js?v=7.9.7"></script></body></html>
