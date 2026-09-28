@@ -51,3 +51,5 @@ if(/new\s+MutationObserver/.test(boot))throw new Error('Observer global indevido
 console.log('TAREFAS Alpha 2.4.9.7 build 294 — App independente da Web: OK');
 
 // Alpha 2.4.9.7 build trigger: source-level Web decoupling.
+
+// trigger after v2497 sanitizer correction
