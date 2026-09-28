@@ -67,3 +67,5 @@ console.log('TAREFAS Alpha 2.4.9.7 build 294 — App independente da Web: OK');
 // final syntax trigger
 
 // trigger final visual separator cleanup
+
+// trigger verified App-only build
