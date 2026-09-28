@@ -51,7 +51,7 @@ await writeFile(path.join(dist,'BETA_2_4_9.json'),JSON.stringify({
   features:{
     preRelease25:true,biometricSessionHandoff:true,biometricNativeSinglePrompt:true,
     patchManagerPreserved:true,patchManagerV1:true,scalesPreserved:true,
-    servicesHotbar2468:true,dashboardNextServiceRemoved:true,web791Preserved:true,
+    servicesHotbar2468:true,dashboardNextServiceRemoved:true,web797Preserved:true,
     releaseBranchIsolatedFromMain:true
   }
 },null,2)+'\n');
