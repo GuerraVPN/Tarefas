@@ -47,7 +47,9 @@ Ao atualizar uma instalação existente, mantenha o APK assinado do projeto para
 
 ## Web
 
-**Versão Web atual: 7.9.6** — Módulo Orçamentários com o novo tipo de Guia **Fornecimento**, além das correções anteriores.
+**Web 7.9.7** — Orçamentários separado em páginas independentes para reduzir carregamento e travamentos; cada área carrega somente seu módulo.
+
+**Versão Web atual: 7.9.7** — Módulo Orçamentários com o novo tipo de Guia **Fornecimento**, além das correções anteriores.
 
 A versão Web continua disponível pelo GitHub Pages:
 
