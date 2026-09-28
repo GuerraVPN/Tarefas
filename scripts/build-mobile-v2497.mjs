@@ -29,7 +29,7 @@ await patch('mobile-release-v240.js',s=>{
  x=x.replace(/document\\.documentElement\\.dataset\\.tarefasWebVersion=WEB_VERSION;\\s*/g,'');
  x=x.replace(/const wanted=effectiveVersion\\(\\)+' • WEB '\\+web;/g,'const wanted=effectiveVersion();');
  x=x.replace(/const wanted=PATCH_VERSION\\+' • WEB '\\+WEB_VERSION;/g,'const wanted=PATCH_VERSION;');
- x=x.replace(/next=next\\.replace\\([^;]*WEB_VERSION[^;]*;\\s*/g,'');
+ x=x.split('\n').filter(line=>!line.includes('next=next.replace(/WEB')&&!line.includes('next=next.replace(/Base')).join('\n');
  x=x.replace(/WEB_VERSION/g,'APP_VERSION');
  x=x.replace(/__TAREFAS_WEB_BASE_VERSION__/g,'__TAREFAS_APP_BASE_VERSION__');
  x=x.replace(/tarefasWebVersion/g,'tarefasAppBaseVersion');
