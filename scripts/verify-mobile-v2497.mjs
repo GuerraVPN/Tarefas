@@ -15,3 +15,5 @@ const java=await readFile(path.join(root,'app/android/TarefasBiometricPlugin.jav
 for(const marker of ['authenticateInProgress','pendingAuthenticateCalls','resolvePendingAuthenticateCalls','rejectPendingAuthenticateCalls','synchronized (authenticateLock)'])must(java.includes(marker),'trava biométrica '+marker);
 must(java.match(/new BiometricPrompt\(/g)?.length===1,'mais de um BiometricPrompt');
 console.log('VERIFY 2.4.9.7 ALPHA OK');
+
+// final trigger
