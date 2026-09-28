@@ -4,7 +4,7 @@
   "baseVersion": "2.4.1",
   "baseBuild": 276,
   "generatedAt": "2026-09-28T00:00:00Z",
-  "latestPatch": "2.4.9.4",
+  "latestPatch": "2.4.9.5",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -924,7 +924,8 @@
       "installable": false,
       "description": "Corrige o travamento de Orçamentários no Android reproduzindo a arquitetura da Web 7.9.7, com módulos separados, e atualiza a base Web carregada pelo app para a Web 7.9.7.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.9.1.tpatch",
-      "sha256": "0aab8eb73ce579e4fbdf4e8f410c2bac7cb84c0a3d135539e87b59d234a238fa"
+      "sha256": "0aab8eb73ce579e4fbdf4e8f410c2bac7cb84c0a3d135539e87b59d234a238fa",
+      "supersededBy": "2.4.9.5"
     },
     {
       "id": "2.4.9.2",
@@ -947,7 +948,8 @@
         "Preserva a base existente do Orçamentários.",
         "Adiciona somente Notas Fiscais.",
         "Substitui o patch 2.4.9.1."
-      ]
+      ],
+      "supersededBy": "2.4.9.5"
     },
     {
       "id": "2.4.9.3",
@@ -974,7 +976,7 @@
         "Mantém o Orçamentários local do Android e não carrega uma base Web externa.",
         "Substitui cumulativamente o 2.4.9.2."
       ],
-      "supersededBy": "2.4.9.4"
+      "supersededBy": "2.4.9.5"
     },
     {
       "id": "2.4.9.4",
@@ -991,7 +993,7 @@
         "2.4.9.2",
         "2.4.9.1"
       ],
-      "installable": true,
+      "installable": false,
       "description": "Android independente: remove referências à Web sem observers globais e mantém Notas Fiscais sem interferir no boot do aplicativo.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.9.4.tpatch",
       "sha256": "5428e20d9c5a541f85799b0609b3839fd6ed18e28b3a335a2582fbec2217cdca",
@@ -1001,7 +1003,37 @@
         "Limita a inclusão da aba Notas Fiscais ao módulo Orçamentários.",
         "Mantém o módulo Notas Fiscais e os formulários Empresa/Nota Fiscal.",
         "Substitui cumulativamente o 2.4.9.3."
-      ]
+      ],
+      "supersededBy": "2.4.9.5"
+    },
+    {
+      "id": "2.4.9.5",
+      "name": "TAREFAS 2.4.9.5 — Somente versão do App",
+      "baseVersion": "2.4.9",
+      "minBuild": 293,
+      "maxBuild": 293,
+      "channel": "alpha",
+      "publishedAt": "2026-09-28T14:35:00Z",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.4.9.4",
+        "2.4.9.3",
+        "2.4.9.2",
+        "2.4.9.1"
+      ],
+      "installable": true,
+      "description": "Desvincula a identificação visual da Web no Android: o cabeçalho e a tela Sobre exibem somente a versão do aplicativo.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.9.5.tpatch",
+      "sha256": "e31db0e91c6fd7670e2d68f0ceaf0ef0eb0fe234b0855fea17ea4bd7f466226b",
+      "changelog": [
+        "Cabeçalho do Android passa a exibir somente a versão efetiva do aplicativo.",
+        "Remove o cartão Base web da tela Sobre do aplicativo.",
+        "Impede que o Patch Manager volte a acrescentar a versão Web no cabeçalho.",
+        "Mantém o aplicativo independente da Web; a integração entre os dois permanece somente no banco de dados.",
+        "Substitui cumulativamente o 2.4.9.4."
+      ],
+      "order": 24905
     }
   ],
   "history": [
