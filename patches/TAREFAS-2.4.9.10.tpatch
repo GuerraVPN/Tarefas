@@ -27,6 +27,5 @@
     "css": ""
   },
   "payloadSha256": "aadcb7a64669feb75ff3760b5b5dda435bdc8d5db7278e58e1b33e4c4ccba0d7",
-  "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.9.10.tpatch",
-  "sha256": "8f4c1517dbf77a37ca07dfeeddf99806bc314696650ce45e2d061ac1021517a7"
+  "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.9.10.tpatch"
 }
