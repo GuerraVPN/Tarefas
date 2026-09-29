@@ -1137,7 +1137,7 @@
       "installable": true,
       "description": "Corrige somente a aparência dos botões de adicionar empresa, adicionar Nota Fiscal e avançar de etapa, usando verde e texto adaptado ao tema claro/escuro.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.9.10.tpatch",
-      "sha256": "8f4c1517dbf77a37ca07dfeeddf99806bc314696650ce45e2d061ac1021517a7",
+      "sha256": "f525f009780cdf56130b11dc24e5e533775306e368a6f66d7a6ac95d952deb16",
       "changelog": [
         "Remove o fundo cinza dos botões das Notas Fiscais.",
         "Usa verde no padrão de botão de ação do aplicativo.",
