@@ -147,7 +147,7 @@ python3 - <<'PY'
 import json
 with open('android/app/build/outputs/apk/release/output-metadata.json',encoding='utf-8') as f:
     e=json.load(f)['elements'][0]
-assert int(e['versionCode']) == 294, e
+assert int(e['versionCode']) == 295, e
 assert str(e['versionName']) == '2.4.10', e
 PY
 
