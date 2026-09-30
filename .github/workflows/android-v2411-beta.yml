@@ -3,7 +3,7 @@ name: Android 2.4.11 Beta — pré-release da linha 2.5
 on:
   workflow_dispatch:
   push:
-    branches: [app/android-v2411-beta-prep]
+    branches: [app/android-v2411-beta]
     paths:
       - 'scripts/build-mobile-v2411.mjs'
       - 'scripts/verify-mobile-v2411.mjs'
@@ -26,7 +26,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: app/android-v2411-beta-prep
+          ref: app/android-v2411-beta
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
@@ -50,5 +50,5 @@ jobs:
             TAREFAS-2.4.11.apk.sha256
             TAREFAS-2.4.11-beta-build-296.zip
             TAREFAS-2.4.11-beta-build-296.zip.sha256
-            dist/BETA_2_4_10.json
+            dist/BETA_2_4_11.json
           if-no-files-found: error
