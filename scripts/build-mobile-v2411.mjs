@@ -14,7 +14,7 @@ await import('./build-mobile-v2497.mjs');
 
 const patchFile=path.join(root,'patches/TAREFAS-2.4.9.11.tpatch');
 const patchObj=JSON.parse(await readFile(patchFile,'utf8'));
-if(patchObj.id!==PATCH||patchObj.baseVersion!=='2.4.9.7')throw new Error('2.4.10: patch 2.4.9.11 incompatível com a base esperada.');
+if(patchObj.id!==PATCH||patchObj.baseVersion!=='2.4.9.7')throw new Error('2.4.11: patch 2.4.9.11 incompatível com a base esperada.');
 const payloadText=JSON.stringify({js:String(patchObj.payload?.js||''),css:String(patchObj.payload?.css||'')});
 const actual=createHash('sha256').update(payloadText,'utf8').digest('hex');
 if(actual!==String(patchObj.payloadSha256||'').toLowerCase())throw new Error('2.4.10: SHA interno do 2.4.9.11 divergente: '+actual);
@@ -32,7 +32,7 @@ await patch('mobile-bootstrap.js',source=>{
 
 await patch('mobile-bootstrap.js',s=>s
   .replaceAll("2.4.9.7","2.4.11")
-  .replace("const APP_BUILD = 294;","const APP_BUILD = 295;")
+  .replace("const APP_BUILD = 294;","const APP_BUILD = 296;")
   .replace("channel:'alpha'","channel:'beta'")
   .replace("channel: 'alpha'","channel: 'beta'")
   .replace("APP_CHANNEL='alpha'","APP_CHANNEL='beta'")
@@ -84,8 +84,8 @@ for(const name of ['mobile-bootstrap.js','mobile-patch-manager-v240.js','mobile-
 }
 const boot=await readFile(path.join(dist,'mobile-bootstrap.js'),'utf8');
 const pm=await readFile(path.join(dist,'mobile-patch-manager-v240.js'),'utf8');
-if(!boot.includes("const APP_VERSION = '2.4.10';")||!boot.includes('const APP_BUILD = 295;'))throw new Error('2.4.10: versão/build incorretos');
-if(!pm.includes("APP_VERSION='2.4.10'")||!pm.includes('APP_BUILD=295')||!pm.includes("APP_CHANNEL='beta'"))throw new Error('2.4.10: Patch Manager não promovido');
+if(!boot.includes("const APP_VERSION = '2.4.11';")||!boot.includes('const APP_BUILD = 296;'))throw new Error('2.4.11: versão/build incorretos');
+if(!pm.includes("APP_VERSION='2.4.11'")||!pm.includes('APP_BUILD=296')||!pm.includes("APP_CHANNEL='beta'"))throw new Error('2.4.11: Patch Manager não promovido');
 if(!boot.includes('__TAREFAS_ALPHA_24911_CONSOLIDATED__'))throw new Error('2.4.11: Notas Fiscais 2.4.9.11 não consolidadas');
 if(!boot.includes('__TAREFAS_ANDROID_2411_BOTTOM_TABS_FIX__')||!boot.includes('.tm-bottom-nav'))throw new Error('2.4.11: correção das abas inferiores ausente');
 console.log('TAREFAS Android 2.4.11 build 296 BETA — abas inferiores restauradas OK');
