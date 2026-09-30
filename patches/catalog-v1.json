@@ -1092,7 +1092,7 @@
         "Não altera Escalas, biometria, Patch Manager ou os demais módulos."
       ],
       "order": 24908,
-      "supersededBy": "2.4.9.10"
+      "supersededBy": "2.4.9.11"
     },
     {
       "id": "2.4.9.9",
@@ -1119,7 +1119,7 @@
         "Não altera a lógica, banco, permissões, Escalas, biometria ou outros módulos."
       ],
       "order": 24909,
-      "supersededBy": "2.4.9.10"
+      "supersededBy": "2.4.9.11"
     },
     {
       "id": "2.4.9.10",
@@ -1134,7 +1134,7 @@
       "replaces": [
         "2.4.9.9"
       ],
-      "installable": true,
+      "installable": false,
       "description": "Corrige somente a aparência dos botões de adicionar empresa, adicionar Nota Fiscal e avançar de etapa, usando verde e texto adaptado ao tema claro/escuro.",
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.9.10.tpatch",
       "sha256": "f525f009780cdf56130b11dc24e5e533775306e368a6f66d7a6ac95d952deb16",
@@ -1145,7 +1145,36 @@
         "Tema claro: texto preto.",
         "Não altera a lógica nem os demais módulos."
       ],
-      "order": 24910
+      "order": 24910,
+      "supersededBy": "2.4.9.11"
+    },
+    {
+      "id": "2.4.9.11",
+      "name": "TAREFAS 2.4.9.11 — Cores dos botões das Notas Fiscais",
+      "baseVersion": "2.4.9.7",
+      "minBuild": 293,
+      "maxBuild": 294,
+      "channel": "alpha",
+      "publishedAt": "2026-09-30T08:34:00-03:00",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.4.9.10"
+      ],
+      "installable": true,
+      "description": "Corrige somente as cores dos botões do módulo Notas Fiscais: ações em verde e cancelamentos em vermelho, com texto adaptado ao tema claro ou escuro.",
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.9.11.tpatch",
+      "sha256": "b0f763d7dc76eec333cc138f5fb23547ca745741a87c7ce9aadc18b13ad0bbcc",
+      "changelog": [
+        "Adiciona empresa e Adicionar Nota Fiscal passam a usar verde fixo de ação.",
+        "Cadastros das modais também usam botão verde.",
+        "Avançar para mantém o verde de ação.",
+        "Cancelar nas duas modais passa a usar vermelho.",
+        "Tema claro/militar usa texto preto nos botões verdes.",
+        "Tema escuro/night usa texto branco nos botões verdes.",
+        "Não altera lógica, banco, permissões, Escalas, biometria ou outros módulos."
+      ],
+      "order": 24911
     }
   ],
   "history": [
