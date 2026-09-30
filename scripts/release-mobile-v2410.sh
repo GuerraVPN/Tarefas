@@ -317,3 +317,5 @@ jq -e '.ok == true and .version == "2.4.10" and .build == 295 and .channel == "b
 # trigger final release audit
 
 # trigger final signed build
+
+# trigger: workflow registrado no main; executar Beta 2.4.10 no branch prep
