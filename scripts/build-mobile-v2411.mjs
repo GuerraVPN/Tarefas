@@ -40,7 +40,7 @@ await patch('mobile-bootstrap.js',s=>s
   .replace("const APP_CHANNEL = 'alpha'","const APP_CHANNEL = 'beta'")
 );
 await patch('mobile-patch-manager-v240.js',s=>s
-  .replace("const APP_VERSION='2.4.9.7',APP_BUILD=294,APP_CHANNEL='alpha';","const APP_VERSION='2.4.10',APP_BUILD=295,APP_CHANNEL='beta';")
+  .replace("const APP_VERSION='2.4.9.7',APP_BUILD=294,APP_CHANNEL='alpha';","const APP_VERSION='2.4.11',APP_BUILD=296,APP_CHANNEL='beta';")
 );
 await patch('mobile-release-v240.js',s=>s
   .replaceAll("2.4.9.7","2.4.10")
