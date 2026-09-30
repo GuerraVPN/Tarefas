@@ -1,0 +1,54 @@
+name: Android 2.4.11 Beta — pré-release da linha 2.5
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [app/android-v2411-beta-prep]
+    paths:
+      - 'scripts/build-mobile-v2411.mjs'
+      - 'scripts/verify-mobile-v2411.mjs'
+      - 'scripts/release-mobile-v2411.sh'
+      - 'app/android/TarefasBiometricPlugin.java'
+      - 'patches/TAREFAS-2.4.9.11.tpatch'
+      - '.github/workflows/android-v2411-beta.yml'
+
+concurrency:
+  group: android-v2411-beta
+  cancel-in-progress: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: app/android-v2411-beta-prep
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Compilar, validar, assinar e publicar 2.4.11 Beta
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          chmod +x scripts/release-mobile-v2411.sh
+          scripts/release-mobile-v2411.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tarefas-android-2.4.11-beta-build-296
+          path: |
+            TAREFAS-2.4.11.apk
+            TAREFAS-2.4.11.apk.sha256
+            TAREFAS-2.4.11-beta-build-296.zip
+            TAREFAS-2.4.11-beta-build-296.zip.sha256
+            dist/BETA_2_4_10.json
+          if-no-files-found: error
