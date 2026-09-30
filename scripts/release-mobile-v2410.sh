@@ -28,6 +28,8 @@ node --check scripts/build-mobile-v2477.mjs
 node --check scripts/build-mobile-v2486.mjs
 node --check scripts/verify-mobile-v246.mjs
 node --check scripts/verify-mobile-v2486.mjs
+node --check scripts/build-mobile-v2410.mjs
+node --check scripts/verify-mobile-v2410.mjs
 node scripts/verify-web.mjs .
 
 # Recria a cadeia até a base validada 2.4.3, aplica 2.4.5 e então a camada Beta 2.4.6 pré-release.
@@ -53,9 +55,6 @@ git fetch origin app/releases
 git show origin/app/releases:patches/TAREFAS-2.4.9.11.tpatch > patches/TAREFAS-2.4.9.11.tpatch
 node scripts/build-mobile-v2410.mjs
 node scripts/verify-mobile-v2410.mjs dist
-
-git fetch origin app/releases
-git show origin/app/releases:patches/TAREFAS-2.4.9.11.tpatch > patches/TAREFAS-2.4.9.11.tpatch
 
 curl --fail --silent --show-error --retry 3 \
   'https://bpvijatnsluwsgnzklrd.supabase.co/functions/v1/firebase-config-v17' \
@@ -161,8 +160,8 @@ t=Path(os.environ['RUNNER_TEMP'])
 boot=(t/'bootstrap-v249.js').read_text()
 pm=(t/'pm-v249.js').read_text()
 assert "const APP_VERSION = '2.4.10';" in boot
-assert "const APP_BUILD = 294;" in boot
-assert "APP_VERSION='2.4.10'" in pm and "APP_BUILD=294" in pm and "APP_CHANNEL='alpha'" in pm
+assert "const APP_BUILD = 295;" in boot
+assert "APP_VERSION='2.4.10'" in pm and "APP_BUILD=295" in pm and "APP_CHANNEL='beta'" in pm
 print("PRE-SIGN APP-ONLY CHECK OK")
 PY
 
@@ -213,7 +212,7 @@ for name in ['boot-alpha.js','pm-alpha.js']:
     for token in [' • WEB ','Base web','Base Web','WEB_VERSION','__TAREFAS_WEB_BASE_VERSION__','tarefasWebVersion']:
         assert token not in s, f'{name}: {token}'
 assert 'const APP_VERSION = \'2.4.10\';' in (Path(__import__('os').environ['RUNNER_TEMP'])/'boot-alpha.js').read_text()
-assert 'APP_BUILD=294' in (Path(__import__('os').environ['RUNNER_TEMP'])/'pm-alpha.js').read_text()
+assert 'APP_BUILD=295' in (Path(__import__('os').environ['RUNNER_TEMP'])/'pm-alpha.js').read_text()
 print('APK APP-ONLY POST-SIGN CHECK OK')
 PY
 sha256sum "$APK" | tee "$APK.sha256"
@@ -251,7 +250,7 @@ if ! git diff --cached --quiet; then
 fi
 cd "$GITHUB_WORKSPACE"
 
-URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.4.10-alpha.apk'
+URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.4.10.apk'
 LOCAL_SHA="$(sha256sum "$APK" | awk '{print $1}')"
 for attempt in 1 2 3 4 5 6 7 8; do
   if curl --fail --silent --show-error -L "$URL" -o "$RUNNER_TEMP/published.apk" \
@@ -272,7 +271,7 @@ jq -n \
   --argjson build "$BUILD" \
   --arg channel 'beta' \
   --arg web_version "$WEB_VERSION" \
-  --arg title 'TAREFAS 2.4.10 Alpha — App independente da Web' \
+  --arg title 'TAREFAS 2.4.10 Beta — pré-release da linha 2.5' \
   --arg url "$URL" \
   --arg sha "$SHA" \
   '{
@@ -284,13 +283,13 @@ jq -n \
     changelog:[
       "🔐 Corrige na camada Android nativa a duplicidade de solicitações de biometria.",
       "1️⃣ Apenas um BiometricPrompt pode ficar ativo por vez; chamadas concorrentes reutilizam a mesma autenticação.",
-      "🧩 Patches 2.4.8.1 até 2.4.8.5 e o handoff 2.4.8.7 consolidados no APK 2.4.9.",
+      "🧩 Patches 2.4.8.x, 2.4.9.7 e a correção visual 2.4.9.11 consolidados no APK 2.4.10.",
       "🛡️ Mantidas Escalas, Fornecimento, Guias, Distribuição e layout de Desrelacionamento/Baixa.",
       "🩹 Patch Manager .tpatch v1 e validação SHA-256 preservados.",
       "🚫 Cartão Próximo Serviço continua removido.",
       "📱 App independente da Web; integração somente pelo banco de dados.",
-      "🌿 Build isolada da main na branch app/android-v2410-alpha.",
-      "🧪 Alpha destinado à validação da biometria duplicada."
+      "🌿 Build isolada da main na branch app/android-v2410-beta-prep.",
+      "🧪 Beta pré-release destinado à validação dos módulos e regressões antes da linha 2.5."
     ],
     mandatory:false,
     download_url:$url,
@@ -307,7 +306,7 @@ CODE="$(curl --silent --show-error \
 
 cat "$RUNNER_TEMP/result.json"
 test "$CODE" = '200'
-jq -e '.ok == true and .version == "2.4.10" and .build == 294 and .channel == "alpha"' "$RUNNER_TEMP/result.json" >/dev/null
+jq -e '.ok == true and .version == "2.4.10" and .build == 295 and .channel == "beta"' "$RUNNER_TEMP/result.json" >/dev/null
 
 # trigger final signing check
 
