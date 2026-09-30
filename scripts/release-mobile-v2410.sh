@@ -63,7 +63,7 @@ test -s app/google-services.json
 
 npx cap add android
 cp app/google-services.json android/app/google-services.json
-sed -i 's/versionCode 1/versionCode 294/' android/app/build.gradle
+sed -i 's/versionCode 1/versionCode 295/' android/app/build.gradle
 sed -i 's/versionName "1.0"/versionName "2.4.10"/' android/app/build.gradle
 
 npm run assets:android
