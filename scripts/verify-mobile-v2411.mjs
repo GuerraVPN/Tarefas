@@ -1,0 +1,22 @@
+import { access,readFile,readdir } from 'node:fs/promises';
+import path from 'node:path';
+import { createHash } from 'node:crypto';
+const root=process.cwd(),dir=path.resolve(process.argv[2]||'dist'),read=f=>readFile(path.join(dir,f),'utf8');
+const must=(x,m)=>{if(!x)throw new Error('2.4.11 verify: '+m)};
+for(const f of ['mobile-bootstrap.js','mobile-login-v17.js','mobile-patch-manager-v240.js','dashboard.html','dashboard.js','about.html','BETA_2_4_11.json'])await access(path.join(dir,f));
+const b=await read('mobile-bootstrap.js'),pm=await read('mobile-patch-manager-v240.js'),rel=await read('mobile-release-v240.js'),m=JSON.parse(await read('BETA_2_4_11.json'));
+must(b.includes("const APP_VERSION = '2.4.11';")&&b.includes('const APP_BUILD = 296;'),'versão/build');
+must(pm.includes("APP_VERSION='2.4.11'")&&pm.includes('APP_BUILD=296')&&pm.includes("APP_CHANNEL='beta'"),'Patch Manager');
+must(m.version==='2.4.11'&&m.build===296&&m.channel==='beta','manifesto');
+must(m.features?.preRelease25===true&&m.features?.notesFiscalConsolidated===true,'flags de pré-release/Notas Fiscais');
+must(b.includes('__TAREFAS_ALPHA_24911_CONSOLIDATED__'),'Notas Fiscais 2.4.9.11 não consolidada');
+must(b.includes('__TAREFAS_ANDROID_2411_BOTTOM_TABS_FIX__')&&b.includes('.tm-bottom-nav'),'abas inferiores 2.4.11 não restauradas');
+const p=JSON.parse(await readFile(path.join(root,'patches/TAREFAS-2.4.9.11.tpatch'),'utf8'));
+const actual=createHash('sha256').update(JSON.stringify({js:String(p.payload?.js||''),css:String(p.payload?.css||'')}),'utf8').digest('hex');
+must(actual===String(p.payloadSha256||'').toLowerCase(),'SHA do payload 2.4.9.11');
+const forbidden=[' • WEB ','Base web','Base Web','WEB_VERSION','__TAREFAS_WEB_BASE_VERSION__','tarefasWebVersion'];
+for(const name of await readdir(dir)){if(!/\.(?:js|html|json)$/i.test(name))continue;const s=await read(name);for(const t of forbidden)must(!s.includes(t),name+' contém '+t)}
+const java=await readFile(path.join(root,'app/android/TarefasBiometricPlugin.java'),'utf8');
+for(const marker of ['authenticateInProgress','pendingAuthenticateCalls','resolvePendingAuthenticateCalls','rejectPendingAuthenticateCalls','synchronized (authenticateLock)'])must(java.includes(marker),'trava biométrica '+marker);
+must((java.match(/new BiometricPrompt\(/g)||[]).length===1,'mais de um BiometricPrompt');
+console.log('VERIFY 2.4.11 BETA OK.');
