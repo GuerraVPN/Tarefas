@@ -283,12 +283,12 @@ jq -n \
     changelog:[
       "🔐 Corrige na camada Android nativa a duplicidade de solicitações de biometria.",
       "1️⃣ Apenas um BiometricPrompt pode ficar ativo por vez; chamadas concorrentes reutilizam a mesma autenticação.",
-      "🧩 Patches 2.4.8.x, 2.4.10 e a correção visual 2.4.9.11 consolidados no APK 2.4.11.",
+      "🧩 Patches 2.4.8.x, 2.4.9.11 e 2.4.10, a correção visual 2.4.9.11 consolidados no APK 2.4.11.",
       "🛡️ Mantidas Escalas, Fornecimento, Guias, Distribuição e layout de Desrelacionamento/Baixa.",
       "🩹 Patch Manager .tpatch v1 e validação SHA-256 preservados.",
       "🚫 Cartão Próximo Serviço continua removido.",
       "📱 App independente da Web; integração somente pelo banco de dados.",
-      "🌿 Build isolada da main na branch app/android-v2411-beta-prep.",
+      "🌿 Build isolada da main na branch app/android-v2411-beta.",
       "🧪 Beta pré-release destinado à validação dos módulos e regressões antes da linha 2.5."
     ],
     mandatory:false,
@@ -318,4 +318,4 @@ jq -e '.ok == true and .version == "2.4.11" and .build == 296 and .channel == "b
 
 # trigger final signed build
 
-# trigger: workflow registrado no main; executar Beta 2.4.11 no branch prep
+# trigger: workflow registrado no main; executar Beta 2.4.11 no branch app/android-v2411-beta
