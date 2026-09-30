@@ -319,3 +319,5 @@ jq -e '.ok == true and .version == "2.4.11" and .build == 296 and .channel == "b
 # trigger final signed build
 
 # trigger: workflow registrado no main; executar Beta 2.4.11 no branch app/android-v2411-beta
+
+# trigger build 2.4.11 bottom tabs
