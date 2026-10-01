@@ -10,6 +10,13 @@ on:
       - 'crediflow-build/patch_beta199.py'
       - 'crediflow-inspect/LoanPaymentAction.smali'
   workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/crediflow-beta199-fix-build.yml'
+      - 'crediflow-build/patch_beta195.py'
+      - 'crediflow-build/patch_beta199.py'
+      - 'crediflow-inspect/LoanPaymentAction.smali'
 
 permissions:
   contents: write
@@ -136,4 +143,4 @@ jobs:
           retention-days: 14
 
 # trigger: CrediFlow 1.9.9 fix build
-# manual rebuild trigger 2026-10-01T08:14-03:00
+# PR build trigger enabled 2026-10-01T08:16-03:00
