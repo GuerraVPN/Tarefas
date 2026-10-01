@@ -136,3 +136,4 @@ jobs:
           retention-days: 14
 
 # trigger: CrediFlow 1.9.9 fix build
+# manual rebuild trigger 2026-10-01T08:14-03:00
