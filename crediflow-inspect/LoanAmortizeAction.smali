@@ -62,14 +62,16 @@
     iget-object v6, p0, Lbr/com/guerravpn/crediflow/LoanAmortizeAction;->d:Landroid/widget/TextView;
     invoke-virtual {v6, v1}, Landroid/widget/TextView;->setText(Ljava/lang/CharSequence;)V
 
-    cmpg-double v8, v4, v2
-    if-lez v8, :full
+    iput-wide v2, v0, Lbr/com/guerravpn/crediflow/MainActivityV06;->partialPaymentAmount:D
 
-    const-string v1, "Saldo calculado. O pagamento parcial ainda não é registrado no servidor."
-    const/4 v6, 0x0
-    invoke-static {v0, v1, v6}, Landroid/widget/Toast;->makeText(Landroid/content/Context;Ljava/lang/CharSequence;I)Landroid/widget/Toast;
-    move-result-object v6
-    invoke-virtual {v6}, Landroid/widget/Toast;->show()V
+    iget-object v1, p0, Lbr/com/guerravpn/crediflow/LoanAmortizeAction;->b:Lorg/json/JSONObject;
+    const-string v7, "id"
+    invoke-virtual {v1, v7}, Lorg/json/JSONObject;->optString(Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v7
+    new-instance v6, Lbr/com/guerravpn/crediflow/EarlyPaymentUi;
+    invoke-direct {v6, v0, v7}, Lbr/com/guerravpn/crediflow/EarlyPaymentUi;-><init>(Lbr/com/guerravpn/crediflow/MainActivityV06;Ljava/lang/String;)V
+    iput-object v6, v0, Lbr/com/guerravpn/crediflow/MainActivityV06;->earlyPaymentUi:Lbr/com/guerravpn/crediflow/EarlyPaymentUi;
+    invoke-virtual {v6}, Lbr/com/guerravpn/crediflow/EarlyPaymentUi;->show()V
     return-void
 
 :full
