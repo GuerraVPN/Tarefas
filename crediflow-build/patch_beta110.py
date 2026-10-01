@@ -31,8 +31,8 @@ if s.count(needle_field) != 1:
 s = s.replace(needle_field, replace_field, 1)
 
 anchor_loan = '''    const-string v13, "Pagar antecipado"'''
-insert_loan = '''    invoke-static {v0, v10, v8}, Lbr/com/guerravpn/crediflow/LoanPaymentUi;->add(Lbr/com/guerravpn/crediflow/MainActivityV06;Landroid/widget/LinearLayout;Lorg/json/JSONObject;)V
-
+insert_loan = '''    # Startup-safe 1.9.11: do not inject a new payment view while showHome is
+    # constructing the existing layout. The original payment flow remains intact.
     const-string v13, "Pagar antecipado"'''
 if s.count(anchor_loan) != 1:
     raise SystemExit('per-loan insertion point count=%d' % s.count(anchor_loan))
