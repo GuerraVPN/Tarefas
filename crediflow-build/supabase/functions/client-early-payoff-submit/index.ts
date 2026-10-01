@@ -23,37 +23,23 @@ const calculatePayoff = (loan: any, items: any[]) => {
   let amountPaid = 0;
   let totalFees = 0;
   let feePaid = 0;
-
   for (const it of items) {
     const amountDue = Math.max(0, Number(it.amount_due || 0));
     const recordedPaid = Math.max(0, Number(it.amount_paid || 0));
     const effectivePaid = it.status === 'paid' ? Math.max(recordedPaid, amountDue) : recordedPaid;
     amountPaid += effectivePaid;
-
     const feePart = Math.max(0, Number(it.fee_amount || 0));
     totalFees += feePart;
     feePaid += Math.min(effectivePaid, feePart);
   }
-
   const remainingContractualBalance = Math.max(0, totalAmount - amountPaid);
   const feeDue = Math.max(0, totalFees - feePaid);
   const payoffAmount = round(remainingContractualBalance + feeDue);
-
   const startAt = loan.disbursed_at || loan.approved_at || loan.created_at;
   const startDate = startAt ? dateKey(new Date(startAt)) : dateKey(new Date());
   const payoffDate = dateKey(new Date());
   const elapsedDays = daysBetween(startDate, payoffDate);
-
-  return {
-    payoffAmount,
-    remainingContractualBalance: round(remainingContractualBalance),
-    totalAmount: round(totalAmount),
-    amountPaid: round(amountPaid),
-    feeDue: round(feeDue),
-    elapsedDays,
-    payoffDate,
-    startDate,
-  };
+  return { payoffAmount, remainingContractualBalance: round(remainingContractualBalance), totalAmount: round(totalAmount), amountPaid: round(amountPaid), feeDue: round(feeDue), elapsedDays, payoffDate, startDate };
 };
 
 Deno.serve(async (req) => {
@@ -135,7 +121,7 @@ Deno.serve(async (req) => {
     proof_filename: fileName || `comprovante.${ext}`,
     proof_mime_type: mimeType,
     status: 'pending',
-  }).select('id,status,submitted_at,payoff_amount').single();
+  }).select('id,status,submitted_at,payoff_amount,payment_type').single();
 
   if (insertError || !row) {
     await service.storage.from('crediflow-payment-proofs').remove([path]);
@@ -152,10 +138,9 @@ Deno.serve(async (req) => {
       payoff_amount: paymentAmount,
       payment_type: paymentType,
       payoff_rule: 'contractual_remaining_balance',
-      daily_rate: calc.dailyRate,
       elapsed_days: calc.elapsedDays,
-      accrued_interest_due: calc.accruedInterestDue,
-      remaining_principal: calc.remainingPrincipal,
+      amount_paid: calc.amountPaid,
+      remaining_contractual_balance: calc.remainingContractualBalance,
       proof_filename: fileName,
       mime_type: mimeType,
     },
