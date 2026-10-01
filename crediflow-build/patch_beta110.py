@@ -107,10 +107,6 @@ new_onclick = r'''.method public onClick(Landroid/view/View;)V
 
     iget-object v1, p0, Lbr/com/guerravpn/crediflow/LoanAmortizeAction;->b:Lorg/json/JSONObject;
     const-string v4, "total_amount"
-    invoke-virtual {v1, v4, v4}, Lorg/json/JSONObject;->has(Ljava/lang/String;)Z
-    move-result v6
-    if-eqz v6, :open
-
     const-wide/16 v4, 0x0
     invoke-virtual {v1, v4, v5}, Lorg/json/JSONObject;->optDouble(Ljava/lang/String;D)D
     move-result-wide v4
@@ -237,26 +233,34 @@ ue = e.find('.end method', us)
 if us < 0 or ue < 0:
     raise SystemExit('proof handler not found')
 upload = e[us:ue]
-if 'requestedAmount:D' in e:
-    upload = upload.replace('    .locals 6', '    .locals 8', 1)
-    old = 'invoke-static {v3, v4, v1, v0, v2}, Lbr/com/guerravpn/crediflow/Api;->clientEarlyPayoffSubmit(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[B)Lbr/com/guerravpn/crediflow/Api$Resp;'
-    if old in upload:
-        repl = '''iget-wide v6, p0, Lbr/com/guerravpn/crediflow/EarlyPaymentUi;->requestedAmount:D
-    const-wide/16 v4, 0x0
-    cmpl-double v5, v6, v4
-    if-lez v5, :full_submit
-    invoke-static/range {v3 .. v8}, Lbr/com/guerravpn/crediflow/Api;->clientEarlyPayoffSubmit(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[BD)Lbr/com/guerravpn/crediflow/Api$Resp;
+upload = upload.replace('    .locals 6', '    .locals 12', 1)
+old = 'invoke-static {v3, v4, v1, v0, v2}, Lbr/com/guerravpn/crediflow/Api;->clientEarlyPayoffSubmit(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[B)Lbr/com/guerravpn/crediflow/Api$Resp;'
+if old not in upload:
+    raise SystemExit('original proof submit call not found')
+repl = '''iget-wide v5, p0, Lbr/com/guerravpn/crediflow/EarlyPaymentUi;->requestedAmount:D
+    const-wide/16 v7, 0x0
+    cmpl-double v9, v5, v7
+    if-lez v9, :full_submit
+
+    move-object v7, v3
+    move-object v8, v4
+    move-object v9, v1
+    move-object v10, v0
+    move-object v11, v2
+    move-object v0, v7
+    move-object v1, v8
+    move-object v2, v9
+    move-object v3, v10
+    move-object v4, v11
+    invoke-static/range {v0 .. v6}, Lbr/com/guerravpn/crediflow/Api;->clientEarlyPayoffSubmit(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[BD)Lbr/com/guerravpn/crediflow/Api$Resp;
     move-result-object v0
     goto :submit_done
 :full_submit
     invoke-static {v3, v4, v1, v0, v2}, Lbr/com/guerravpn/crediflow/Api;->clientEarlyPayoffSubmit(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[B)Lbr/com/guerravpn/crediflow/Api$Resp;
     move-result-object v0
 :submit_done'''
-        upload = upload.replace(old, repl, 1)
-    else:
-        raise SystemExit('original proof submit call not found')
-    e = e[:us] + upload + e[ue:]
-
+upload=upload.replace(old,repl,1)
+e=e[:us]+upload+e[ue:]
 early.write_text(e, encoding='utf-8')
 
 # Version metadata.
