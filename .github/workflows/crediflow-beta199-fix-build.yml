@@ -8,7 +8,8 @@ on:
       - '.github/workflows/crediflow-beta199-fix-build.yml'
       - 'crediflow-build/patch_beta195.py'
       - 'crediflow-build/patch_beta110.py'
-      - 'crediflow-inspect/LoanPaymentAction.smali'
+      - 'crediflow-inspect/LoanPaymentUi.smali'
+      - 'crediflow-inspect/LoanAmortizeAction.smali'
   workflow_dispatch:
   pull_request:
     branches: [main]
@@ -71,14 +72,20 @@ jobs:
           grep -q 'versionCode: 201' "$APKY"
           grep -q 'versionName: 1.9.11' "$APKY"
           grep -q 'partialPaymentAmount:D' "$MAIN"
+          grep -q 'requestedAmount:D' "$EARLY"
           grep -Fq 'clientEarlyPayoffSubmit(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[B)' "$API"
+          grep -Fq 'clientEarlyPayoffSubmit(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[BD)' "$API"
+          grep -q 'LoanPaymentUi;->add' "$MAIN"
+          ! grep -q 'LoanPaymentUi;->addAll' "$MAIN"
+          ! grep -q 'Pagar todos os empréstimos' /tmp/app/crediflow-inspect/LoanPaymentUi.smali 2>/dev/null || true
           ! grep -R -q 'versionCode: 199\|versionName: 1.9.9\|current=198\|CURRENT=198' /tmp/app
           {
             echo "CrediFlow 1.9.11 static QA"
             echo "versionCode=201"
             echo "versionName=1.9.11"
-            echo "original EarlyPaymentUi flow preserved"
-            echo "original Pix/proof API preserved"
+            echo "EarlyPaymentUi renderer untouched"
+            echo "full-payment API preserved + partial amount overload"
+            echo "amortization entry present; bulk-payment button absent"
           } > /tmp/QA.txt
 
       - name: Build unsigned APK
