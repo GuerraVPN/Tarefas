@@ -301,4 +301,4 @@ if not amort_src.exists():
     raise SystemExit('LoanAmortizeAction source file not found')
 (main.parent / 'LoanAmortizeAction.smali').write_text(amort_src.read_text(encoding='utf-8'), encoding='utf-8')
 
-# build trigger: signed APK rebuild 2026-10-01T08:17-03:00
+# build trigger: signed APK rebuild 2026-10-01T08:19-03:00
