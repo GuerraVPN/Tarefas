@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:compileSdkVersion="35" android:compileSdkVersionCodename="15" package="br.com.guerravpn.crediflow.app" platformBuildVersionCode="35" platformBuildVersionName="15">
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <application android:allowBackup="false" android:debuggable="true" android:extractNativeLibs="false" android:icon="@drawable/ic_crediflow" android:label="CrediFlow" android:name="br.com.guerravpn.crediflow.CrediFlowApp" android:roundIcon="@drawable/ic_crediflow" android:theme="@style/Theme.CrediFlow" android:usesCleartextTraffic="false">
+        <activity android:exported="true" android:name="br.com.guerravpn.crediflow.MainActivityV06" android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

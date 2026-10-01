@@ -1,0 +1,59 @@
+name: CrediFlow Beta194 inspect
+
+on:
+  push:
+    branches: [crediflow-beta194-build]
+    paths:
+      - 'crediflow-build/**'
+      - '.github/workflows/crediflow-beta194-inspect.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: crediflow-beta194-build
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Restore stable APK
+        run: |
+          cat crediflow-build/base.part* | base64 -d > /tmp/crediflow-1.9.apk
+          echo '3d13bfb2e55c9d9719f19f6769701a28e438566574022bb4cd4d7220197a46c0  /tmp/crediflow-1.9.apk' | sha256sum -c -
+      - name: Download verified Apktool
+        run: |
+          curl -fL --retry 3 -o /tmp/apktool.jar https://github.com/iBotPeaches/Apktool/releases/download/v3.0.3/apktool_3.0.3.jar
+          echo 'dbf930b076c6b9be08d57c449cacefc3bdd6b71ebd59b3066fc0e1f5b14f9423  /tmp/apktool.jar' | sha256sum -c -
+      - name: Decode
+        run: |
+          rm -rf /tmp/decoded
+          java -jar /tmp/apktool.jar d -f /tmp/crediflow-1.9.apk -o /tmp/decoded
+      - name: Capture source inspection
+        run: |
+          rm -rf crediflow-inspect
+          mkdir -p crediflow-inspect
+          cp /tmp/decoded/AndroidManifest.xml crediflow-inspect/AndroidManifest.xml
+          cp /tmp/decoded/apktool.yml crediflow-inspect/apktool.yml
+          MAIN=$(find /tmp/decoded -type f -name 'MainActivityV06.smali' | head -n1)
+          APP=$(find /tmp/decoded -type f -name 'CrediFlowApp.smali' | head -n1)
+          test -n "$MAIN"
+          cp "$MAIN" crediflow-inspect/MainActivityV06.smali
+          test -n "$APP" && cp "$APP" crediflow-inspect/CrediFlowApp.smali || true
+          printf 'main=%s\napp=%s\n' "$MAIN" "$APP" > crediflow-inspect/paths.txt
+          java -jar /tmp/apktool.jar b /tmp/decoded -o /tmp/control-unsigned.apk
+          unzip -t /tmp/control-unsigned.apk > crediflow-inspect/rebuild-zip-test.txt
+          sha256sum /tmp/crediflow-1.9.apk /tmp/control-unsigned.apk > crediflow-inspect/hashes.txt
+      - name: Commit inspection
+        run: |
+          git config user.name 'CrediFlow Build Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add crediflow-inspect
+          git diff --cached --quiet && exit 0
+          git commit -m 'CrediFlow beta194: inspect stable 1.9 source'
+          git push origin HEAD:crediflow-beta194-build

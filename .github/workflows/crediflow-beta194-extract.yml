@@ -1,0 +1,61 @@
+name: CrediFlow Beta194 extract methods
+
+on:
+  push:
+    branches: [crediflow-beta194-build]
+    paths:
+      - '.github/workflows/crediflow-beta194-extract.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: crediflow-beta194-build
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Restore exact stable APK
+        run: |
+          cat crediflow-build/base.part00 crediflow-build/base.part01 crediflow-build/base.part02 crediflow-build/base.part03 crediflow-build/base.part04 crediflow-build/base.part05 crediflow-build/base.part06 crediflow-build/base.part07 | base64 -d > /tmp/base.apk
+          echo '3d13bfb2e55c9d9719f19f6769701a28e438566574022bb4cd4d7220197a46c0  /tmp/base.apk' | sha256sum -c -
+      - name: Decode
+        run: |
+          curl -fL --retry 3 -o /tmp/apktool.jar https://github.com/iBotPeaches/Apktool/releases/download/v3.0.3/apktool_3.0.3.jar
+          echo 'dbf930b076c6b9be08d57c449cacefc3bdd6b71ebd59b3066fc0e1f5b14f9423  /tmp/apktool.jar' | sha256sum -c -
+          java -jar /tmp/apktool.jar d -f /tmp/base.apk -o /tmp/decoded
+      - name: Extract relevant methods
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          src = next(Path('/tmp/decoded').rglob('MainActivityV06.smali')).read_text()
+          out = Path('crediflow-inspect'); out.mkdir(exist_ok=True)
+          methods=[]
+          cur=[]; sig=''
+          for line in src.splitlines(True):
+              if line.startswith('.method '):
+                  cur=[line]; sig=line.strip()
+              elif cur:
+                  cur.append(line)
+                  if line.startswith('.end method'):
+                      if ('showProfile' in sig or 'showHome' in sig or 'onCreate' in sig or 'logout' in sig):
+                          methods.append(''.join(cur))
+                      cur=[]; sig=''
+          (out/'profile-home-methods.smali').write_text('\n\n'.join(methods))
+          ui = next(Path('/tmp/decoded').rglob('Ui.smali')).read_text()
+          (out/'Ui.smali').write_text(ui)
+          PY
+      - name: Commit extracts
+        run: |
+          git config user.name 'CrediFlow Build Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add crediflow-inspect/profile-home-methods.smali crediflow-inspect/Ui.smali
+          git diff --cached --quiet && exit 0
+          git commit -m 'CrediFlow beta194: extract profile and UI methods'
+          git push origin HEAD:crediflow-beta194-build
