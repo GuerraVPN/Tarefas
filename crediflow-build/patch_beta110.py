@@ -278,3 +278,5 @@ u = u.replace('CrediFlow 1.9.10 Beta · build 200', 'CrediFlow 1.9.11 Beta · bu
 up.write_text(u, encoding='utf-8')
 
 print('CrediFlow 1.9.11: stable full-payment flow + isolated amortization + no bulk-payment button')
+
+# trigger: 1.9.11 QA diagnostics after payment-flow cleanup
