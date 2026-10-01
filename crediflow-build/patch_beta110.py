@@ -282,3 +282,149 @@ print('CrediFlow 1.9.11: stable full-payment flow + isolated amortization + no b
 # trigger: 1.9.11 QA diagnostics after payment-flow cleanup
 
 # trigger: rerun QA with API descriptor search fix
+
+
+# 1.9.11 DEBUG: persistent crash reporter.
+# Persist the exception before process termination and upload it on the next
+# successful Activity start through the authenticated Supabase Edge Function.
+crash = main.parent / 'CrashReporter.smali'
+crash.write_text(r'''.class public Lbr/com/guerravpn/crediflow/CrashReporter;
+.super Ljava/lang/Object;
+.implements Ljava/lang/Thread$UncaughtExceptionHandler;
+
+.field private final context:Landroid/content/Context;
+.field private final previous:Ljava/lang/Thread$UncaughtExceptionHandler;
+
+.method public constructor <init>(Landroid/content/Context;Ljava/lang/Thread$UncaughtExceptionHandler;)V
+    .locals 0
+    invoke-direct {p0}, Ljava/lang/Object;-><init>()V
+    iput-object p1, p0, Lbr/com/guerravpn/crediflow/CrashReporter;->context:Landroid/content/Context;
+    iput-object p2, p0, Lbr/com/guerravpn/crediflow/CrashReporter;->previous:Ljava/lang/Thread$UncaughtExceptionHandler;
+    return-void
+.end method
+
+.method public static install(Landroid/content/Context;)V
+    .locals 2
+    invoke-static {}, Ljava/lang/Thread;->getDefaultUncaughtExceptionHandler()Ljava/lang/Thread$UncaughtExceptionHandler;
+    move-result-object v0
+    new-instance v1, Lbr/com/guerravpn/crediflow/CrashReporter;
+    invoke-direct {v1, p0, v0}, Lbr/com/guerravpn/crediflow/CrashReporter;-><init>(Landroid/content/Context;Ljava/lang/Thread$UncaughtExceptionHandler;)V
+    invoke-static {v1}, Ljava/lang/Thread;->setDefaultUncaughtExceptionHandler(Ljava/lang/Thread$UncaughtExceptionHandler;)V
+    return-void
+.end method
+
+.method public uncaughtException(Ljava/lang/Thread;Ljava/lang/Throwable;)V
+    .locals 5
+    :try_start
+    iget-object v0, p0, Lbr/com/guerravpn/crediflow/CrashReporter;->context:Landroid/content/Context;
+    const-string v1, "crediflow"
+    const/4 v2, 0x0
+    invoke-virtual {v0, v1, v2}, Landroid/content/Context;->getSharedPreferences(Ljava/lang/String;I)Landroid/content/SharedPreferences;
+    move-result-object v0
+    new-instance v1, Lorg/json/JSONObject;
+    invoke-direct {v1}, Lorg/json/JSONObject;-><init>()V
+    const-string v2, "app_version"
+    const-string v3, "1.9.11"
+    invoke-virtual {v1, v2, v3}, Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;
+    const-string v2, "build_code"
+    const/16 v3, 0xc9
+    invoke-virtual {v1, v2, v3}, Lorg/json/JSONObject;->put(Ljava/lang/String;I)Lorg/json/JSONObject;
+    const-string v2, "device_model"
+    sget-object v3, Landroid/os/Build;->MODEL:Ljava/lang/String;
+    invoke-virtual {v1, v2, v3}, Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;
+    const-string v2, "android_version"
+    sget-object v3, Landroid/os/Build$VERSION;->RELEASE:Ljava/lang/String;
+    invoke-virtual {v1, v2, v3}, Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;
+    const-string v2, "thread_name"
+    invoke-virtual {p1}, Ljava/lang/Thread;->getName()Ljava/lang/String;
+    move-result-object v3
+    invoke-virtual {v1, v2, v3}, Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;
+    const-string v2, "exception_type"
+    invoke-virtual {p2}, Ljava/lang/Throwable;->getClass()Ljava/lang/Class;
+    move-result-object v3
+    invoke-virtual {v3}, Ljava/lang/Class;->getName()Ljava/lang/String;
+    move-result-object v3
+    invoke-virtual {v1, v2, v3}, Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;
+    const-string v2, "exception_message"
+    invoke-virtual {p2}, Ljava/lang/Throwable;->getMessage()Ljava/lang/String;
+    move-result-object v3
+    invoke-virtual {v1, v2, v3}, Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;
+    new-instance v2, Ljava/io/StringWriter;
+    invoke-direct {v2}, Ljava/io/StringWriter;-><init>()V
+    new-instance v3, Ljava/io/PrintWriter;
+    invoke-direct {v3, v2}, Ljava/io/PrintWriter;-><init>(Ljava/io/Writer;)V
+    invoke-virtual {p2, v3}, Ljava/lang/Throwable;->printStackTrace(Ljava/io/PrintWriter;)V
+    invoke-virtual {v2}, Ljava/io/StringWriter;->toString()Ljava/lang/String;
+    move-result-object v3
+    const-string v4, "stack_trace"
+    invoke-virtual {v1, v4, v3}, Lorg/json/JSONObject;->put(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;
+    const-string v2, "pending_crash_report"
+    invoke-virtual {v1}, Lorg/json/JSONObject;->toString()Ljava/lang/String;
+    move-result-object v3
+    invoke-interface {v0}, Landroid/content/SharedPreferences;->edit()Landroid/content/SharedPreferences$Editor;
+    move-result-object v4
+    invoke-interface {v4, v2, v3}, Landroid/content/SharedPreferences$Editor;->putString(Ljava/lang/String;Ljava/lang/String;)Landroid/content/SharedPreferences$Editor;
+    move-result-object v4
+    invoke-interface {v4}, Landroid/content/SharedPreferences$Editor;->commit()Z
+    :try_end
+    .catch Ljava/lang/Throwable; {:try_start .. :try_end} :catch_store
+:catch_store
+    iget-object v0, p0, Lbr/com/guerravpn/crediflow/CrashReporter;->previous:Ljava/lang/Thread$UncaughtExceptionHandler;
+    if-eqz v0, :done
+    invoke-interface {v0, p1, p2}, Ljava/lang/Thread$UncaughtExceptionHandler;->uncaughtException(Ljava/lang/Thread;Ljava/lang/Throwable;)V
+:done
+    return-void
+.end method
+
+.method public static flush(Lbr/com/guerravpn/crediflow/MainActivityV06;)V
+    .locals 6
+    :try_start
+    const-string v0, "crediflow"
+    const/4 v1, 0x0
+    invoke-virtual {p0, v0, v1}, Lbr/com/guerravpn/crediflow/MainActivityV06;->getSharedPreferences(Ljava/lang/String;I)Landroid/content/SharedPreferences;
+    move-result-object v0
+    const-string v1, "pending_crash_report"
+    const/4 v2, 0x0
+    invoke-interface {v0, v1, v2}, Landroid/content/SharedPreferences;->getString(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+    move-result-object v1
+    if-eqz v1, :done
+    new-instance v2, Lorg/json/JSONObject;
+    invoke-direct {v2, v1}, Lorg/json/JSONObject;-><init>(Ljava/lang/String;)V
+    iget-object v3, p0, Lbr/com/guerravpn/crediflow/MainActivityV06;->accessToken:Ljava/lang/String;
+    if-eqz v3, :done
+    invoke-virtual {v3}, Ljava/lang/String;->isEmpty()Z
+    move-result v4
+    if-nez v4, :done
+    const-string v4, "/functions/v1/client-crash-report"
+    invoke-static {v4, v2, v3}, Lbr/com/guerravpn/crediflow/Api;->post(Ljava/lang/String;Lorg/json/JSONObject;Ljava/lang/String;)Lbr/com/guerravpn/crediflow/Api$Resp;
+    move-result-object v4
+    invoke-interface {v0}, Landroid/content/SharedPreferences;->edit()Landroid/content/SharedPreferences$Editor;
+    move-result-object v5
+    invoke-interface {v5, v1}, Landroid/content/SharedPreferences$Editor;->remove(Ljava/lang/String;)Landroid/content/SharedPreferences$Editor;
+    move-result-object v5
+    invoke-interface {v5}, Landroid/content/SharedPreferences$Editor;->apply()V
+:done
+    return-void
+    :try_end
+    .catch Ljava/lang/Throwable; {:try_start .. :try_end} :catch_flush
+:catch_flush
+    return-void
+.end method
+''', encoding='utf-8')
+
+# Install before the rest of Activity initialization and flush a report from the previous run.
+oc = s.find('.method protected onCreate(Landroid/os/Bundle;)V')
+oe = s.find('.end method', oc)
+if oc < 0 or oe < 0:
+    raise SystemExit('onCreate not found for crash reporter')
+oncreate = s[oc:oe]
+anchor = '    invoke-super {p0, p1}, Landroid/app/Activity;->onCreate(Landroid/os/Bundle;)V'
+if anchor not in oncreate:
+    raise SystemExit('onCreate super call not found')
+if 'CrashReporter;->install' not in oncreate:
+    oncreate = oncreate.replace(anchor, anchor + '''
+    invoke-static {p0}, Lbr/com/guerravpn/crediflow/CrashReporter;->install(Landroid/content/Context;)V
+    invoke-static {p0}, Lbr/com/guerravpn/crediflow/CrashReporter;->flush(Lbr/com/guerravpn/crediflow/MainActivityV06;)V''', 1)
+s = s[:oc] + oncreate + s[oe:]
+main.write_text(s, encoding='utf-8')
+print('CrediFlow 1.9.11 debug: persistent crash capture + Supabase upload enabled')
