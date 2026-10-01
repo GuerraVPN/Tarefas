@@ -287,7 +287,7 @@ up = next(root.rglob('UpdateActivity.smali'))
 u = up.read_text(encoding='utf-8')
 u = u.replace('current=195', 'current=200')
 u = u.replace('CURRENT=195', 'CURRENT=200')
-u = u.replace('CrediFlow 1.9.5 Beta · build 195', 'CrediFlow 1.9.10 Beta · build 198')
+u = u.replace('CrediFlow 1.9.5 Beta · build 195', 'CrediFlow 1.9.10 Beta · build 200')
 up.write_text(u, encoding='utf-8')
 
 listener_src = Path('crediflow-inspect/LoanPaymentAction.smali')
