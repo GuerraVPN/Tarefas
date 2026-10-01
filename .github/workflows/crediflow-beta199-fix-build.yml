@@ -57,8 +57,6 @@ jobs:
       - name: Apply conservative 1.9.10 payment fix
         run: python3 crediflow-build/patch_beta110.py
 
-
-
       - name: Static safety audit
         run: |
           set -e
@@ -74,11 +72,11 @@ jobs:
           grep -q 'versionName: 1.9.10' "$APKY"
           grep -q 'field private final requestedAmount:D' "$EARLY"
           grep -q 'partialPaymentAmount:D' "$MAIN"
-          grep -q 'clientEarlyPayoffSubmit(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;\\[BD)' "$API"
-          grep -q 'clientEarlyPayoffSubmit(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;\\[B)' "$API"
-          grep -q '^    \\.locals 14' "$EARLY"
+          grep -Fq 'clientEarlyPayoffSubmit(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[BD)' "$API"
+          grep -Fq 'clientEarlyPayoffSubmit(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[B)' "$API"
+          grep -q '^    \.locals 14' "$EARLY"
           ! grep -q 'EarlyPaymentUi;-><init>(Lbr/com/guerravpn/crediflow/MainActivityV06;Ljava/lang/String;D)' "$EARLY"
-          ! grep -R -q 'versionCode: 199\\|versionName: 1.9.9\\|current=198\\|CURRENT=198' /tmp/app
+          ! grep -R -q 'versionCode: 199\|versionName: 1.9.9\|current=198\|CURRENT=198' /tmp/app
           {
             echo "CrediFlow 1.9.10 static QA"
             echo "versionCode=200"
