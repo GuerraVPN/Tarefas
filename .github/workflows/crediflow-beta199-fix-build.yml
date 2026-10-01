@@ -3,19 +3,19 @@ name: CrediFlow Beta 1.9.10 build
 
 on:
   push:
-    branches: [crediflow-beta200-fix-build]
+    branches: [crediflow-beta199-fix-build]
     paths:
-      - '.github/workflows/crediflow-beta200-fix-build.yml'
+      - '.github/workflows/crediflow-beta199-fix-build.yml'
       - 'crediflow-build/patch_beta195.py'
-      - 'crediflow-build/patch_beta200.py'
+      - 'crediflow-build/patch_beta110.py'
       - 'crediflow-inspect/LoanPaymentAction.smali'
   workflow_dispatch:
   pull_request:
     branches: [main]
     paths:
-      - '.github/workflows/crediflow-beta200-fix-build.yml'
+      - '.github/workflows/crediflow-beta199-fix-build.yml'
       - 'crediflow-build/patch_beta195.py'
-      - 'crediflow-build/patch_beta200.py'
+      - 'crediflow-build/patch_beta110.py'
       - 'crediflow-inspect/LoanPaymentAction.smali'
 
 permissions:
@@ -29,7 +29,7 @@ jobs:
       - name: Checkout Beta 1.9.10
         uses: actions/checkout@v4
         with:
-          ref: crediflow-beta200-fix-build
+          ref: crediflow-beta199-fix-build
           fetch-depth: 0
 
       - name: Setup Java
@@ -55,7 +55,7 @@ jobs:
         run: python3 crediflow-build/patch_beta195.py
 
       - name: Apply conservative 1.9.10 payment fix
-        run: python3 crediflow-build/patch_beta200.py
+        run: python3 crediflow-build/patch_beta110.py
 
 
 
