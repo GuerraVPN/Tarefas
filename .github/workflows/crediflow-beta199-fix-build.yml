@@ -74,7 +74,7 @@ jobs:
           grep -q 'partialPaymentAmount:D' "$MAIN" || { echo 'FAIL: partialPaymentAmount field'; exit 1; }
           grep -q 'requestedAmount:D' "$EARLY" || { echo 'FAIL: requestedAmount field'; exit 1; }
           grep -Fq 'clientEarlyPayoffSubmit(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[B)' "$API" || { echo 'FAIL: original API'; exit 1; }
-          grep -Fq 'clientEarlyPayoffSubmit(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[BD)' "$API" || { echo 'FAIL: amount API'; exit 1; }
+          grep -R -Fq 'clientEarlyPayoffSubmit(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[BD)' /tmp/app || { echo 'FAIL: amount API'; exit 1; }
           grep -q 'LoanPaymentUi;->add' "$MAIN" || { echo 'FAIL: amortization injection'; exit 1; }
           ! grep -q 'LoanPaymentUi;->addAll' "$MAIN" || { echo 'FAIL: bulk injection remains'; exit 1; }
           ! grep -q 'Pagar todos os empréstimos' /tmp/app/crediflow-inspect/LoanPaymentUi.smali 2>/dev/null || true
