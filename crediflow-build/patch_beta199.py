@@ -193,6 +193,8 @@ render_start=e.find('.method private render(Lorg/json/JSONObject;)V')
 render_end=e.find('.end method',render_start)
 if render_start<0 or render_end<0: raise SystemExit('EarlyPaymentUi render method not found')
 render=e[render_start:render_end]
+# Crash fix: the requested-amount overlay uses v9..v13; reserve the full register frame.
+render = re.sub(r'^\s*\.locals\s+\d+', '    .locals 14', render, count=1, flags=re.M)
 needle='''    move-result-wide v7
 
     .line 70'''
