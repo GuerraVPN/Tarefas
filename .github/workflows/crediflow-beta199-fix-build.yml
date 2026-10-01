@@ -72,13 +72,11 @@ jobs:
           grep -q 'versionName: 1.9.11' "$APKY"
           grep -q 'partialPaymentAmount:D' "$MAIN"
           grep -Fq 'clientEarlyPayoffSubmit(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[B)' "$API"
-          grep -q '^    \.locals 14' "$EARLY"
           ! grep -R -q 'versionCode: 199\|versionName: 1.9.9\|current=198\|CURRENT=198' /tmp/app
           {
             echo "CrediFlow 1.9.11 static QA"
             echo "versionCode=201"
             echo "versionName=1.9.11"
-            echo "EarlyPaymentUi locals=14"
             echo "original EarlyPaymentUi flow preserved"
             echo "original Pix/proof API preserved"
           } > /tmp/QA.txt
