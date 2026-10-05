@@ -11,7 +11,7 @@ Os APKs públicos ficam na seção **Releases** do GitHub. As versões de teste 
 | Canal | Versão | Build | Base Web | Indicação |
 |---|---:|---:|---:|---|
 | **Release / Oficial** | **2.4.0** | **274** | **7.9.1** | Uso normal |
-| **Pré-release / Beta** | **2.4.1** | **276** | **7.9.1** | Base nativa atual de testes |
+| **Pré-release / Beta** | **2.4.13** | **300** | **7.9.7** | Base atual de testes da linha 2.5 |
 | **Alpha / Patch** | **2.4.1.10** — corrige o menu móvel para deixar somente **Escalas**, removendo **Pessoal / Escalas** e **Missões** e mantendo os links de Motorista, Patrulheiro e Permanência.
 
 ### Download
@@ -37,7 +37,7 @@ Ao atualizar uma instalação existente, mantenha o APK assinado do projeto para
 
 **Oficial** é o canal estável, destinado ao uso normal.
 
-**Beta** recebe novidades antes do canal oficial. A **2.4.1 / build 276** é a base nativa atual e inclui a ponte Android necessária para recursos como o seletor de ícones.
+**Beta** recebe novidades antes do canal oficial. A **2.4.13 / build 300** é a base atual de testes da linha 2.5, construída sobre a base validada **2.4.12.2**.
 
 **Alpha** é destinada aos usuários elegíveis que habilitaram esse canal. A partir da base 2.4.1, as próximas Betas e Alphas podem ser entregues como **`.tpatch`**, seguindo as mesmas preferências de notificação dos canais APK.
 
