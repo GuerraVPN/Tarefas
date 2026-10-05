@@ -147,7 +147,7 @@ import json
 with open('android/app/build/outputs/apk/release/output-metadata.json',encoding='utf-8') as f:
     e=json.load(f)['elements'][0]
 assert int(e['versionCode']) == 297, e
-assert str(e['versionName']) == '2.4.12', e
+assert str(e['versionName']) == '2.4.12.1', e
 PY
 
 unzip -p "$UNSIGNED" assets/public/mobile-bootstrap.js > "$RUNNER_TEMP/bootstrap-v249.js"
@@ -170,8 +170,8 @@ assert "__TAREFAS_ALPHA_2468_SERVICOS_HOTBAR_FIX__" in boot
 assert "__TAREFAS_ALPHA_2467_ESCALAS_2433__" not in boot
 for marker in ["__TAREFAS_ALPHA_2481_DISTRIBUICAO_FISCAL_FIX__","__TAREFAS_ALPHA_2482_GUIDES_READY_FIX__","__TAREFAS_ALPHA_2483_FORNECIMENTO__","__TAREFAS_ALPHA_2484_PEDIDO_LAYOUT_FIX__","__TAREFAS_ALPHA_2485_BIOMETRIC_SINGLE_PROMPT__"]:
     assert marker in boot, marker
-assert "const APP_VERSION = '2.4.12';" in boot and "const APP_BUILD = 297;" in boot
-assert "dashboard.html?app=2.4.12" in boot and "dashboard.html?app=2.4.12" in login
+assert "const APP_VERSION = '2.4.12.1';" in boot and "const APP_BUILD = 298;" in boot
+assert "dashboard.html?app=2.4.12.1" in boot and "dashboard.html?app=2.4.12" in login
 assert "mobile-dashboard-v184.js" not in html and "mobile-dashboard-v185.js" not in html
 assert "kNextService" not in dash and "Próximo Serviço" not in dash and "Próximo serviço" not in dash
 java=Path('app/android/TarefasBiometricPlugin.java').read_text()
@@ -253,7 +253,7 @@ cp supabase/migrations/20260924133000_fix_v5_4_2_mover_distribuicao_motivo_ambig
 cp app/android/TarefasLauncherIconPlugin.java "$RUNNER_TEMP/package/app/"
 true
 cp scripts/build-mobile-v246.mjs scripts/build-mobile-v2477.mjs scripts/build-mobile-v2486.mjs scripts/build-mobile-v249.mjs scripts/build-mobile-v24121.mjs scripts/verify-mobile-v2486.mjs scripts/verify-mobile-v249.mjs scripts/verify-mobile-v24121.mjs "$RUNNER_TEMP/package/scripts/"
-cp dist/BETA_2_4_12.json "$RUNNER_TEMP/package/manifest/"
+cp dist/ALPHA_2_4_12_1.json "$RUNNER_TEMP/package/manifest/"
 (cd "$RUNNER_TEMP/package" && zip -qr "$GITHUB_WORKSPACE/$ZIP" .)
 unzip -tq "$ZIP"
 sha256sum "$ZIP" | tee "$ZIP.sha256"
@@ -273,7 +273,7 @@ if ! git diff --cached --quiet; then
 fi
 cd "$GITHUB_WORKSPACE"
 
-URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.4.12.apk'
+URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.4.12.1.apk'
 LOCAL_SHA="$(sha256sum "$APK" | awk '{print $1}')"
 for attempt in 1 2 3 4 5 6 7 8; do
   if curl --fail --silent --show-error -L "$URL" -o "$RUNNER_TEMP/published.apk" \
