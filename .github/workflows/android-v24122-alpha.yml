@@ -57,5 +57,6 @@ jobs:
             TAREFAS-2.4.12.2-alpha-build-299.zip
             TAREFAS-2.4.12.2-alpha-build-299.zip.sha256
             app/release-v249.txt
-            dist/ALPHA_2_4_12_1.json
+            dist/ALPHA_2_4_12_2.json
           if-no-files-found: error
+
