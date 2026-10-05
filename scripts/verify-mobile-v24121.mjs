@@ -9,7 +9,7 @@ for(const f of ['mobile-bootstrap.js','mobile-login-v17.js','mobile-patch-manage
   await access(path.join(dir,f));
 }
 const b=await read('mobile-bootstrap.js'), pm=await read('mobile-patch-manager-v240.js');
-const m=JSON.parse(await read('BETA_2_4_12.json'));
+const m=JSON.parse(await read('ALPHA_2_4_12_1.json'));
 
 must(b.includes("const APP_VERSION = '2.4.12.1'") && b.includes('const APP_BUILD = 298'),'versão/build');
 must(pm.includes("APP_VERSION='2.4.12.1'") && pm.includes('APP_BUILD=298') && pm.includes("APP_CHANNEL='alpha'"),'Patch Manager');
@@ -36,3 +36,5 @@ for(const name of await readdir(dir)){
 console.log('VERIFY 2.4.12.1 BETA OK: base 2.4.9 + patch 2.4.9.11, sem camada visual 2.4.11.');
 
 // final alpha verification trigger.
+
+// manifest path fix trigger.
