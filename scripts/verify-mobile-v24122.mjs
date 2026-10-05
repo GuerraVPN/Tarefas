@@ -77,3 +77,5 @@ console.log('VERIFY 2.4.12.2 ALPHA OK: Android sem identificação Web na interf
 // final alpha build trigger.
 
 // final verifier behavior checks.
+
+// final Alpha 2.4.12.2 build trigger.
