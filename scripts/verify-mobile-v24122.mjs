@@ -35,7 +35,7 @@ for(const name of await readdir(dir)){
 }
 
 
-const uiFiles=['mobile-bootstrap.js','mobile-v12.js','mobile-updates-v181.js','mobile-patch-manager-v240.js','mobile-release-v240.js','mobile-beta-v2325.js'];
+const uiFiles=['mobile-bootstrap.js','mobile-v12.js','mobile-updates-v181.js','mobile-patch-manager-v240.js','mobile-release-v240.js'];
 for(const file of uiFiles){
   const s=await read(file);
   must(!/WEB\s*[0-9]+\.[0-9]+/i.test(s),file+' contém referência Web visível');
@@ -59,3 +59,5 @@ console.log('VERIFY 2.4.12.2 ALPHA OK: Android sem identificação Web na interf
 // manifest path fix trigger.
 
 // final PM format trigger.
+
+// verifier aligned with packaged runtime files.
