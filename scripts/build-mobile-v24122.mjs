@@ -99,6 +99,8 @@ for(const file of ['mobile-bootstrap.js','mobile-v12.js','mobile-updates-v181.js
       .replace(/const wanted=effectiveVersion\s*\+\s*" • WEB "\s*\+\s*web;/g,'const wanted=effectiveVersion;')
       .replace(/const channel=v\.channel==='beta'\?'BETA':'OFICIAL'/g,"const channel=v.channel==='alpha'?'ALPHA':v.channel==='beta'?'BETA':'OFICIAL'")
       .replace(/latestBadge=latest\?\.channel==='beta'\?'BETA':'OFICIAL'/g,"latestBadge=latest?.channel==='alpha'?'ALPHA':latest?.channel==='beta'?'BETA':'OFICIAL'")
+      .replaceAll("APP_CHANNEL==='beta'?'BETA':'OFICIAL'","APP_CHANNEL==='alpha'?'ALPHA':APP_CHANNEL==='beta'?'BETA':'OFICIAL'")
+      .replace("Build \\${esc(v.build)} • \\${esc(v.web_version||'')}","Build \\${esc(v.build)}")
       .replace(/latest\.channel==='beta'\?'beta':''/g,"latest.channel==='alpha'?'alpha':latest.channel==='beta'?'beta':''");
   });
 }
@@ -156,3 +158,5 @@ console.log('TAREFAS Android 2.4.12.2 build 299 — Android-only identity valida
 // identity guard syntax trigger.
 
 // final trigger after identity guard injection.
+
+// alpha badge and history web removal trigger.
