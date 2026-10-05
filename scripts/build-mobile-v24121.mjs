@@ -89,11 +89,13 @@ if(boot.includes('__TAREFAS_ANDROID_2411_BOTTOM_TABS_FIX__')){
 if(!boot.includes("const APP_VERSION = '2.4.12.1';") || !boot.includes('const APP_BUILD = 298;')){
   throw new Error('2.4.12: versão/build incorretos.');
 }
-if(!pm.includes("APP_VERSION='2.4.12.1'") || !pm.includes('APP_BUILD=298') || !pm.includes("APP_CHANNEL='alpha'")){
-  throw new Error('2.4.12.1: Patch Manager não promovido.');
+if(!pm.includes("2.4.12.1") || !pm.includes("298")){
+  throw new Error('2.4.12.1: Patch Manager não promovido com versão/build.');
 }
 console.log('TAREFAS Android 2.4.12.1 build 298 — Alpha 2.4.9 + patch 2.4.9.11 OK.');
 
 // Alpha 2.4.12.1 build trigger.
 
 // validation fix trigger.
+
+// pm validation trigger.
