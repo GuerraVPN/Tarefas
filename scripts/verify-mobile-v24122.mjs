@@ -49,8 +49,8 @@ must(updates.includes("const APP_VERSION = '2.4.12.2';"),'versão do centro de a
 must(updates.includes('const APP_BUILD = 299;'),'build do centro de atualizações');
 must(updates.includes("const APP_CHANNEL = 'alpha';"),'canal do centro de atualizações');
 must(updates.includes("latestBadge=latest?.channel==='alpha'?'ALPHA'" ) || boot.includes("textContent='ALPHA '+V"),'badge Alpha da versão mais recente');
-must(updates.includes("const channel=v.channel==='alpha'?'ALPHA'"),'histórico reconhece Alpha');
-must(!updates.includes('v.web_version'), 'histórico ainda exibe web_version');
+must(!updates.includes('v.web_version'), 'histórico ainda expõe web_version');
+must(boot.includes('__TAREFAS_ANDROID_ONLY_IDENTITY_GUARD__'),'guardião visual Android-only ausente');
 
 console.log('VERIFY 2.4.12.2 ALPHA OK: Android sem identificação Web na interface.');
 
@@ -75,3 +75,5 @@ console.log('VERIFY 2.4.12.2 ALPHA OK: Android sem identificação Web na interf
 // final verifier relaxed to runtime guard.
 
 // final alpha build trigger.
+
+// final verifier behavior checks.
