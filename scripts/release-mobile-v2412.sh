@@ -3,7 +3,7 @@ set -euo pipefail
 
 VERSION='2.4.12'
 BUILD='297'
-WEB_VERSION='7.9.1'
+WEB_VERSION='7.9.7'
 APK="TAREFAS-${VERSION}.apk"
 ZIP="TAREFAS-${VERSION}-beta-build-${BUILD}.zip"
 
@@ -50,6 +50,9 @@ node scripts/build-mobile-v246.mjs
 node scripts/build-mobile-v2477.mjs
 node scripts/build-mobile-v2486.mjs
 node scripts/build-mobile-v2412.mjs
+git fetch origin app/releases
+mkdir -p patches
+git show origin/app/releases:patches/TAREFAS-2.4.9.11.tpatch > patches/TAREFAS-2.4.9.11.tpatch
 node scripts/verify-mobile-v2412.mjs dist
 
 curl --fail --silent --show-error --retry 3 \
@@ -59,7 +62,7 @@ test -s app/google-services.json
 
 npx cap add android
 cp app/google-services.json android/app/google-services.json
-sed -i 's/versionCode 1/versionCode 293/' android/app/build.gradle
+sed -i 's/versionCode 1/versionCode 297/' android/app/build.gradle
 sed -i 's/versionName "1.0"/versionName "2.4.12"/' android/app/build.gradle
 
 npm run assets:android
@@ -143,7 +146,7 @@ python3 - <<'PY'
 import json
 with open('android/app/build/outputs/apk/release/output-metadata.json',encoding='utf-8') as f:
     e=json.load(f)['elements'][0]
-assert int(e['versionCode']) == 293, e
+assert int(e['versionCode']) == 297, e
 assert str(e['versionName']) == '2.4.12', e
 PY
 
@@ -167,7 +170,7 @@ assert "__TAREFAS_ALPHA_2468_SERVICOS_HOTBAR_FIX__" in boot
 assert "__TAREFAS_ALPHA_2467_ESCALAS_2433__" not in boot
 for marker in ["__TAREFAS_ALPHA_2481_DISTRIBUICAO_FISCAL_FIX__","__TAREFAS_ALPHA_2482_GUIDES_READY_FIX__","__TAREFAS_ALPHA_2483_FORNECIMENTO__","__TAREFAS_ALPHA_2484_PEDIDO_LAYOUT_FIX__","__TAREFAS_ALPHA_2485_BIOMETRIC_SINGLE_PROMPT__"]:
     assert marker in boot, marker
-assert "const APP_VERSION = '2.4.12';" in boot and "const APP_BUILD = 293;" in boot
+assert "const APP_VERSION = '2.4.12';" in boot and "const APP_BUILD = 297;" in boot
 assert "dashboard.html?app=2.4.12" in boot and "dashboard.html?app=2.4.12" in login
 assert "mobile-dashboard-v184.js" not in html and "mobile-dashboard-v185.js" not in html
 assert "kNextService" not in dash and "Próximo Serviço" not in dash and "Próximo serviço" not in dash
@@ -249,7 +252,7 @@ cp patches/TAREFAS-2.4.8.7.tpatch patches/TAREFAS-2.4.9.11.tpatch "$RUNNER_TEMP/
 cp supabase/migrations/20260924133000_fix_v5_4_2_mover_distribuicao_motivo_ambiguous.sql "$RUNNER_TEMP/package/supabase/"
 cp app/android/TarefasLauncherIconPlugin.java "$RUNNER_TEMP/package/app/"
 true
-cp scripts/build-mobile-v246.mjs scripts/build-mobile-v2477.mjs scripts/build-mobile-v2486.mjs scripts/build-mobile-v2412.mjs scripts/verify-mobile-v2486.mjs scripts/verify-mobile-v2412.mjs "$RUNNER_TEMP/package/scripts/"
+cp scripts/build-mobile-v246.mjs scripts/build-mobile-v2477.mjs scripts/build-mobile-v2486.mjs scripts/build-mobile-v249.mjs scripts/build-mobile-v2412.mjs scripts/verify-mobile-v2486.mjs scripts/verify-mobile-v249.mjs scripts/verify-mobile-v2412.mjs "$RUNNER_TEMP/package/scripts/"
 cp dist/BETA_2_4_12.json "$RUNNER_TEMP/package/manifest/"
 (cd "$RUNNER_TEMP/package" && zip -qr "$GITHUB_WORKSPACE/$ZIP" .)
 unzip -tq "$ZIP"
@@ -303,13 +306,13 @@ jq -n \
     changelog:[
       "🔐 Corrige na camada Android nativa a duplicidade de solicitações de biometria.",
       "1️⃣ Apenas um BiometricPrompt pode ficar ativo por vez; chamadas concorrentes reutilizam a mesma autenticação.",
-      "🧩 Patches 2.4.8.1 até 2.4.8.5 e o handoff 2.4.8.7 consolidados no APK 2.4.12.",
+      "🧩 Beta 2.4.9 (build 293) consolidada com o patch 2.4.9.11, sem a camada de layout da 2.4.11.",
       "🛡️ Mantidas Escalas, Fornecimento, Guias, Distribuição e layout de Desrelacionamento/Baixa.",
       "🩹 Patch Manager .tpatch v1 e validação SHA-256 preservados.",
       "🚫 Cartão Próximo Serviço continua removido.",
-      "🌐 Web 7.9.1 preservada.",
+      "🌐 Web 7.9.7 preservada.",
       "🌿 Build isolada da main na branch app/android-v2412-beta-prep.",
-      "🧪 Alpha destinado à validação da biometria duplicada."
+      "🧪 Beta destinado a validar a base 2.4.9 + patch 2.4.9.11."
     ],
     mandatory:false,
     download_url:$url,
@@ -326,4 +329,4 @@ CODE="$(curl --silent --show-error \
 
 cat "$RUNNER_TEMP/result.json"
 test "$CODE" = '200'
-jq -e '.ok == true and .version == "2.4.12" and .build == 293 and .channel == "beta"' "$RUNNER_TEMP/result.json" >/dev/null
+jq -e '.ok == true and .version == "2.4.12" and .build == 297 and .channel == "beta"' "$RUNNER_TEMP/result.json" >/dev/null
