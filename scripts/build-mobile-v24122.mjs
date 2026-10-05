@@ -55,7 +55,7 @@ await rm(path.join(dist,'BETA_2_4_9.json'),{force:true});
 await rm(path.join(dist,'BETA_2_4_10.json'),{force:true});
 await rm(path.join(dist,'BETA_2_4_11.json'),{force:true});
 await rm(path.join(dist,'ALPHA_2_4_9_7.json'),{force:true});
-await writeFile(path.join(dist,'ALPHA_2_4_12_1.json'),JSON.stringify({
+await writeFile(path.join(dist,'ALPHA_2_4_12_2.json'),JSON.stringify({
   version:VERSION,build:BUILD,channel:'alpha',
   base:'2.4.9',basedOn:'2.4.9',
   incorporatedPatch:PATCH,
@@ -88,6 +88,8 @@ for(const file of ['mobile-bootstrap.js','mobile-v12.js','mobile-updates-v181.js
       .replace('const APP_BUILD = 293;','const APP_BUILD = '+BUILD+';')
       .replace("const APP_CHANNEL = 'beta';","const APP_CHANNEL = 'alpha';")
       .replace(/const wanted=effectiveVersion\s*\+\s*' • WEB '\s*\+\s*web;/g,'const wanted=effectiveVersion;')
+      .replace(/const wanted=effectiveVersion\(\)\s*\+\s*' • WEB '\s*\+\s*web;/g,"const wanted=effectiveVersion();")
+      .replace(/const wanted=PATCH_VERSION\s*\+\s*' • WEB '\s*\+\s*WEB_VERSION;/g,'const wanted=PATCH_VERSION;')
       .replace(/const wanted=effectiveVersion\s*\+\s*" • WEB "\s*\+\s*web;/g,'const wanted=effectiveVersion;')
       .replace(/const channel=v\.channel==='beta'\?'BETA':'OFICIAL'/g,"const channel=v.channel==='alpha'?'ALPHA':v.channel==='beta'?'BETA':'OFICIAL'")
       .replace(/latestBadge=latest\?\.channel==='beta'\?'BETA':'OFICIAL'/g,"latestBadge=latest?.channel==='alpha'?'ALPHA':latest?.channel==='beta'?'BETA':'OFICIAL'")
@@ -100,6 +102,15 @@ await patch('mobile-bootstrap.js',s=>s
   .replace('<p>Aplicativo móvel do sistema TAREFAS.</p>','<p>Aplicativo Android do sistema TAREFAS.</p>')
 );
 
+
+
+const uiAuditFiles=['mobile-bootstrap.js','mobile-v12.js','mobile-updates-v181.js','mobile-patch-manager-v240.js','mobile-release-v240.js','mobile-beta-v2325.js'];
+for(const file of uiAuditFiles){
+  const s=await readFile(path.join(dist,file),'utf8');
+  if(/WEB\s*[0-9]+\.[0-9]+/i.test(s)) throw new Error('2.4.12.2: referência Web visível em '+file);
+}
+const updatesUi=await readFile(path.join(dist,'mobile-updates-v181.js'),'utf8');
+if(!updatesUi.includes("const APP_VERSION = '2.4.12.2';") || !updatesUi.includes('const APP_BUILD = 299;') || !updatesUi.includes("const APP_CHANNEL = 'alpha';")) throw new Error('2.4.12.2: centro de atualizações não promovido.');
 const boot=await readFile(path.join(dist,'mobile-bootstrap.js'),'utf8');
 const pm=await readFile(path.join(dist,'mobile-patch-manager-v240.js'),'utf8');
 
