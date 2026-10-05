@@ -55,7 +55,7 @@ await rm(path.join(dist,'BETA_2_4_9.json'),{force:true});
 await rm(path.join(dist,'BETA_2_4_10.json'),{force:true});
 await rm(path.join(dist,'BETA_2_4_11.json'),{force:true});
 await rm(path.join(dist,'ALPHA_2_4_9_7.json'),{force:true});
-await writeFile(path.join(dist,'BETA_2_4_12.json'),JSON.stringify({
+await writeFile(path.join(dist,'ALPHA_2_4_12_1.json'),JSON.stringify({
   version:VERSION,build:BUILD,channel:'alpha',
   base:'2.4.9',basedOn:'2.4.9',
   incorporatedPatch:PATCH,
