@@ -3,7 +3,7 @@ set -euo pipefail
 
 VERSION='2.4.12.1'
 BUILD='298'
-WEB_VERSION=''
+WEB_VERSION='7.9.7'
 APK="TAREFAS-${VERSION}.apk"
 ZIP="TAREFAS-${VERSION}-alpha-build-${BUILD}.zip"
 
@@ -330,3 +330,5 @@ CODE="$(curl --silent --show-error \
 cat "$RUNNER_TEMP/result.json"
 test "$CODE" = '200'
 jq -e '.ok == true and .version == "2.4.12.1" and .build == 298 and .channel == "alpha"' "$RUNNER_TEMP/result.json" >/dev/null
+
+# catalog metadata fix trigger.
