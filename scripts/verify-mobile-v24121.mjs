@@ -34,3 +34,5 @@ for(const name of await readdir(dir)){
   }
 }
 console.log('VERIFY 2.4.12.1 BETA OK: base 2.4.9 + patch 2.4.9.11, sem camada visual 2.4.11.');
+
+// final alpha verification trigger.
