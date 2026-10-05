@@ -82,7 +82,7 @@ await patch('mobile-bootstrap.js',source=>source
 await patch('mobile-bootstrap.js',s=>{
   s=s.replace(/Beta 2\.4\.8[^<\n]*/g,'Alpha 2.4.12.2 — identificação e atualizações do Android.');
   s=s.replace(/Web 7\.9\.1/gi,'').replace(/WEB 7\.9\.1/gi,'');
-  s += "\n;(()=>{const V='2.4.12.2';function enforce(){document.querySelectorAll('.tm-app-brand small').forEach(el=>{el.textContent=V});if((location.pathname.split('/').pop()||'').toLowerCase()==='about.html'){document.querySelectorAll('.tm-about-grid article').forEach(el=>{if(/base\\s*web/i.test(el.textContent||''))el.remove()});document.querySelectorAll('.tm-about-page *').forEach(el=>{if(el.children.length===0&&/base\\s*web\\s*:?|web\\s*[0-9]+\\./i.test(el.textContent||''))el.remove()})}}enforce();[150,500,1200,2500].forEach(ms=>setTimeout(enforce,ms));})();\n";
+  s += "\n;(()=>{if(globalThis.__TAREFAS_ANDROID_ONLY_IDENTITY_GUARD__)return;globalThis.__TAREFAS_ANDROID_ONLY_IDENTITY_GUARD__=true;const V='2.4.12.2';function enforce(){document.querySelectorAll('.tm-app-brand small').forEach(el=>{el.textContent=V});document.querySelectorAll('#tmAppUpdates .tm-update-installed').forEach(el=>{el.textContent='ALPHA '+V});document.querySelectorAll('#tmAppUpdates .tm-update-channel').forEach((el,i)=>{if(i===0)el.textContent='ALPHA'});document.querySelectorAll('#tmAppUpdates .tm-update-history-item small').forEach(el=>{el.textContent=el.textContent.replace(/\\s*•\\s*[^•]*$/,'')});if((location.pathname.split('/').pop()||'').toLowerCase()==='about.html'){document.querySelectorAll('.tm-about-grid article,.meta div').forEach(el=>{if(/base\\s*web/i.test(el.textContent||''))el.remove();if(/vers[aã]o atual/i.test(el.textContent||'')){const b=el.querySelector('b');if(b)b.textContent=V}});document.querySelectorAll('.tm-about-page p,.hero p').forEach(el=>{if(/Beta 2\\.4\\.8/i.test(el.textContent||''))el.textContent='Alpha 2.4.12.2 — identificação e atualizações do Android.'});document.querySelectorAll('.tm-about-page *,.hero *').forEach(el=>{if(el.children.length===0&&/base\\s*web\\s*:?|web\\s*[0-9]+\\./i.test(el.textContent||''))el.remove()})}}enforce();[150,500,1200,2500].forEach(ms=>setTimeout(enforce,ms));})();\n";
   return s;
 });
 for(const file of ['mobile-bootstrap.js','mobile-v12.js','mobile-updates-v181.js','mobile-patch-manager-v240.js','mobile-release-v240.js']){
@@ -160,3 +160,5 @@ console.log('TAREFAS Android 2.4.12.2 build 299 — Android-only identity valida
 // final trigger after identity guard injection.
 
 // alpha badge and history web removal trigger.
+
+// final identity guard content fix.
