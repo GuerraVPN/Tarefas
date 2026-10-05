@@ -5,7 +5,7 @@ import { createHash } from 'node:crypto';
 const root=process.cwd(), dir=path.resolve(process.argv[2]||'dist'), read=f=>readFile(path.join(dir,f),'utf8');
 const must=(x,m)=>{if(!x)throw new Error('2.4.12.1 verify: '+m)};
 
-for(const f of ['mobile-bootstrap.js','mobile-login-v17.js','mobile-patch-manager-v240.js','dashboard.html','dashboard.js','about.html','BETA_2_4_12.json']){
+for(const f of ['mobile-bootstrap.js','mobile-login-v17.js','mobile-patch-manager-v240.js','dashboard.html','dashboard.js','about.html','ALPHA_2_4_12_1.json']){
   await access(path.join(dir,f));
 }
 const b=await read('mobile-bootstrap.js'), pm=await read('mobile-patch-manager-v240.js');
