@@ -62,3 +62,5 @@ for(const marker of ['tmDrawer','tm-bottom-nav','__TAREFAS_ALPHA_2468_SERVICOS_H
 }
 if(boot.includes('__TAREFAS_ANDROID_2411_BOTTOM_TABS_FIX__')) throw new Error('2.4.13: layout da 2.4.11 incorporado.');
 console.log('TAREFAS Android 2.4.13 build 300 BETA — promoção limpa da 2.4.12.2.');
+
+// Beta 2.4.13 final build trigger.
