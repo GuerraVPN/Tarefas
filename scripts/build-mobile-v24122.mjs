@@ -170,3 +170,5 @@ console.log('TAREFAS Android 2.4.12.2 build 299 — Android-only identity valida
 // corrected history renderer syntax.
 
 // final build after syntax repair.
+
+// correct regex escaping in build transform.
