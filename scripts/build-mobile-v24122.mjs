@@ -79,7 +79,7 @@ await patch('mobile-bootstrap.js',source=>source
 
 
 // 2.4.12.2: identidade do Android é soberana na interface e no centro de atualizações.
-for(const file of ['mobile-bootstrap.js','mobile-v12.js','mobile-updates-v181.js','mobile-patch-manager-v240.js','mobile-release-v240.js','mobile-beta-v2325.js']){
+for(const file of ['mobile-bootstrap.js','mobile-v12.js','mobile-updates-v181.js','mobile-patch-manager-v240.js','mobile-release-v240.js']){
   await patch(file,s=>{
     return s
       .replace(/const WEB_VERSION\s*=\s*'[^']*';/g,"const WEB_VERSION='';")
@@ -104,7 +104,7 @@ await patch('mobile-bootstrap.js',s=>s
 
 
 
-const uiAuditFiles=['mobile-bootstrap.js','mobile-v12.js','mobile-updates-v181.js','mobile-patch-manager-v240.js','mobile-release-v240.js','mobile-beta-v2325.js'];
+const uiAuditFiles=['mobile-bootstrap.js','mobile-v12.js','mobile-updates-v181.js','mobile-patch-manager-v240.js','mobile-release-v240.js'];
 for(const file of uiAuditFiles){
   const s=await readFile(path.join(dist,file),'utf8');
   if(/WEB\s*[0-9]+\.[0-9]+/i.test(s)) throw new Error('2.4.12.2: referência Web visível em '+file);
@@ -138,3 +138,5 @@ console.log('TAREFAS Android 2.4.12.2 build 299 — Android-only identity valida
 // updates constants trigger.
 
 // final 2.4.12.2 trigger.
+
+// remove unavailable beta module from audit.
