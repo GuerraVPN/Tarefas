@@ -1,0 +1,58 @@
+name: Android 2.4.12 Beta — pré-release da 2.5 (rebuild 2)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [app/android-v2412-beta-prep]
+    paths:
+      - 'app/android/TarefasBiometricPlugin.java'
+      - 'app/release-v249.txt'
+      - 'patches/TAREFAS-2.4.8.7.tpatch'
+      - 'scripts/build-mobile-v2486.mjs'
+      - 'scripts/build-mobile-v249.mjs'
+      - 'scripts/verify-mobile-v2486.mjs'
+      - 'scripts/verify-mobile-v249.mjs'
+      - 'scripts/release-mobile-v249.sh'
+      - '.github/workflows/android-v2412-beta.yml'
+
+concurrency:
+  group: android-v2412-beta
+  cancel-in-progress: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: app/android-v2412-beta-prep
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Compilar, validar, assinar e publicar 2.4.12 Beta
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          chmod +x scripts/release-mobile-v249.sh
+          scripts/release-mobile-v249.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tarefas-android-2.4.9-beta-build-297
+          path: |
+            TAREFAS-2.4.12.apk
+            TAREFAS-2.4.12.apk.sha256
+            TAREFAS-2.4.12-beta-build-297.zip
+            TAREFAS-2.4.12-beta-build-297.zip.sha256
+            app/release-v249.txt
+            dist/BETA_2_4_12.json
+          if-no-files-found: error
