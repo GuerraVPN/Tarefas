@@ -1,4 +1,4 @@
-name: Android 2.4.12 Beta — pré-release da 2.5 (rebuild 2)
+name: Android 2.4.12 Beta — Beta 2.4.9 + patch 2.4.9.11
 
 on:
   workflow_dispatch:
@@ -7,10 +7,13 @@ on:
     paths:
       - 'app/android/TarefasBiometricPlugin.java'
       - 'app/release-v249.txt'
-      - 'patches/TAREFAS-2.4.8.7.tpatch\n      - 'patches/TAREFAS-2.4.9.11.tpatch''
+      - 'patches/TAREFAS-2.4.8.7.tpatch'
+      - 'patches/TAREFAS-2.4.9.11.tpatch'
       - 'scripts/build-mobile-v2486.mjs'
+      - 'scripts/build-mobile-v249.mjs'
       - 'scripts/build-mobile-v2412.mjs'
       - 'scripts/verify-mobile-v2486.mjs'
+      - 'scripts/verify-mobile-v249.mjs'
       - 'scripts/verify-mobile-v2412.mjs'
       - 'scripts/release-mobile-v2412.sh'
       - '.github/workflows/android-v2412-beta.yml'
