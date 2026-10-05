@@ -57,6 +57,6 @@ jobs:
             TAREFAS-2.4.13-beta-build-300.zip
             TAREFAS-2.4.13-beta-build-300.zip.sha256
             app/release-v249.txt
-            dist/BETA_2_4_12_2.json
+            dist/BETA_2_4_13.json
           if-no-files-found: error
 
