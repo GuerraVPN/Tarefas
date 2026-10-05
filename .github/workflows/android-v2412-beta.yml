@@ -7,12 +7,12 @@ on:
     paths:
       - 'app/android/TarefasBiometricPlugin.java'
       - 'app/release-v249.txt'
-      - 'patches/TAREFAS-2.4.8.7.tpatch'
+      - 'patches/TAREFAS-2.4.8.7.tpatch\n      - 'patches/TAREFAS-2.4.9.11.tpatch''
       - 'scripts/build-mobile-v2486.mjs'
-      - 'scripts/build-mobile-v249.mjs'
+      - 'scripts/build-mobile-v2412.mjs'
       - 'scripts/verify-mobile-v2486.mjs'
-      - 'scripts/verify-mobile-v249.mjs'
-      - 'scripts/release-mobile-v249.sh'
+      - 'scripts/verify-mobile-v2412.mjs'
+      - 'scripts/release-mobile-v2412.sh'
       - '.github/workflows/android-v2412-beta.yml'
 
 concurrency:
@@ -43,11 +43,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          chmod +x scripts/release-mobile-v249.sh
-          scripts/release-mobile-v249.sh
+          chmod +x scripts/release-mobile-v2412.sh
+          scripts/release-mobile-v2412.sh
       - uses: actions/upload-artifact@v4
         with:
-          name: tarefas-android-2.4.9-beta-build-297
+          name: tarefas-android-2.4.12-beta-build-297
           path: |
             TAREFAS-2.4.12.apk
             TAREFAS-2.4.12.apk.sha256
