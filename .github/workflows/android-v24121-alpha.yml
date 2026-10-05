@@ -1,0 +1,61 @@
+name: Android 2.4.12.1 Alpha — Android independente da Web
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [app/android-v24121-alpha-prep]
+    paths:
+      - 'app/android/TarefasBiometricPlugin.java'
+      - 'app/release-v249.txt'
+      - 'patches/TAREFAS-2.4.8.7.tpatch'
+      - 'patches/TAREFAS-2.4.9.11.tpatch'
+      - 'scripts/build-mobile-v2486.mjs'
+      - 'scripts/build-mobile-v249.mjs'
+      - 'scripts/build-mobile-v24121.mjs'
+      - 'scripts/verify-mobile-v2486.mjs'
+      - 'scripts/verify-mobile-v249.mjs'
+      - 'scripts/verify-mobile-v24121.mjs'
+      - 'scripts/release-mobile-v24121.sh'
+      - '.github/workflows/android-v24121-alpha.yml'
+
+concurrency:
+  group: android-v24121-alpha
+  cancel-in-progress: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: app/android-v24121-alpha-prep
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Compilar, validar, assinar e publicar 2.4.12.1 Alpha
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          chmod +x scripts/release-mobile-v24121.sh
+          scripts/release-mobile-v24121.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tarefas-android-2.4.12.1-alpha-build-298
+          path: |
+            TAREFAS-2.4.12.1.apk
+            TAREFAS-2.4.12.1.apk.sha256
+            TAREFAS-2.4.12.1-alpha-build-298.zip
+            TAREFAS-2.4.12.1-alpha-build-298.zip.sha256
+            app/release-v249.txt
+            dist/ALPHA_2_4_12_1.json
+          if-no-files-found: error
