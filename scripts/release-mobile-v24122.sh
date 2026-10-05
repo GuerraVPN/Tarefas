@@ -62,7 +62,7 @@ test -s app/google-services.json
 
 npx cap add android
 cp app/google-services.json android/app/google-services.json
-sed -i 's/versionCode 1/versionCode 297/' android/app/build.gradle
+sed -i 's/versionCode 1/versionCode 299/' android/app/build.gradle
 sed -i 's/versionName "1.0"/versionName "2.4.12.2"/' android/app/build.gradle
 
 npm run assets:android
@@ -146,7 +146,7 @@ python3 - <<'PY'
 import json
 with open('android/app/build/outputs/apk/release/output-metadata.json',encoding='utf-8') as f:
     e=json.load(f)['elements'][0]
-assert int(e['versionCode']) == 297, e
+assert int(e['versionCode']) == 299, e
 assert str(e['versionName']) == '2.4.12.2', e
 PY
 
