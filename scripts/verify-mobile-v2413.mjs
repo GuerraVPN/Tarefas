@@ -28,3 +28,5 @@ must(!updates.includes('v.web_version'),'histórico ainda renderiza web_version'
 must(updates.includes('BETA'),'badge/canal Beta ausente');
 
 console.log('VERIFY 2.4.13 BETA OK: promoção limpa da 2.4.12.2.');
+
+// final Beta verifier trigger.
