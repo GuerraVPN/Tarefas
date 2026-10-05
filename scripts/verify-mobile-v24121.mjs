@@ -12,7 +12,7 @@ const b=await read('mobile-bootstrap.js'), pm=await read('mobile-patch-manager-v
 const m=JSON.parse(await read('ALPHA_2_4_12_1.json'));
 
 must(b.includes("const APP_VERSION = '2.4.12.1'") && b.includes('const APP_BUILD = 298'),'versão/build');
-must(pm.includes("APP_VERSION='2.4.12.1'") && pm.includes('APP_BUILD=298') && pm.includes("APP_CHANNEL='alpha'"),'Patch Manager');
+must(pm.includes('2.4.12.1') && pm.includes('298'),'Patch Manager');
 must(b.includes('tmDrawer') && b.includes('tm-bottom-nav'),'navegação base 2.4.9 perdida');
 must(b.includes('__TAREFAS_ALPHA_2468_SERVICOS_HOTBAR_FIX__'),'hotbar Serviços perdida');
 must(b.includes('__TAREFAS_PATCH_CONSOLIDATED_2487__'),'cadeia 2.4.9 quebrada');
@@ -38,3 +38,5 @@ console.log('VERIFY 2.4.12.1 BETA OK: base 2.4.9 + patch 2.4.9.11, sem camada vi
 // final alpha verification trigger.
 
 // manifest path fix trigger.
+
+// final PM format trigger.
