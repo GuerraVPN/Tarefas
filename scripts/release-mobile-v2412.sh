@@ -49,10 +49,10 @@ node scripts/build-mobile-v245.mjs
 node scripts/build-mobile-v246.mjs
 node scripts/build-mobile-v2477.mjs
 node scripts/build-mobile-v2486.mjs
-node scripts/build-mobile-v2412.mjs
 git fetch origin app/releases
 mkdir -p patches
 git show origin/app/releases:patches/TAREFAS-2.4.9.11.tpatch > patches/TAREFAS-2.4.9.11.tpatch
+node scripts/build-mobile-v2412.mjs
 node scripts/verify-mobile-v2412.mjs dist
 
 curl --fail --silent --show-error --retry 3 \
