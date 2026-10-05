@@ -84,6 +84,9 @@ for(const file of ['mobile-bootstrap.js','mobile-v12.js','mobile-updates-v181.js
     return s
       .replace(/const WEB_VERSION\s*=\s*'[^']*';/g,"const WEB_VERSION='';")
       .replace(/const text='[^']*•\s*WEB[^']*';/g,"const text='"+VERSION+"';")
+      .replace("const APP_VERSION = '2.4.9';","const APP_VERSION = '"+VERSION+"';")
+      .replace('const APP_BUILD = 293;','const APP_BUILD = '+BUILD+';')
+      .replace("const APP_CHANNEL = 'beta';","const APP_CHANNEL = 'alpha';")
       .replace(/const wanted=effectiveVersion\s*\+\s*' • WEB '\s*\+\s*web;/g,'const wanted=effectiveVersion;')
       .replace(/const wanted=effectiveVersion\s*\+\s*" • WEB "\s*\+\s*web;/g,'const wanted=effectiveVersion;')
       .replace(/const channel=v\.channel==='beta'\?'BETA':'OFICIAL'/g,"const channel=v.channel==='alpha'?'ALPHA':v.channel==='beta'?'BETA':'OFICIAL'")
@@ -120,3 +123,5 @@ console.log('TAREFAS Android 2.4.12.2 build 299 — Android-only identity valida
 // validation fix trigger.
 
 // pm validation trigger.
+
+// updates constants trigger.
