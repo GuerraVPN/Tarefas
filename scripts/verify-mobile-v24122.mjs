@@ -47,7 +47,8 @@ const updates=await read('mobile-updates-v181.js');
 must(updates.includes("const APP_VERSION = '2.4.12.2';"),'versão do centro de atualizações');
 must(updates.includes('const APP_BUILD = 299;'),'build do centro de atualizações');
 must(updates.includes("const APP_CHANNEL = 'alpha';"),'canal do centro de atualizações');
-must(updates.includes("latestBadge=latest?.channel==='alpha'?'ALPHA'"),'badge Alpha do centro de atualizações');
+must(updates.includes("latestBadge=latest?.channel==='alpha'?'ALPHA'"),'badge Alpha da versão mais recente');
+must(updates.includes("APP_CHANNEL==='alpha'?'ALPHA':APP_CHANNEL==='beta'?'BETA':'OFICIAL'"),'badge Alpha da versão instalada');
 must(updates.includes("const channel=v.channel==='alpha'?'ALPHA'"),'histórico reconhece Alpha');
 must(!updates.includes('v.web_version'), 'histórico ainda exibe web_version');
 
@@ -64,3 +65,5 @@ console.log('VERIFY 2.4.12.2 ALPHA OK: Android sem identificação Web na interf
 // remove redundant about copy assertion.
 
 // final verifier trigger.
+
+// alpha badge verifier trigger.
