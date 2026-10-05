@@ -12,7 +12,7 @@ const b=await read('mobile-bootstrap.js'), pm=await read('mobile-patch-manager-v
 const m=JSON.parse(await read('BETA_2_4_12.json'));
 
 must(b.includes("const APP_VERSION = '2.4.12.1'") && b.includes('const APP_BUILD = 298'),'versão/build');
-must(pm.includes("APP_VERSION='2.4.12.1'") && pm.includes('APP_BUILD=298') && pm.includes("APP_CHANNEL='beta'"),'Patch Manager');
+must(pm.includes("APP_VERSION='2.4.12.1'") && pm.includes('APP_BUILD=298') && pm.includes("APP_CHANNEL='alpha'"),'Patch Manager');
 must(b.includes('tmDrawer') && b.includes('tm-bottom-nav'),'navegação base 2.4.9 perdida');
 must(b.includes('__TAREFAS_ALPHA_2468_SERVICOS_HOTBAR_FIX__'),'hotbar Serviços perdida');
 must(b.includes('__TAREFAS_PATCH_CONSOLIDATED_2487__'),'cadeia 2.4.9 quebrada');
