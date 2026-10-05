@@ -100,7 +100,7 @@ for(const file of ['mobile-bootstrap.js','mobile-v12.js','mobile-updates-v181.js
       .replace(/const channel=v\.channel==='beta'\?'BETA':'OFICIAL'/g,"const channel=v.channel==='alpha'?'ALPHA':v.channel==='beta'?'BETA':'OFICIAL'")
       .replace(/latestBadge=latest\?\.channel==='beta'\?'BETA':'OFICIAL'/g,"latestBadge=latest?.channel==='alpha'?'ALPHA':latest?.channel==='beta'?'BETA':'OFICIAL'")
       .replaceAll("APP_CHANNEL==='beta'?'BETA':'OFICIAL'","APP_CHANNEL==='alpha'?'ALPHA':APP_CHANNEL==='beta'?'BETA':'OFICIAL'")
-      .replace(/\\s*•\\s*\\$\\{esc\\(v\\.web_version\\|\\|''\\)\\}/g,'')
+      .replace(/<small>Build\s*\$\{esc\(v\.build\)\}[^<]*<\/small>/g,'<small>Build \${esc(v.build)}</small>')
       .replace(/latest\.channel==='beta'\?'beta':''/g,"latest.channel==='alpha'?'alpha':latest.channel==='beta'?'beta':''");
   });
 }
@@ -172,3 +172,5 @@ console.log('TAREFAS Android 2.4.12.2 build 299 — Android-only identity valida
 // final build after syntax repair.
 
 // correct regex escaping in build transform.
+
+// final history small replacement.
