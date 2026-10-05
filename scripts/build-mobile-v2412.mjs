@@ -36,7 +36,7 @@ await patch('mobile-bootstrap.js',source=>{
 });
 
 // Promove somente os identificadores da versão/build; não injeta nenhuma correção de layout da 2.4.11.
-for(const file of ['mobile-bootstrap.js','mobile-patch-manager-v240.js','mobile-release-v240.js','mobile-v12.js','package.json','v7_5_1_about.js']){
+for(const file of ['mobile-bootstrap.js','mobile-login-v17.js','index.html','mobile-patch-manager-v240.js','mobile-release-v240.js','mobile-v12.js','package.json','v7_5_1_about.js']){
   await patch(file,s=>s
     .replaceAll('2.4.9.7',VERSION)
     .replaceAll('2.4.9',VERSION)
