@@ -28,6 +28,8 @@ node --check scripts/build-mobile-v2477.mjs
 node --check scripts/build-mobile-v2486.mjs
 node --check scripts/verify-mobile-v246.mjs
 node --check scripts/verify-mobile-v2486.mjs
+node --check scripts/build-mobile-v2413.mjs
+node --check scripts/verify-mobile-v2413.mjs
 node scripts/verify-web.mjs .
 
 # Recria a cadeia até a base validada 2.4.3, aplica 2.4.5 e então a camada Beta 2.4.6 pré-release.
@@ -268,7 +270,7 @@ git config user.name 'GuerraVPN Android Build'
 git config user.email '81371258+GuerraVPN@users.noreply.github.com'
 git add downloads/TAREFAS-2.4.13*
 if ! git diff --cached --quiet; then
-  git commit -m 'release(android): TAREFAS 2.4.13 alpha build 300'
+  git commit -m 'release(android): TAREFAS 2.4.13 beta build 300'
   git push origin HEAD:app/releases
 fi
 cd "$GITHUB_WORKSPACE"
@@ -294,7 +296,7 @@ jq -n \
   --argjson build "$BUILD" \
   --arg channel 'beta' \
   --arg web_version "$WEB_VERSION" \
-  --arg title 'TAREFAS 2.4.13 Alpha — identidade do Android corrigida' \
+  --arg title 'TAREFAS 2.4.13 Beta' \
   --arg url "$URL" \
   --arg sha "$SHA" \
   '{
@@ -304,13 +306,9 @@ jq -n \
     web_version:$web_version,
     title:$title,
     changelog:[
-      "📱 Cabeçalho e identificação do aplicativo passam a exibir somente a versão Android.",
-      "ℹ️ About remove Base web e mantém apenas versão, build e pacote Android.",
-      "🔄 Centro de atualizações passa a usar corretamente Alpha 2.4.13 / build 300.",
-      "🧩 Mantida a base funcional 2.4.9 + patch 2.4.9.11.",
-      "🛡️ Mantidas Escalas, Fornecimento, Guias, Distribuição e layout de Desrelacionamento/Baixa.",
-      "🩹 Patch Manager .tpatch v1 e validação SHA-256 preservados.",
-      "🚫 Cartão Próximo Serviço continua removido."
+      "📱 Android independente da Web — removida a dependência visual da versão/base Web nas informações do aplicativo.",
+      "🧹 Interface limpa — removidas referências à Web no cabeçalho e nas informações do aplicativo.",
+      "🛡️ Base 2.4.12.2 preservada — mantendo a estabilidade, navegação, módulos e funcionalidades já validadas."
     ],
     mandatory:false,
     download_url:$url,
