@@ -171,7 +171,7 @@ assert "__TAREFAS_ALPHA_2467_ESCALAS_2433__" not in boot
 for marker in ["__TAREFAS_ALPHA_2481_DISTRIBUICAO_FISCAL_FIX__","__TAREFAS_ALPHA_2482_GUIDES_READY_FIX__","__TAREFAS_ALPHA_2483_FORNECIMENTO__","__TAREFAS_ALPHA_2484_PEDIDO_LAYOUT_FIX__","__TAREFAS_ALPHA_2485_BIOMETRIC_SINGLE_PROMPT__"]:
     assert marker in boot, marker
 assert "const APP_VERSION = '2.4.12.2';" in boot and "const APP_BUILD = 299;" in boot
-assert "dashboard.html?app=2.4.12.2" in boot and "dashboard.html?app=2.4.12" in login
+assert "dashboard.html?app=2.4.12.2" in boot and "dashboard.html?app=2.4.12.2" in login
 assert "mobile-dashboard-v184.js" not in html and "mobile-dashboard-v185.js" not in html
 assert "kNextService" not in dash and "Próximo Serviço" not in dash and "Próximo serviço" not in dash
 java=Path('app/android/TarefasBiometricPlugin.java').read_text()
@@ -253,7 +253,7 @@ cp supabase/migrations/20260924133000_fix_v5_4_2_mover_distribuicao_motivo_ambig
 cp app/android/TarefasLauncherIconPlugin.java "$RUNNER_TEMP/package/app/"
 true
 cp scripts/build-mobile-v246.mjs scripts/build-mobile-v2477.mjs scripts/build-mobile-v2486.mjs scripts/build-mobile-v249.mjs scripts/build-mobile-v24122.mjs scripts/verify-mobile-v2486.mjs scripts/verify-mobile-v249.mjs scripts/verify-mobile-v24122.mjs "$RUNNER_TEMP/package/scripts/"
-cp dist/ALPHA_2_4_12_1.json "$RUNNER_TEMP/package/manifest/"
+cp dist/ALPHA_2_4_12_2.json "$RUNNER_TEMP/package/manifest/"
 (cd "$RUNNER_TEMP/package" && zip -qr "$GITHUB_WORKSPACE/$ZIP" .)
 unzip -tq "$ZIP"
 sha256sum "$ZIP" | tee "$ZIP.sha256"
@@ -330,3 +330,5 @@ test "$CODE" = '200'
 jq -e '.ok == true and .version == "2.4.12.2" and .build == 299 and .channel == "alpha"' "$RUNNER_TEMP/result.json" >/dev/null
 
 # catalog metadata fix trigger.
+
+# final metadata/path validation trigger.
