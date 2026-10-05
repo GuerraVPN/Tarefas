@@ -93,3 +93,5 @@ if(!pm.includes("APP_VERSION='2.4.12'") || !pm.includes('APP_BUILD=297') || !pm.
   throw new Error('2.4.12: Patch Manager não promovido.');
 }
 console.log('TAREFAS Android 2.4.12.1 build 298 — Alpha 2.4.9 + patch 2.4.9.11 OK.');
+
+// Alpha 2.4.12.1 build trigger.
