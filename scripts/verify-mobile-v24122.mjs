@@ -73,3 +73,5 @@ console.log('VERIFY 2.4.12.2 ALPHA OK: Android sem identificação Web na interf
 // final guard verification.
 
 // final verifier relaxed to runtime guard.
+
+// final alpha build trigger.
