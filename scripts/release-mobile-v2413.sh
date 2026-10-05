@@ -255,7 +255,7 @@ cp supabase/migrations/20260924133000_fix_v5_4_2_mover_distribuicao_motivo_ambig
 cp app/android/TarefasLauncherIconPlugin.java "$RUNNER_TEMP/package/app/"
 true
 cp scripts/build-mobile-v246.mjs scripts/build-mobile-v2477.mjs scripts/build-mobile-v2486.mjs scripts/build-mobile-v249.mjs scripts/build-mobile-v2413.mjs scripts/verify-mobile-v2486.mjs scripts/verify-mobile-v249.mjs scripts/verify-mobile-v2413.mjs "$RUNNER_TEMP/package/scripts/"
-cp dist/ALPHA_2_4_12_2.json "$RUNNER_TEMP/package/manifest/"
+cp dist/BETA_2_4_13.json "$RUNNER_TEMP/package/manifest/"
 (cd "$RUNNER_TEMP/package" && zip -qr "$GITHUB_WORKSPACE/$ZIP" .)
 unzip -tq "$ZIP"
 sha256sum "$ZIP" | tee "$ZIP.sha256"
@@ -330,3 +330,5 @@ jq -e '.ok == true and .version == "2.4.13" and .build == 300 and .channel == "b
 # catalog metadata fix trigger.
 
 # final metadata/path validation trigger.
+
+# final Beta manifest path.
