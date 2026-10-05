@@ -97,8 +97,8 @@ for(const file of ['mobile-bootstrap.js','mobile-v12.js','mobile-updates-v181.js
   });
 }
 await patch('mobile-bootstrap.js',s=>s
-  .replace('<article><small>Base web</small><strong>\${WEB_VERSION}</strong></article>\\n        ','')
-  .replace('<small>\${APP_VERSION} • WEB \${WEB_VERSION}</small>','<small>\${APP_VERSION}</small>')
+  .replace(/\s*<article>\s*<small>Base web<\/small>\s*<strong>\$\{WEB_VERSION\}<\/strong>\s*<\/article>/gi,'')
+  .replace(/<small>\$\{APP_VERSION\}\s*•\s*WEB\s*\$\{WEB_VERSION\}<\/small>/g,'<small>\${APP_VERSION}</small>')
   .replace('<p>Aplicativo móvel do sistema TAREFAS.</p>','<p>Aplicativo Android do sistema TAREFAS.</p>')
 );
 
@@ -142,3 +142,5 @@ console.log('TAREFAS Android 2.4.12.2 build 299 — Android-only identity valida
 // remove unavailable beta module from audit.
 
 // final trigger after runtime audit fix.
+
+// regex Base web removal fix.
