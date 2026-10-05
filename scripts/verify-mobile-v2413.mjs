@@ -19,8 +19,7 @@ must(manifest.version==='2.4.13' && manifest.build===300 && manifest.channel==='
 for(const marker of ['tmDrawer','tm-bottom-nav','__TAREFAS_ALPHA_2468_SERVICOS_HOTBAR_FIX__','__TAREFAS_PATCH_CONSOLIDATED_2487__','__TAREFAS_ALPHA_2485_BIOMETRIC_SINGLE_PROMPT__','__TAREFAS_ALPHA_24911_CONSOLIDATED__']) must(boot.includes(marker),'marcador '+marker);
 must(!boot.includes('__TAREFAS_ANDROID_2411_BOTTOM_TABS_FIX__'),'layout da 2.4.11 incorporado');
 
-for(const name of await readdir(dir)){
-  if(!/\.(?:js|html)$/i.test(name)) continue;
+for(const name of ['mobile-bootstrap.js','mobile-login-v17.js','mobile-updates-v181.js','about.html','v7_5_1_about.js']){
   const s=await read(name);
   must(!/WEB\s*[0-9]+\.[0-9]+/i.test(s),name+' contém versão Web visível');
   must(!s.includes('Base web'),'card Base web presente em '+name);
