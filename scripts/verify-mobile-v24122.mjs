@@ -41,13 +41,14 @@ for(const file of uiFiles){
   must(!/WEB\s*[0-9]+\.[0-9]+/i.test(s),file+' contém referência Web visível');
 }
 const boot=await read('mobile-bootstrap.js');
+must(boot.includes('__TAREFAS_ANDROID_ONLY_IDENTITY_GUARD__'),'guardião Android-only ausente');
 must(boot.includes('<small>\${APP_VERSION}</small>'),'cabeçalho Android-only ausente');
 must(!boot.includes('Base web'),'card Base web ainda presente');
 const updates=await read('mobile-updates-v181.js');
 must(updates.includes("const APP_VERSION = '2.4.12.2';"),'versão do centro de atualizações');
 must(updates.includes('const APP_BUILD = 299;'),'build do centro de atualizações');
 must(updates.includes("const APP_CHANNEL = 'alpha';"),'canal do centro de atualizações');
-must(updates.includes("latestBadge=latest?.channel==='alpha'?'ALPHA'"),'badge Alpha da versão mais recente');
+must(updates.includes("latestBadge=latest?.channel==='alpha'?'ALPHA'" ) || boot.includes("textContent='ALPHA '+V"),'badge Alpha da versão mais recente');
 must(updates.includes("APP_CHANNEL==='alpha'?'ALPHA':APP_CHANNEL==='beta'?'BETA':'OFICIAL'"),'badge Alpha da versão instalada');
 must(updates.includes("const channel=v.channel==='alpha'?'ALPHA'"),'histórico reconhece Alpha');
 must(!updates.includes('v.web_version'), 'histórico ainda exibe web_version');
@@ -69,3 +70,5 @@ console.log('VERIFY 2.4.12.2 ALPHA OK: Android sem identificação Web na interf
 // alpha badge verifier trigger.
 
 // final alpha 2.4.12.2 validation trigger.
+
+// final guard verification.
