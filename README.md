@@ -70,3 +70,4 @@ As Releases incluem um arquivo **.sha256** junto do APK para permitir a conferê
 ---
 
 Projeto TAREFAS — 26º Pel PE Mec.
+
