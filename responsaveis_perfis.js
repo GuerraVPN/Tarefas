@@ -92,18 +92,33 @@
       .select('tarefa_id,usuario_id,perfil_id,atribuido_por,atribuido_por_perfil_id,atribuido_em').in('tarefa_id',ids);
     if(rv.error)throw rv.error;
     const pids=[...new Set((rv.data||[]).map(v=>v.perfil_id).filter(v=>v!=null).map(String))];
+    // As consultas de perfis e usuários são independentes e podem ocorrer em paralelo.
+    // Antes eram sequenciais, acrescentando uma ida à API inteira ao tempo de hidratação.
+    const uidsDiretos=[...new Set((rv.data||[]).map(v=>String(v.usuario_id??'')).filter(Boolean))];
     let profiles=new Map();
-    if(pids.length){
-      const rp=await client.from('usuario_perfis').select('id,usuario_id,secao,posicao,principal,ativo').in('id',pids);
-      if(rp.error)throw rp.error;
-      profiles=new Map((rp.data||[]).map(p=>[String(p.id),p]));
-    }
-    const uids=[...new Set((rv.data||[]).map(v=>String(profiles.get(String(v.perfil_id))?.usuario_id??v.usuario_id??'')).filter(Boolean))];
     let users=new Map();
-    if(uids.length){
-      const ru=await client.from('usuarios').select('id,nome_guerra,patente').in('id',uids);
-      if(ru.error)throw ru.error;
-      users=new Map((ru.data||[]).map(u=>[String(u.id),u]));
+    const [rpResult,ruDiretoResult]=await Promise.all([
+      pids.length
+        ? client.from('usuario_perfis').select('id,usuario_id,secao,posicao,principal,ativo').in('id',pids)
+        : Promise.resolve({data:[],error:null}),
+      uidsDiretos.length
+        ? client.from('usuarios').select('id,nome_guerra,patente').in('id',uidsDiretos)
+        : Promise.resolve({data:[],error:null})
+    ]);
+    if(rpResult.error)throw rpResult.error;
+    if(ruDiretoResult.error)throw ruDiretoResult.error;
+    profiles=new Map((rpResult.data||[]).map(p=>[String(p.id),p]));
+
+    const uidsComPerfil=[...new Set((rpResult.data||[]).map(p=>String(p.usuario_id??'')).filter(Boolean))];
+    const uidsFaltantes=uidsComPerfil.filter(id=>!users.has(id));
+    // Quando o vínculo usa perfil, buscamos também o usuário apontado pelo perfil.
+    if(uidsFaltantes.length){
+      const ruPerfil=await client.from('usuarios').select('id,nome_guerra,patente').in('id',uidsFaltantes);
+      if(ruPerfil.error)throw ruPerfil.error;
+      const dados=[...(ruDiretoResult.data||[]),...(ruPerfil.data||[])];
+      users=new Map(dados.map(u=>[String(u.id),u]));
+    }else{
+      users=new Map((ruDiretoResult.data||[]).map(u=>[String(u.id),u]));
     }
     const byTask=new Map();
     (rv.data||[]).forEach(v=>{
