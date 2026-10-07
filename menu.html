@@ -1994,8 +1994,11 @@
                 const { data, error } = await consulta;
                 if (error) throw error;
                 todasAsTarefas = data || [];
-                await hidratarResponsaveisFase2(todasAsTarefas);
                 renderizarQuadroKanban();
+                const tarefasCarregadas = todasAsTarefas;
+                hidratarResponsaveisFase2(tarefasCarregadas).then(() => {
+                    if (todasAsTarefas === tarefasCarregadas) renderizarQuadroKanban();
+                }).catch(err => console.warn('Hidratação de responsáveis:', err?.message || err));
                 const tarefaDireta = new URLSearchParams(location.search).get('tarefa');
                 if (tarefaDireta && !tarefaUrlAbertaV6 && encontrarTarefa(tarefaDireta)) {
                     tarefaUrlAbertaV6 = true;
