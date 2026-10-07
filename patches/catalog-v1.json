@@ -3,8 +3,8 @@
   "app": "TAREFAS",
   "baseVersion": "2.4.1",
   "baseBuild": 276,
-  "generatedAt": "2026-10-07T14:06:00Z",
-  "latestPatch": "2.4.13.1",
+  "generatedAt": "2026-10-07T14:13:00Z",
+  "latestPatch": "2.4.13.2",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -1201,7 +1201,39 @@
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.13.1.tpatch",
       "sha256": "223ee8b7d48d26ff52f9cdedd58e1267869962f859d45168ec78b194899f75f2",
       "payloadSha256": "ef99bf2d4a71e8b749e23f3df5270cbb597b35f4548508bd684bd4bb0462a959",
-      "installable": true
+      "installable": false,
+      "supersededBy": "2.4.13.2"
+    },
+    {
+      "format": "tarefas-tpatch-v1",
+      "id": "2.4.13.2",
+      "name": "TAREFAS 2.4.13.2 — Calendário com lembretes independentes",
+      "patchVersion": 1,
+      "createdAt": "2026-10-07T14:13:00Z",
+      "baseVersion": "2.4.13",
+      "minBuild": 300,
+      "maxBuild": 300,
+      "channel": "beta",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [
+        "2.4.13.1"
+      ],
+      "description": "Adiciona ao Calendário do app os novos lembretes independentes de tarefas, mantendo a correção de recorrências da 2.4.13.1.",
+      "changelog": [
+        "Adiciona lembretes diretamente ao dia selecionado no Calendário.",
+        "Cada lembrete tem título, horário opcional e descrição opcional.",
+        "Permite editar e excluir lembretes sem criar ou alterar tarefas.",
+        "Mostra os lembretes no painel do dia e também dentro das células do mês.",
+        "Os lembretes ficam separados das tarefas e vinculados ao usuário local do app.",
+        "Substitui integralmente a 2.4.13.1 na base 2.4.13/build 300."
+      ],
+      "order": 24132,
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.13.2.tpatch",
+      "sha256": "80978fd67457ef86a6eb82251bdc6b3373f6f46d96f3e88952e6bd1b89e16aab",
+      "payloadSha256": "37e7f20b989ac4e3c5bf62ee3f2cee0430fbde4f37148fab901f5763fb0896d7",
+      "installable": true,
+      "publishedAt": "2026-10-07T14:13:00Z"
     }
   ],
   "history": [
