@@ -1971,20 +1971,8 @@
         atualizarPerfilNaTela();
 
         async function carregarPerfilUsuarioDoBanco() {
-            let base = { ...usuarioLogado };
-            try {
-                const { data, error } = await supabaseClient
-                    .from('usuarios')
-                    .select('*')
-                    .eq('id', usuarioLogado.id)
-                    .limit(1);
-
-                if (error) throw error;
-                if (Array.isArray(data) && data[0]) base = { ...usuarioLogado, ...data[0] };
-            } catch (err) {
-                console.warn('Não foi possível atualizar os dados do usuário pelo banco:', err.message);
-            }
-
+            // Performance: reutiliza os dados da sessão; Perfis26 já resolve o perfil ativo.
+            const base = { ...usuarioLogado };
             try {
                 const estado = window.Perfis26
                     ? await Perfis26.carregar(supabaseClient, base)
@@ -1999,7 +1987,6 @@
             }
             atualizarPerfilNaTela();
         }
-
         function normalizarIdentidade(valor) {
             return String(valor || '').trim().replace(/\s+/g, ' ').toLocaleLowerCase('pt-BR');
         }
