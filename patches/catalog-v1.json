@@ -3,8 +3,8 @@
   "app": "TAREFAS",
   "baseVersion": "2.4.1",
   "baseBuild": 276,
-  "generatedAt": "2026-09-28T22:31:25.864Z",
-  "latestPatch": "2.4.9.8",
+  "generatedAt": "2026-10-07T14:06:00Z",
+  "latestPatch": "2.4.13.1",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -1175,6 +1175,33 @@
         "Não altera lógica, banco, permissões, Escalas, biometria ou outros módulos."
       ],
       "order": 24911
+    },
+    {
+      "format": "tarefas-tpatch-v1",
+      "id": "2.4.13.1",
+      "name": "TAREFAS 2.4.13.1 — Proteção contra chamadas simultâneas de recorrência",
+      "patchVersion": 1,
+      "createdAt": "2026-10-07T14:06:00Z",
+      "baseVersion": "2.4.13",
+      "minBuild": 300,
+      "maxBuild": 300,
+      "channel": "beta",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [],
+      "description": "Patch de teste da Beta 2.4.13 para evitar chamadas simultâneas à rotina de processamento de recorrências enquanto validamos a correção do banco.",
+      "changelog": [
+        "Protege o RPC processar_recorrencias_v4 contra chamadas simultâneas no mesmo WebView.",
+        "Chamadas concorrentes compartilham a mesma execução em andamento, evitando processamento duplicado.",
+        "A primeira execução continua sendo enviada normalmente ao Supabase; o patch não bloqueia a geração de recorrências.",
+        "Mantém o restante do comportamento do aplicativo sem alterar tarefas, calendário ou permissões.",
+        "Compatível com a Beta 2.4.13 / build 300."
+      ],
+      "order": 24131,
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.13.1.tpatch",
+      "sha256": "eb69d2130fe186907baba71148569d1f50fd21edc94817917721c70277fbc2b8",
+      "payloadSha256": "98ea42717b453122f2b6eaaf3d530f2a7d4ae149c3c6e758c153fd047ccc872f",
+      "installable": true
     }
   ],
   "history": [
