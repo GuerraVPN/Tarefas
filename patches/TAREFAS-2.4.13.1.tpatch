@@ -24,5 +24,5 @@
     "js": "(()=>{'use strict';const MARK='__TAREFAS_24131_PATCH__';if(globalThis[MARK])return;globalThis[MARK]=true;function install(){const sb=globalThis.supabaseClient;if(!sb||typeof sb.rpc!=='function'||sb.__tarefas24131RpcGuard)return;if(sb.__tarefas24131RpcGuard)return;const original=sb.rpc.bind(sb);let inFlight=null;sb.rpc=function(fn,args,opts){if(String(fn)==='processar_recorrencias_v4'){if(inFlight)return inFlight;inFlight=original(fn,args,opts).finally(()=>{setTimeout(()=>{inFlight=null},1000)});return inFlight}return original(fn,args,opts)};try{Object.defineProperty(sb,'__tarefas24131RpcGuard',{value:true,configurable:false,enumerable:false})}catch(_){sb.__tarefas24131RpcGuard=true}}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();globalThis.TarefasPatch24131=Object.freeze({version:'2.4.13.1',base:'2.4.13',recurrenceRpcGuard:true})})();",
     "css": ""
   },
-  "payloadSha256": "98ea42717b453122f2b6eaaf3d530f2a7d4ae149c3c6e758c153fd047ccc872f"
+  "payloadSha256": "ef99bf2d4a71e8b749e23f3df5270cbb597b35f4548508bd684bd4bb0462a959"
 }
