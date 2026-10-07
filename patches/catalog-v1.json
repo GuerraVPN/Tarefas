@@ -1219,8 +1219,9 @@
       "replaces": [
         "2.4.13.1"
       ],
-      "description": "Adiciona ao Calendário do app os novos lembretes independentes de tarefas, mantendo a correção de recorrências da 2.4.13.1.",
+      "description": "Adiciona ao Calendário do app os novos lembretes independentes de tarefas e mantém a proteção contra chamadas simultâneas de recorrência da 2.4.13.1.",
       "changelog": [
+        "Protege o RPC processar_recorrencias_v4 contra chamadas simultâneas no mesmo WebView.",
         "Adiciona lembretes diretamente ao dia selecionado no Calendário.",
         "Cada lembrete tem título, horário opcional e descrição opcional.",
         "Permite editar e excluir lembretes sem criar ou alterar tarefas.",
@@ -1230,8 +1231,8 @@
       ],
       "order": 24132,
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.13.2.tpatch",
-      "sha256": "80978fd67457ef86a6eb82251bdc6b3373f6f46d96f3e88952e6bd1b89e16aab",
-      "payloadSha256": "37e7f20b989ac4e3c5bf62ee3f2cee0430fbde4f37148fab901f5763fb0896d7",
+      "sha256": "ef62d7766410e7929c639eb81ebd940e27f10d22f50bbb84ec8bca7503999274",
+      "payloadSha256": "ca564256a8c4e8dc871fa48db11823e9a026ddfabae3ab9621574ac2b333b90b",
       "installable": true,
       "publishedAt": "2026-10-07T14:13:00Z"
     }
