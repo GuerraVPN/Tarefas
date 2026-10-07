@@ -1199,8 +1199,8 @@
       ],
       "order": 24131,
       "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.13.1.tpatch",
-      "sha256": "eb69d2130fe186907baba71148569d1f50fd21edc94817917721c70277fbc2b8",
-      "payloadSha256": "98ea42717b453122f2b6eaaf3d530f2a7d4ae149c3c6e758c153fd047ccc872f",
+      "sha256": "223ee8b7d48d26ff52f9cdedd58e1267869962f859d45168ec78b194899f75f2",
+      "payloadSha256": "ef99bf2d4a71e8b749e23f3df5270cbb597b35f4548508bd684bd4bb0462a959",
       "installable": true
     }
   ],
