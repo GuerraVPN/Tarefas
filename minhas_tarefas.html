@@ -2099,10 +2099,16 @@
                 todasAsTarefas = [...tarefasPorId.values()]
                     .sort((a, b) => Number(a.id) - Number(b.id));
 
-                await hidratarResponsaveisFase2(todasAsTarefas);
-
+                // A lista principal não fica bloqueada pela hidratação dos responsáveis.
                 renderizarQuadroKanban();
                 atualizarResumoPessoal();
+                const tarefasCarregadas = todasAsTarefas;
+                hidratarResponsaveisFase2(tarefasCarregadas).then(() => {
+                    if (todasAsTarefas === tarefasCarregadas) {
+                        renderizarQuadroKanban();
+                        atualizarResumoPessoal();
+                    }
+                }).catch(err => console.warn('Hidratação de responsáveis:', err?.message || err));
                 const tarefaDireta = new URLSearchParams(location.search).get('tarefa');
                 if (tarefaDireta && !tarefaUrlAbertaV6 && encontrarTarefa(tarefaDireta)) {
                     tarefaUrlAbertaV6 = true;
