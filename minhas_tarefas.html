@@ -2054,12 +2054,14 @@
                 consultaCriadas = usuarioPerfilAtual?.perfil_id
                     ? consultaCriadas.eq('criado_por_perfil_id', usuarioPerfilAtual.perfil_id)
                     : consultaCriadas.eq('criado_por', usuarioLogado.id);
-                const criadas = await consultaCriadas;
+                const [criadas, idsAtribuidas] = await Promise.all([
+                    consultaCriadas,
+                    buscarIdsTarefasAtribuidasFase2(usuarioLogado.id, usuarioPerfilAtual?.perfil_id)
+                ]);
                 if (criadas.error) throw criadas.error;
                 adicionar(criadas.data);
 
                 // Tarefas atribuídas exatamente ao PERFIL ativo.
-                const idsAtribuidas = await buscarIdsTarefasAtribuidasFase2(usuarioLogado.id, usuarioPerfilAtual?.perfil_id);
 
                 if (idsAtribuidas !== null) {
                     if (idsAtribuidas.length) {
