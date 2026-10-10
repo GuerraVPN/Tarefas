@@ -35,7 +35,7 @@ for(const file of ['mobile-bootstrap.js','mobile-login-v17.js','index.html','mob
 
 await rm(path.join(dist,'ALPHA_2_4_12_2.json'),{force:true});
 await rm(path.join(dist,'ALPHA_2_4_12_1.json'),{force:true});
-await writeFile(path.join(dist,'BETA_2_4_13.json'),JSON.stringify({
+await writeFile(path.join(dist,'BETA_2_4_14.json'),JSON.stringify({
   version:VERSION,
   build:BUILD,
   channel:'beta',
