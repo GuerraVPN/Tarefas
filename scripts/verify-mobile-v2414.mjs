@@ -4,12 +4,12 @@ import path from 'node:path';
 const root=process.cwd(), dir=path.resolve(process.argv[2]||'dist'), read=f=>readFile(path.join(dir,f),'utf8');
 const must=(x,m)=>{if(!x)throw new Error('2.4.14 verify: '+m)};
 
-for(const f of ['mobile-calendar-reminders-v2414.js','calendario.html','mobile-bootstrap.js','mobile-login-v17.js','mobile-patch-manager-v240.js','mobile-updates-v181.js','dashboard.html','dashboard.js','about.html','BETA_2_4_13.json']) await access(path.join(dir,f));
+for(const f of ['mobile-calendar-reminders-v2414.js','calendario.html','mobile-bootstrap.js','mobile-login-v17.js','mobile-patch-manager-v240.js','mobile-updates-v181.js','dashboard.html','dashboard.js','about.html','BETA_2_4_14.json']) await access(path.join(dir,f));
 
 const boot=await read('mobile-bootstrap.js');
 const updates=await read('mobile-updates-v181.js');
 const pm=await read('mobile-patch-manager-v240.js');
-const manifest=JSON.parse(await read('BETA_2_4_13.json'));
+const manifest=JSON.parse(await read('BETA_2_4_14.json'));
 
 must(boot.includes("const APP_VERSION = '2.4.14';") && boot.includes('const APP_BUILD = 301;'),'versão/build');
 must(updates.includes("const APP_VERSION = '2.4.14';") && updates.includes('const APP_BUILD = 301;') && updates.includes("const APP_CHANNEL = 'beta';"),'centro de atualizações');
