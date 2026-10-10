@@ -7,7 +7,7 @@ for(const f of ['mobile-calendar-reminders-v2415.js','calendario.html','mobile-b
 const boot=await read('mobile-bootstrap.js'),updates=await read('mobile-updates-v181.js'),pm=await read('mobile-patch-manager-v240.js');
 const manifest=JSON.parse(await read('BETA_2_4_15.json')),reminders=await read('mobile-calendar-reminders-v2415.js'),calendar=await read('calendario.html');
 must(boot.includes("const APP_VERSION = '2.4.15';")&&boot.includes('const APP_BUILD = 302;'),'versão/build no bootstrap');
-must(updates.includes("const APP_VERSION = '2.4.15';")&&updates.includes('const APP_BUILD = 302;')&&updates.includes("const APP_CHANNEL = 'beta';'),'centro de atualizações');
+must(updates.includes("const APP_VERSION = '2.4.15';")&&updates.includes('const APP_BUILD = 302;')&&updates.includes("const APP_CHANNEL = 'beta';"),'centro de atualizações');
 must(pm.includes('2.4.15')&&pm.includes('302'),'Patch Manager');
 must(manifest.version==='2.4.15'&&manifest.build===302&&manifest.channel==='beta'&&manifest.base==='2.4.14'&&manifest.features.menuEscalaServicoRemoved===true,'manifesto da Beta');
 must(boot.includes('__TAREFAS_2415_HIDE_ESCALA_SERVICO__')&&boot.includes("title==='escala de serviço'"),'remoção apenas da entrada Escala de serviço no menu Android');
