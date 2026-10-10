@@ -1,0 +1,32 @@
+# TAREFAS 2.4.15 — Beta de correção do menu Android
+
+## Objetivo
+Beta para corrigir a navegação do aplicativo Android sem alterar a versão Web nem remover dados ou funcionalidades do banco.
+
+## Identificação
+- Versão do app: **2.4.15**.
+- Build Android: **302**.
+- Canal: **Beta**.
+- Base funcional: Beta 2.4.14 (build 301), com as correções de calendário e recorrências preservadas.
+
+## Correção principal
+- **Menu Android:** remove a entrada redundante **Escala de serviço**.
+- Mantém na seção Serviços e Pessoal as entradas **Escalas**, **Férias e dispensas** e **Usuários**.
+- A mudança atua somente na navegação visível do aplicativo. Não exclui registros, tabelas, escalas ou rotas do sistema.
+
+## Recursos preservados
+- **Calendário:** lembretes independentes por data, com edição e exclusão sem criar tarefas.
+- **Tarefas recorrentes:** proteção contra chamadas simultâneas de `processar_recorrencias_v4`.
+- **Integridade:** SHA-256 recalculado sobre `UTF-8(JSON.stringify({js, css}))`.
+- **Patch Manager:** mantido no canal Beta.
+- Sem o cartão **Próximo Serviço** e sem exibir versão/base Web na identificação do Android.
+
+## Testes obrigatórios
+1. Instalar o APK e confirmar versão 2.4.15 / build 302 / canal Beta.
+2. Abrir o menu e confirmar que “Escala de serviço” não aparece.
+3. Confirmar que “Escalas”, “Férias e dispensas” e “Usuários” continuam visíveis e abrem normalmente.
+4. Criar uma tarefa recorrente e confirmar que o app continua respondendo.
+5. Criar, editar e excluir um lembrete no Calendário.
+6. Confirmar Patch Manager, SHA-256 e ausência do cartão “Próximo Serviço”.
+
+Esta é uma Beta para testes; não é uma Release oficial.
