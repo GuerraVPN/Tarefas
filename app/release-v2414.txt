@@ -1,0 +1,27 @@
+# TAREFAS 2.4.14-prerelease — Beta de validação da Release 2.5 💪🏻
+
+## Objetivo
+Build Beta de validação antes da Release 2.5. Esta versão consolida a base Android 2.4.13 e incorpora as correções cumulativas de calendário e recorrência.
+
+## Identificação
+- Versão do app: **2.4.14**.
+- Build Android: **301**.
+- Canal: **Beta / prerelease**.
+- Base: linha Android 2.4.13, mantendo o Patch Manager e a assinatura oficial.
+
+## Correções e melhorias
+- **Calendário:** adicionar lembretes independentes diretamente à data selecionada, com título, horário e observação opcionais.
+- **Lembretes:** editar e excluir sem criar ou alterar tarefas; exibir no painel do dia e nas células do mês.
+- **Tarefas recorrentes:** proteger a chamada `processar_recorrencias_v4` contra chamadas simultâneas no mesmo WebView, evitando travamentos por concorrência.
+- **Integridade:** recalcular SHA-256 do payload usando exatamente `SHA256(UTF-8(JSON.stringify({js, css})) )`.
+- **Interface:** manter o Patch Manager e o canal Beta; não reintroduzir o cartão **Próximo Serviço** nem exibir versão Web na identificação do app.
+
+## Testes obrigatórios
+1. Instalar o APK e confirmar versão 2.4.14 / build 301 / canal Beta.
+2. Abrir Quadro e Minhas Tarefas e verificar carregamento.
+3. Criar uma tarefa recorrente e confirmar que o app continua respondendo.
+4. Criar, editar e excluir um lembrete no Calendário; confirmar que não vira tarefa.
+5. Fechar completamente e reabrir o app; confirmar que os lembretes persistem.
+6. Confirmar que o Patch Manager calcula e valida SHA-256 e que não aparece o cartão **Próximo Serviço**.
+
+Esta é uma prerelease para testes. Só deve ser promovida à Release 2.5 depois de validar o APK instalado e os fluxos acima.
