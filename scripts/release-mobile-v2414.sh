@@ -255,8 +255,9 @@ cp patches/TAREFAS-2.4.8.7.tpatch patches/TAREFAS-2.4.9.11.tpatch "$RUNNER_TEMP/
 cp supabase/migrations/20260924143000_fix_v5_4_2_mover_distribuicao_motivo_ambiguous.sql "$RUNNER_TEMP/package/supabase/"
 cp app/android/TarefasLauncherIconPlugin.java "$RUNNER_TEMP/package/app/"
 true
-cp scripts/build-mobile-v246.mjs scripts/build-mobile-v2477.mjs scripts/build-mobile-v2486.mjs scripts/build-mobile-v2414.mjs scripts/build-mobile-v2414.mjs scripts/verify-mobile-v2486.mjs scripts/verify-mobile-v2414.mjs scripts/verify-mobile-v2414.mjs "$RUNNER_TEMP/package/scripts/"
-cp dist/BETA_2_4_13.json "$RUNNER_TEMP/package/manifest/"
+cp scripts/build-mobile-v246.mjs scripts/build-mobile-v2477.mjs scripts/build-mobile-v2486.mjs scripts/build-mobile-v2414.mjs scripts/verify-mobile-v2486.mjs scripts/verify-mobile-v2414.mjs "$RUNNER_TEMP/package/scripts/"
+cp dist/BETA_2_4_14.json "$RUNNER_TEMP/package/manifest/"
+cp patches/TAREFAS-2.4.14.1.tpatch "$RUNNER_TEMP/package/patches/"
 (cd "$RUNNER_TEMP/package" && zip -qr "$GITHUB_WORKSPACE/$ZIP" .)
 unzip -tq "$ZIP"
 sha256sum "$ZIP" | tee "$ZIP.sha256"
@@ -297,7 +298,7 @@ jq -n \
   --argjson build "$BUILD" \
   --arg channel 'beta' \
   --arg web_version "$WEB_VERSION" \
-  --arg title 'TAREFAS 2.4.14-prerelease Beta' \
+  --arg title 'TAREFAS 2.4.14-prerelease Beta — Calendário e recorrências' \
   --arg url "$URL" \
   --arg sha "$SHA" \
   '{
@@ -307,9 +308,10 @@ jq -n \
     web_version:$web_version,
     title:$title,
     changelog:[
-      "📱 Android independente da Web — removida a dependência visual da versão/base Web nas informações do aplicativo.",
-      "🧹 Interface limpa — removidas referências à Web no cabeçalho e nas informações do aplicativo.",
-      "🛡️ Base 2.4.12.2 preservada — mantendo a estabilidade, navegação, módulos e funcionalidades já validadas."
+      "🔔 Calendário: lembretes independentes por data, com edição e exclusão sem criar tarefas.",
+      "🛡️ Recorrências: proteção contra chamadas simultâneas de processar_recorrencias_v4.",
+      "🔐 Integridade: SHA-256 do payload recalculado com JSON.stringify({js, css}).",
+      "🩹 Patch Manager preservado; canal Beta; sem cartão Próximo Serviço."
     ],
     mandatory:false,
     download_url:$url,
