@@ -1,0 +1,56 @@
+name: Android 2.4.15 Beta — build 302
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [app/android-v2414-beta-prep]
+    paths:
+      - 'app/android/TarefasBiometricPlugin.java'
+      - 'app/release-v2415.txt'
+      - 'patches/TAREFAS-2.4.13.2.tpatch'
+      - 'scripts/build-mobile-v2415.mjs'
+      - 'scripts/verify-mobile-v2415.mjs'
+      - 'scripts/release-mobile-v2415.sh'
+      - '.github/workflows/android-v2415-beta.yml'
+
+concurrency:
+  group: android-v2415-beta-build-302
+  cancel-in-progress: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: app/android-v2414-beta-prep
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Compilar, validar, assinar e publicar 2.4.15 Beta
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          chmod +x scripts/release-mobile-v2415.sh
+          scripts/release-mobile-v2415.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tarefas-android-2.4.15-beta-build-302
+          path: |
+            TAREFAS-2.4.15-prerelease.apk
+            TAREFAS-2.4.15-prerelease.apk.sha256
+            TAREFAS-2.4.15-prerelease-beta-build-302.zip
+            TAREFAS-2.4.15-prerelease-beta-build-302.zip.sha256
+            app/release-v2415.txt
+            dist/BETA_2_4_15.json
+          if-no-files-found: error
