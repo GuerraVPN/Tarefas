@@ -281,7 +281,7 @@ if ! git diff --cached --quiet; then
 fi
 cd "$GITHUB_WORKSPACE"
 
-URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.4.14-prerelease.apk'
+URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.4.14.apk'
 LOCAL_SHA="$(sha256sum "$APK" | awk '{print $1}')"
 for attempt in 1 2 3 4 5 6 7 8; do
   if curl --fail --silent --show-error -L "$URL" -o "$RUNNER_TEMP/published.apk" \
