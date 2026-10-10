@@ -266,6 +266,11 @@ RELEASES_DIR="$RUNNER_TEMP/tarefas-releases-v248"
 git worktree add "$RELEASES_DIR" origin/app/releases
 mkdir -p "$RELEASES_DIR/downloads"
 cp "$APK" "$APK.sha256" "$ZIP" "$ZIP.sha256" "$RELEASES_DIR/downloads/"
+# O catálogo android-release-publish exige o nome canônico TAREFAS-<version>.apk.
+CATALOG_APK="$GITHUB_WORKSPACE/TAREFAS-2.4.14.apk"
+cp "$APK" "$CATALOG_APK"
+sha256sum "$CATALOG_APK" > "$CATALOG_APK.sha256"
+cp "$CATALOG_APK" "$CATALOG_APK.sha256" "$RELEASES_DIR/downloads/"
 cd "$RELEASES_DIR"
 git config user.name 'GuerraVPN Android Build'
 git config user.email '81371258+GuerraVPN@users.noreply.github.com'
