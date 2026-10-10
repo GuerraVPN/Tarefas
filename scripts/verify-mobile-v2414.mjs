@@ -10,6 +10,8 @@ const boot=await read('mobile-bootstrap.js');
 const updates=await read('mobile-updates-v181.js');
 const pm=await read('mobile-patch-manager-v240.js');
 const manifest=JSON.parse(await read('BETA_2_4_14.json'));
+const reminders=await read('mobile-calendar-reminders-v2414.js');
+const calendar=await read('calendario.html');
 
 must(boot.includes("const APP_VERSION = '2.4.14';") && boot.includes('const APP_BUILD = 301;'),'versão/build');
 must(updates.includes("const APP_VERSION = '2.4.14';") && updates.includes('const APP_BUILD = 301;') && updates.includes("const APP_CHANNEL = 'beta';"),'centro de atualizações');
