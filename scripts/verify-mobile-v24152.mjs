@@ -6,7 +6,7 @@ const must=(x,m)=>{if(!x)throw new Error('2.4.15.2 verify: '+m)};
 for(const f of ['mobile-calendar-reminders-v2415.js','calendario.html','mobile-bootstrap.js','mobile-login-v17.js','mobile-patch-manager-v240.js','mobile-updates-v181.js','native-mobile.js','dashboard.html','dashboard.js','about.html','BETA_2_4_15_2.json'])await access(path.join(dir,f));
 const boot=await read('mobile-bootstrap.js'),updates=await read('mobile-updates-v181.js'),pm=await read('mobile-patch-manager-v240.js'),native=await read('native-mobile.js'),manifest=JSON.parse(await read('BETA_2_4_15_2.json')),reminders=await read('mobile-calendar-reminders-v2415.js'),calendar=await read('calendario.html');
 must(boot.includes("const APP_VERSION = '2.4.15.2';")&&boot.includes('const APP_BUILD = 303;'),'bootstrap version/build');
-must(updates.includes("const APP_VERSION = '2.4.15.2';")&&updates.includes('const APP_BUILD = 303;')&&updates.includes("const APP_CHANNEL = 'beta';'),'update center version/build/channel');
+must(updates.includes("const APP_VERSION = '2.4.15.2';")&&updates.includes('const APP_BUILD = 303;')&&updates.includes("const APP_CHANNEL = 'beta';"),'update center version/build/channel');
 must(pm.includes('2.4.15.2')&&pm.includes('303'),'Patch Manager version/build');
 must(manifest.version==='2.4.15.2'&&manifest.build===303&&manifest.channel==='beta'&&manifest.base==='2.4.15','manifest metadata');
 must(manifest.features.installedVersionFromCapacitor===true&&manifest.features.versionSyncAfterStartup===true&&manifest.features.versionSyncAfterPushRegistration===true&&manifest.features.versionSyncOnForeground===true,'version sync triggers');
