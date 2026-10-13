@@ -3,8 +3,8 @@
   "app": "TAREFAS",
   "baseVersion": "2.4.1",
   "baseBuild": 276,
-  "generatedAt": "2026-10-07T14:13:00Z",
-  "latestPatch": "2.4.13.2",
+  "generatedAt": "2026-10-13T00:00:00Z",
+  "latestPatch": "2.4.15.1",
   "replacementPolicy": "latest-cumulative-replaces-older-same-base",
   "patches": [
     {
@@ -1235,6 +1235,34 @@
       "payloadSha256": "ca564256a8c4e8dc871fa48db11823e9a026ddfabae3ab9621574ac2b333b90b",
       "installable": true,
       "publishedAt": "2026-10-07T14:13:00Z"
+    },
+    {
+      "format": "tarefas-tpatch-v1",
+      "id": "2.4.15.1",
+      "name": "TAREFAS 2.4.15.1 — Sincronização segura da versão instalada",
+      "patchVersion": 1,
+      "createdAt": "2026-10-13T00:00:00Z",
+      "baseVersion": "2.4.15",
+      "minBuild": 302,
+      "maxBuild": 302,
+      "channel": "beta",
+      "cumulative": true,
+      "replacementMode": "replace-older-same-base",
+      "replaces": [],
+      "description": "Tenta sincronizar a versão Android real com o Supabase usando o plugin nativo App.getInfo, apenas quando o aplicativo confirma ser 2.4.15. A sincronização é validada pelo RPC existente; não confia na versão fixa legada 1.8.0.",
+      "changelog": [
+        "Tenta ler a versão real do APK pelo plugin nativo App.getInfo.",
+        "Sincroniza 2.4.15 com o Supabase apenas quando a versão retornada é exatamente 2.4.15.",
+        "Usa o RPC v2_4_1_1_sync_app_version, que valida sessão e versão publicada.",
+        "Não usa o valor legado fixo 1.8.0 como prova da versão instalada.",
+        "A correção no Supabase impede novos avisos automáticos para versões desconhecidas."
+      ],
+      "order": 24151,
+      "url": "https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/patches/TAREFAS-2.4.15.1.tpatch",
+      "sha256": "fdd1aa1161d92b3dbca890e5132ca546cf70ad8bb4ac2a8b53485cbbc62a3391",
+      "payloadSha256": "e92fa1f434e6a95f7c542574bb4479b966d1e1df43dbe9a3605045a573523361",
+      "installable": true,
+      "publishedAt": "2026-10-13T00:00:00Z"
     }
   ],
   "history": [
