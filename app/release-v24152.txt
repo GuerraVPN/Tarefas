@@ -1,0 +1,16 @@
+# TAREFAS 2.4.15.2 — Beta de correção da sincronização de versão
+
+## Identificação
+- Versão Android: **2.4.15.2**
+- Build: **303**
+- Canal: **Beta**
+- Base funcional: Beta 2.4.15 (build 302)
+
+## Correções
+- **Versão real instalada:** consulta `App.getInfo()` do Capacitor, em vez de confiar em uma versão antiga codificada no registro de push.
+- **Sincronização:** atualiza Supabase após inicialização, sessão de push, registro do token e retorno ao primeiro plano.
+- **Notificações de atualização:** sincroniza a versão usada pela regra de desatualização e limpa lembretes pendentes da versão sincronizada.
+- Preserva Patch Manager, Calendário/lembretes e proteção de tarefas recorrentes; sem o cartão **Próximo Serviço**.
+
+## Testes no aparelho
+Confirme Sobre = 2.4.15.2/build 303, a versão do dispositivo no Supabase e ausência de novo aviso para atualizar para 2.4.15.
