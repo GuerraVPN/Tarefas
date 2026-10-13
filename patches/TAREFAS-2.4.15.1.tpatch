@@ -1,0 +1,29 @@
+{
+  "format": "tarefas-tpatch-v1",
+  "id": "2.4.15.1",
+  "name": "TAREFAS 2.4.15.1 — Sincronização segura da versão instalada",
+  "patchVersion": 1,
+  "createdAt": "2026-10-13T00:00:00Z",
+  "baseVersion": "2.4.15",
+  "minBuild": 302,
+  "maxBuild": 302,
+  "channel": "beta",
+  "cumulative": true,
+  "replacementMode": "replace-older-same-base",
+  "replaces": [],
+  "description": "Tenta sincronizar a versão Android real com o Supabase usando o plugin nativo App.getInfo, apenas quando o aplicativo confirma ser 2.4.15. A sincronização é validada pelo RPC existente; não confia na versão fixa legada 1.8.0.",
+  "changelog": [
+    "Tenta ler a versão real do APK pelo plugin nativo App.getInfo.",
+    "Sincroniza 2.4.15 com o Supabase apenas quando a versão retornada é exatamente 2.4.15.",
+    "Usa o RPC v2_4_1_1_sync_app_version, que valida sessão e versão publicada.",
+    "Não usa o valor legado fixo 1.8.0 como prova da versão instalada.",
+    "A correção no Supabase impede novos avisos automáticos para versões desconhecidas."
+  ],
+  "order": 24151,
+  "payload": {
+    "js": "(()=>{'use strict';\nconst MARK='__TAREFAS_24151_APP_VERSION_SYNC__';\nif(globalThis[MARK])return;\nglobalThis[MARK]=true;\nlet running=false;\nasync function syncInstalledVersion(){\n  if(running||!window.TarefasNative?.isNative)return false;\n  running=true;\n  try{\n    const appPlugin=window.Capacitor?.Plugins?.App;\n    if(!appPlugin||typeof appPlugin.getInfo!=='function')return false;\n    const info=await appPlugin.getInfo();\n    const version=String(info?.version||'').trim();\n    if(version!=='2.4.15')return false;\n    const sessionToken=String(localStorage.getItem('tarefasPushSession17')||'').trim();\n    const client=window.supabaseClient;\n    if(sessionToken.length<32||!client||typeof client.rpc!=='function')return false;\n    const {data,error}=await client.rpc('v2_4_1_1_sync_app_version',{p_session_token:sessionToken,p_app_version:version});\n    if(error){console.warn('[TAREFAS 2.4.15.1] Não foi possível sincronizar a versão instalada:',error.message||error);return false;}\n    if(data===true){window.dispatchEvent(new CustomEvent('tarefas:app-version-synced',{detail:{version}}));return true;}\n    return false;\n  }catch(err){console.warn('[TAREFAS 2.4.15.1] Sincronização de versão indisponível:',err?.message||err);return false;}\n  finally{running=false}\n}\nfunction schedule(){syncInstalledVersion().catch(()=>{});}\nif(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule,{once:true});else schedule();\nwindow.addEventListener('focus',schedule);window.addEventListener('pageshow',schedule);\ndocument.addEventListener('visibilitychange',()=>{if(!document.hidden)schedule()});\nglobalThis.TarefasAppVersionSync24151=Object.freeze({version:'2.4.15.1',run:syncInstalledVersion});\n})();",
+    "css": ""
+  },
+  "payloadSha256": "e92fa1f434e6a95f7c542574bb4479b966d1e1df43dbe9a3605045a573523361",
+  "publishedAt": "2026-10-13T00:00:00Z"
+}
