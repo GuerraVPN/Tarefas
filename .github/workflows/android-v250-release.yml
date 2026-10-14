@@ -1,6 +1,6 @@
 name: Android 2.5 Release Oficial — build 305
 on:
-    push:
+  push:
     branches: [app/android-v250-prep]
     paths:
       - '.v25-release-trigger'
