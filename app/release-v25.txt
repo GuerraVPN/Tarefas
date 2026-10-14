@@ -1,0 +1,19 @@
+# TAREFAS Android 2.5 — Release Oficial
+
+## Identificação
+- Versão Android: **2.5**
+- Build: **304**
+- Canal: **Release / Oficial**
+- Base funcional: **2.4.15.2**
+
+## Novidades e correções
+- **Versão do aplicativo:** sincronização pela versão real instalada no Android, sem mostrar rótulos ou números da Web na identidade do app.
+- **Menu Escalas:** mantém **Escalas**, **Férias e Dispensas** e **Usuários**; remove a entrada redundante **Escala de Serviço**.
+- **Calendário:** lembretes independentes por data, com edição e exclusão.
+- **Tarefas recorrentes:** proteção para evitar processamento concorrente que possa bloquear o carregamento.
+- **Atualizações:** preserva a Central de Atualizações e o Patch Manager, com verificação de integridade SHA-256.
+- **Interface:** removido o cartão **Próximo Serviço**.
+- **Estabilidade:** consolida as correções validadas da linha 2.4.15 até a pré-release 2.4.15.2.
+
+## Verificação
+O lançamento só será considerado concluído depois que o workflow compilar, validar, assinar e conferir o SHA-256 do APK, e confirmar a publicação no canal oficial.
