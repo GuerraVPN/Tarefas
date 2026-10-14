@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-VERSION='2.5'
-BUILD='304'
+VERSION='2.5.0'
+BUILD='305'
 WEB_VERSION='7.9.7'
 APK="TAREFAS-${VERSION}-official-build-${BUILD}.apk"
 ZIP="TAREFAS-${VERSION}-official-build-${BUILD}.zip"
@@ -67,8 +67,8 @@ test -s app/google-services.json
 
 npx cap add android
 cp app/google-services.json android/app/google-services.json
-sed -i 's/versionCode 1/versionCode 304/' android/app/build.gradle
-sed -i 's/versionName "1.0"/versionName "2.5"/' android/app/build.gradle
+sed -i 's/versionCode 1/versionCode 305/' android/app/build.gradle
+sed -i 's/versionName "1.0"/versionName "2.5.0"/' android/app/build.gradle
 
 npm run assets:android
 npx cap sync android
@@ -151,8 +151,8 @@ python3 - <<'PY'
 import json
 with open('android/app/build/outputs/apk/release/output-metadata.json',encoding='utf-8') as f:
     e=json.load(f)['elements'][0]
-assert int(e['versionCode']) == 304, e
-assert str(e['versionName']) == '2.5', e
+assert int(e['versionCode']) == 305, e
+assert str(e['versionName']) == '2.5.0', e
 PY
 
 unzip -p "$UNSIGNED" assets/public/mobile-bootstrap.js > "$RUNNER_TEMP/bootstrap-v249.js"
@@ -177,9 +177,9 @@ assert "__TAREFAS_ALPHA_2468_SERVICOS_HOTBAR_FIX__" in boot
 assert "__TAREFAS_ALPHA_2467_ESCALAS_2433__" not in boot
 for marker in ["__TAREFAS_ALPHA_2481_DISTRIBUICAO_FISCAL_FIX__","__TAREFAS_ALPHA_2482_GUIDES_READY_FIX__","__TAREFAS_ALPHA_2483_FORNECIMENTO__","__TAREFAS_ALPHA_2484_PEDIDO_LAYOUT_FIX__","__TAREFAS_ALPHA_2485_BIOMETRIC_SINGLE_PROMPT__"]:
     assert marker in boot, marker
-assert "const APP_VERSION = '2.5';" in boot and "const APP_BUILD = 304;" in boot
+assert "const APP_VERSION = '2.5.0';" in boot and "const APP_BUILD = 305;" in boot
 assert "v2_4_1_1_sync_app_version" in native and "__TAREFAS_ANDROID_VERSION_SYNC__" in native and "2.5" in native
-assert "dashboard.html?app=2.5" in boot and "dashboard.html?app=2.5" in login
+assert "dashboard.html?app=2.5.0" in boot and "dashboard.html?app=2.5.0" in login
 assert "mobile-dashboard-v184.js" not in html and "mobile-dashboard-v185.js" not in html
 assert "kNextService" not in dash and "Próximo Serviço" not in dash and "Próximo serviço" not in dash
 java=Path('app/android/TarefasBiometricPlugin.java').read_text()
@@ -260,7 +260,7 @@ cp patches/TAREFAS-2.4.8.7.tpatch patches/TAREFAS-2.4.9.11.tpatch "$RUNNER_TEMP/
 cp app/android/TarefasLauncherIconPlugin.java "$RUNNER_TEMP/package/app/"
 true
 cp scripts/build-mobile-v246.mjs scripts/build-mobile-v2477.mjs scripts/build-mobile-v2486.mjs scripts/build-mobile-v2415.mjs scripts/build-mobile-v25.mjs scripts/verify-mobile-v2486.mjs scripts/verify-mobile-v2415.mjs scripts/verify-mobile-v25.mjs "$RUNNER_TEMP/package/scripts/"
-cp dist/RELEASE_2_5.json "$RUNNER_TEMP/package/manifest/"
+cp dist/RELEASE_2_5_0.json "$RUNNER_TEMP/package/manifest/"
 cp patches/TAREFAS-2.4.15.1.tpatch "$RUNNER_TEMP/package/patches/"
 (cd "$RUNNER_TEMP/package" && zip -qr "$GITHUB_WORKSPACE/$ZIP" .)
 unzip -tq "$ZIP"
@@ -272,21 +272,21 @@ git worktree add "$RELEASES_DIR" origin/app/releases
 mkdir -p "$RELEASES_DIR/downloads"
 cp "$APK" "$APK.sha256" "$ZIP" "$ZIP.sha256" "$RELEASES_DIR/downloads/"
 # O catálogo android-release-publish exige o nome canônico TAREFAS-<version>.apk.
-CATALOG_APK="$GITHUB_WORKSPACE/TAREFAS-2.5.apk"
+CATALOG_APK="$GITHUB_WORKSPACE/TAREFAS-2.5.0.apk"
 cp "$APK" "$CATALOG_APK"
 sha256sum "$CATALOG_APK" > "$CATALOG_APK.sha256"
 cp "$CATALOG_APK" "$CATALOG_APK.sha256" "$RELEASES_DIR/downloads/"
 cd "$RELEASES_DIR"
 git config user.name 'GuerraVPN Android Build'
 git config user.email '81371258+GuerraVPN@users.noreply.github.com'
-git add downloads/TAREFAS-2.5*
+git add downloads/TAREFAS-2.5.0*
 if ! git diff --cached --quiet; then
-  git commit -m 'release(android): TAREFAS 2.5 beta build 304'
+  git commit -m 'release(android): TAREFAS 2.5 official build 305'
   git push origin HEAD:app/releases
 fi
 cd "$GITHUB_WORKSPACE"
 
-URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.5.apk'
+URL='https://raw.githubusercontent.com/GuerraVPN/Tarefas/app/releases/downloads/TAREFAS-2.5.0.apk'
 LOCAL_SHA="$(sha256sum "$APK" | awk '{print $1}')"
 for attempt in 1 2 3 4 5 6 7 8; do
   if curl --fail --silent --show-error -L "$URL" -o "$RUNNER_TEMP/published.apk" \
@@ -340,7 +340,7 @@ CODE="$(curl --silent --show-error \
 
 cat "$RUNNER_TEMP/result.json"
 test "$CODE" = '200'
-jq -e '.ok == true and .version == "2.5" and .build == 304 and .channel == "official"' "$RUNNER_TEMP/result.json" >/dev/null
+jq -e '.ok == true and .version == "2.5.0" and .build == 305 and .channel == "official"' "$RUNNER_TEMP/result.json" >/dev/null
 
 # catalog metadata fix trigger.
 
@@ -348,7 +348,7 @@ jq -e '.ok == true and .version == "2.5" and .build == 304 and .channel == "offi
 
 # final Beta manifest path.
 
-TAG='android-v2.5'
+TAG='android-v2.5.0'
 if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
   gh release upload "$TAG" "$APK" "$APK.sha256" "$ZIP" "$ZIP.sha256" --clobber --repo "$GITHUB_REPOSITORY"
   gh release edit "$TAG" --title 'TAREFAS Android 2.5 — Oficial' --notes-file app/release-v25.txt --latest --repo "$GITHUB_REPOSITORY"
