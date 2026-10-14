@@ -1,18 +1,12 @@
-name: Android 2.5 Release Oficial — build 304
+name: Android 2.5 Release Oficial — build 305
 on:
-  workflow_dispatch:
-  push:
+    push:
     branches: [app/android-v250-prep]
     paths:
-      - 'app/native-mobile-entry.js'
-      - 'app/release-v25.txt'
-      - 'scripts/build-mobile-v25.mjs'
-      - 'scripts/verify-mobile-v25.mjs'
-      - 'scripts/release-mobile-v25.sh'
-      - '.github/workflows/android-v250-release.yml'
+      - '.v25-release-trigger'
 
 concurrency:
-  group: android-v250-release-build-304
+  group: android-v250-release-build-305
   cancel-in-progress: true
 
 jobs:
@@ -43,12 +37,12 @@ jobs:
           scripts/release-mobile-v25.sh
       - uses: actions/upload-artifact@v4
         with:
-          name: tarefas-android-2.5-official-build-304
+          name: tarefas-android-2.5.0-official-build-305
           path: |
-            TAREFAS-2.5-official-build-304.apk
-            TAREFAS-2.5-official-build-304.apk.sha256
-            TAREFAS-2.5-official-build-304.zip
-            TAREFAS-2.5-official-build-304.zip.sha256
+            TAREFAS-2.5.0-official-build-305.apk
+            TAREFAS-2.5.0-official-build-305.apk.sha256
+            TAREFAS-2.5.0-official-build-305.zip
+            TAREFAS-2.5.0-official-build-305.zip.sha256
             app/release-v25.txt
-            dist/RELEASE_2_5.json
+            dist/RELEASE_2_5_0.json
           if-no-files-found: error
