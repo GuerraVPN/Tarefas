@@ -1,0 +1,54 @@
+name: Android 2.5 Oficial — build 304
+on:
+  workflow_dispatch:
+  push:
+    branches: [app/android-v250-official-prep]
+    paths:
+      - 'app/native-mobile-entry.js'
+      - 'app/release-v25.txt'
+      - 'scripts/build-mobile-v25.mjs'
+      - 'scripts/verify-mobile-v25.mjs'
+      - 'scripts/release-mobile-v25.sh'
+      - '.github/workflows/android-v25-official.yml'
+
+concurrency:
+  group: android-v25-official-build-304
+  cancel-in-progress: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: app/android-v250-official-prep
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Compilar, validar, assinar e publicar TAREFAS 2.5
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          chmod +x scripts/release-mobile-v25.sh
+          scripts/release-mobile-v25.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tarefas-android-2.5-official-build-304
+          path: |
+            TAREFAS-2.5-official-build-304.apk
+            TAREFAS-2.5-official-build-304.apk.sha256
+            TAREFAS-2.5-official-build-304.zip
+            TAREFAS-2.5-official-build-304.zip.sha256
+            app/release-v25.txt
+            dist/RELEASE_2_5.json
+          if-no-files-found: error
