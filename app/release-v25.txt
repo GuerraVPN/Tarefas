@@ -1,8 +1,8 @@
 # TAREFAS Android 2.5 — Release Oficial
 
 ## Identificação
-- Versão Android: **2.5**
-- Build: **304**
+- Versão Android: **2.5.0**
+- Build: **305**
 - Canal: **Release / Oficial**
 - Base funcional: **2.4.15.2**
 
